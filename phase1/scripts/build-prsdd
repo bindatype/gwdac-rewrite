@@ -142,6 +142,7 @@ if [[ -n "${cm12_seam_root}" ]]; then
         cm12_kernel
         cm12_solution
         cm12_background_seam
+        cm12_non_cm12_seam
         cm12_request_kernel
         cm12_legacy_context
         cmmwp_seam
@@ -151,7 +152,8 @@ if [[ -n "${cm12_seam_root}" ]]; then
     cp \
         "${source_root}/said/"{prsd,prsd2,pru,pwnam}.f \
         "${cm12_seam_root}/"{cm12_kernel,cm12_solution}.f90 \
-        "${cm12_seam_root}/"{cm12_background_seam,cm12_request_kernel}.f90 \
+        "${cm12_seam_root}/"{cm12_background_seam,cm12_non_cm12_seam}.f90 \
+        "${cm12_seam_root}/cm12_request_kernel.f90" \
         "${cm12_seam_root}/"{cm12_legacy_context,cmmwp_seam}.f90 \
         "${cm12_seam_root}/"{cm12_prda_probs_seam,cm12_prbas_seam}.f90 \
         "${core_root}/"
@@ -172,6 +174,12 @@ if [[ -n "${cm12_seam_root}" ]]; then
         -d "${core_root}" \
         -p1 \
         -i "${cm12_seam_root}/cm12_prsd_pure.patch" \
+        >>"${core_log}" 2>&1
+    patch \
+        --fuzz=0 \
+        -d "${core_root}" \
+        -p1 \
+        -i "${cm12_seam_root}/cm12_prsd_hadronic_trace.patch" \
         >>"${core_log}" 2>&1
 fi
 
@@ -310,6 +318,9 @@ install -m 755 \
     sha256sum "${gplot_patch}"
     sha256sum "${prrdx_patch}"
     sha256sum "${saidopen_patch}"
+    if [[ -n "${cm12_seam_root}" ]]; then
+        sha256sum "${cm12_seam_root}/cm12_prsd_hadronic_trace.patch"
+    fi
     if [[ "${build_variant}" == "cm12-immutable-seam" ]]; then
         sha256sum \
             "${cm12_seam_root}/cm12_kernel.f90" \

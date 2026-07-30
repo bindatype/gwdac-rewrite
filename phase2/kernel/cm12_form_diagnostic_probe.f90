@@ -77,6 +77,7 @@ program cm12_form_diagnostic_probe
     integer :: non_cm12_forms
     integer :: applicable_non_cm12_forms
     integer :: exact_cm12_multipoles
+    integer :: exact_non_cm12_multipoles
     integer :: exact_replayed_deltas
     logical :: applicable
     logical :: multipole_exact
@@ -167,6 +168,7 @@ program cm12_form_diagnostic_probe
     non_cm12_forms = 0
     applicable_non_cm12_forms = 0
     exact_cm12_multipoles = 0
+    exact_non_cm12_multipoles = 0
     exact_replayed_deltas = 0
 
     write(*, '(a)') &
@@ -263,7 +265,16 @@ program cm12_form_diagnostic_probe
                         candidate_amplitudes = next_amplitudes
                         disposition = 'kernel-applied'
                     else
-                        disposition = 'kernel-omitted'
+                        adjusted_multipole = &
+                            background%non_cm12_multipoles( &
+                                family, branch, orbital_l + 1)
+                        multipole_exact = &
+                            adjusted_multipole == legacy_multipole
+                        if (multipole_exact) then
+                            exact_non_cm12_multipoles = &
+                                exact_non_cm12_multipoles + 1
+                        end if
+                        disposition = 'prepared'
                     end if
                 end if
 
@@ -312,6 +323,8 @@ program cm12_form_diagnostic_probe
     write(*, '(a,i0)') &
         'exact_cm12_multipoles=', exact_cm12_multipoles
     write(*, '(a,i0)') &
+        'exact_non_cm12_multipoles=', exact_non_cm12_multipoles
+    write(*, '(a,i0)') &
         'exact_replayed_deltas=', exact_replayed_deltas
     write(*, '(a,l1)') 'initial_exact=', initial_exact
     write(*, '(a,l1)') 'full_amplitudes_exact=', full_amplitudes_exact
@@ -330,7 +343,7 @@ program cm12_form_diagnostic_probe
             aimag(candidate_amplitudes(family)), &
             family=1, amplitude_count)
     write(*, '(a,8(es16.8,1x))') &
-        'current_order_1xx_amplitudes=', &
+        'candidate_request_amplitudes=', &
         (real(current_result%amplitudes_mfm(family), kind=real32), &
             aimag(current_result%amplitudes_mfm(family)), &
             family=1, amplitude_count)
@@ -344,9 +357,9 @@ program cm12_form_diagnostic_probe
         'legacy_order_1xx_dsg_display=', &
         trim(adjustl(candidate_dsg_display))
     write(*, '(a,es16.8)') &
-        'current_order_1xx_dsg=', &
+        'candidate_request_dsg=', &
         current_result%dsg_microbarn_per_sr
     write(*, '(a,a)') &
-        'current_order_1xx_dsg_display=', &
+        'candidate_request_dsg_display=', &
         trim(adjustl(current_dsg_display))
 end program cm12_form_diagnostic_probe

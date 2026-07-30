@@ -91,7 +91,13 @@
 -      SUBROUTINE PROBS
 +      SUBROUTINE PROBS_LEGACY
        COMMON/PRSC/MTRN,IR,MM,JJ,LL,NN,NE,NA,IE,IA,II,NNBT,IT,NPRM
-@@ -2343,9 +2359,10 @@
+@@ -2322,3 +2338,5 @@
+       COMMON/GOMEGA/GOM1,GOM2,GOMS,GPI2,GP1,GP2,IRCT,BCOFF
++      INTEGER CM12DIAG
++      COMMON/CM12DIAG/CM12DIAG
+       COMMON/PRKC/IPRK
+       COMMON/PGLOB/PG(20,4,8),NFG(4,8)
+@@ -2343,9 +2361,10 @@
        ! >MWP 100930.v1
        mjlmp=100*mm+10*jj+ll-1
        !print *,'enter prdlt: ',mjlmp,nf(mm,jj,ll)
@@ -104,7 +110,7 @@
           !goto 98
           goto 199 ! Must do this for 'new' CM solution form 135 MWP 2011.07.29
        endif
-@@ -4969,3 +4986,3 @@
+@@ -4969,3 +4993,3 @@
  C *******************************************************
 -      SUBROUTINE PRDA
 +      SUBROUTINE PRDA_LEGACY

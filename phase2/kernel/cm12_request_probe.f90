@@ -15,6 +15,12 @@ program cm12_request_probe
         400.0_real32, 1000.0_real32, 500.0_real32, 800.0_real32 ]
     real(real32), parameter :: angles(case_count) = [ &
         30.0_real32, 90.0_real32, 120.0_real32, 150.0_real32 ]
+    complex(real32), parameter :: target_amplitudes(4) = [ &
+        cmplx(-10.2181225_real32, -4.52479029_real32, kind=real32), &
+        cmplx(2.77394581_real32, -0.813638806_real32, kind=real32), &
+        cmplx(1.49333465_real32, 15.6418772_real32, kind=real32), &
+        cmplx(2.75762773_real32, 5.33125830_real32, kind=real32) ]
+    real(real32), parameter :: target_dsg = 2.03560233_real32
 
     type(cm12_dataset) :: dataset
     type(cm12_solution) :: solution
@@ -62,7 +68,7 @@ program cm12_request_probe
             solution, dataset, request, background, result, &
             status, message)
         if (status /= cm12_ok) stop 4
-        if (result%evaluated_multipoles /= 34) stop 5
+        if (result%evaluated_multipoles /= 40) stop 5
         if (case_index == 2) first_result = result
         write(*, '(a,a,i0,a,i0,a,i0,a,3(es16.8,a))') &
             'request', achar(9), case_index, achar(9), status, achar(9), &
@@ -71,33 +77,35 @@ program cm12_request_probe
             aimag(result%amplitudes_mfm(1)), achar(9), &
             result%dsg_microbarn_per_sr, ''
     end do
+    if (any(first_result%amplitudes_mfm /= target_amplitudes)) stop 6
+    if (first_result%dsg_microbarn_per_sr /= target_dsg) stop 7
 
     request = cm12_request( &
         reaction=1, photon_lab_energy_mev=400.0_real32, &
         angle_cm_deg=30.0_real32)
     call cm12_prepare_legacy_background( &
         solution, request, background, status, message)
-    if (status /= cm12_ok) stop 6
+    if (status /= cm12_ok) stop 8
     call cm12_evaluate_request( &
         solution, dataset, request, background, result, status, message)
-    if (status /= cm12_ok) stop 7
+    if (status /= cm12_ok) stop 9
     request = cm12_request( &
         reaction=2, photon_lab_energy_mev=1000.0_real32, &
         angle_cm_deg=90.0_real32)
     call cm12_prepare_legacy_background( &
         solution, request, background, status, message)
-    if (status /= cm12_ok) stop 8
+    if (status /= cm12_ok) stop 10
     call cm12_evaluate_request( &
         solution, dataset, request, background, result, status, message)
-    if (status /= cm12_ok) stop 9
+    if (status /= cm12_ok) stop 11
     exact = &
         result%evaluated_multipoles == first_result%evaluated_multipoles .and. &
         all(result%amplitudes_mfm == first_result%amplitudes_mfm) .and. &
         result%dsg_microbarn_per_sr == first_result%dsg_microbarn_per_sr
     write(*, '(a,a,a,a,i0,a,i0,a,a)') &
-        'order', achar(9), 'A-B-A', achar(9), cm12_ok, achar(9), 34, &
+        'order', achar(9), 'A-B-A', achar(9), cm12_ok, achar(9), 40, &
         achar(9), merge('exact    ', 'different', exact)
-    if (.not. exact) stop 10
+    if (.not. exact) stop 12
 
     request%angle_cm_deg = -1.0_real32
     call cm12_evaluate_request( &
@@ -105,7 +113,7 @@ program cm12_request_probe
     write(*, '(a,a,a,a,i0,a,i0,a,a)') &
         'rejection', achar(9), 'invalid-angle', achar(9), status, &
         achar(9), 0, achar(9), trim(message)
-    if (status /= cm12_invalid_argument) stop 11
+    if (status /= cm12_invalid_argument) stop 13
 
     request = cm12_request( &
         reaction=2, photon_lab_energy_mev=100.0_real32, &
@@ -115,5 +123,5 @@ program cm12_request_probe
     write(*, '(a,a,a,a,i0,a,i0,a,a)') &
         'rejection', achar(9), 'below-threshold', achar(9), status, &
         achar(9), result%evaluated_multipoles, achar(9), trim(message)
-    if (status /= cm12_domain_error) stop 12
+    if (status /= cm12_domain_error) stop 14
 end program cm12_request_probe

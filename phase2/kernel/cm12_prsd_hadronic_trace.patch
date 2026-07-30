@@ -1,0 +1,10 @@
+--- a/prsd.f
++++ b/prsd.f
+@@ -2457,2 +2457,7 @@
+       CALL ADDRESK(NFG(N,LL),WCM,TER,TEI,NL,PG(1,N,LL))
++      IF(CM12DIAG.EQ.1.AND.IR.EQ.2.AND.
++     C ABS(E(IE)-1000.0).LT.0.01)
++     C WRITE(*,9013) MM,JJ,LL,NROT,NNF,N,
++     C EPX,EPXX,TER,TEI,QCM(IE),ZKCM(IE)
++ 9013 FORMAT('CM12DIAG HADRONIC',6(1X,I4),6(1X,ES24.16E3))
+       if(mjl.ne.999) go to 92

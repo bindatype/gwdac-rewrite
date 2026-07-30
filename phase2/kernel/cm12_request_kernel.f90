@@ -10,6 +10,7 @@ module cm12_request_kernel
         cm12_solution_background, cm12_solution_is_loaded, &
         cm12_solution_multipole, cm12_accumulate_multipole
     use cm12_background_seam, only: cm12_evaluate_background
+    use cm12_non_cm12_seam, only: cm12_prepare_non_cm12_multipoles
     implicit none
     private
 
@@ -29,6 +30,9 @@ module cm12_request_kernel
             family_count, branch_count, partial_wave_count) = 0.0_real32
         real(real32) :: opec_multipoles( &
             family_count, branch_count, partial_wave_count) = 0.0_real32
+        complex(real32) :: non_cm12_multipoles( &
+            family_count, branch_count, partial_wave_count) = &
+            cmplx(0.0_real32, 0.0_real32, kind=real32)
         complex(real32) :: initial_amplitudes(amplitude_count) = &
             cmplx(0.0_real32, 0.0_real32, kind=real32)
     end type cm12_prepared_background
@@ -55,6 +59,7 @@ contains
         character(len=*), intent(out) :: message
 
         type(cm12_background_constants) :: constants
+        type(cm12_kinematics) :: kinematics
 
         background = cm12_prepared_background()
         call cm12_solution_background( &
@@ -69,6 +74,15 @@ contains
             request%angle_cm_deg, request%reaction, &
             background%born_multipoles, background%opec_multipoles, &
             background%initial_amplitudes, status, message)
+        if (status /= cm12_ok) return
+        call cm12_calculate_kinematics( &
+            request%reaction, request%photon_lab_energy_mev, &
+            kinematics, status, message)
+        if (status /= cm12_ok) return
+        call cm12_prepare_non_cm12_multipoles( &
+            solution, request%reaction, kinematics, &
+            background%opec_multipoles, &
+            background%non_cm12_multipoles, status, message)
     end subroutine cm12_prepare_legacy_background
 
     pure subroutine cm12_evaluate_request( &
@@ -126,39 +140,50 @@ contains
             any(.not. ieee_is_finite( &
                 real(background%initial_amplitudes, kind=real32))) .or. &
             any(.not. ieee_is_finite( &
-                aimag(background%initial_amplitudes)))) then
+                aimag(background%initial_amplitudes))) .or. &
+            any(.not. ieee_is_finite( &
+                real(background%non_cm12_multipoles, kind=real32))) .or. &
+            any(.not. ieee_is_finite( &
+                aimag(background%non_cm12_multipoles)))) then
             status = cm12_invalid_argument
             message = 'prepared CM12 background must be finite'
             return
         end if
 
         result%amplitudes_mfm = background%initial_amplitudes
-        do orbital_l = 0, partial_wave_count - 1
+        do family = 1, family_count
+            if ( &
+                request%reaction < 3 .and. family > 4 .or. &
+                request%reaction > 2 .and. &
+                    (family == 3 .or. family == 4)) cycle
             do branch = 1, branch_count
-                do family = 1, family_count
+                do orbital_l = 0, partial_wave_count - 1
                     call cm12_solution_multipole( &
                         solution, family, branch, orbital_l, &
                         form_selector, parameters, status, message)
                     if (status /= cm12_ok) return
+                    if (form_selector == 0) cycle
 
-                    ! The CM12 K-matrix seam owns only 1xx forms. Frozen
-                    ! non-CM defaults are the OPEC tail already represented
-                    ! explicitly by the prepared background.
-                    if (form_selector <= 100 .or. form_selector >= 200) cycle
-
-                    call cm12_evaluate_multipole( &
-                        dataset, form_selector, parameters, family, branch, &
-                        orbital_l, result%kinematics%w_cm_mev, &
-                        background%born_multipoles( &
-                            family, branch, orbital_l + 1), &
-                        multipole, status, message)
-                    if (status /= cm12_ok) return
-
-                    adjusted_multipole = multipole - &
-                        cmplx( &
+                    if ( &
+                        form_selector > 100 .and. &
+                        form_selector < 200) then
+                        call cm12_evaluate_multipole( &
+                            dataset, form_selector, parameters, &
+                            family, branch, orbital_l, &
+                            result%kinematics%w_cm_mev, &
+                            background%born_multipoles( &
+                                family, branch, orbital_l + 1), &
+                            multipole, status, message)
+                        if (status /= cm12_ok) return
+                        adjusted_multipole = multipole - cmplx( &
                             background%opec_multipoles( &
                                 family, branch, orbital_l + 1), &
                             0.0_real32, kind=real32)
+                    else
+                        adjusted_multipole = &
+                            background%non_cm12_multipoles( &
+                                family, branch, orbital_l + 1)
+                    end if
                     call cm12_accumulate_multipole( &
                         solution, request%reaction, request%angle_cm_deg, &
                         family, branch, orbital_l, adjusted_multipole, &

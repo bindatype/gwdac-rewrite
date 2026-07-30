@@ -147,6 +147,14 @@ gfortran \
     -fno-second-underscore \
     -J "${parity_build_root}" \
     -I "${parity_build_root}" \
+    -c "${kernel_root}/cm12_non_cm12_seam.f90" \
+    -o "${parity_build_root}/cm12_non_cm12_seam.o"
+gfortran \
+    -O1 \
+    -std=f2008 \
+    -fno-second-underscore \
+    -J "${parity_build_root}" \
+    -I "${parity_build_root}" \
     -c "${kernel_root}/cm12_request_kernel.f90" \
     -o "${parity_build_root}/cm12_request_kernel.o"
 gfortran \
@@ -217,7 +225,8 @@ cp "${source_root}/said/pru.f" "${legacy_split_root}/"
 ) >"${legacy_split_root}/fsplit.log" 2>&1
 
 for legacy_name in \
-    gpiff hbas hopec imjl prborn prepv prkin prnpol promega propec prrho; do
+    addres addres2 eta33 gpiff hbas hopec imjl pnsm05 prborn prepv prkin \
+    prnpol promega propec prrho tmcm; do
     gfortran \
         -O1 \
         -std=legacy \
@@ -226,6 +235,16 @@ for legacy_name in \
         -fno-automatic \
         -c "${legacy_split_root}/${legacy_name}.f" \
         -o "${legacy_split_root}/${legacy_name}.o"
+done
+for library_name in alg cmfn cmsinv mcmcv sqz; do
+    gfortran \
+        -O1 \
+        -std=legacy \
+        -ffixed-line-length-none \
+        -fno-second-underscore \
+        -fno-automatic \
+        -c "${source_root}/lib/${library_name}.f" \
+        -o "${legacy_split_root}/${library_name}.o"
 done
 gfortran \
     -O1 \
@@ -329,10 +348,19 @@ gfortran \
     "${parity_build_root}/cm12_kernel.o" \
     "${parity_build_root}/cm12_solution.o" \
     "${parity_build_root}/cm12_background_seam.o" \
+    "${parity_build_root}/cm12_non_cm12_seam.o" \
     "${parity_build_root}/cm12_request_kernel.o" \
+    "${legacy_split_root}/addres.o" \
+    "${legacy_split_root}/addres2.o" \
+    "${legacy_split_root}/alg.o" \
+    "${legacy_split_root}/cmfn.o" \
+    "${legacy_split_root}/cmsinv.o" \
+    "${legacy_split_root}/eta33.o" \
     "${legacy_split_root}/gpiff.o" \
     "${legacy_split_root}/hopec.o" \
     "${legacy_split_root}/imjl.o" \
+    "${legacy_split_root}/mcmcv.o" \
+    "${legacy_split_root}/pnsm05.o" \
     "${legacy_split_root}/prborn.o" \
     "${legacy_split_root}/prepv.o" \
     "${legacy_split_root}/prkin.o" \
@@ -341,12 +369,14 @@ gfortran \
     "${legacy_split_root}/propec.o" \
     "${legacy_split_root}/prrho.o" \
     "${legacy_split_root}/qjofx.o" \
+    "${legacy_split_root}/sqz.o" \
+    "${legacy_split_root}/tmcm.o" \
     "${parity_build_root}/cm12_request_probe.o"
 "${artifact_root}/cm12-request-probe" \
     "${solution_file}" "${solution_sha256}" "${kcm_root}" \
     >"${report_root}/cm12-request-orchestration.tsv"
 awk -F '\t' '
-    NR > 1 && $1 == "request" && ($3 != 0 || $4 != 34) { exit 1 }
+    NR > 1 && $1 == "request" && ($3 != 0 || $4 != 40) { exit 1 }
     NR > 1 && $1 == "request" { requests++ }
     $1 == "order" && $5 !~ /^exact/ { exit 1 }
     $1 == "order" { orders++ }
@@ -371,10 +401,19 @@ gfortran \
     "${parity_build_root}/cm12_kernel.o" \
     "${parity_build_root}/cm12_solution.o" \
     "${parity_build_root}/cm12_background_seam.o" \
+    "${parity_build_root}/cm12_non_cm12_seam.o" \
     "${parity_build_root}/cm12_request_kernel.o" \
+    "${legacy_split_root}/addres.o" \
+    "${legacy_split_root}/addres2.o" \
+    "${legacy_split_root}/alg.o" \
+    "${legacy_split_root}/cmfn.o" \
+    "${legacy_split_root}/cmsinv.o" \
+    "${legacy_split_root}/eta33.o" \
     "${legacy_split_root}/gpiff.o" \
     "${legacy_split_root}/hopec.o" \
     "${legacy_split_root}/imjl.o" \
+    "${legacy_split_root}/mcmcv.o" \
+    "${legacy_split_root}/pnsm05.o" \
     "${legacy_split_root}/prborn.o" \
     "${legacy_split_root}/prepv.o" \
     "${legacy_split_root}/prkin.o" \
@@ -383,6 +422,8 @@ gfortran \
     "${legacy_split_root}/propec.o" \
     "${legacy_split_root}/prrho.o" \
     "${legacy_split_root}/qjofx.o" \
+    "${legacy_split_root}/sqz.o" \
+    "${legacy_split_root}/tmcm.o" \
     "${parity_build_root}/cm12_form_diagnostic_probe.o"
 
 if nm "${artifact_root}/prsdd-headless" |
@@ -409,6 +450,7 @@ fi
         "${kernel_root}/cm12_kernel.f90" \
         "${kernel_root}/cm12_solution.f90" \
         "${kernel_root}/cm12_background_seam.f90" \
+        "${kernel_root}/cm12_non_cm12_seam.f90" \
         "${kernel_root}/cm12_request_kernel.f90" \
         "${kernel_root}/cm12_legacy_context.f90" \
         "${kernel_root}/cmmwp_seam.f90" \
