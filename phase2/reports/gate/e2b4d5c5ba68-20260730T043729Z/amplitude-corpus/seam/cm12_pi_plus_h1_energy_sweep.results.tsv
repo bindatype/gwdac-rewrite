@@ -1,0 +1,6 @@
+independent_variable	independent_value	a1_real_mfm	a1_imag_mfm	a2_real_mfm	a2_imag_mfm	a3_real_mfm	a3_imag_mfm	a4_real_mfm	a4_imag_mfm
+Elab	200.0	-8.12	0.07	-20.39	-1.42	24.18	-0.06	33.84	1.25
+Elab	400.0	-5.71	0.87	-5.53	0.15	39.11	-0.04	20.68	-0.00
+Elab	600.0	-3.23	6.25	-8.12	2.91	42.85	5.75	15.78	5.16
+Elab	800.0	-27.15	15.37	-3.56	-4.88	21.05	18.31	4.16	11.31
+Elab	1000.0	-27.12	-4.09	-3.09	-0.44	17.63	15.46	-1.72	5.76

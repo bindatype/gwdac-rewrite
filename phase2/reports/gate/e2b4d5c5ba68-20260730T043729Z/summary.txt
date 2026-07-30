@@ -1,0 +1,8 @@
+outputs_commit=e2b4d5c5ba68a56fbdd192867ffaf60cc53b858c
+compose_project=gwdac-gate-e2b4d5c5ba68
+fixtures=24
+typed_records=288
+command_failures=0
+fixture_failures=21
+gate_table_sha256=9dd6984dd24744c1258e3a61b92d4928470725f6a8d718e2155213a2190b857e
+result=fail
