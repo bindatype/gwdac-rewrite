@@ -65,20 +65,18 @@
  Note: TOTAL cross-section MUST be done at 0 deg
  Ind Var? A(Acm),C(CosA),E(Elab), or W(Wcm) -> (Min Inc Max) for CosA ? GO9 to quit ->  Fixed variable? E(Elab), or W(Wcm) -> Value of Elab ? ->  You are set to calculate PI+N production at Elab = 1000.000
   CosA goes from   -1.000 to    1.000 in increments of    0.500
-  Enter N to change, -GO9 to quit ->
-Thresholds=  144.76  151.65  148.43  144.74
- Enter Y(or M) for Multipoles at Elab= 1000.00 MeV->
+  Enter N to change, -GO9 to quit -> Enter Y(or M) for Multipoles at Elab= 1000.00 MeV->
   Enter observable (or MULT), -Return for choices ->
  WEB
 
   CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    7/30/26  
      PI+N  DSG  AT Elab =  1000.00       7/30/26  
      CosA         Obs,Err             (Alab, DSGlab) 
-    -1.000  0.2213E+01  0.0000E+00
-    -0.500  0.3371E+01  0.0000E+00
-     0.000  0.2036E+01  0.0000E+00
-     0.500  0.6642E+01  0.0000E+00
-     1.000  0.1008E+02  0.0000E+00
+    -1.000  0.4385E+01  0.0000E+00
+    -0.500  0.5524E+01  0.0000E+00
+     0.000  0.6593E+01  0.0000E+00
+     0.500  0.1080E+02  0.0000E+00
+     1.000  0.6164E+01  0.0000E+00
   To see exp data enter a range(min max) for Elab ->
  WEB
 

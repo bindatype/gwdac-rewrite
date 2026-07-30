@@ -65,34 +65,32 @@
  Note: TOTAL cross-section MUST be done at 0 deg
  Ind Var? A(Acm),C(CosA),E(Elab), or W(Wcm) -> (Min Inc Max) for Acm  ? GO9 to quit ->  Fixed variable? E(Elab), or W(Wcm) -> Value of Elab ? ->  You are set to calculate PI+N production at Elab = 1000.000
   Acm  goes from    0.000 to  180.000 in increments of   10.000
-  Enter N to change, -GO9 to quit ->
-Thresholds=  144.76  151.65  148.43  144.74
- Enter Y(or M) for Multipoles at Elab= 1000.00 MeV->
+  Enter N to change, -GO9 to quit -> Enter Y(or M) for Multipoles at Elab= 1000.00 MeV->
   Enter observable (or MULT), -Return for choices ->
  WEB
 
   CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    7/30/26  
      PI+N  DSG  AT Elab =  1000.00       7/30/26  
      Acm          Obs,Err             (Alab, DSGlab) 
-     0.000  0.1008E+02  0.0000E+00    0.00  0.3224E+02
-    10.000  0.6988E+01  0.0000E+00    5.60  0.2212E+02
-    20.000  0.7432E+01  0.0000E+00   11.26  0.2282E+02
-    30.000  0.8829E+01  0.0000E+00   17.03  0.2575E+02
-    40.000  0.9264E+01  0.0000E+00   22.99  0.2514E+02
-    50.000  0.8448E+01  0.0000E+00   29.19  0.2091E+02
-    60.000  0.6642E+01  0.0000E+00   35.71  0.1468E+02
-    70.000  0.4505E+01  0.0000E+00   42.64  0.8714E+01
-    80.000  0.2805E+01  0.0000E+00   50.09  0.4656E+01
-    90.000  0.2036E+01  0.0000E+00   58.15  0.2845E+01
-   100.000  0.2187E+01  0.0000E+00   66.98  0.2529E+01
-   110.000  0.2820E+01  0.0000E+00   76.71  0.2658E+01
-   120.000  0.3371E+01  0.0000E+00   87.52  0.2562E+01
-   130.000  0.3489E+01  0.0000E+00   99.57  0.2130E+01
-   140.000  0.3186E+01  0.0000E+00  113.02  0.1570E+01
-   150.000  0.2730E+01  0.0000E+00  127.94  0.1105E+01
-   160.000  0.2388E+01  0.0000E+00  144.29  0.8234E+00
-   170.000  0.2242E+01  0.0000E+00  161.81  0.6945E+00
-   180.000  0.2213E+01  0.0000E+00  180.00  0.6602E+00
+     0.000  0.6164E+01  0.0000E+00    0.00  0.1972E+02
+    10.000  0.4588E+01  0.0000E+00    5.60  0.1452E+02
+    20.000  0.6784E+01  0.0000E+00   11.26  0.2083E+02
+    30.000  0.9477E+01  0.0000E+00   17.03  0.2764E+02
+    40.000  0.1114E+02  0.0000E+00   22.99  0.3024E+02
+    50.000  0.1155E+02  0.0000E+00   29.19  0.2857E+02
+    60.000  0.1080E+02  0.0000E+00   35.71  0.2387E+02
+    70.000  0.9326E+01  0.0000E+00   42.64  0.1804E+02
+    80.000  0.7753E+01  0.0000E+00   50.09  0.1287E+02
+    90.000  0.6593E+01  0.0000E+00   58.15  0.9214E+01
+   100.000  0.6002E+01  0.0000E+00   66.98  0.6940E+01
+   110.000  0.5764E+01  0.0000E+00   76.71  0.5433E+01
+   120.000  0.5524E+01  0.0000E+00   87.52  0.4199E+01
+   130.000  0.5086E+01  0.0000E+00   99.57  0.3104E+01
+   140.000  0.4548E+01  0.0000E+00  113.02  0.2240E+01
+   150.000  0.4176E+01  0.0000E+00  127.94  0.1691E+01
+   160.000  0.4126E+01  0.0000E+00  144.29  0.1423E+01
+   170.000  0.4286E+01  0.0000E+00  161.81  0.1328E+01
+   180.000  0.4385E+01  0.0000E+00  180.00  0.1308E+01
   To see exp data enter a range(min max) for Elab -> "Scratch" data is: OUT  "GO13" will toggle IN/OUT
  Enter "Y" to normalize, "R" to enter references->
  E=  995.000 ND=   1  HE(88)P  BONN   HEISE   THESIS BONN-IR-88-06   
@@ -183,11 +181,11 @@ Thresholds=  144.76  151.65  148.43  144.74
  "MEAS" to measure points with the graphics CURSOR(stroke "M")
  "CHAN" to change a partial-wave and replot
  "OBS " to plot another observable on the same plot
-  Enter PLOT to generate a picture -> Ymin,ymax=  0.0000E+00  0.1091E+02 -Return, or change ->CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    7
+  Enter PLOT to generate a picture -> Ymin,ymax=  0.0000E+00  0.1155E+02 -Return, or change ->CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    7
 PR094  Photo-prod          07/09 Arndt  08/18/14                
  PI+N  DSG    Elab= 1000.00  UNNormalized
      0.00
-    10.91
+    11.55
  Plotted data is for Elab= 995.00 to Elab=1005.00
  HE(88)P 
  ZE(88)P 

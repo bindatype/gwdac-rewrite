@@ -65,9 +65,7 @@
  Note: TOTAL cross-section MUST be done at 0 deg
  Ind Var? A(Acm),C(CosA),E(Elab), or W(Wcm) -> (Min Inc Max) for Acm  ? GO9 to quit ->  Fixed variable? E(Elab), or W(Wcm) -> Value of Elab ? ->  You are set to calculate PI+N production at Elab = 1000.000
   Acm  goes from   90.000 to   90.000 in increments of    1.000
-  Enter N to change, -GO9 to quit ->
-Thresholds=  144.76  151.65  148.43  144.74
- Enter Y(or M) for Multipoles at Elab= 1000.00 MeV->
+  Enter N to change, -GO9 to quit -> Enter Y(or M) for Multipoles at Elab= 1000.00 MeV->
   Enter observable (or MULT), -Return for choices -> Choices are:
  1- VPI&SU helicity amplitudes (from Walker)           
  2- CGLN "F" amplitudes;  Chew, PR106, 1345(1957)      
@@ -78,7 +76,7 @@ Thresholds=  144.76  151.65  148.43  144.74
     VPI&SU helicity amplitudes (from Walker)           mFm 
    PI+N  Scattering Amplitudes    Elab= 1000.00
    Acm     A1(Re,Im)         A2(Re,Im)         A3(Re,Im)         A4(Re,Im)
-    90.0   -10.22  -4.52       2.77  -0.81       1.49  15.64       2.76   5.33  
+    90.0   -27.12  -4.09      -3.09  -0.44      17.63  15.46      -1.72   5.76  
 
   Enter observable (or MULT), -Return for choices -> Messages can be sent to: 
  mparis@gwu.edu or rworkman@gwu.edu

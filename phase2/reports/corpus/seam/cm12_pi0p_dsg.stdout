@@ -65,22 +65,20 @@
  Note: TOTAL cross-section MUST be done at 0 deg
  Ind Var? A(Acm),C(CosA),E(Elab), or W(Wcm) -> (Min Inc Max) for Acm  ? GO9 to quit ->  Fixed variable? E(Elab), or W(Wcm) -> Value of Elab ? ->  You are set to calculate PI0P production at Elab =  400.000
   Acm  goes from    0.000 to  180.000 in increments of   30.000
-  Enter N to change, -GO9 to quit ->
-Thresholds=  144.76  151.65  148.43  144.74
- Enter Y(or M) for Multipoles at Elab=  400.00 MeV->
+  Enter N to change, -GO9 to quit -> Enter Y(or M) for Multipoles at Elab=  400.00 MeV->
   Enter observable (or MULT), -Return for choices ->
  WEB
 
   CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    7/30/26  
      PI0P  DSG  AT Elab =   400.00       7/30/26  
      Acm          Obs,Err             (Alab, DSGlab) 
-     0.000  0.6873E+01  0.0000E+00    0.00  0.1350E+02
-    30.000  0.8965E+01  0.0000E+00   21.63  0.1652E+02
-    60.000  0.1351E+02  0.0000E+00   44.63  0.2066E+02
-    90.000  0.1523E+02  0.0000E+00   70.54  0.1734E+02
-   120.000  0.1126E+02  0.0000E+00  101.14  0.8889E+01
-   150.000  0.5211E+01  0.0000E+00  137.94  0.2920E+01
-   180.000  0.2287E+01  0.0000E+00  180.00  0.1103E+01
+     0.000  0.4511E+00  0.0000E+00    0.00  0.8859E+00
+    30.000  0.9397E+00  0.0000E+00   21.63  0.1732E+01
+    60.000  0.1609E+01  0.0000E+00   44.63  0.2461E+01
+    90.000  0.1820E+01  0.0000E+00   70.54  0.2072E+01
+   120.000  0.2123E+01  0.0000E+00  101.14  0.1676E+01
+   150.000  0.2772E+01  0.0000E+00  137.94  0.1553E+01
+   180.000  0.3137E+01  0.0000E+00  180.00  0.1513E+01
   To see exp data enter a range(min max) for Elab ->
  WEB
 

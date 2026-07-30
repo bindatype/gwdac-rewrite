@@ -65,9 +65,7 @@
  Note: TOTAL cross-section MUST be done at 0 deg
  Ind Var? A(Acm),C(CosA),E(Elab), or W(Wcm) -> (Min Inc Max) for Acm  ? GO9 to quit ->  Fixed variable? E(Elab), or W(Wcm) -> Value of Elab ? ->  You are set to calculate PI0N production at Elab =  800.000
   Acm  goes from    0.000 to  180.000 in increments of   30.000
-  Enter N to change, -GO9 to quit ->
-Thresholds=  144.76  151.65  148.43  144.74
- Enter Y(or M) for Multipoles at Elab=  800.00 MeV->
+  Enter N to change, -GO9 to quit -> Enter Y(or M) for Multipoles at Elab=  800.00 MeV->
   Enter observable (or MULT), -Return for choices -> Choices are:
  1- VPI&SU helicity amplitudes (from Walker)           
  2- CGLN "F" amplitudes;  Chew, PR106, 1345(1957)      
@@ -78,13 +76,13 @@ Thresholds=  144.76  151.65  148.43  144.74
     VPI&SU helicity amplitudes (from Walker)           mFm 
    PI0N  Scattering Amplitudes    Elab=  800.00
    Acm     A1(Re,Im)         A2(Re,Im)         A3(Re,Im)         A4(Re,Im)
-     0.0     0.00   0.00      12.92 -11.91       0.00   0.00       0.00   0.00  
-    30.0     2.26   6.71      13.62  -9.86      -0.38   1.16       1.62   4.99  
-    60.0    -8.99   8.88       8.99  -5.80      -0.92   4.10      -2.04   7.81  
-    90.0   -15.93   7.05      -1.45  -3.11      -0.71   6.76      -6.83   9.08  
-   120.0    -8.97   3.96      -5.32  -2.17       0.05   6.71      -8.86  10.54  
-   150.0    -1.63   1.20      -1.63  -1.38       0.51   3.83      -8.35  12.26  
-   180.0    -0.00   0.00      -0.00  -0.00       0.00   0.00      -7.87  13.08  
+     0.0     0.00   0.00      -7.33  -9.80       0.00   0.00       0.00   0.00  
+    30.0    16.12   6.50      -3.23  -8.22      -6.05   1.16      12.65   4.02  
+    60.0    16.98   8.65       3.49  -5.36     -16.92   4.20      11.75   6.49  
+    90.0     9.15   6.85       6.86  -3.85     -23.47   7.03       0.45   8.33  
+   120.0     4.30   3.79       8.69  -3.49     -24.87   6.95     -12.91  11.01  
+   150.0     1.73   1.12       7.84  -2.38     -18.20   3.95     -25.71  13.89  
+   180.0    -0.00   0.00      -0.00  -0.00      -0.00   0.00     -32.06  15.14  
 
   Enter observable (or MULT), -Return for choices -> Messages can be sent to: 
  mparis@gwu.edu or rworkman@gwu.edu

@@ -441,9 +441,49 @@ Progress recorded 2026-07-29:
   routines. Valid retained requests use the new typed seams, and both full
   corpora remain byte-identical at displayed precision.
 
-- The next boundary after `RESUME` is pure single-request orchestration in
-  place of legacy `PRBAS`, plus a decision on when to port the formulas behind
-  the explicit background seam.
+PRBAS orchestration regression-gate result, 2026-07-29:
+
+- The user authorized only pure single-request orchestration to replace
+  `PRBAS` and a written decision on whether or when to port the frozen
+  background formulas. All other workflow and language-selection work
+  remained out of scope.
+- **Reference evidence:** an experimental compiler-enforced pure
+  `cm12_evaluate_request` operation accepted explicit solution, dataset,
+  request, and prepared-background values. Its direct probe completed one
+  finite request for each pion channel, evaluated 34 CM12 `1xx` multipoles per
+  request, reproduced an exact A-B-A request result, and returned typed errors
+  for an invalid angle and a below-threshold request.
+- **Oracle/corroborated-reference gate:** the compatibility build completed
+  both corpus runners, but its typed result files failed exact comparison
+  against the already-correlated modern, checked-in arndt64, and checked-in
+  GWDAC results. Nine of 11 DSG fixture files differed and 12 of 13
+  choice-1 amplitude fixture files differed. Only the dense-grid and
+  below-threshold DSG fixtures and the maximum-grid amplitude fixture remained
+  exact.
+- The mismatch is material, not a display-rounding edge. At
+  `Elab=1000 MeV`, `Acm=90 degrees`, pion-plus DSG changed from the gated
+  `2.036` to `6.593`. The associated choice-1 amplitude components also
+  changed substantially.
+- **Inferred, not yet proven:** treating the 34 CM12 `1xx` selectors plus
+  explicit OPEC/HOPEC values as the complete retained amplitude is
+  insufficient. The immutable solution contains 60 active forms, so the 26
+  non-`1xx` forms require explicit behavioral accounting. The experiment also
+  accumulated in a different loop order than frozen `PRBAS`; legacy
+  `family -> branch -> orbital_l` order must be preserved until exact parity
+  proves reordering safe.
+- The experimental request module, compatibility adapter, and generated
+  failed seam outputs are diagnostic evidence only. They are not an accepted
+  Phase 2 slice and must not be used as an oracle or described as a completed
+  `PRBAS` replacement.
+- Work stopped at the absolute regression gate. No tolerance, fixture, oracle,
+  frozen-source comment, or warning-driven source fix was changed. The
+  requested CI entry point, background-formula porting decision, and accepted
+  seam-validation report were not completed after the mismatch.
+- The next bounded investigation, if explicitly authorized, is to contract
+  the 26 non-`1xx` active-form contributions and reproduce frozen
+  `family -> branch -> orbital_l` sequencing before attempting another
+  request-orchestration gate. Formula porting remains undecided and must not
+  begin as a side effect of that investigation.
 
 ### Phase 3: Select the Target Language
 
@@ -759,20 +799,29 @@ None of these decisions blocks `ARCH-001`.
 
 ## Current Status
 
-Status: Phase 0 preservation and retained-scope Phase 1 are complete. Phase 2
-contracts, shared-state mapping, immutable CM12 solution/dataset loading,
-scalar multipole evaluation, explicit background isolation, pure amplitude
-accumulation, and pure DSG calculation are complete. Physics review remains
-pending.
+Status: Phase 0 preservation and retained-scope Phase 1 are complete. Accepted
+Phase 2 work includes contracts, shared-state mapping, immutable CM12
+solution/dataset loading, scalar multipole evaluation, explicit background
+isolation, pure amplitude accumulation, and pure DSG calculation. Physics
+review remains pending.
 
 The modern reference and both historical executables agree on 138 typed DSG
 records and 150 typed choice-1 amplitude records. Direct evidence adds 42
 synthetic zero-Born scalar cases, 42 actual-solution nonzero-Born scalar
 cases, six unrounded `PRDA` cases, and three pure DSG contract cases.
 
-The current pure boundary stops at request orchestration: legacy `PRBAS` still
-owns command grids and sequencing, and the explicit background seam still
-invokes frozen legacy formula routines internally. Neither boundary changes
-the retained valid-domain results.
+The accepted pure boundary still stops before request orchestration. A
+2026-07-29 attempt to replace `PRBAS` passed its direct reference probe but
+failed the absolute corpus gate: 9/11 DSG fixture files and 12/13 amplitude
+fixture files differed from the frozen three-engine result. The attempt is
+diagnostic, not accepted. Legacy `PRBAS` therefore still owns command grids
+and sequencing in the gated build, and the explicit background seam still
+invokes frozen legacy formula routines internally.
 
-**PAUSED: wait for the exact user command `RESUME`.**
+The background-formula porting decision remains open because the regression
+gate stopped the authorized session before that decision could be supported
+and recorded. Phase 3 and further vertical slices have not started.
+
+**STOPPED AT REGRESSION GATE: wait for explicit user direction before
+investigating the 26 non-`1xx` forms, changing orchestration, deciding formula
+porting, or starting Phase 3.**

@@ -99,7 +99,7 @@ contains
         dataset%loaded = .true.
     end subroutine load_cm12_dataset
 
-    logical function cm12_dataset_is_loaded(dataset)
+    pure logical function cm12_dataset_is_loaded(dataset)
         type(cm12_dataset), intent(in) :: dataset
 
         cm12_dataset_is_loaded = dataset%loaded
@@ -129,7 +129,7 @@ contains
         last_energy = dataset%energy(grid_count, 1)
     end subroutine cm12_dataset_summary
 
-    subroutine cm12_evaluate_multipole( &
+    pure subroutine cm12_evaluate_multipole( &
         dataset, form_number, parameters, multipole_family, j_branch, &
         orbital_l, w_cm_mev, born_multipole, value_mfm, status, message)
         type(cm12_dataset), intent(in) :: dataset
@@ -469,7 +469,7 @@ contains
         message = ''
     end subroutine validate_energy_grid
 
-    subroutine identify_wave( &
+    pure subroutine identify_wave( &
         multipole_family, j_branch, orbital_l, wave, status, message)
         integer, intent(in) :: multipole_family
         integer, intent(in) :: j_branch
@@ -542,7 +542,7 @@ contains
         message = ''
     end subroutine identify_wave
 
-    integer function find_wave(wave)
+    pure integer function find_wave(wave)
         character(len=*), intent(in) :: wave
 
         integer :: index
@@ -556,7 +556,7 @@ contains
         end do
     end function find_wave
 
-    subroutine interpolate_cmm( &
+    pure subroutine interpolate_cmm( &
         dataset, wave, w_cm_mev, values_real, values_imag)
         type(cm12_dataset), intent(in) :: dataset
         integer, intent(in) :: wave
@@ -646,7 +646,7 @@ contains
         status = cm12_io_error
     end subroutine file_error
 
-    subroutine set_error(code, text, status, message)
+    pure subroutine set_error(code, text, status, message)
         integer, intent(in) :: code
         character(len=*), intent(in) :: text
         integer, intent(out) :: status

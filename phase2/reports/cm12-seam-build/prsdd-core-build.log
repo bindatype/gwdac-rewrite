@@ -1,6 +1,6 @@
 patching file pru.f
 patching file prsd.f
-Hunk #6 succeeded at 2345 (offset 1 line).
+Hunk #7 succeeded at 2345 (offset 1 line).
 prsd.f:2613:37:
 
  2611 |       DO 4 I=1,16
@@ -17,6 +17,46 @@ prsd.f:2616:16:
  2616 |     5 A(IA)=EMI(I)
       |                1
 Warning: Array reference at (1) out of bounds (16 > 15) in loop beginning at (2)
+prsd.f:2369:42:
+
+ 2369 |       CALL GIESSENPR(TLB,MJL,IR,DER,DEI,M,TITLE)
+      |                                          1
+Warning: Rank mismatch in argument 'ttl' at (1) (scalar and rank-1)
+prsd.f:2371:38:
+
+ 2371 |       CALL MD05I(TLB,MJL,IR,DER,DEI,M,TITLE)
+      |                                      1
+Warning: Rank mismatch in argument 'ttl' at (1) (scalar and rank-1)
+prsd.f:2373:38:
+
+ 2373 |       CALL MD03I(TLB,MJL,IR,DER,DEI,M,TITLE)
+      |                                      1
+Warning: Rank mismatch in argument 'ttl' at (1) (scalar and rank-1)
+prsd.f:2375:38:
+
+ 2375 |       CALL MD07I(TLB,MJL,IR,DER,DEI,M,TITLE)
+      |                                      1
+Warning: Rank mismatch in argument 'ttl' at (1) (scalar and rank-1)
+prsd.f:2562:18:
+
+ 2562 |    98 CALL DMTEPR(TITLE,MJL,0.0,WCM,DER,DEI)
+      |                  1
+Warning: Rank mismatch in argument 'h' at (1) (scalar and rank-1)
+prsd.f:2563:19:
+
+ 2563 |       CALL HLEEEPR(TITLE,MJL,0.0,WCM,DER,DEI)
+      |                   1
+Warning: Rank mismatch in argument 'h' at (1) (scalar and rank-1)
+prsd.f:2564:17:
+
+ 2564 |       CALL HLPRI(TITLE,MJL,WCM,DER,DEI)
+      |                 1
+Warning: Rank mismatch in argument 'h' at (1) (scalar and rank-1)
+prsd.f:2565:18:
+
+ 2565 |       CALL LEGSMP(TITLE,MJL,E(IE),DER,DEI)
+      |                  1
+Warning: Rank mismatch in argument 'title' at (1) (scalar and rank-1)
 prsd.f:5161:17:
 
  5124 |       CALL DATA1(NDTP,1,M)
@@ -102,46 +142,35 @@ prsd.f:8887:16:
  8887 |       CALL XCHG(YZ,4H    )
       |                1
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
-prsd.f:2369:42:
+prsd.f:2613:17:
 
- 2369 |       CALL GIESSENPR(TLB,MJL,IR,DER,DEI,M,TITLE)
-      |                                          1
-Warning: Rank mismatch in argument 'ttl' at (1) (scalar and rank-1)
-prsd.f:2371:38:
-
- 2371 |       CALL MD05I(TLB,MJL,IR,DER,DEI,M,TITLE)
-      |                                      1
-Warning: Rank mismatch in argument 'ttl' at (1) (scalar and rank-1)
-prsd.f:2373:38:
-
- 2373 |       CALL MD03I(TLB,MJL,IR,DER,DEI,M,TITLE)
-      |                                      1
-Warning: Rank mismatch in argument 'ttl' at (1) (scalar and rank-1)
-prsd.f:2375:38:
-
- 2375 |       CALL MD07I(TLB,MJL,IR,DER,DEI,M,TITLE)
-      |                                      1
-Warning: Rank mismatch in argument 'ttl' at (1) (scalar and rank-1)
-prsd.f:2562:18:
-
- 2562 |    98 CALL DMTEPR(TITLE,MJL,0.0,WCM,DER,DEI)
-      |                  1
-Warning: Rank mismatch in argument 'h' at (1) (scalar and rank-1)
-prsd.f:2563:19:
-
- 2563 |       CALL HLEEEPR(TITLE,MJL,0.0,WCM,DER,DEI)
-      |                   1
-Warning: Rank mismatch in argument 'h' at (1) (scalar and rank-1)
-prsd.f:2564:17:
-
- 2564 |       CALL HLPRI(TITLE,MJL,WCM,DER,DEI)
+ 1936 |       CALL DATA4(MJL,1,ZM,1,ZZ,1,PH,1,M)
+      |                 2
+......
+ 2613 |     4 CALL DATA4(X,1,A(IA),1,X,1,EMI(I),1,M)
       |                 1
-Warning: Rank mismatch in argument 'h' at (1) (scalar and rank-1)
-prsd.f:2565:18:
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+prsd.f:3533:23:
 
- 2565 |       CALL LEGSMP(TITLE,MJL,E(IE),DER,DEI)
-      |                  1
-Warning: Rank mismatch in argument 'title' at (1) (scalar and rank-1)
+ 2530 |       CALL PRKIN(E(IE),1,EPZ,ZKZ,Q0)
+      |                         2
+......
+ 3533 |       CALL PRKIN(TLB,1,EPI,ZK,Q)
+      |                       1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+prsd.f:3537:24:
+
+ 2435 |       CALL PNPWI(N,LL-1,EPXX,TER,TEI,TTLI)
+      |                        2
+......
+ 3537 |       CALL PNPWI(N,LL-1,EPI,TR,TI,TTLI)
+      |                        1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+prsd.f:3093:38:
+
+ 3093 |       IF(H.EQ.GIET) CALL GIESSENET(EG,GTH,MJL,DER,DEI)
+      |                                      1
+Warning: Rank mismatch in argument 'gth' at (1) (scalar and rank-1)
 prsd.f:4047:23:
 
  1936 |       CALL DATA4(MJL,1,ZM,1,ZZ,1,PH,1,M)
@@ -166,31 +195,10 @@ prsd.f:4047:36:
  4047 |       CALL DATA4(NJL,1,ARX,79,NJL,1,AIX,79,M)
       |                                    1
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
-prsd.f:2613:17:
-
- 1936 |       CALL DATA4(MJL,1,ZM,1,ZZ,1,PH,1,M)
-      |                 2
-......
- 2613 |     4 CALL DATA4(X,1,A(IA),1,X,1,EMI(I),1,M)
-      |                 1
-Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
-prsd.f:3537:24:
-
- 2252 |       CALL PNPWI(-1,0,0.0,TRX,TIX,TTLI)
-      |                      2  
-......
- 3537 |       CALL PNPWI(N,LL-1,EPI,TR,TI,TTLI)
-      |                        1
-Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
-prsd.f:3093:38:
-
- 3093 |       IF(H.EQ.GIET) CALL GIESSENET(EG,GTH,MJL,DER,DEI)
-      |                                      1
-Warning: Rank mismatch in argument 'gth' at (1) (scalar and rank-1)
 prsd.f:2759:24:
 
- 2252 |       CALL PNPWI(-1,0,0.0,TRX,TIX,TTLI)
-      |                      2  
+ 2435 |       CALL PNPWI(N,LL-1,EPXX,TER,TEI,TTLI)
+      |                        2
 ......
  2759 |       CALL PNPWI(N,LL-1,EPI,TR,TI,TTLI)
       |                        1

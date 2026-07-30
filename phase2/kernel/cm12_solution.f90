@@ -133,13 +133,13 @@ contains
         solution%loaded = .true.
     end subroutine load_cm12_solution
 
-    logical function cm12_solution_is_loaded(solution)
+    pure logical function cm12_solution_is_loaded(solution)
         type(cm12_solution), intent(in) :: solution
 
         cm12_solution_is_loaded = solution%loaded
     end function cm12_solution_is_loaded
 
-    subroutine cm12_solution_summary( &
+    pure subroutine cm12_solution_summary( &
         solution, identifier, title, source_path, source_sha256, &
         explicit_records, max_partial_wave)
         type(cm12_solution), intent(in) :: solution
@@ -158,7 +158,7 @@ contains
         max_partial_wave = solution%max_partial_wave
     end subroutine cm12_solution_summary
 
-    subroutine cm12_solution_multipole( &
+    pure subroutine cm12_solution_multipole( &
         solution, family, j_branch, orbital_l, form_selector, &
         parameters, status, message)
         type(cm12_solution), intent(in) :: solution
@@ -196,7 +196,8 @@ contains
         message = ''
     end subroutine cm12_solution_multipole
 
-    subroutine cm12_solution_background(solution, background, status, message)
+    pure subroutine cm12_solution_background( &
+        solution, background, status, message)
         type(cm12_solution), intent(in) :: solution
         type(cm12_background_constants), intent(out) :: background
         integer, intent(out) :: status
@@ -1090,7 +1091,7 @@ contains
         end do
     end function lowercase
 
-    subroutine set_error(code, text, status, message)
+    pure subroutine set_error(code, text, status, message)
         integer, intent(in) :: code
         character(len=*), intent(in) :: text
         integer, intent(out) :: status

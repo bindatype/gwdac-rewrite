@@ -66,9 +66,7 @@
  Note: TOTAL cross-section MUST be done at 0 deg
  Ind Var? A(Acm),C(CosA),E(Elab), or W(Wcm) -> (Min Inc Max) for Acm  ? GO9 to quit ->  Fixed variable? E(Elab), or W(Wcm) -> Value of Elab ? ->  You are set to calculate PI+N production at Elab = 1000.000
   Acm  goes from   10.000 to  170.000 in increments of   20.000
-  Enter N to change, -GO9 to quit ->
-Thresholds=  144.76  151.65  148.43  144.74
- Enter Y(or M) for Multipoles at Elab= 1000.00 MeV->
+  Enter N to change, -GO9 to quit -> Enter Y(or M) for Multipoles at Elab= 1000.00 MeV->
   Enter observable (or MULT), -Return for choices -> Choices are:
  1- VPI&SU helicity amplitudes (from Walker)           
  2- CGLN "F" amplitudes;  Chew, PR106, 1345(1957)      
@@ -79,15 +77,15 @@ Thresholds=  144.76  151.65  148.43  144.74
     VPI&SU helicity amplitudes (from Walker)           mFm 
    PI+N  Scattering Amplitudes    Elab= 1000.00
    Acm     A1(Re,Im)         A2(Re,Im)         A3(Re,Im)         A4(Re,Im)
-    10.0    -2.06   9.68     -29.51 -17.14      12.36   1.26       3.21   1.11  
-    30.0    -2.71  23.49     -13.69 -14.87      26.28   9.76       6.51   2.96  
-    50.0    -2.81  24.15      -9.46 -10.67      21.64  19.70       7.78   3.98  
-    70.0    -5.15  12.15      -3.42  -5.46      11.49  22.72       6.10   4.47  
-    90.0   -10.22  -4.52       2.77  -0.81       1.49  15.64       2.76   5.33  
-   110.0   -14.38 -15.80       5.22   1.88      -4.88   2.63       0.36   7.64  
-   130.0   -13.38 -16.23       3.37   2.37      -6.79  -8.32       0.39  11.76  
-   150.0    -7.16  -8.55       0.27   1.56      -5.13 -11.01       2.72  16.62  
-   170.0    -0.98  -1.13      -0.53   0.50      -1.80  -4.91       5.39  19.98  
+    10.0    -5.26   9.60     -17.75 -18.38      12.73   1.23       0.38   1.23  
+    30.0   -12.60  23.44      -2.62 -15.80      29.48   9.55      -1.06   3.37  
+    50.0   -18.80  24.40      -2.22 -11.10      29.74  19.36      -1.72   4.69  
+    70.0   -23.91  12.65      -3.00  -5.43      24.56  22.43      -1.88   5.22  
+    90.0   -27.12  -4.09      -3.09  -0.44      17.63  15.46      -1.72   5.76  
+   110.0   -26.50 -15.63      -3.68   2.49      12.21   2.39       0.12   7.57  
+   130.0   -20.33 -16.26      -5.27   3.10       9.57  -8.72       5.57  11.23  
+   150.0    -9.93  -8.60      -5.82   2.20       7.61 -11.45      14.32  15.76  
+   170.0    -1.31  -1.14      -2.71   0.75       3.17  -5.10      21.68  18.96  
 
   Enter observable (or MULT), -Return for choices -> Messages can be sent to: 
  mparis@gwu.edu or rworkman@gwu.edu

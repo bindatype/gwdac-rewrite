@@ -1,5 +1,8 @@
 --- a/prsd.f
 +++ b/prsd.f
+@@ -1349 +1349 @@
+-      SUBROUTINE PRBAS  
++      SUBROUTINE PRBAS_LEGACY
 @@ -1376,7 +1376,7 @@
  C     CALL DATA3(SPW,1,SOP,1,SOPW,1,M)
  C     WRITE(*,101) IR,SPW,SOP,SOPW
