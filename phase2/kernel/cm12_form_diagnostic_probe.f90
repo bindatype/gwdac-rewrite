@@ -28,6 +28,10 @@ program cm12_form_diagnostic_probe
     character(len=1024) :: form_trace_path
     character(len=1024) :: summary_path
     character(len=64) :: solution_sha256
+    character(len=32) :: oracle_dsg_display
+    character(len=32) :: replayed_dsg_display
+    character(len=32) :: candidate_dsg_display
+    character(len=32) :: current_dsg_display
     character(len=512) :: message
     character(len=32) :: disposition
     character(len=32) :: classification
@@ -54,7 +58,6 @@ program cm12_form_diagnostic_probe
     real(real32) :: legacy_initial(amplitude_count)
     real(real32) :: legacy_final_real(amplitude_count)
     real(real32) :: legacy_final_imag(amplitude_count)
-    real(real32) :: legacy_dsg
     real(real32) :: full_dsg
     real(real32) :: candidate_dsg
     real(real32) :: legacy_row_delta_real(amplitude_count)
@@ -82,10 +85,10 @@ program cm12_form_diagnostic_probe
     logical :: full_amplitudes_exact
     logical :: full_dsg_exact
 
-    if (command_argument_count() /= 5) then
+    if (command_argument_count() /= 6) then
         write(*, '(a)') &
             'usage: cm12-form-diagnostic-probe SOLUTION SHA256 KCM_ROOT ' // &
-            'FORM_TRACE SUMMARY'
+            'FORM_TRACE SUMMARY ORACLE_DSG_DISPLAY'
         stop 64
     end if
     call get_command_argument(1, solution_path)
@@ -93,6 +96,7 @@ program cm12_form_diagnostic_probe
     call get_command_argument(3, dataset_root)
     call get_command_argument(4, form_trace_path)
     call get_command_argument(5, summary_path)
+    call get_command_argument(6, oracle_dsg_display)
 
     call load_cm12_solution( &
         trim(solution_path), trim(solution_sha256), 'CM12', solution, &
@@ -147,8 +151,7 @@ program cm12_form_diagnostic_probe
     if (ios /= 0) stop 9
     read(unit, *, iostat=ios) &
         legacy_initial, &
-        (legacy_final_real(k), legacy_final_imag(k), k=1, amplitude_count), &
-        legacy_dsg
+        (legacy_final_real(k), legacy_final_imag(k), k=1, amplitude_count)
     close(unit)
     if (ios /= 0) stop 10
     legacy_final = cmplx( &
@@ -293,7 +296,13 @@ program cm12_form_diagnostic_probe
     if (status /= cm12_ok) stop 18
 
     full_amplitudes_exact = all(full_amplitudes == legacy_final)
-    full_dsg_exact = full_dsg == legacy_dsg
+    write(replayed_dsg_display, '(e11.4)') full_dsg
+    write(candidate_dsg_display, '(e11.4)') candidate_dsg
+    write(current_dsg_display, '(e11.4)') &
+        current_result%dsg_microbarn_per_sr
+    full_dsg_exact = &
+        trim(adjustl(replayed_dsg_display)) == &
+        trim(adjustl(oracle_dsg_display))
     write(*, '(a)') 'SUMMARY'
     write(*, '(a,i0)') 'active_forms=', active_forms
     write(*, '(a,i0)') 'cm12_forms=', cm12_forms
@@ -325,10 +334,19 @@ program cm12_form_diagnostic_probe
         (real(current_result%amplitudes_mfm(family), kind=real32), &
             aimag(current_result%amplitudes_mfm(family)), &
             family=1, amplitude_count)
-    write(*, '(a,es16.8)') 'legacy_dsg=', legacy_dsg
+    write(*, '(a,a)') &
+        'oracle_dsg_display=', trim(adjustl(oracle_dsg_display))
     write(*, '(a,es16.8)') 'replayed_all_dsg=', full_dsg
+    write(*, '(a,a)') &
+        'replayed_all_dsg_display=', trim(adjustl(replayed_dsg_display))
     write(*, '(a,es16.8)') 'legacy_order_1xx_dsg=', candidate_dsg
+    write(*, '(a,a)') &
+        'legacy_order_1xx_dsg_display=', &
+        trim(adjustl(candidate_dsg_display))
     write(*, '(a,es16.8)') &
         'current_order_1xx_dsg=', &
         current_result%dsg_microbarn_per_sr
+    write(*, '(a,a)') &
+        'current_order_1xx_dsg_display=', &
+        trim(adjustl(current_dsg_display))
 end program cm12_form_diagnostic_probe

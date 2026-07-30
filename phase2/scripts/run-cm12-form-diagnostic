@@ -20,6 +20,14 @@ readonly target_stdout="$(
     printf '%s/amplitude-corpus/seam/%s.stdout' \
         "${corpus_report_root}" cm12_pi_plus_h1_single_point
 )"
+readonly target_dsg_stdout="$(
+    printf '%s/corpus/seam/%s.stdout' \
+        "${corpus_report_root}" cm12_pi_plus_dsg_baseline
+)"
+readonly target_dsg_results="$(
+    printf '%s/corpus/seam/%s.results.tsv' \
+        "${corpus_report_root}" cm12_pi_plus_dsg_baseline
+)"
 readonly trace="${diagnostic_root}/legacy-form-trace.tsv"
 readonly legacy_summary="${diagnostic_root}/legacy-target-summary.tsv"
 readonly attribution="${diagnostic_root}/cm12-form-attribution.txt"
@@ -35,10 +43,22 @@ PRSD_ENGINE=seam \
 PRSD_STATE_ROOT=/workspace/phase2/form-diagnostic \
 PHASE2_REPORT_ROOT="${corpus_report_root}" \
     bash "${phase2_root}/scripts/run-prsdd-amplitude-corpus"
+CM12_FORCE_LEGACY_PRBAS=1 \
+PRSD_ENGINE=seam \
+PRSD_STATE_ROOT=/workspace/phase2/form-diagnostic \
+PHASE2_REPORT_ROOT="${corpus_report_root}" \
+    bash "${phase2_root}/scripts/run-prsdd-corpus"
 
-test "$(grep -c '^CM12DIAG INITIAL' "${target_stdout}")" -eq 1
+test "$(grep -c 'CM12DIAG INITIAL' "${target_stdout}")" -eq 1
 test "$(grep -c '^CM12DIAG FINAL' "${target_stdout}")" -eq 1
 test "$(grep -c '^CM12DIAG APPLY' "${target_stdout}")" -gt 0
+test "$(grep -c '^CM12DIAG FINAL' "${target_dsg_stdout}")" -eq 1
+readonly oracle_dsg_display="$(
+    awk -F '\t' \
+        '$1 == "Acm" && $2 == "90.000" { print $3 }' \
+        "${target_dsg_results}"
+)"
+test -n "${oracle_dsg_display}"
 
 awk '
     BEGIN {
@@ -62,25 +82,39 @@ awk '
             "final_a1_real", "final_a1_imag", \
             "final_a2_real", "final_a2_imag", \
             "final_a3_real", "final_a3_imag", \
-            "final_a4_real", "final_a4_imag", "dsg"
+            "final_a4_real", "final_a4_imag"
     }
-    /^CM12DIAG INITIAL/ {
-        initial = $3 OFS $4 OFS $5 OFS $6
+    NR == FNR && /CM12DIAG INITIAL/ {
+        marker = index($0, "CM12DIAG INITIAL")
+        count = split(substr($0, marker), fields)
+        if (count != 6) {
+            exit 1
+        }
+        initial = fields[3] OFS fields[4] OFS fields[5] OFS fields[6]
     }
-    /^CM12DIAG FINAL/ {
-        final = $3 OFS $4 OFS $5 OFS $6 OFS $7 OFS $8 OFS \
-            $9 OFS $10 OFS $11
+    NR == FNR && /^CM12DIAG FINAL/ {
+        for (field = 3; field <= 10; field++) {
+            final[field] = $field
+        }
+    }
+    NR != FNR && /^CM12DIAG FINAL/ {
+        for (field = 3; field <= 10; field++) {
+            if ($field != final[field]) {
+                exit 1
+            }
+        }
     }
     END {
-        print initial, final
+        print initial, final[3], final[4], final[5], final[6], \
+            final[7], final[8], final[9], final[10]
     }
-' "${target_stdout}" >"${legacy_summary}"
+' "${target_stdout}" "${target_dsg_stdout}" >"${legacy_summary}"
 
 (
     cd "${source_root}/said"
     "${artifact_root}/cm12-form-diagnostic-probe" \
         "${solution_file}" "${solution_sha256}" "${kcm_root}" \
-        "${trace}" "${legacy_summary}"
+        "${trace}" "${legacy_summary}" "${oracle_dsg_display}"
 ) >"${attribution}"
 
 awk '
@@ -120,7 +154,13 @@ test "$(($(wc -l <"${table}") - 1))" -eq 60
     printf 'target_stdout_sha256=%s\n' "$(
         sha256sum "${target_stdout}" | awk '{print $1}'
     )"
-    sha256sum "${trace}" "${legacy_summary}" "${table}" "${summary}"
+    printf 'target_dsg_stdout_sha256=%s\n' "$(
+        sha256sum "${target_dsg_stdout}" | awk '{print $1}'
+    )"
+    printf 'oracle_dsg_display=%s\n' "${oracle_dsg_display}"
+    sha256sum \
+        "${target_dsg_results}" "${trace}" "${legacy_summary}" \
+        "${table}" "${summary}"
 } >"${manifest}"
 
 printf 'CM12 form attribution: %s\n' "${table}"
