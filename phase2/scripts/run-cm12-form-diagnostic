@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_report_root="${PHASE1_REPORT_ROOT:-/phase1/reports}"
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly report_root="${PHASE2_REPORT_ROOT:-${phase2_root}/reports}"
+readonly diagnostic_root="${report_root}/cm12-form-diagnostic"
+readonly corpus_report_root="${diagnostic_root}/legacy-corpus"
+readonly source_commit="$(
+    awk -F= '$1 == "source_commit" { print $2 }' \
+        "${phase1_report_root}/build-manifest.txt"
+)"
+readonly short_commit="${source_commit:0:12}"
+readonly artifact_root="/workspace/phase2/reproducible/artifacts/${short_commit}"
+readonly solution_file="${source_root}/sdat/prsol.dat"
+readonly solution_sha256="dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly target_stdout="$(
+    printf '%s/amplitude-corpus/seam/%s.stdout' \
+        "${corpus_report_root}" cm12_pi_plus_h1_single_point
+)"
+readonly trace="${diagnostic_root}/legacy-form-trace.tsv"
+readonly legacy_summary="${diagnostic_root}/legacy-target-summary.tsv"
+readonly attribution="${diagnostic_root}/cm12-form-attribution.txt"
+readonly table="${diagnostic_root}/cm12-form-attribution.tsv"
+readonly summary="${diagnostic_root}/cm12-form-attribution-summary.txt"
+readonly manifest="${diagnostic_root}/manifest.txt"
+
+mkdir -p "${diagnostic_root}"
+test -x "${artifact_root}/cm12-form-diagnostic-probe"
+
+CM12_FORCE_LEGACY_PRBAS=1 \
+PRSD_ENGINE=seam \
+PRSD_STATE_ROOT=/workspace/phase2/form-diagnostic \
+PHASE2_REPORT_ROOT="${corpus_report_root}" \
+    bash "${phase2_root}/scripts/run-prsdd-amplitude-corpus"
+
+test "$(grep -c '^CM12DIAG INITIAL' "${target_stdout}")" -eq 1
+test "$(grep -c '^CM12DIAG FINAL' "${target_stdout}")" -eq 1
+test "$(grep -c '^CM12DIAG APPLY' "${target_stdout}")" -gt 0
+
+awk '
+    BEGIN {
+        OFS = "\t"
+        print "family", "branch", "orbital_l", "selector", \
+            "adjusted_real", "adjusted_imag", \
+            "a1_real", "a1_imag", "a2_real", "a2_imag", \
+            "a3_real", "a3_imag", "a4_real", "a4_imag"
+    }
+    /^CM12DIAG APPLY/ {
+        print $3, $4, $5 - 1, $6, $7, $8, \
+            $9, $10, $11, $12, $13, $14, $15, $16
+    }
+' "${target_stdout}" >"${trace}"
+
+awk '
+    BEGIN {
+        OFS = "\t"
+        print "initial_a1_real", "initial_a2_real", \
+            "initial_a3_real", "initial_a4_real", \
+            "final_a1_real", "final_a1_imag", \
+            "final_a2_real", "final_a2_imag", \
+            "final_a3_real", "final_a3_imag", \
+            "final_a4_real", "final_a4_imag", "dsg"
+    }
+    /^CM12DIAG INITIAL/ {
+        initial = $3 OFS $4 OFS $5 OFS $6
+    }
+    /^CM12DIAG FINAL/ {
+        final = $3 OFS $4 OFS $5 OFS $6 OFS $7 OFS $8 OFS \
+            $9 OFS $10 OFS $11
+    }
+    END {
+        print initial, final
+    }
+' "${target_stdout}" >"${legacy_summary}"
+
+(
+    cd "${source_root}/said"
+    "${artifact_root}/cm12-form-diagnostic-probe" \
+        "${solution_file}" "${solution_sha256}" "${kcm_root}" \
+        "${trace}" "${legacy_summary}"
+) >"${attribution}"
+
+awk '
+    /^SUMMARY$/ { exit }
+    { print }
+' "${attribution}" >"${table}"
+awk '
+    found { print }
+    /^SUMMARY$/ { found = 1 }
+' "${attribution}" >"${summary}"
+
+grep -Fxq 'active_forms=60' "${summary}"
+grep -Fxq 'cm12_forms=34' "${summary}"
+grep -Fxq 'non_cm12_forms=26' "${summary}"
+grep -Fxq 'initial_exact=T' "${summary}"
+grep -Fxq 'full_amplitudes_exact=T' "${summary}"
+grep -Fxq 'full_dsg_exact=T' "${summary}"
+test "$(($(wc -l <"${table}") - 1))" -eq 60
+
+{
+    printf 'evidence_label=reference\n'
+    printf 'scope=CM12 pion-plus Elab=1000 MeV Acm=90 degrees\n'
+    printf 'source_commit=%s\n' "${source_commit}"
+    printf 'solution_file=%s\n' "${solution_file}"
+    printf 'solution_sha256=%s\n' "${solution_sha256}"
+    printf 'instrumented_binary=%s\n' \
+        "${artifact_root}/prsdd-headless"
+    printf 'instrumented_binary_sha256=%s\n' "$(
+        sha256sum "${artifact_root}/prsdd-headless" | awk '{print $1}'
+    )"
+    printf 'probe_binary=%s\n' \
+        "${artifact_root}/cm12-form-diagnostic-probe"
+    printf 'probe_binary_sha256=%s\n' "$(
+        sha256sum "${artifact_root}/cm12-form-diagnostic-probe" |
+            awk '{print $1}'
+    )"
+    printf 'target_stdout_sha256=%s\n' "$(
+        sha256sum "${target_stdout}" | awk '{print $1}'
+    )"
+    sha256sum "${trace}" "${legacy_summary}" "${table}" "${summary}"
+} >"${manifest}"
+
+printf 'CM12 form attribution: %s\n' "${table}"
+printf 'CM12 attribution summary: %s\n' "${summary}"

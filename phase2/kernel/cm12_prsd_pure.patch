@@ -3,6 +3,14 @@
 @@ -1349 +1349 @@
 -      SUBROUTINE PRBAS  
 +      SUBROUTINE PRBAS_LEGACY
+@@ -1357,5 +1357,7 @@
+       COMMON/GOMEGA/GOM1,GOM2,GOMS,GPI2,GP1,GP2,IRCT,BCOFF
+       DIMENSION EMPI(6,2,6)
++      INTEGER CM12DIAG
++      COMMON/CM12DIAG/CM12DIAG
+ C     EQUIVALENCE (CCX,GOM1)
+       DATA MMMN,MMMX,TERR/1,6,4HTERR/
+ C     CALCULATE BASES AND AMPLITUDES FOR PLOT
 @@ -1376,7 +1376,7 @@
  C     CALL DATA3(SPW,1,SOP,1,SOPW,1,M)
  C     WRITE(*,101) IR,SPW,SOP,SOPW
@@ -36,14 +44,54 @@
      2 CONTINUE
        IF(IR.EQ.0)  GO TO 99
        II=1
-@@ -1472 +1472,2 @@
+@@ -1458,6 +1460,9 @@
+       IF(TT1.EQ.TERR) CALL CSHA(TLB,A(IA),IRX,HR(1,II),HI(1,II))
+       IF(TT1.EQ.TERR) GO TO 4
+       IF(IR0.EQ.0) CALL HOPEC(TLB,A(IA),IR,HRX)
++      IF(CM12DIAG.EQ.1.AND.IR.EQ.2.AND.
++     C ABS(TLB-1000.0).LT.0.01.AND.ABS(A(IA)-90.0).LT.0.01)
++     C WRITE(*,9010) (HRX(K),K=1,4)
+       DO 5 K=1,4
+       HR(K,II)=SOP*HRX(K)
+     5 HI(K,II)=0.0
+@@ -1472,19 +1477,30 @@
 -      IF(NF(M,J,L).EQ.0)  GO TO 8
 +      CALL CM12SOLUTIONFORM(M,J,L,NFX)
 +      IF(NFX.EQ.0)  GO TO 8
-@@ -1492 +1493 @@
+       DER=EMR(I,M,J,L)
+       DEI=EMI(I,M,J,L)
+       DER=SPW*DER+SOPW*EMPI(M,J,L)
+       DEI=SPW*DEI
+       LL=L
+ C     write(*,223) m,j,l,emr(i,m,j,l),emi(i,m,j,l)
+ C 223 format(3i3,2e12.4)
+       CALL PRDA
++      IF(CM12DIAG.EQ.1.AND.IR.EQ.2.AND.
++     C ABS(TLB-1000.0).LT.0.01.AND.ABS(A(IA)-90.0).LT.0.01)
++     C WRITE(*,9011) M,J,L,NFX,DER,DEI,
++     C (HRX(K)-HR(K,II),HIX(K)-HI(K,II),K=1,4)
+       DO 7 K=1,4
+       HR(K,II)=HRX(K)
+     7 HI(K,II)=HIX(K)
+     8 CONTINUE
+     6 CONTINUE
+       CALL PROBS
+       OBS(II)=OBSPRD
++      IF(CM12DIAG.EQ.1.AND.IR.EQ.2.AND.
++     C ABS(TLB-1000.0).LT.0.01.AND.ABS(A(IA)-90.0).LT.0.01)
++     C WRITE(*,9012) (HRX(K),HIX(K),K=1,4),OBSPRD
+     4 II=II+1
++ 9010 FORMAT('CM12DIAG INITIAL',4(1X,ES24.16E3))
++ 9011 FORMAT('CM12DIAG APPLY',4(1X,I4),10(1X,ES24.16E3))
++ 9012 FORMAT('CM12DIAG FINAL',9(1X,ES24.16E3))
+    99 RETURN
+       END
+@@ -1491,3 +1507,3 @@
+ C *****************************************************************
 -      SUBROUTINE PROBS
 +      SUBROUTINE PROBS_LEGACY
-@@ -2343,9 +2344,10 @@
+       COMMON/PRSC/MTRN,IR,MM,JJ,LL,NN,NE,NA,IE,IA,II,NNBT,IT,NPRM
+@@ -2343,9 +2359,10 @@
        ! >MWP 100930.v1
        mjlmp=100*mm+10*jj+ll-1
        !print *,'enter prdlt: ',mjlmp,nf(mm,jj,ll)
@@ -56,6 +104,8 @@
           !goto 98
           goto 199 ! Must do this for 'new' CM solution form 135 MWP 2011.07.29
        endif
-@@ -4970 +4972 @@
+@@ -4969,3 +4986,3 @@
+ C *******************************************************
 -      SUBROUTINE PRDA
 +      SUBROUTINE PRDA_LEGACY
+       COMMON/PRSC/MTRN,IR,MM,JJ,LL,NN,NE,NA,IE,IA,II,NNBT,IT,NPRM

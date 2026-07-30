@@ -33,6 +33,7 @@ docker compose exec -T -e PRSD_ENGINE=seam dev \
 docker compose exec -T -e PRSD_ENGINE=seam dev \
   bash /phase2/scripts/run-prsdd-amplitude-corpus
 docker compose exec -T dev bash /phase2/scripts/compare-cm12-seam
+docker compose exec -T dev bash /phase2/scripts/run-cm12-form-diagnostic
 ```
 
 ## Run the clean-checkout gate

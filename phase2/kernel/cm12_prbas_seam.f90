@@ -91,8 +91,25 @@ subroutine prbas
     integer :: result_index
     integer :: status
     integer :: k
+    integer :: cm12_diagnostic
+    integer :: diagnostic_length
+    integer :: diagnostic_status
+    character(len=8) :: diagnostic_value
     external :: prbas_legacy
+    common /cm12diag/ cm12_diagnostic
 
+    cm12_diagnostic = 0
+    diagnostic_value = ''
+    call get_environment_variable( &
+        'CM12_FORCE_LEGACY_PRBAS', diagnostic_value, &
+        length=diagnostic_length, status=diagnostic_status)
+    if ( &
+        diagnostic_status == 0 .and. diagnostic_length > 0 .and. &
+        diagnostic_value(1:1) == '1') then
+        cm12_diagnostic = 1
+        call prbas_legacy
+        return
+    end if
     if (.not. retained_request_is_valid()) then
         call prbas_legacy
         return

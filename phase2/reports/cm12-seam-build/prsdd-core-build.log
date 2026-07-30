@@ -1,121 +1,121 @@
 patching file pru.f
 patching file prsd.f
-Hunk #7 succeeded at 2345 (offset 1 line).
-prsd.f:2613:37:
+Hunk #9 succeeded at 2360 (offset 1 line).
+prsd.f:2628:37:
 
- 2611 |       DO 4 I=1,16
+ 2626 |       DO 4 I=1,16
       |                 2                    
- 2612 |       IA=IA+1
- 2613 |     4 CALL DATA4(X,1,A(IA),1,X,1,EMI(I),1,M)
+ 2627 |       IA=IA+1
+ 2628 |     4 CALL DATA4(X,1,A(IA),1,X,1,EMI(I),1,M)
       |                                     1
 Warning: Array reference at (1) out of bounds (16 > 15) in loop beginning at (2)
-prsd.f:2616:16:
+prsd.f:2631:16:
 
- 2614 |       DO 5 I=1,16
+ 2629 |       DO 5 I=1,16
       |                 2
- 2615 |       IA=IA+1
- 2616 |     5 A(IA)=EMI(I)
+ 2630 |       IA=IA+1
+ 2631 |     5 A(IA)=EMI(I)
       |                1
 Warning: Array reference at (1) out of bounds (16 > 15) in loop beginning at (2)
-prsd.f:2369:42:
+prsd.f:2384:42:
 
- 2369 |       CALL GIESSENPR(TLB,MJL,IR,DER,DEI,M,TITLE)
+ 2384 |       CALL GIESSENPR(TLB,MJL,IR,DER,DEI,M,TITLE)
       |                                          1
 Warning: Rank mismatch in argument 'ttl' at (1) (scalar and rank-1)
-prsd.f:2371:38:
+prsd.f:2386:38:
 
- 2371 |       CALL MD05I(TLB,MJL,IR,DER,DEI,M,TITLE)
+ 2386 |       CALL MD05I(TLB,MJL,IR,DER,DEI,M,TITLE)
       |                                      1
 Warning: Rank mismatch in argument 'ttl' at (1) (scalar and rank-1)
-prsd.f:2373:38:
+prsd.f:2388:38:
 
- 2373 |       CALL MD03I(TLB,MJL,IR,DER,DEI,M,TITLE)
+ 2388 |       CALL MD03I(TLB,MJL,IR,DER,DEI,M,TITLE)
       |                                      1
 Warning: Rank mismatch in argument 'ttl' at (1) (scalar and rank-1)
-prsd.f:2375:38:
+prsd.f:2390:38:
 
- 2375 |       CALL MD07I(TLB,MJL,IR,DER,DEI,M,TITLE)
+ 2390 |       CALL MD07I(TLB,MJL,IR,DER,DEI,M,TITLE)
       |                                      1
 Warning: Rank mismatch in argument 'ttl' at (1) (scalar and rank-1)
-prsd.f:2562:18:
+prsd.f:2577:18:
 
- 2562 |    98 CALL DMTEPR(TITLE,MJL,0.0,WCM,DER,DEI)
+ 2577 |    98 CALL DMTEPR(TITLE,MJL,0.0,WCM,DER,DEI)
       |                  1
 Warning: Rank mismatch in argument 'h' at (1) (scalar and rank-1)
-prsd.f:2563:19:
+prsd.f:2578:19:
 
- 2563 |       CALL HLEEEPR(TITLE,MJL,0.0,WCM,DER,DEI)
+ 2578 |       CALL HLEEEPR(TITLE,MJL,0.0,WCM,DER,DEI)
       |                   1
 Warning: Rank mismatch in argument 'h' at (1) (scalar and rank-1)
-prsd.f:2564:17:
+prsd.f:2579:17:
 
- 2564 |       CALL HLPRI(TITLE,MJL,WCM,DER,DEI)
+ 2579 |       CALL HLPRI(TITLE,MJL,WCM,DER,DEI)
       |                 1
 Warning: Rank mismatch in argument 'h' at (1) (scalar and rank-1)
-prsd.f:2565:18:
+prsd.f:2580:18:
 
- 2565 |       CALL LEGSMP(TITLE,MJL,E(IE),DER,DEI)
+ 2580 |       CALL LEGSMP(TITLE,MJL,E(IE),DER,DEI)
       |                  1
 Warning: Rank mismatch in argument 'title' at (1) (scalar and rank-1)
-prsd.f:5161:17:
+prsd.f:5176:17:
 
- 5124 |       CALL DATA1(NDTP,1,M)
+ 5139 |       CALL DATA1(NDTP,1,M)
       |                 2
 ......
- 5161 |       CALL DATA1(X,-14,MTRN)
+ 5176 |       CALL DATA1(X,-14,MTRN)
       |                 1
 Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
-prsd.f:5174:17:
+prsd.f:5189:17:
 
- 5113 |       CALL DATA2(EMIN,1,EMAX,1,MTRN)
+ 5128 |       CALL DATA2(EMIN,1,EMAX,1,MTRN)
       |                 2
 ......
- 5174 |       CALL DATA2(NYI,1,NYF,1,MTRN)
+ 5189 |       CALL DATA2(NYI,1,NYF,1,MTRN)
       |                 1
 Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
-prsd.f:5174:23:
+prsd.f:5189:23:
 
- 5113 |       CALL DATA2(EMIN,1,EMAX,1,MTRN)
+ 5128 |       CALL DATA2(EMIN,1,EMAX,1,MTRN)
       |                        2
 ......
- 5174 |       CALL DATA2(NYI,1,NYF,1,MTRN)
+ 5189 |       CALL DATA2(NYI,1,NYF,1,MTRN)
       |                       1
 Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
-prsd.f:5342:20:
+prsd.f:5357:20:
 
- 5101 |       CALL XCHG(HXD,4HIN  )
+ 5116 |       CALL XCHG(HXD,4HIN  )
       |                    2
 ......
- 5342 |       CALL XCHG(HPP,MTTL(MTP))
+ 5357 |       CALL XCHG(HPP,MTTL(MTP))
       |                    1
 Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/HOLLERITH).
-prsd.f:4599:17:
+prsd.f:4614:17:
 
- 4599 |       CALL DATA1(NIT,7,MTRN)
+ 4614 |       CALL DATA1(NIT,7,MTRN)
       |                 1
 ......
- 5124 |       CALL DATA1(NDTP,1,M)
+ 5139 |       CALL DATA1(NDTP,1,M)
       |                 2
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
-prsd.f:2178:17:
+prsd.f:2193:17:
 
- 2178 |       CALL DATA1(NBT,NNBT,M)
+ 2193 |       CALL DATA1(NBT,NNBT,M)
       |                 1
 ......
- 5124 |       CALL DATA1(NDTP,1,M)
+ 5139 |       CALL DATA1(NDTP,1,M)
       |                 2
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
-prsd.f:2283:46:
+prsd.f:2298:46:
 
- 2283 |       IF(MTRN.EQ.22) CALL PNCHPR(TITLE,PEM,NF)
+ 2298 |       IF(MTRN.EQ.22) CALL PNCHPR(TITLE,PEM,NF)
       |                                              1
 Warning: Type mismatch in argument 'ntl' at (1); passed REAL(4) to INTEGER(4)
-prsd.f:8600:25:
+prsd.f:8615:25:
 
- 4664 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
+ 4679 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
       |                               2
 ......
- 8600 |       CALL SYMBOL(X,Y,HT,CSTR,0.0,7)
+ 8615 |       CALL SYMBOL(X,Y,HT,CSTR,0.0,7)
       |                         1
 Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(80)/REAL(4)).
 prsd.f:1163:43:
@@ -123,84 +123,84 @@ prsd.f:1163:43:
  1163 |     3 CALL PRRDX(NFIL,T,ITX,MT,NDX,ZX,ZERR,TTX,MMO,MMY,XEX,M)
       |                                           1
 ......
- 5225 |       CALL PRRDX(NFIL,T,ITP,MTP,NDX,ZX,ZERR,INPT,MMO,MMY,XEX,M)
+ 5240 |       CALL PRRDX(NFIL,T,ITP,MTP,NDX,ZX,ZERR,INPT,MMO,MMY,XEX,M)
       |                                            2
 Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
-prsd.f:5507:41:
+prsd.f:5522:41:
 
- 5225 |       CALL PRRDX(NFIL,T,ITP,MTP,NDX,ZX,ZERR,INPT,MMO,MMY,XEX,M)
+ 5240 |       CALL PRRDX(NFIL,T,ITP,MTP,NDX,ZX,ZERR,INPT,MMO,MMY,XEX,M)
       |                                            2
 ......
- 5507 |       CALL PRRDX(8,T,ITP,MTP,NDX,ZX,ZERR,INPT,MMO,MMY,XEX,N)
+ 5522 |       CALL PRRDX(8,T,ITP,MTP,NDX,ZX,ZERR,INPT,MMO,MMY,XEX,N)
       |                                         1
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
-prsd.f:8887:16:
+prsd.f:8902:16:
 
- 5101 |       CALL XCHG(HXD,4HIN  )
+ 5116 |       CALL XCHG(HXD,4HIN  )
       |                2
 ......
- 8887 |       CALL XCHG(YZ,4H    )
+ 8902 |       CALL XCHG(YZ,4H    )
       |                1
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
-prsd.f:2613:17:
+prsd.f:2628:17:
 
- 1936 |       CALL DATA4(MJL,1,ZM,1,ZZ,1,PH,1,M)
+ 1951 |       CALL DATA4(MJL,1,ZM,1,ZZ,1,PH,1,M)
       |                 2
 ......
- 2613 |     4 CALL DATA4(X,1,A(IA),1,X,1,EMI(I),1,M)
+ 2628 |     4 CALL DATA4(X,1,A(IA),1,X,1,EMI(I),1,M)
       |                 1
 Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
-prsd.f:3533:23:
+prsd.f:3548:23:
 
- 2530 |       CALL PRKIN(E(IE),1,EPZ,ZKZ,Q0)
+ 2545 |       CALL PRKIN(E(IE),1,EPZ,ZKZ,Q0)
       |                         2
 ......
- 3533 |       CALL PRKIN(TLB,1,EPI,ZK,Q)
+ 3548 |       CALL PRKIN(TLB,1,EPI,ZK,Q)
       |                       1
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
-prsd.f:3537:24:
+prsd.f:3552:24:
 
- 2435 |       CALL PNPWI(N,LL-1,EPXX,TER,TEI,TTLI)
+ 2450 |       CALL PNPWI(N,LL-1,EPXX,TER,TEI,TTLI)
       |                        2
 ......
- 3537 |       CALL PNPWI(N,LL-1,EPI,TR,TI,TTLI)
+ 3552 |       CALL PNPWI(N,LL-1,EPI,TR,TI,TTLI)
       |                        1
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
-prsd.f:3093:38:
+prsd.f:3108:38:
 
- 3093 |       IF(H.EQ.GIET) CALL GIESSENET(EG,GTH,MJL,DER,DEI)
+ 3108 |       IF(H.EQ.GIET) CALL GIESSENET(EG,GTH,MJL,DER,DEI)
       |                                      1
 Warning: Rank mismatch in argument 'gth' at (1) (scalar and rank-1)
-prsd.f:4047:23:
+prsd.f:4062:23:
 
- 1936 |       CALL DATA4(MJL,1,ZM,1,ZZ,1,PH,1,M)
+ 1951 |       CALL DATA4(MJL,1,ZM,1,ZZ,1,PH,1,M)
       |                       2
 ......
- 4047 |       CALL DATA4(NJL,1,ARX,79,NJL,1,AIX,79,M)
+ 4062 |       CALL DATA4(NJL,1,ARX,79,NJL,1,AIX,79,M)
       |                       1
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
-prsd.f:4047:30:
+prsd.f:4062:30:
 
- 1936 |       CALL DATA4(MJL,1,ZM,1,ZZ,1,PH,1,M)
+ 1951 |       CALL DATA4(MJL,1,ZM,1,ZZ,1,PH,1,M)
       |                            2  
 ......
- 4047 |       CALL DATA4(NJL,1,ARX,79,NJL,1,AIX,79,M)
+ 4062 |       CALL DATA4(NJL,1,ARX,79,NJL,1,AIX,79,M)
       |                              1
 Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
-prsd.f:4047:36:
+prsd.f:4062:36:
 
- 1936 |       CALL DATA4(MJL,1,ZM,1,ZZ,1,PH,1,M)
+ 1951 |       CALL DATA4(MJL,1,ZM,1,ZZ,1,PH,1,M)
       |                                 2   
 ......
- 4047 |       CALL DATA4(NJL,1,ARX,79,NJL,1,AIX,79,M)
+ 4062 |       CALL DATA4(NJL,1,ARX,79,NJL,1,AIX,79,M)
       |                                    1
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
-prsd.f:2759:24:
+prsd.f:2774:24:
 
- 2435 |       CALL PNPWI(N,LL-1,EPXX,TER,TEI,TTLI)
+ 2450 |       CALL PNPWI(N,LL-1,EPXX,TER,TEI,TTLI)
       |                        2
 ......
- 2759 |       CALL PNPWI(N,LL-1,EPI,TR,TI,TTLI)
+ 2774 |       CALL PNPWI(N,LL-1,EPI,TR,TI,TTLI)
       |                        1
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
 prsd.f:367:21:
@@ -208,7 +208,7 @@ prsd.f:367:21:
   367 |       CALL EMSYM(MJL,IDUM(2*K-1))
       |                     1
 ......
- 2241 |       CALL EMSYM(MJL,DUM(5))
+ 2256 |       CALL EMSYM(MJL,DUM(5))
       |                     2
 Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
 prsd.f:466:29:
@@ -216,7 +216,7 @@ prsd.f:466:29:
   466 |       CALL SYMBOL(0.1,YL,0.1,TTL,0.0,14)
       |                             1
 ......
- 4664 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
+ 4679 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
       |                               2
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
 prsd.f:658:17:
@@ -224,7 +224,7 @@ prsd.f:658:17:
   658 |       CALL DATA1(MSG,-24,MTRN)
       |                 1
 ......
- 5124 |       CALL DATA1(NDTP,1,M)
+ 5139 |       CALL DATA1(NDTP,1,M)
       |                 2
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
 prsd.f:788:16:
@@ -232,7 +232,7 @@ prsd.f:788:16:
   788 |   205 CALL XCHG(INPT(J),DUM(J))
       |                1
 ......
- 5101 |       CALL XCHG(HXD,4HIN  )
+ 5116 |       CALL XCHG(HXD,4HIN  )
       |                2
 Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
 prsd.f:873:31:
@@ -240,7 +240,7 @@ prsd.f:873:31:
   873 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
       |                               1
 ......
- 4664 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
+ 4679 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
       |                               2
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
 prsd.f:875:31:
@@ -248,7 +248,7 @@ prsd.f:875:31:
   875 |       CALL SYMBOL(5.5,-.2,0.12,TTL,0.,6)
       |                               1
 ......
- 4664 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
+ 4679 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
       |                               2
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
 prsd.f:886:48:
@@ -256,7 +256,7 @@ prsd.f:886:48:
   886 |       IF(SGINT.NE.0.0) CALL SYMBOL(0.7,0.1,0.15,TTL,0.0,19)
       |                                                1
 ......
- 4664 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
+ 4679 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
       |                               2                 
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
 prsd.f:893:28:
@@ -264,7 +264,7 @@ prsd.f:893:28:
   893 |       CALL SYMBOL(.5,4.1,.1,TTL,0.,41)
       |                            1
 ......
- 4664 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
+ 4679 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
       |                               2
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
 prsd.f:896:31:
@@ -272,7 +272,7 @@ prsd.f:896:31:
   896 |       CALL SYMBOL(-1.05,.05,.1,TTL,0.,9)
       |                               1
 ......
- 4664 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
+ 4679 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
       |                               2
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
 prsd.f:898:32:
@@ -280,7 +280,7 @@ prsd.f:898:32:
   898 |       CALL SYMBOL(-1.05,3.95,.1,TTL,0.,9)
       |                                1
 ......
- 4664 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
+ 4679 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
       |                               2 
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
 prsd.f:979:28:
@@ -288,7 +288,7 @@ prsd.f:979:28:
   979 |       CALL SYMBOL(.5,4.3,.1,TTL,0.,49)
       |                            1
 ......
- 4664 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
+ 4679 |       CALL SYMBOL(-.5,-.2,0.12,TTL,0.,6)
       |                               2
 Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
 prsd2.f:7046:16:

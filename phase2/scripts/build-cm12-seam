@@ -358,6 +358,33 @@ awk -F '\t' '
     }
 ' "${report_root}/cm12-request-orchestration.tsv"
 
+gfortran \
+    -O1 \
+    -std=f2008 \
+    -fno-second-underscore \
+    -J "${parity_build_root}" \
+    -I "${parity_build_root}" \
+    -c "${kernel_root}/cm12_form_diagnostic_probe.f90" \
+    -o "${parity_build_root}/cm12_form_diagnostic_probe.o"
+gfortran \
+    -o "${artifact_root}/cm12-form-diagnostic-probe" \
+    "${parity_build_root}/cm12_kernel.o" \
+    "${parity_build_root}/cm12_solution.o" \
+    "${parity_build_root}/cm12_background_seam.o" \
+    "${parity_build_root}/cm12_request_kernel.o" \
+    "${legacy_split_root}/gpiff.o" \
+    "${legacy_split_root}/hopec.o" \
+    "${legacy_split_root}/imjl.o" \
+    "${legacy_split_root}/prborn.o" \
+    "${legacy_split_root}/prepv.o" \
+    "${legacy_split_root}/prkin.o" \
+    "${legacy_split_root}/prnpol.o" \
+    "${legacy_split_root}/promega.o" \
+    "${legacy_split_root}/propec.o" \
+    "${legacy_split_root}/prrho.o" \
+    "${legacy_split_root}/qjofx.o" \
+    "${parity_build_root}/cm12_form_diagnostic_probe.o"
+
 if nm "${artifact_root}/prsdd-headless" |
     grep -Eq '[[:space:]](ys_|gettm_|mjl2cpw_|kos_)$'; then
     printf 'Legacy ysKCM symbol remains in the CM12 seam binary\n' >&2
@@ -378,6 +405,7 @@ fi
         "${artifact_root}/cm12-layer-parity-probe" \
         "${artifact_root}/cm12-pure-kernel-probe" \
         "${artifact_root}/cm12-request-probe" \
+        "${artifact_root}/cm12-form-diagnostic-probe" \
         "${kernel_root}/cm12_kernel.f90" \
         "${kernel_root}/cm12_solution.f90" \
         "${kernel_root}/cm12_background_seam.f90" \
@@ -388,6 +416,7 @@ fi
         "${kernel_root}/cm12_prbas_seam.f90" \
         "${kernel_root}/cm12_request_probe.f90" \
         "${kernel_root}/cm12_pure_kernel_probe.f90" \
+        "${kernel_root}/cm12_form_diagnostic_probe.f90" \
         "${kernel_root}/cm12_prsd_pure.patch" \
         "${report_root}/cm12-dataset-loader.tsv" \
         "${report_root}/cm12-dataset-rejection.txt" \
