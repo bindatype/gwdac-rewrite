@@ -1,0 +1,55 @@
+=== /workspace/gwdac/gwdac/cgi-bin/prsd ===
+/workspace/gwdac/gwdac/cgi-bin/prsd: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.15, BuildID[sha1]=4cfb75e7177db02d35c419388b6c40e51630c8b5, with debug_info, not stripped
+f37ba4e753fb1ff96081a9bc28a74e5fa667f70a93043efb6cf65bef94104aba  /workspace/gwdac/gwdac/cgi-bin/prsd
+  NEEDED               libpng12.so.0
+  NEEDED               libgd.so.2
+  NEEDED               libgfortran.so.3
+  NEEDED               libm.so.6
+  NEEDED               libXt.so.6
+  NEEDED               libX11.so.6
+  NEEDED               libg2c.so.0
+  NEEDED               libgcc_s.so.1
+  NEEDED               libc.so.6
+	libpng12.so.0 => not found
+	libgd.so.2 => not found
+	libgfortran.so.3 => not found
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fffff6d6000)
+	libXt.so.6 => /lib/x86_64-linux-gnu/libXt.so.6 (0x00007fffff66b000)
+	libX11.so.6 => /lib/x86_64-linux-gnu/libX11.so.6 (0x00007fffff52c000)
+	libg2c.so.0 => not found
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fffff4fe000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fffff2ec000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007ffffffc6000)
+	libSM.so.6 => /lib/x86_64-linux-gnu/libSM.so.6 (0x00007fffff2e2000)
+	libICE.so.6 => /lib/x86_64-linux-gnu/libICE.so.6 (0x00007fffff2c4000)
+	libxcb.so.1 => /lib/x86_64-linux-gnu/libxcb.so.1 (0x00007fffff29b000)
+	libuuid.so.1 => /lib/x86_64-linux-gnu/libuuid.so.1 (0x00007fffff291000)
+	libbsd.so.0 => /lib/x86_64-linux-gnu/libbsd.so.0 (0x00007fffff27b000)
+	libXau.so.6 => /lib/x86_64-linux-gnu/libXau.so.6 (0x00007fffff275000)
+	libXdmcp.so.6 => /lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007fffff26d000)
+	libmd.so.0 => /lib/x86_64-linux-gnu/libmd.so.0 (0x00007fffff25c000)
+
+=== /workspace/arndt64/said/prsdd ===
+/workspace/arndt64/said/prsdd: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.24, BuildID[sha1]=a0b9fa3ed247ae284768b45bc7cc0abe3e65e07b, not stripped
+8a3c925a3aa95314fb4ad4fa7a8cbfa0095df898ee6fa96dad2071d20789678a  /workspace/arndt64/said/prsdd
+  NEEDED               libgd.so.2
+  NEEDED               libgfortran.so.3
+  NEEDED               libm.so.6
+  NEEDED               libX11.so.6
+  NEEDED               libg2c.so.0
+  NEEDED               libgcc_s.so.1
+  NEEDED               libc.so.6
+	libgd.so.2 => not found
+	libgfortran.so.3 => not found
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fffff6d6000)
+	libX11.so.6 => /lib/x86_64-linux-gnu/libX11.so.6 (0x00007fffff599000)
+	libg2c.so.0 => not found
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fffff56b000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fffff357000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007ffffffc6000)
+	libxcb.so.1 => /lib/x86_64-linux-gnu/libxcb.so.1 (0x00007fffff32e000)
+	libXau.so.6 => /lib/x86_64-linux-gnu/libXau.so.6 (0x00007fffff328000)
+	libXdmcp.so.6 => /lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007fffff320000)
+	libbsd.so.0 => /lib/x86_64-linux-gnu/libbsd.so.0 (0x00007fffff30a000)
+	libmd.so.0 => /lib/x86_64-linux-gnu/libmd.so.0 (0x00007fffff2f9000)
+

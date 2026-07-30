@@ -1,0 +1,357 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Digest::SHA qw(sha256_hex);
+use File::Basename qw(basename);
+use File::Find qw(find);
+use File::Path qw(make_path);
+use File::Spec;
+use File::Temp qw(tempdir);
+
+my $source_root = $ENV{ARNDT64_SOURCE} // '/workspace/arndt64';
+my $report_root = $ENV{PHASE1_REPORT_ROOT} // '/phase1/reports';
+my @trees = qw(said said_bkp said_old);
+
+make_path($report_root);
+
+sub file_sha {
+    my ($path) = @_;
+    return '' unless defined $path && (-f $path || -l $path);
+    if (-l $path) {
+        return sha256_hex('symlink:' . readlink($path));
+    }
+    open my $fh, '<:raw', $path or die "open $path: $!";
+    my $digest = Digest::SHA->new(256);
+    $digest->addfile($fh);
+    close $fh;
+    return $digest->hexdigest;
+}
+
+sub file_kind {
+    my ($path) = @_;
+    return 'symlink' if -l $path;
+    return 'fortran-source' if $path =~ /\.(?:f|for|f90)$/i;
+    return 'build-recipe' if basename($path) =~ /^Makefile/;
+    return 'source-archive' if $path =~ /\.(?:tar\.gz|tgz|tar)$/i;
+    return 'generated-object' if $path =~ /\.(?:o|a)$/i;
+    return 'script' if $path =~ /\.(?:sh|csh|pl)$/i;
+    return 'dataset' if $path =~ /\.(?:dat|inp|pct|tmp|out)$/i;
+    return 'other';
+}
+
+sub scope_for {
+    my ($relative) = @_;
+    return 'code-archive' if $relative =~ m{^code-archive/};
+    return 'build-archive' if $relative =~ m{^mk-archive/};
+    return 'alternate-saidi' if $relative =~ m{^saidi/};
+    return 'top-level';
+}
+
+sub relation_for {
+    my (@hashes) = @_;
+    my @present = grep { length } @hashes;
+    return 'missing-from-all' unless @present;
+    return 'identical-all-three'
+        if @present == 3 && $hashes[0] eq $hashes[1] && $hashes[0] eq $hashes[2];
+    return 'said-and-said_old-identical'
+        if length($hashes[0]) && length($hashes[2]) && $hashes[0] eq $hashes[2];
+    return 'variant-specific';
+}
+
+sub canonical_role {
+    my ($relative, $kind, $scope) = @_;
+    return 'generated-evidence-not-source'
+        if $kind eq 'generated-object' || $kind eq 'dataset';
+    return 'historical-source-evidence'
+        if $scope eq 'code-archive' || $scope eq 'source-archive';
+    return 'historical-build-evidence' if $scope eq 'build-archive';
+    return 'alternate-interactive-infrastructure' if $scope eq 'alternate-saidi';
+    return 'active-canonical-source' if $kind eq 'fortran-source';
+    return 'active-build-provenance' if $kind eq 'build-recipe';
+    return 'supporting-evidence';
+}
+
+sub behavioral_relevance {
+    my ($relative, $kind, $scope, $relation) = @_;
+    return 'high-scientific-correctness'
+        if $relative eq 'pru.f' && $relation ne 'identical-all-three';
+    return 'high-build-only'
+        if basename($relative) eq 'Makefile' && $relation ne 'identical-all-three';
+    return 'medium-historical-comparison'
+        if $scope eq 'code-archive' || $kind eq 'source-archive';
+    return 'low-generated' if $kind eq 'generated-object';
+    return 'none-no-variant-delta' if $relation eq 'identical-all-three';
+    return 'review-if-workflow-retained' if $kind eq 'fortran-source';
+    return 'low';
+}
+
+my %files;
+for my $tree (@trees) {
+    my $tree_root = File::Spec->catdir($source_root, $tree);
+    find(
+        {
+            no_chdir => 1,
+            wanted => sub {
+                return unless -f $_ || -l $_;
+                my $relative = File::Spec->abs2rel($File::Find::name, $tree_root);
+                $files{$relative}{$tree} = $File::Find::name;
+            },
+        },
+        $tree_root
+    );
+}
+
+my $file_map = File::Spec->catfile($report_root, 'canonical-source-file-map.tsv');
+open my $file_out, '>', $file_map or die "open $file_map: $!";
+print {$file_out} join(
+    "\t",
+    qw(scope path kind said_sha256 said_bkp_sha256 said_old_sha256 relation canonical_role behavioral_relevance)
+), "\n";
+
+for my $relative (sort keys %files) {
+    my @paths = map { $files{$relative}{$_} } @trees;
+    my @hashes = map { file_sha($_) } @paths;
+    my $sample = (grep { defined } @paths)[0];
+    my $kind = file_kind($sample);
+    my $scope = scope_for($relative);
+    my $relation = relation_for(@hashes);
+    print {$file_out} join(
+        "\t",
+        $scope,
+        $relative,
+        $kind,
+        @hashes,
+        $relation,
+        canonical_role($relative, $kind, $scope),
+        behavioral_relevance($relative, $kind, $scope, $relation)
+    ), "\n";
+}
+close $file_out;
+
+sub declaration {
+    my ($line, $fixed_form) = @_;
+    return if $line =~ /^[Cc*!]/;
+
+    my $statement = $fixed_form && length($line) > 6 ? substr($line, 6) : $line;
+    $statement =~ s/!.*$// unless $fixed_form;
+    my $upper = uc $statement;
+
+    if ($upper =~ /^\s*PROGRAM\s+([A-Z][A-Z0-9_]*)/) {
+        return ('program', $1);
+    }
+    if ($upper =~ /^\s*(?:(?:RECURSIVE|PURE|ELEMENTAL)\s+)*SUBROUTINE\s+([A-Z][A-Z0-9_]*)/) {
+        return ('subroutine', $1);
+    }
+    if ($upper =~ /^\s*BLOCK\s+DATA(?:\s+([A-Z][A-Z0-9_]*))?/) {
+        return ('block-data', defined($1) ? $1 : '__BLOCK_DATA__');
+    }
+    if ($upper =~ /^\s*
+            (?:(?:RECURSIVE|PURE|ELEMENTAL)\s+)*
+            (?:
+                (?:DOUBLE\s+PRECISION|DOUBLE\s+COMPLEX|REAL|INTEGER|LOGICAL|COMPLEX|CHARACTER)
+                (?:\s*\*\s*\d+|\s*\([^)]*\))?\s+
+            )?
+            FUNCTION\s+([A-Z][A-Z0-9_]*)/x
+    ) {
+        return ('function', $1);
+    }
+    return;
+}
+
+sub parse_routines {
+    my ($path) = @_;
+    return {} unless defined $path && -f $path;
+    open my $fh, '<', $path or die "open $path: $!";
+    my @lines = <$fh>;
+    close $fh;
+
+    my $fixed = $path !~ /\.f90$/i;
+    my @starts;
+    for my $index (0 .. $#lines) {
+        my ($kind, $name) = declaration($lines[$index], $fixed);
+        push @starts, [$index, $kind, $name] if defined $kind;
+    }
+
+    if (!@starts || $starts[0][0] > 0) {
+        unshift @starts, [0, 'implicit-main', '__MAIN__'];
+    }
+
+    my %seen;
+    my %routines;
+    for my $position (0 .. $#starts) {
+        my ($start, $kind, $name) = @{$starts[$position]};
+        my $end = $position < $#starts ? $starts[$position + 1][0] - 1 : $#lines;
+        my $occurrence = ++$seen{$name};
+        my $key = $name . '#' . $occurrence;
+        my $body = join('', @lines[$start .. $end]);
+        $routines{$key} = {
+            name => $name,
+            kind => $kind,
+            line => $start + 1,
+            sha => sha256_hex($body),
+        };
+    }
+    return \%routines;
+}
+
+sub routine_relation {
+    my ($canonical, $variant) = @_;
+    return 'missing' unless defined $variant;
+    return $canonical->{sha} eq $variant->{sha} ? 'identical' : 'changed';
+}
+
+my $routine_map =
+    File::Spec->catfile($report_root, 'canonical-source-routine-map.tsv');
+open my $routine_out, '>', $routine_map or die "open $routine_map: $!";
+print {$routine_out} join(
+    "\t",
+    qw(file routine kind said_line said_bkp_relation said_old_relation said_sha256 said_bkp_sha256 said_old_sha256 behavioral_relevance)
+), "\n";
+
+for my $relative (sort keys %files) {
+    next unless $relative !~ m{/} && $relative =~ /\.(?:f|for|f90)$/i;
+    my @parsed = map { parse_routines($files{$relative}{$_}) } @trees;
+    for my $key (sort {
+        $parsed[0]{$a}{line} <=> $parsed[0]{$b}{line}
+    } keys %{$parsed[0]}) {
+        my $canonical = $parsed[0]{$key};
+        my $backup = $parsed[1]{$key};
+        my $old = $parsed[2]{$key};
+        my $backup_relation = routine_relation($canonical, $backup);
+        my $old_relation = routine_relation($canonical, $old);
+        my $relevance =
+            ($backup_relation eq 'changed' || $old_relation eq 'changed')
+            ? 'high-canonical-selection'
+            : 'none-no-variant-delta';
+        print {$routine_out} join(
+            "\t",
+            $relative,
+            $canonical->{name},
+            $canonical->{kind},
+            $canonical->{line},
+            $backup_relation,
+            $old_relation,
+            $canonical->{sha},
+            $backup ? $backup->{sha} : '',
+            $old ? $old->{sha} : '',
+            $relevance
+        ), "\n";
+    }
+}
+close $routine_out;
+
+my $archive_root = tempdir('said-archive-map.XXXXXX', TMPDIR => 1, CLEANUP => 1);
+my $tarball = File::Spec->catfile($source_root, 'said', 'said.tar.gz');
+system('tar', '-xzf', $tarball, '-C', $archive_root) == 0
+    or die "extract $tarball failed";
+
+sub find_named {
+    my ($root, $wanted) = @_;
+    my @matches;
+    find(
+        {
+            no_chdir => 1,
+            wanted => sub {
+                push @matches, $File::Find::name
+                    if -f $_ && basename($File::Find::name) eq $wanted;
+            },
+        },
+        $root
+    );
+    return $matches[0];
+}
+
+my @archive_candidates;
+for my $name (qw(nn1.f prsd.f pru.f)) {
+    push @archive_candidates, [
+        "said.tar.gz/$name",
+        find_named($archive_root, $name),
+        $name,
+    ];
+}
+push @archive_candidates,
+    [
+        'code-archive/nn1.f-orig-2011.02.24',
+        File::Spec->catfile(
+            $source_root, 'said', 'code-archive', 'nn1.f-orig-2011.02.24'
+        ),
+        'nn1.f',
+    ],
+    [
+        'code-archive/prsd.f-2011.03.11-orig',
+        File::Spec->catfile(
+            $source_root, 'said', 'code-archive', 'prsd.f-2011.03.11-orig'
+        ),
+        'prsd.f',
+    ],
+    [
+        'cmmwp.f-110401',
+        File::Spec->catfile($source_root, 'said', 'cmmwp.f-110401'),
+        'cmmwp.f',
+    ],
+    [
+        'prsd03.f',
+        File::Spec->catfile($source_root, 'said', 'prsd03.f'),
+        'prsd.f',
+    ],
+    [
+        'pru03.f',
+        File::Spec->catfile($source_root, 'said', 'pru03.f'),
+        'pru.f',
+    ];
+
+my $archive_map =
+    File::Spec->catfile($report_root, 'canonical-source-archive-routine-map.tsv');
+open my $archive_out, '>', $archive_map or die "open $archive_map: $!";
+print {$archive_out} join(
+    "\t",
+    qw(candidate canonical_file routine status canonical_line candidate_line canonical_sha256 candidate_sha256 behavioral_relevance)
+), "\n";
+
+for my $candidate (@archive_candidates) {
+    my ($label, $candidate_path, $canonical_name) = @{$candidate};
+    my $canonical_path = File::Spec->catfile($source_root, 'said', $canonical_name);
+    my $canonical = parse_routines($canonical_path);
+    my $archived = parse_routines($candidate_path);
+    my %keys;
+    $keys{$_} = 1 for keys %{$canonical};
+    $keys{$_} = 1 for keys %{$archived};
+    for my $key (sort {
+        (defined($canonical->{$a}) ? $canonical->{$a}{line} : 1_000_000) <=>
+            (defined($canonical->{$b}) ? $canonical->{$b}{line} : 1_000_000)
+            ||
+        (defined($archived->{$a}) ? $archived->{$a}{line} : 1_000_000) <=>
+            (defined($archived->{$b}) ? $archived->{$b}{line} : 1_000_000)
+    } keys %keys) {
+        my $current = $canonical->{$key};
+        my $old = $archived->{$key};
+        my $status =
+            !defined $current ? 'archive-only'
+            : !defined $old ? 'canonical-only'
+            : $current->{sha} eq $old->{sha} ? 'identical'
+            : 'changed';
+        my $name = $current ? $current->{name} : $old->{name};
+        my $relevance =
+            $status eq 'identical'
+            ? 'none'
+            : 'historical-delta-not-canonical-without-workflow-evidence';
+        print {$archive_out} join(
+            "\t",
+            $label,
+            $canonical_name,
+            $name,
+            $status,
+            $current ? $current->{line} : '',
+            $old ? $old->{line} : '',
+            $current ? $current->{sha} : '',
+            $old ? $old->{sha} : '',
+            $relevance
+        ), "\n";
+    }
+}
+close $archive_out;
+
+print "Wrote $file_map\n";
+print "Wrote $routine_map\n";
+print "Wrote $archive_map\n";

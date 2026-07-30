@@ -1,0 +1,271 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly engine="${PRSD_ENGINE:-modern}"
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly gwdac_root="${GWDAC_SOURCE:-/workspace/gwdac}"
+readonly phase1_report_root="${PHASE1_REPORT_ROOT:-/phase1/reports}"
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly report_root="${PHASE2_REPORT_ROOT:-${phase2_root}/reports}"
+readonly corpus="${phase2_root}/fixtures/amplitudes/corpus.tsv"
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-120}"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly data_root="${source_root}/sdat"
+readonly solution_file="${data_root}/prsol.dat"
+readonly solution_sha256="dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522"
+readonly source_commit="$(
+    awk -F= '$1 == "source_commit" { print $2 }' \
+        "${phase1_report_root}/build-manifest.txt"
+)"
+readonly short_commit="${source_commit:0:12}"
+
+case "${engine}" in
+    modern)
+        readonly executable="$(
+            printf '/workspace/phase1/reproducible/artifacts/%s/prsdd-headless' \
+                "${short_commit}"
+        )"
+        readonly state_root="${PRSD_STATE_ROOT:-/workspace/phase2/amplitudes}"
+        readonly runtime_library_path="${LD_LIBRARY_PATH:-}"
+        ;;
+    seam)
+        readonly executable="$(
+            printf '/workspace/phase2/reproducible/artifacts/%s/prsdd-headless' \
+                "${short_commit}"
+        )"
+        readonly state_root="${PRSD_STATE_ROOT:-/workspace/phase2/seam-amplitudes}"
+        readonly runtime_library_path="${LD_LIBRARY_PATH:-}"
+        ;;
+    arndt64)
+        readonly executable="${source_root}/said/prsdd"
+        readonly state_root="${PRSD_STATE_ROOT:-/oracle-work/phase2/amplitudes}"
+        readonly runtime_library_path="${LD_LIBRARY_PATH}"
+        ;;
+    gwdac)
+        readonly executable="${gwdac_root}/gwdac/cgi-bin/prsd"
+        readonly state_root="${PRSD_STATE_ROOT:-/oracle-work/phase2/amplitudes}"
+        readonly runtime_library_path="$(
+            printf '/opt/oracle/gfortran-4.4/usr/lib:%s' "${LD_LIBRARY_PATH}"
+        )"
+        ;;
+    *)
+        printf 'Unknown PRSD_ENGINE: %s\n' "${engine}" >&2
+        exit 2
+        ;;
+esac
+
+readonly engine_report_root="${report_root}/amplitude-corpus/${engine}"
+readonly summary="${report_root}/prsdd-amplitude-corpus-${engine}.tsv"
+mkdir -p "${state_root}/runs" "${engine_report_root}" "${report_root}"
+test -x "${executable}"
+test -f "${corpus}"
+test -d "${kcm_root}"
+test -d "${data_root}"
+test -f "${solution_file}"
+
+extract_results() {
+    local stdout_file="$1"
+    local result_file="$2"
+
+    awk '
+        BEGIN {
+            OFS = "\t"
+            print "independent_variable", "independent_value", \
+                "a1_real_mfm", "a1_imag_mfm", \
+                "a2_real_mfm", "a2_imag_mfm", \
+                "a3_real_mfm", "a3_imag_mfm", \
+                "a4_real_mfm", "a4_imag_mfm"
+        }
+        /^[[:space:]]+(Acm|CosA|Elab|Wcm)[[:space:]]+A1\(Re,Im\)/ {
+            variable = $1
+            capture = 1
+            next
+        }
+        capture && /Enter observable/ {
+            exit
+        }
+        capture && NF == 9 &&
+            $1 ~ /^[-+]?[0-9]*\.?[0-9]+([Ee][-+]?[0-9]+)?$/ {
+            print variable, $1, $2, $3, $4, $5, $6, $7, $8, $9
+        }
+    ' "${stdout_file}" >"${result_file}"
+}
+
+validate_expected_behavior() {
+    local behavior="$1"
+    local stdout_file="$2"
+    local result_file="$3"
+
+    case "${behavior}" in
+        normal)
+            ;;
+        finite_underflow_diagnostic)
+            if grep -Fq 'NaN' "${result_file}"; then
+                printf 'Wcm sweep produced a non-finite amplitude\n' >&2
+                return 1
+            fi
+            ;;
+        legacy_clamp)
+            grep -Eq 'CosA[[:space:]]+goes from[[:space:]]+-1\.000.*1\.000' \
+                "${stdout_file}"
+            ;;
+        maximum_grid)
+            [[ "$(($(wc -l <"${result_file}") - 1))" -eq 70 ]]
+            ;;
+        single_point)
+            [[ "$(($(wc -l <"${result_file}") - 1))" -eq 1 ]]
+            ;;
+        legacy_choice_clamp)
+            grep -Fq 'Enter choice (1, 2, or 3)' "${stdout_file}"
+            grep -Fq 'VPI&SU helicity amplitudes (from Walker)' "${stdout_file}"
+            ;;
+        legacy_reprompt)
+            if [[ "$(grep -c 'Enter reaction no' "${stdout_file}")" -lt 2 ]] &&
+                ! grep -Fq 'Choices are' "${stdout_file}"; then
+                printf 'Expected a legacy re-prompt\n' >&2
+                return 1
+            fi
+            ;;
+        *)
+            printf 'Unknown expected behavior: %s\n' "${behavior}" >&2
+            return 1
+            ;;
+    esac
+}
+
+validate_stderr() {
+    local behavior="$1"
+    local stderr_file="$2"
+
+    case "${behavior}" in
+        finite_underflow_diagnostic)
+            if [[ ! -s "${stderr_file}" ]]; then
+                return 0
+            fi
+            grep -Fqx \
+                'Note: The following floating-point exceptions are signalling: IEEE_UNDERFLOW_FLAG IEEE_DENORMAL' \
+                "${stderr_file}"
+            ;;
+        *)
+            [[ ! -s "${stderr_file}" ]]
+            ;;
+    esac
+}
+
+printf '%s\n' \
+    $'id\tcategory\texit_status\tstderr_bytes\tresult_rows\tresult_sha256\tbehavior' \
+    >"${summary}"
+failures=0
+
+while IFS=$'\t' read -r id category solution reaction independent_variable \
+    grid_min grid_step grid_max fixed_variable fixed_value amplitude_choice \
+    expected_rows expected_behavior description; do
+    if [[ "${id}" == "id" ]]; then
+        continue
+    fi
+
+    fixture="${phase2_root}/fixtures/amplitudes/decks/${id}.in"
+    prefix="${engine_report_root}/${id}"
+    stdout_file="${prefix}.stdout"
+    stderr_file="${prefix}.stderr"
+    exit_file="${prefix}.exit"
+    result_file="${prefix}.results.tsv"
+    manifest_file="${prefix}.manifest"
+    run_root="$(mktemp -d "${state_root}/runs/${id}.XXXXXX")"
+
+    test -f "${fixture}"
+    cp -a "${source_root}/pr" "${run_root}/pr"
+    rm -f \
+        "${run_root}/pr/SAID.TMP" \
+        "${run_root}/pr/SAID.PCT" \
+        "${run_root}/pr/SAID.LOG" \
+        "${run_root}/pr/SAID.PS" \
+        "${run_root}/pr/fort.3" \
+        "${run_root}/pr/fort.7"
+    ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+    ln -s "${data_root}" "${run_root}/sdat"
+
+    set +e
+    (
+        cd "${run_root}/pr"
+        timeout "${timeout_seconds}" \
+            env \
+            CM12_KCM_ROOT="${kcm_root}" \
+            CM12_SOLUTION_FILE="${solution_file}" \
+            CM12_SOLUTION_SHA256="${solution_sha256}" \
+            CM12_SOLUTION_ID=CM12 \
+            SAID_DATA_ROOT="${data_root}" \
+            LD_LIBRARY_PATH="${runtime_library_path}" \
+            "${executable}" \
+            <"${fixture}" \
+            >"${stdout_file}" \
+            2>"${stderr_file}"
+    )
+    status=$?
+    set -e
+    printf '%s\n' "${status}" >"${exit_file}"
+
+    extract_results "${stdout_file}" "${result_file}"
+    result_rows="$(($(wc -l <"${result_file}") - 1))"
+    result_sha256="$(sha256sum "${result_file}" | awk '{print $1}')"
+
+    {
+        printf 'id=%s\n' "${id}"
+        printf 'category=%s\n' "${category}"
+        printf 'description=%s\n' "${description}"
+        printf 'engine=%s\n' "${engine}"
+        printf 'binary=%s\n' "${executable}"
+        printf 'binary_sha256=%s\n' "$(
+            sha256sum "${executable}" | awk '{print $1}'
+        )"
+        printf 'fixture=%s\n' "${fixture}"
+        printf 'fixture_sha256=%s\n' "$(
+            sha256sum "${fixture}" | awk '{print $1}'
+        )"
+        printf 'source_commit=%s\n' "${source_commit}"
+        printf 'solution=%s\n' "${solution}"
+        printf 'solution_file=%s\n' "${solution_file}"
+        printf 'solution_sha256=%s\n' "${solution_sha256}"
+        printf 'reaction=%s\n' "${reaction}"
+        printf 'independent_variable=%s\n' "${independent_variable}"
+        printf 'grid=%s,%s,%s\n' "${grid_min}" "${grid_step}" "${grid_max}"
+        printf 'fixed_variable=%s\n' "${fixed_variable}"
+        printf 'fixed_value=%s\n' "${fixed_value}"
+        printf 'amplitude_choice=%s\n' "${amplitude_choice}"
+        printf 'expected_behavior=%s\n' "${expected_behavior}"
+        printf 'exit_status=%s\n' "${status}"
+        printf 'stderr_bytes=%s\n' "$(wc -c <"${stderr_file}")"
+        printf 'result_rows=%s\n' "${result_rows}"
+        printf 'result_sha256=%s\n' "${result_sha256}"
+    } >"${manifest_file}"
+
+    behavior_status=pass
+    if [[ "${status}" -ne 0 ]] ||
+        [[ "${result_rows}" -ne "${expected_rows}" ]] ||
+        ! grep -Fq 'Thanks for using SAID' "${stdout_file}" ||
+        ! validate_stderr "${expected_behavior}" "${stderr_file}" ||
+        ! validate_expected_behavior \
+            "${expected_behavior}" "${stdout_file}" "${result_file}"; then
+        behavior_status=fail
+        failures=$((failures + 1))
+        printf '%s failed for %s\n' "${engine}" "${id}" >&2
+    fi
+
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+        "${id}" \
+        "${category}" \
+        "${status}" \
+        "$(wc -c <"${stderr_file}")" \
+        "${result_rows}" \
+        "${result_sha256}" \
+        "${behavior_status}" \
+        >>"${summary}"
+done <"${corpus}"
+
+if [[ "${failures}" -ne 0 ]]; then
+    printf '%s amplitude corpus case(s) failed for %s\n' \
+        "${failures}" "${engine}" >&2
+    exit 1
+fi
+
+printf '%s amplitude corpus passed: %s\n' "${engine}" "${summary}"

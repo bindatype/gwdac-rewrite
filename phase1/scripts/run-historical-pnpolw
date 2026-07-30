@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}"
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly gwdac_root="${GWDAC_SOURCE:-/workspace/gwdac}"
+readonly request_fixture="${phase1_root}/fixtures/pnpol-request.in"
+readonly interactive_fixture="${phase1_root}/fixtures/pnpol-interactive.inp"
+
+normalize_dates() {
+    perl -pe 's{\b\d{1,2}/\s*\d{1,2}/\s*\d{1,2}\b}{<DATE>}g' "$1"
+}
+
+run_oracle() {
+    local label="$1"
+    local executable="$2"
+    local run_root="/oracle-work/pnpol-${label}"
+    local runtime_path="${LD_LIBRARY_PATH}"
+
+    if [[ "${label}" == "gwdac" ]]; then
+        runtime_path="/opt/oracle/gfortran-4.4/usr/lib/x86_64-linux-gnu:${runtime_path}"
+    fi
+
+    mkdir -p "${run_root}"
+    cp "${executable}" "${run_root}/pnpolw"
+    chmod 755 "${run_root}/pnpolw"
+    cp "${request_fixture}" "${run_root}/PNPOL.IN"
+    cp "${interactive_fixture}" "${run_root}/PNPOL.INP"
+    rm -f \
+        "${run_root}/PNPOL.PCT" \
+        "${run_root}/PNPOL.TMP" \
+        "${run_root}/stdout" \
+        "${run_root}/stderr"
+
+    set +e
+    (
+        cd "${run_root}"
+        LD_LIBRARY_PATH="${runtime_path}" \
+            ./pnpolw <PNPOL.INP >stdout 2>stderr
+    )
+    local status=$?
+    set -e
+
+    printf '%s\n' "${status}" \
+        >"${report_root}/pnpol-historical-${label}.exit"
+    cp "${run_root}/stdout" \
+        "${report_root}/pnpol-historical-${label}.stdout"
+    cp "${run_root}/stderr" \
+        "${report_root}/pnpol-historical-${label}.stderr"
+    cp "${run_root}/PNPOL.PCT" \
+        "${report_root}/pnpol-historical-${label}.PNPOL.PCT"
+    cp "${run_root}/PNPOL.TMP" \
+        "${report_root}/pnpol-historical-${label}.PNPOL.TMP"
+    normalize_dates "${run_root}/stdout" \
+        >"${report_root}/pnpol-historical-${label}.normalized.stdout"
+    normalize_dates "${run_root}/PNPOL.PCT" \
+        >"${report_root}/pnpol-historical-${label}.normalized.PNPOL.PCT"
+
+    {
+        printf 'exit=%s\n' "${status}"
+        printf 'executable_sha256=%s\n' "$(sha256sum "${executable}" | awk '{print $1}')"
+        printf 'outputs_sha256:\n'
+        sha256sum \
+            "${report_root}/pnpol-historical-${label}.normalized.stdout" \
+            "${report_root}/pnpol-historical-${label}.normalized.PNPOL.PCT" \
+            "${report_root}/pnpol-historical-${label}.PNPOL.TMP"
+    } >"${report_root}/pnpol-historical-${label}-manifest.txt"
+
+    if [[ "${status}" -ne 0 || -s "${run_root}/stderr" ]]; then
+        printf 'Historical pnpolw %s failed validation\n' "${label}" >&2
+        return 1
+    fi
+}
+
+mkdir -p "${report_root}"
+run_oracle arndt64 "${source_root}/webplt/pnpolw"
+run_oracle gwdac "${gwdac_root}/gwdac/cgi-bin/pnpolw"
+
+printf 'Historical pnpolw reports written to %s\n' "${report_root}"

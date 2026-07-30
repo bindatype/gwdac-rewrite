@@ -1,0 +1,152 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly state_root="${PHASE1_STATE_ROOT:-/workspace/phase1/reproducible}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}"
+readonly fixture="$(
+    printf '%s' \
+        "${PRSD_FIXTURE:-${phase1_root}/fixtures/go3pr-cm12-default.in}"
+)"
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-120}"
+readonly artifact_name="${PRSD_ARTIFACT_NAME:-prsdd}"
+readonly report_label="${PRSD_REPORT_LABEL:-modern}"
+readonly result_filename="${PRSD_RESULT_FILENAME:-go3pr-cm12-dsg.tsv}"
+readonly forbidden_outputs="${PRSD_FORBIDDEN_OUTPUTS:-}"
+
+readonly commit="$(git -C "${source_root}" rev-parse HEAD)"
+readonly short_commit="$(git -C "${source_root}" rev-parse --short=12 HEAD)"
+readonly executable="${state_root}/artifacts/${short_commit}/${artifact_name}"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly data_root="${source_root}/sdat"
+
+readonly report_prefix="${report_root}/go3pr-${report_label}"
+readonly stdout_report="${report_prefix}.stdout"
+readonly stderr_report="${report_prefix}.stderr"
+readonly exit_report="${report_prefix}.exit"
+readonly result_report="${report_root}/${result_filename}"
+readonly manifest_report="${report_prefix}-manifest.txt"
+readonly checksum_report="${report_prefix}-artifacts.sha256"
+
+test -x "${executable}"
+test -f "${fixture}"
+test -f "${kcm_root}/cmmD33.dat"
+test -d "${data_root}"
+mkdir -p "${state_root}/runs" "${report_root}"
+
+readonly run_root="$(
+    mktemp -d "${state_root}/runs/go3pr-${report_label}.XXXXXX"
+)"
+cp -a "${source_root}/pr" "${run_root}/pr"
+rm -f \
+    "${run_root}/pr/SAID.TMP" \
+    "${run_root}/pr/SAID.PCT" \
+    "${run_root}/pr/SAID.LOG" \
+    "${run_root}/pr/SAID.PS" \
+    "${run_root}/pr/fort.3" \
+    "${run_root}/pr/fort.7"
+rm -f \
+    "${report_prefix}.SAID.TMP" \
+    "${report_prefix}.SAID.PCT" \
+    "${report_prefix}.SAID.LOG" \
+    "${report_prefix}.SAID.PS" \
+    "${report_prefix}.fort.3" \
+    "${report_prefix}.fort.7"
+
+# The archived pr/KCM link points to a former maintainer's home directory.
+ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+ln -s "${data_root}" "${run_root}/sdat"
+
+set +e
+(
+    cd "${run_root}/pr"
+    timeout "${timeout_seconds}" \
+        env SAID_DATA_ROOT="${data_root}" \
+        "${executable}" \
+        <"${fixture}" \
+        >"${stdout_report}" \
+        2>"${stderr_report}"
+)
+readonly status=$?
+set -e
+printf '%s\n' "${status}" >"${exit_report}"
+
+for name in SAID.TMP SAID.PCT SAID.LOG fort.3 fort.7; do
+    if [[ -f "${run_root}/pr/${name}" ]]; then
+        install -m 644 \
+            "${run_root}/pr/${name}" \
+            "${report_prefix}.${name}"
+    fi
+done
+
+{
+    printf 'acm_deg\tobservable\terror\talab_deg\tdsg_lab\n'
+    awk '
+        /^[[:space:]]+Acm[[:space:]]+Obs,Err/ {
+            capture = 1
+            next
+        }
+        capture && /To see exp data/ {
+            exit
+        }
+        capture && NF == 5 {
+            print $1 "\t" $2 "\t" $3 "\t" $4 "\t" $5
+        }
+    ' "${stdout_report}"
+} >"${result_report}"
+
+readonly result_rows="$(($(wc -l <"${result_report}") - 1))"
+{
+    printf 'source_commit=%s\n' "${commit}"
+    printf 'artifact_name=%s\n' "${artifact_name}"
+    printf 'report_label=%s\n' "${report_label}"
+    printf 'run_root=%s\n' "${run_root}"
+    printf 'executable=%s\n' "${executable}"
+    printf 'fixture=%s\n' "${fixture}"
+    printf 'data_root=%s\n' "${data_root}"
+    printf 'kcm_root=%s\n' "${kcm_root}"
+    printf 'timeout_seconds=%s\n' "${timeout_seconds}"
+    printf 'forbidden_outputs=%s\n' "${forbidden_outputs}"
+    printf 'exit_status=%s\n' "${status}"
+    printf 'stdout_lines=%s\n' "$(wc -l <"${stdout_report}")"
+    printf 'stderr_lines=%s\n' "$(wc -l <"${stderr_report}")"
+    printf 'result_rows=%s\n' "${result_rows}"
+} >"${manifest_report}"
+
+sha_inputs=(
+    "${executable}"
+    "${fixture}"
+    "${kcm_root}/cmmD33.dat"
+    "${stdout_report}"
+    "${stderr_report}"
+    "${result_report}"
+)
+for name in SAID.TMP SAID.PCT SAID.LOG fort.3 fort.7; do
+    if [[ -f "${report_prefix}.${name}" ]]; then
+        sha_inputs+=("${report_prefix}.${name}")
+    fi
+done
+sha256sum "${sha_inputs[@]}" >"${checksum_report}"
+
+if [[ "${status}" -ne 0 ]]; then
+    printf 'prsdd exited with status %s\n' "${status}" >&2
+    exit "${status}"
+fi
+if [[ "${result_rows}" -ne 19 ]]; then
+    printf 'Expected 19 DSG rows, found %s\n' "${result_rows}" >&2
+    exit 1
+fi
+grep -Fq 'Thanks for using SAID' "${stdout_report}"
+test ! -s "${stderr_report}"
+for name in ${forbidden_outputs}; do
+    if [[ -e "${run_root}/pr/${name}" ]]; then
+        printf 'Headless run produced forbidden renderer output %s\n' \
+            "${name}" >&2
+        exit 1
+    fi
+done
+
+printf 'Completed run in %s\n' "${run_root}"
+printf 'Result table %s\n' "${result_report}"
+printf 'Manifest %s\n' "${manifest_report}"

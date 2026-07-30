@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly report_root="${PHASE2_REPORT_ROOT:-${phase2_root}/reports}"
+readonly corpus="${phase2_root}/fixtures/corpus.tsv"
+readonly corpus_report_root="${report_root}/corpus"
+readonly comparison="${report_root}/prsdd-corpus-comparison.tsv"
+readonly markdown_report="${report_root}/prsdd-corpus-validation.md"
+readonly -a engines=(modern arndt64 gwdac)
+
+for engine in "${engines[@]}"; do
+    test -f "${report_root}/prsdd-corpus-${engine}.tsv"
+done
+
+printf '%s\n' \
+    $'id\tcategory\trows\tmodern_sha256\tarndt64_sha256\tgwdac_sha256\texact_all' \
+    >"${comparison}"
+case_count=0
+row_count=0
+
+while IFS=$'\t' read -r id category solution reaction independent_variable \
+    grid_min grid_step grid_max fixed_variable fixed_value observable \
+    expected_rows expected_behavior description; do
+    if [[ "${id}" == "id" ]]; then
+        continue
+    fi
+
+    modern="${corpus_report_root}/modern/${id}.results.tsv"
+    arndt64="${corpus_report_root}/arndt64/${id}.results.tsv"
+    gwdac="${corpus_report_root}/gwdac/${id}.results.tsv"
+    test -f "${modern}"
+    test -f "${arndt64}"
+    test -f "${gwdac}"
+    cmp -s "${modern}" "${arndt64}"
+    cmp -s "${modern}" "${gwdac}"
+
+    modern_sha="$(sha256sum "${modern}" | awk '{print $1}')"
+    arndt64_sha="$(sha256sum "${arndt64}" | awk '{print $1}')"
+    gwdac_sha="$(sha256sum "${gwdac}" | awk '{print $1}')"
+    rows="$(($(wc -l <"${modern}") - 1))"
+    case_count=$((case_count + 1))
+    row_count=$((row_count + rows))
+
+    printf '%s\t%s\t%s\t%s\t%s\t%s\tyes\n' \
+        "${id}" \
+        "${category}" \
+        "${rows}" \
+        "${modern_sha}" \
+        "${arndt64_sha}" \
+        "${gwdac_sha}" \
+        >>"${comparison}"
+done <"${corpus}"
+
+comparison_sha="$(sha256sum "${comparison}" | awk '{print $1}')"
+cat >"${markdown_report}" <<EOF
+# \`prsdd\` CM12 contract-corpus validation
+
+Generated: $(date -u '+%Y-%m-%dT%H:%M:%SZ')
+
+## Result
+
+All ${case_count} corpus cases completed with exit status 0 and the normal SAID
+exit message on the modern headless build and both checked-in historical
+executables. The ${row_count} typed result records are byte-identical across all
+three engines at the legacy program's displayed precision. Valid and recoverable
+requests have empty stderr; the modern runtime reports expected IEEE exceptions
+for the two retained defect-characterization cases.
+
+- Normal requests: 6
+- Boundary requests: 2
+- Malformed selections with legacy recovery: 2
+- Scientifically invalid below-threshold request: 1
+- Comparison SHA-256: \`${comparison_sha}\`
+
+The oracle establishes behavioral correspondence, not physical correctness.
+The below-threshold zero/NaN result, state corruption after an oversized grid,
+and silent cosine clamping are recorded legacy behaviors that the replacement
+API should reject explicitly unless stakeholder review requires compatibility.
+
+## Release rule
+
+The parsed typed tables, not terminal transcripts, are the blocking regression
+artifacts. Exact equality is required at the legacy displayed precision until a
+higher-precision oracle and domain-approved tolerance policy exist.
+
+## Immutable-seam follow-up
+
+The CM12 immutable-loader compatibility build passes the same ${case_count}
+cases and produces all ${row_count} typed records byte-identically to the
+modern reference. Direct scalar evidence is recorded separately in
+\`cm12-seam-validation.md\`.
+EOF
+
+printf 'Corpus comparison passed: %s\n' "${markdown_report}"

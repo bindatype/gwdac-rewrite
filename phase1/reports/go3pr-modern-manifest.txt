@@ -1,0 +1,14 @@
+source_commit=f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+artifact_name=prsdd
+report_label=modern
+run_root=/workspace/phase1/reproducible/runs/go3pr-modern.6BG6mD
+executable=/workspace/phase1/reproducible/artifacts/f6c81d01a1fe/prsdd
+fixture=/phase1/fixtures/go3pr-cm12-default.in
+data_root=/workspace/arndt64/sdat
+kcm_root=/workspace/arndt64/said/KCM.100330
+timeout_seconds=120
+forbidden_outputs=
+exit_status=0
+stdout_lines=206
+stderr_lines=0
+result_rows=19

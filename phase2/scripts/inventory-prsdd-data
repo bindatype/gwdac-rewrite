@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly trace="${phase1_root}/reports/go3pr-historical-arndt64-opened-files.txt"
+readonly output="${phase2_root}/reports/prsdd-opened-data-manifest.tsv"
+
+test -f "${trace}"
+mkdir -p "$(dirname "${output}")"
+
+{
+    printf 'source_path\trole\tevidence\tbytes\tsha256\n'
+    while IFS= read -r opened_path; do
+        role=legacy_configured_input
+        case "${opened_path}" in
+            /home/arndt64/sdat/*)
+                relative_path="sdat/${opened_path##*/}"
+                ;;
+            KCM/*)
+                relative_path="said/KCM.100330/${opened_path#KCM/}"
+                role=cm12_k_matrix_input
+                ;;
+            PRSOL.USR)
+                relative_path="pr/PRSOL.USR"
+                role=solution_catalog
+                ;;
+            PRSEA.DAT)
+                relative_path="pr/PRSEA.DAT"
+                role=single_energy_input
+                ;;
+            PRMC.DAT|NEWDAT.DAT)
+                relative_path="pr/${opened_path}"
+                role=optional_working_data
+                ;;
+            *)
+                continue
+                ;;
+        esac
+
+        source_path="${source_root}/${relative_path}"
+        if [[ ! -f "${source_path}" ]]; then
+            printf 'Missing traced input: %s\n' "${source_path}" >&2
+            exit 1
+        fi
+        printf '%s\t%s\topened_not_read_proven\t%s\t%s\n' \
+            "${relative_path}" \
+            "${role}" \
+            "$(stat -c '%s' "${source_path}")" \
+            "$(sha256sum "${source_path}" | awk '{print $1}')"
+    done <"${trace}"
+} >"${output}"
+
+readonly rows="$(($(wc -l <"${output}") - 1))"
+if [[ "${rows}" -ne 64 ]]; then
+    printf 'Expected 64 traced input files, found %s\n' "${rows}" >&2
+    exit 1
+fi
+
+printf 'Wrote %s traced data records to %s\n' "${rows}" "${output}"

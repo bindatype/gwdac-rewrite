@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly report_root="${PHASE2_REPORT_ROOT:-${phase2_root}/reports}"
+readonly kcm_root="${CM12_KCM_ROOT:-${source_root}/said/KCM.100330}"
+readonly manifest="${report_root}/cm12-kcm-dataset-manifest.tsv"
+readonly -a waves=(
+    S11 S31 P11 P31 P13 P33 D13 D33 D15 D35 F15 F17 F35 F37
+)
+
+mkdir -p "${report_root}"
+printf '%s\n' \
+    $'wave\tcomponent\tpath\trows\tfields_per_row\tfirst_wcm_mev\tlast_wcm_mev\tbytes\tsha256' \
+    >"${manifest}"
+
+for wave in "${waves[@]}"; do
+    for component in cmm cmf kcm; do
+        case "${component}" in
+            cmm) fields=21 ;;
+            cmf) fields=9 ;;
+            kcm) fields=11 ;;
+        esac
+        path="${kcm_root}/${component}${wave}.dat"
+        test -f "${path}"
+        read -r rows first last < <(
+            awk -v fields="${fields}" '
+                NF != fields {
+                    printf "invalid field count at row %d: %d != %d\n", \
+                        NR, NF, fields >"/dev/stderr"
+                    exit 1
+                }
+                NR == 1 { first = $1 }
+                {
+                    expected = 1080 + 5 * (NR - 1)
+                    if ($1 != expected) {
+                        printf "invalid energy at row %d: %s != %s\n", \
+                            NR, $1, expected >"/dev/stderr"
+                        exit 1
+                    }
+                    last = $1
+                }
+                END { if (NR == 275) print NR, first, last; else exit 1 }
+            ' "${path}"
+        )
+        printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+            "${wave}" \
+            "${component}" \
+            "said/KCM.100330/${component}${wave}.dat" \
+            "${rows}" \
+            "${fields}" \
+            "${first}" \
+            "${last}" \
+            "$(wc -c <"${path}")" \
+            "$(sha256sum "${path}" | awk '{print $1}')" \
+            >>"${manifest}"
+    done
+done
+
+if [[ "$(($(wc -l <"${manifest}") - 1))" -ne 42 ]]; then
+    printf 'CM12 manifest does not contain 42 files\n' >&2
+    exit 1
+fi
+
+printf 'CM12 dataset manifest: %s\n' "${manifest}"

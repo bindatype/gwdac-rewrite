@@ -1,0 +1,55 @@
+name: gwdac-rewrite
+
+services:
+  dev:
+    platform: linux/amd64
+    build:
+      context: .
+    working_dir: /workspace
+    volumes:
+      - source:/workspace
+      - ../repository-archives:/archives:ro
+      - ../phase1/compat:/phase1/compat:ro
+      - ../phase1/config:/phase1/config:ro
+      - ../phase1/fixtures:/phase1/fixtures:ro
+      - ../phase1/patches:/phase1/patches:ro
+      - ../phase1/scripts:/phase1/scripts:ro
+      - ../phase1/reports:/phase1/reports
+      - ../phase2/contracts:/phase2/contracts:ro
+      - ../phase2/fixtures:/phase2/fixtures:ro
+      - ../phase2/kernel:/phase2/kernel:ro
+      - ../phase2/scripts:/phase2/scripts:ro
+      - ../phase2/reports:/phase2/reports
+    init: true
+    stdin_open: true
+    tty: true
+
+  oracle:
+    platform: linux/amd64
+    build:
+      context: ../phase1/historical-runtime
+    working_dir: /oracle-work
+    network_mode: none
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - source:/workspace:ro
+      - oracle-work:/oracle-work
+      - ../phase1/fixtures:/phase1/fixtures:ro
+      - ../phase1/scripts:/phase1/scripts:ro
+      - ../phase1/reports:/phase1/reports
+      - ../phase2/contracts:/phase2/contracts:ro
+      - ../phase2/fixtures:/phase2/fixtures:ro
+      - ../phase2/kernel:/phase2/kernel:ro
+      - ../phase2/scripts:/phase2/scripts:ro
+      - ../phase2/reports:/phase2/reports
+    tmpfs:
+      - /tmp
+    init: true
+
+volumes:
+  source:
+  oracle-work:

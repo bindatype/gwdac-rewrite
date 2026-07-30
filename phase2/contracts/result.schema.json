@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://said.arc.gwu.edu/schemas/pion-photoproduction-result-v1.json",
+  "title": "Pion photoproduction DSG result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "code_version",
+    "solution",
+    "reaction",
+    "dataset_version",
+    "units",
+    "records"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": "pion-photoproduction-dsg-v1"
+    },
+    "code_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "solution": {
+      "const": "CM12"
+    },
+    "reaction": {
+      "enum": [
+        "pi0p",
+        "pi+n",
+        "pi-p",
+        "pi0n"
+      ]
+    },
+    "dataset_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "units": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "angle",
+        "energy",
+        "differential_cross_section",
+        "review_status"
+      ],
+      "properties": {
+        "angle": {
+          "const": "deg"
+        },
+        "energy": {
+          "const": "MeV"
+        },
+        "differential_cross_section": {
+          "const": "microbarn_per_sr"
+        },
+        "review_status": {
+          "const": "pending_domain_review"
+        }
+      }
+    },
+    "records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "independent_variable",
+          "independent_value",
+          "differential_cross_section",
+          "legacy_uncertainty"
+        ],
+        "properties": {
+          "independent_variable": {
+            "enum": [
+              "acm_deg",
+              "cos_acm",
+              "photon_lab_energy_mev",
+              "total_cm_energy_mev"
+            ]
+          },
+          "independent_value": {
+            "type": "number"
+          },
+          "differential_cross_section": {
+            "type": "number"
+          },
+          "legacy_uncertainty": {
+            "type": "number"
+          },
+          "lab_angle_deg": {
+            "type": "number"
+          },
+          "lab_differential_cross_section": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

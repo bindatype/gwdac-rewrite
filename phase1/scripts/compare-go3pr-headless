@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly state_root="${PHASE1_STATE_ROOT:-/workspace/phase1/reproducible}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}"
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly short_commit="$(git -C "${source_root}" rev-parse --short=12 HEAD)"
+
+readonly frozen_table="${report_root}/go3pr-cm12-dsg.tsv"
+readonly legacy_prefix="${report_root}/go3pr-no-render-legacy"
+readonly legacy_table="${report_root}/go3pr-no-render-legacy-dsg.tsv"
+readonly headless_prefix="${report_root}/go3pr-headless"
+readonly headless_table="${report_root}/go3pr-headless-dsg.tsv"
+readonly headless_binary="$(
+    printf '%s/artifacts/%s/prsdd-headless' "${state_root}" "${short_commit}"
+)"
+readonly artifact_report="${report_root}/go3pr-headless-artifact-comparison.tsv"
+readonly markdown_report="${report_root}/go3pr-headless-comparison.md"
+
+sha256() {
+    sha256sum "$1" | awk '{ print $1 }'
+}
+
+row_count() {
+    awk 'END { print NR - 1 }' "$1"
+}
+
+assert_successful_run() {
+    local prefix="$1"
+    local table="$2"
+
+    test "$(cat "${prefix}.exit")" = 0
+    test ! -s "${prefix}.stderr"
+    test "$(row_count "${table}")" = 19
+}
+
+assert_successful_run "${legacy_prefix}" "${legacy_table}"
+assert_successful_run "${headless_prefix}" "${headless_table}"
+test -x "${headless_binary}"
+
+cmp -s "${frozen_table}" "${legacy_table}"
+cmp -s "${frozen_table}" "${headless_table}"
+cmp -s "${legacy_prefix}.stdout" "${headless_prefix}.stdout"
+
+{
+    printf 'artifact\tlegacy_sha256\theadless_sha256\texact\n'
+    for artifact in SAID.TMP SAID.PCT SAID.LOG fort.7; do
+        legacy_file="${legacy_prefix}.${artifact}"
+        headless_file="${headless_prefix}.${artifact}"
+        cmp -s "${legacy_file}" "${headless_file}"
+        printf '%s\t%s\t%s\tyes\n' \
+            "${artifact}" \
+            "$(sha256 "${legacy_file}")" \
+            "$(sha256 "${headless_file}")"
+    done
+} >"${artifact_report}"
+
+for forbidden in \
+    "${headless_prefix}.SAID.PS" \
+    "${headless_prefix}.fort.3"; do
+    test ! -e "${forbidden}"
+done
+
+if objdump -p "${headless_binary}" \
+    | grep -Eq \
+        'NEEDED[[:space:]]+lib(X11|Xt|gd|png|jpeg|fontconfig|freetype|tiff|webp|heif)'; then
+    printf 'Graphics or image runtime dependency remains\n' >&2
+    exit 1
+fi
+
+if nm "${headless_binary}" \
+    | grep -Eq \
+        '[[:space:]](x_plot|ps_plot|png_setup|write_ps|gdImage|saidlog|saidpsx|candpps|apltps|colorpsx|symbpsx|agtops)[^[:space:]]*'; then
+    printf 'Renderer implementation symbol remains\n' >&2
+    exit 1
+fi
+
+if strings "${headless_binary}" | grep -Fq '%!PS'; then
+    printf 'PostScript generator payload remains\n' >&2
+    exit 1
+fi
+
+readonly needed="$(
+    objdump -p "${headless_binary}" \
+        | sed -n 's/.*NEEDED[[:space:]]*//p' \
+        | paste -sd, -
+)"
+readonly binary_size="$(stat -c '%s' "${headless_binary}")"
+
+cat >"${markdown_report}" <<EOF
+# CM12 headless-link comparison
+
+Generated: $(date -u '+%Y-%m-%dT%H:%M:%SZ')
+
+## Result
+
+The rendering and headless current-GFortran builds produce byte-identical
+stdout and generated non-renderer artifacts when run with the CM12 no-render
+deck. Both result tables also match the frozen historical-oracle table.
+
+- Frozen result-table SHA-256: \`$(sha256 "${frozen_table}")\`
+- Headless executable SHA-256: \`$(sha256 "${headless_binary}")\`
+- Headless executable size: \`${binary_size}\` bytes
+- ELF dependencies: \`${needed}\`
+- Exit status: \`0\`; stderr: empty; parsed rows: \`19\`
+- \`SAID.TMP\`, \`SAID.PCT\`, \`SAID.LOG\`, and \`fort.7\`: byte-identical
+- \`SAID.PS\` and \`fort.3\`: not produced
+- X11, Xt, GD, PNG, JPEG, font, PostScript converter, and transitive
+  image-library code: absent from the headless link
+
+## Contract
+
+The original historical deck requests PostScript conversion with its final
+\`C\` and \`Y\` responses. It remains the historical executable oracle. The
+no-render deck ends at \`GO99\`, preserving the same scientific request while
+excluding rendering from the contract. The frozen 19-row numerical table is
+identical under both decks.
+
+The headless ABI shim preserves SAID's transaction log and exit messages, but
+intentionally disables drawing, cursor input, renderer control, mail-back, and
+PostScript conversion. Plot equivalence is outside this target's contract.
+EOF
+
+printf 'Headless CM12 comparison passed without renderer dependencies\n'

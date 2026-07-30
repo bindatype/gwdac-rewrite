@@ -1,0 +1,209 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${SOURCE_ROOT:-/workspace}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}"
+
+readonly modern_prefix="${report_root}/go3pr-modern"
+readonly modern_table="${report_root}/go3pr-cm12-dsg.tsv"
+readonly arndt_prefix="${report_root}/go3pr-historical-arndt64"
+readonly gwdac_prefix="${report_root}/go3pr-historical-gwdac"
+readonly captured_transcript="${source_root}/gwdac/gwdac/cgi-bin/TPR"
+readonly captured_table="${report_root}/go3pr-captured-gwdac-tpr-dsg.tsv"
+readonly summary_report="${report_root}/go3pr-oracle-comparison.tsv"
+readonly numeric_report="${report_root}/go3pr-numeric-differences.tsv"
+readonly markdown_report="${report_root}/go3pr-oracle-comparison.md"
+
+extract_result() {
+    local transcript="$1"
+    local result="$2"
+
+    {
+        printf 'acm_deg\tobservable\terror\talab_deg\tdsg_lab\n'
+        awk '
+            /^[[:space:]]+Acm[[:space:]]+Obs,Err/ {
+                capture = 1
+                next
+            }
+            capture && /To see exp data/ {
+                exit
+            }
+            capture && NF == 5 {
+                print $1 "\t" $2 "\t" $3 "\t" $4 "\t" $5
+            }
+        ' "${transcript}"
+    } >"${result}"
+}
+
+row_count() {
+    awk 'END { print NR - 1 }' "$1"
+}
+
+sha256() {
+    sha256sum "$1" | awk '{ print $1 }'
+}
+
+assert_successful_run() {
+    local prefix="$1"
+    local table="$2"
+
+    test "$(cat "${prefix}.exit")" = 0
+    test ! -s "${prefix}.stderr"
+    test "$(row_count "${table}")" = 19
+}
+
+write_numeric_differences() {
+    local candidate="$1"
+    local candidate_table="$2"
+
+    awk -F '\t' -v candidate="${candidate}" '
+        NR == FNR {
+            if (NR == 1) {
+                for (column = 1; column <= NF; column++) {
+                    heading[column] = $column
+                }
+                columns = NF
+                next
+            }
+            for (column = 1; column <= NF; column++) {
+                reference[NR, column] = $column + 0
+            }
+            rows = NR
+            next
+        }
+        FNR == 1 {
+            next
+        }
+        {
+            for (column = 1; column <= columns; column++) {
+                value = $column + 0
+                expected = reference[FNR, column]
+                difference = value - expected
+                if (difference < 0) {
+                    difference = -difference
+                }
+                denominator = value
+                if (denominator < 0) {
+                    denominator = -denominator
+                }
+                expected_magnitude = expected
+                if (expected_magnitude < 0) {
+                    expected_magnitude = -expected_magnitude
+                }
+                if (expected_magnitude > denominator) {
+                    denominator = expected_magnitude
+                }
+                relative = denominator == 0 ? 0 : difference / denominator
+                if (difference > max_absolute[column]) {
+                    max_absolute[column] = difference
+                }
+                if (relative > max_relative[column]) {
+                    max_relative[column] = relative
+                }
+            }
+        }
+        END {
+            if (FNR != rows) {
+                exit 1
+            }
+            for (column = 1; column <= columns; column++) {
+                printf "%s\t%s\t%.17g\t%.17g\n",
+                    candidate,
+                    heading[column],
+                    max_absolute[column],
+                    max_relative[column]
+            }
+        }
+    ' "${modern_table}" "${candidate_table}" >>"${numeric_report}"
+}
+
+test -f "${modern_table}"
+test -f "${captured_transcript}"
+assert_successful_run "${modern_prefix}" "${modern_table}"
+assert_successful_run "${arndt_prefix}" "${arndt_prefix}-dsg.tsv"
+assert_successful_run "${gwdac_prefix}" "${gwdac_prefix}-dsg.tsv"
+
+extract_result "${captured_transcript}" "${captured_table}"
+test "$(row_count "${modern_table}")" = 19
+test "$(row_count "${captured_table}")" = 19
+
+cmp -s "${modern_table}" "${arndt_prefix}-dsg.tsv"
+cmp -s "${modern_table}" "${gwdac_prefix}-dsg.tsv"
+cmp -s "${modern_table}" "${captured_table}"
+cmp -s "${arndt_prefix}.stdout" "${gwdac_prefix}.stdout"
+
+for artifact in SAID.TMP SAID.PCT SAID.LOG fort.7; do
+    cmp -s "${modern_prefix}.${artifact}" "${arndt_prefix}.${artifact}"
+    cmp -s "${modern_prefix}.${artifact}" "${gwdac_prefix}.${artifact}"
+done
+
+{
+    printf 'evidence_id\tevidence_kind\trows\ttable_sha256'
+    printf '\ttable_exact_vs_modern\texit_status\tstderr_bytes'
+    printf '\tstdout_sha256\tstdout_exact_vs_modern'
+    printf '\tshared_artifacts_exact_vs_modern\n'
+    printf 'modern\trebuilt-source-oracle\t19\t%s\tyes\t0\t0\t%s\tyes\tyes\n' \
+        "$(sha256 "${modern_table}")" \
+        "$(sha256 "${modern_prefix}.stdout")"
+    printf 'arndt64\tchecked-in-executable-oracle\t19\t%s\tyes\t0\t0\t%s\tno\tyes\n' \
+        "$(sha256 "${arndt_prefix}-dsg.tsv")" \
+        "$(sha256 "${arndt_prefix}.stdout")"
+    printf 'gwdac\tchecked-in-executable-oracle\t19\t%s\tyes\t0\t0\t%s\tno\tyes\n' \
+        "$(sha256 "${gwdac_prefix}-dsg.tsv")" \
+        "$(sha256 "${gwdac_prefix}.stdout")"
+    printf 'gwdac-tpr\tcaptured-transcript\t19\t%s\tyes\tunknown\tunknown\t%s\tno\tnot-available\n' \
+        "$(sha256 "${captured_table}")" \
+        "$(sha256 "${captured_transcript}")"
+} >"${summary_report}"
+
+printf 'evidence_id\tfield\tmax_absolute_difference\tmax_relative_difference\n' \
+    >"${numeric_report}"
+write_numeric_differences arndt64 "${arndt_prefix}-dsg.tsv"
+write_numeric_differences gwdac "${gwdac_prefix}-dsg.tsv"
+write_numeric_differences gwdac-tpr "${captured_table}"
+
+cat >"${markdown_report}" <<EOF
+# CM12 GO3PR oracle comparison
+
+Generated: $(date -u '+%Y-%m-%dT%H:%M:%SZ')
+
+## Result
+
+The current-GFortran source build, checked-in arndt64 executable, checked-in
+GWDAC executable, and committed GWDAC \`TPR\` transcript produce byte-identical
+19-row DSG tables for the captured CM12 command deck.
+
+- Result-table SHA-256: \`$(sha256 "${modern_table}")\`
+- Maximum absolute difference in every parsed field: \`0\`
+- Maximum relative difference in every parsed field: \`0\`
+- Both historical executable runs: exit \`0\`, empty stderr, normal SAID exit
+- Shared generated files \`SAID.TMP\`, \`SAID.PCT\`, \`SAID.LOG\`, and
+  \`fort.7\`: byte-identical across all three executable runs
+
+## Interpretation
+
+For this fixture, exact text equality at the legacy program's displayed
+precision is the regression requirement. This establishes behavioral
+correspondence for one workflow; it does not establish hidden floating-point
+identity, correctness of the underlying physics, or parity for other inputs.
+Higher-precision absolute and relative tolerances remain a Phase 2 domain
+decision.
+
+The two checked-in executables produce byte-identical full stdout. The modern
+stdout is not byte-identical because bibliography punctuation differs after
+the source-level Hollerith compatibility overlay. The parsed scientific table
+and tested generated artifacts remain exact. The committed GWDAC \`TPR\`
+transcript contains the same result table but an older run date, so it is
+retained as corroborating \`captured\` evidence rather than the primary oracle.
+
+## Evidence
+
+- Machine-readable summary: \`go3pr-oracle-comparison.tsv\`
+- Per-field differences: \`go3pr-numeric-differences.tsv\`
+- Captured transcript extraction: \`go3pr-captured-gwdac-tpr-dsg.tsv\`
+- Historical manifests: \`go3pr-historical-*-manifest.txt\`
+- Opened-file inventories: \`go3pr-historical-*-opened-files.txt\`
+EOF
+
+printf 'CM12 comparison passed: four tables and shared artifacts are exact\n'

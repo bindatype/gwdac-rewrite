@@ -1,0 +1,40 @@
+--- a/saidopen.for
++++ b/saidopen.for
+@@ -4,7 +4,7 @@
+ C 7(EPR)  NR=11(GPEP), 12(GPKL), 13(GPKS), NR<0 to change FILES
+ C 17(EpprmPR)
+       DIMENSION NF(40)
+-      CHARACTER*60 FIL(40),CSTR,TMPNAME,PCTNAME
++      CHARACTER*60 FIL(40),CSTR,TMPNAME,PCTNAME,SDATROOT,LOCALFILE
+ 
+       DATA IR/0/ ! 0 for local; 1 [or /=0] for /home/said64/prsd; controls
+                  ! whether SAID.TMP and SAID.PCT are randomized filenames
+@@ -159,7 +159,17 @@
+       FIL(27)='/home/arndt64/sdat/M05I.DAT'
+       FIL(28)='/home/arndt64/sdat/M03I.DAT'
+       FIL(29)='/home/arndt64/sdat/M07I.DAT'
+-    1 TMPNAME='SAID.TMP'
++    1 CONTINUE
++      SDATROOT=' '
++      CALL GET_ENVIRONMENT_VARIABLE('SAID_DATA_ROOT',SDATROOT)
++      IF(LEN_TRIM(SDATROOT).EQ.0) SDATROOT='../sdat'
++      DO J=1,NNF
++      IF(FIL(J)(1:19).EQ.'/home/arndt64/sdat/') THEN
++      LOCALFILE=FIL(J)(20:60)
++      FIL(J)=SDATROOT(1:LEN_TRIM(SDATROOT))//'/'//LOCALFILE
++      ENDIF
++      ENDDO
++      TMPNAME='SAID.TMP'
+       PCTNAME='SAID.PCT'
+       IF(IR.EQ.0) GO TO 10
+       CALL RANDOM(X,IX,IY)
+@@ -190,7 +199,8 @@
+       IF(J.LE.N1) OPEN(NF(J),FILE=FIL(J),STATUS='UNKNOWN')
+       IF(J.GT.N1) OPEN(NF(J),FILE=FIL(J),STATUS='UNKNOWN')
+     8 CONTINUE
+-      OPEN(58,FILE='/home/arndt64/sdat/secpr.dat',STATUS='UNKNOWN')
++      OPEN(58,FILE=SDATROOT(1:LEN_TRIM(SDATROOT))//'/secpr.dat',
++     C STATUS='UNKNOWN')
+       GO TO 99
+    11 IF(NR.NE.16) GO TO 17
+       FIL(5)='HE01.DAT'

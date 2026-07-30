@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly gwdac_binary=/workspace/gwdac/gwdac/cgi-bin/prsd
+readonly arndt64_binary=/workspace/arndt64/said/prsdd
+readonly gwdac_library_path="/opt/oracle/gfortran-4.4/usr/lib:${LD_LIBRARY_PATH}"
+
+test -x "${gwdac_binary}"
+test -x "${arndt64_binary}"
+
+if LD_LIBRARY_PATH="${gwdac_library_path}" \
+    ldd "${gwdac_binary}" | grep -Fq 'not found'; then
+        LD_LIBRARY_PATH="${gwdac_library_path}" ldd "${gwdac_binary}" >&2
+        exit 1
+fi
+if ldd "${arndt64_binary}" | grep -Fq 'not found'; then
+    ldd "${arndt64_binary}" >&2
+    exit 1
+fi
+
+for soname in libg2c.so.0 libgd.so.2 libgfortran.so.3 libpng12.so.0; do
+    find /opt/oracle/root -name "${soname}" -print -quit | grep -q .
+done
+find /opt/oracle/gfortran-4.4 -name libgfortran.so.3 -print -quit | grep -q .
+
+if grep -Eq '(^|[[:space:]])eth[0-9]+:' /proc/net/dev; then
+    printf 'Oracle container has an external network interface\n' >&2
+    exit 1
+fi
+
+printf 'Historical runtime libraries resolve and network is disabled\n'

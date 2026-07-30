@@ -1,0 +1,517 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Digest::SHA qw(sha256_hex);
+use File::Basename qw(basename);
+use File::Path qw(make_path);
+use File::Spec;
+
+my $source_root = $ENV{ARNDT64_SOURCE} // '/workspace/arndt64/said';
+my $report_root = $ENV{PHASE2_REPORT_ROOT} // '/phase2/reports';
+my @source_files = qw(prsd.f prsd2.f cmmwp.f);
+
+make_path($report_root);
+
+my @fields = (
+    [qw(MTRN scalar 1 command-control command-router excluded legacy-adapter)],
+    [qw(IR scalar 1 grid-index reaction-channel required request)],
+    [qw(MM scalar 1 grid-index multipole-family internal multipole-workspace)],
+    [qw(JJ scalar 1 grid-index total-angular-momentum-branch internal multipole-workspace)],
+    [qw(LL scalar 1 grid-index orbital-angular-momentum internal multipole-workspace)],
+    [qw(NN scalar 1 command-control generic-count excluded none)],
+    [qw(NE scalar 1 grid-index energy-grid-size adapter batch-adapter)],
+    [qw(NA scalar 1 grid-index angle-grid-size adapter batch-adapter)],
+    [qw(IE scalar 1 grid-index active-energy-index internal batch-adapter)],
+    [qw(IA scalar 1 grid-index active-angle-index internal batch-adapter)],
+    [qw(II scalar 1 grid-index flattened-output-index adapter batch-adapter)],
+    [qw(NNBT scalar 1 fit-control fit-point-count optional uncertainty-model)],
+    [qw(IT scalar 1 command-control observable-selector required request)],
+    [qw(NPRM scalar 1 fit-control fit-parameter-count optional uncertainty-model)],
+    [qw(TITLE 18 18 packed-text solution-id adapter solution-metadata)],
+    [qw(DTTL 18 18 packed-text dataset-title excluded legacy-adapter)],
+    [qw(MTTL 8 8 packed-text reaction-labels excluded legacy-adapter)],
+    [qw(ITTL 40 40 packed-text observable-labels excluded legacy-adapter)],
+    [qw(EMR 70x6x2x6 5040 multipole-solution real-multipoles internal multipole-workspace)],
+    [qw(EMI 70x6x2x6 5040 multipole-solution imaginary-multipoles internal multipole-workspace)],
+    [qw(TTLI 18 18 packed-text input-title excluded legacy-adapter)],
+    [qw(E 70 70 kinematics lab-energy-grid required request)],
+    [qw(ZKCM 70 70 kinematics photon-cm-momentum required kinematics-result)],
+    [qw(QCM 70 70 kinematics meson-cm-momentum required kinematics-result)],
+    [qw(EPI 70 70 kinematics final-meson-energy internal kinematics-result)],
+    [qw(NF 6x2x6 72 solution-definition multipole-form-selector required solution)],
+    [qw(PEM 25x6x2x6 1800 solution-definition multipole-parameters required solution)],
+    [qw(BAS 4x10 40 amplitude-workspace angular-basis internal amplitude-workspace)],
+    [qw(HR 4x70 280 amplitude-workspace real-amplitude-grid adapter batch-result)],
+    [qw(HI 4x70 280 amplitude-workspace imaginary-amplitude-grid adapter batch-result)],
+    [qw(HRX 4 4 amplitude-workspace active-real-amplitudes required amplitude-result)],
+    [qw(HIX 4 4 amplitude-workspace active-imaginary-amplitudes required amplitude-result)],
+    [qw(P0 99 99 uncertainty fit-parameter-baseline optional uncertainty-model)],
+    [qw(DDP 99 99 uncertainty fit-parameter-step optional uncertainty-model)],
+    [qw(ETHR scalar 1 kinematics reaction-threshold required kinematics-result)],
+    [qw(YZ 99 99 uncertainty fit-parameter-vector optional uncertainty-model)],
+    [qw(ERMTX 7000 7000 uncertainty covariance-or-work-matrix optional uncertainty-model)],
+    [qw(DUM 100 100 scratch generic-work-array excluded none)],
+    [qw(A 100 100 kinematics angle-grid required request)],
+    [qw(OBSX 200 200 experimental-data observed-values excluded legacy-adapter)],
+    [qw(ERR 200 200 experimental-data measurement-errors excluded legacy-adapter)],
+    [qw(TEX 200 200 experimental-data measured-energies excluded legacy-adapter)],
+    [qw(OBS 99 99 observable-workspace observable-grid adapter batch-result)],
+    [qw(DOBS 99 99 uncertainty observable-uncertainty-grid optional uncertainty-result)],
+    [qw(XEX 600 600 experimental-data plot-or-data-coordinates excluded legacy-adapter)],
+    [qw(NBT 99 99 fit-control fit-bin-or-point-index optional uncertainty-model)],
+    [qw(CIS 6x2 12 solution-definition isospin-coefficients required solution)],
+    [qw(CH 4x4x6 96 solution-definition helicity-angular-coefficients required solution)],
+    [qw(HDAT 3 3 packed-text date-label excluded legacy-adapter)],
+    [qw(IR0 scalar 1 grid-index reaction-family-offset adapter request-validation)],
+    [qw(THTX 200 200 experimental-data measured-angles excluded legacy-adapter)],
+    [qw(NINC scalar 1 grid-index active-grid-count adapter batch-adapter)],
+    [qw(NINCMX scalar 1 grid-index grid-capacity-control excluded legacy-adapter)],
+    [qw(NNL scalar 1 solution-definition partial-wave-limit required solution)],
+    [qw(NMTTL scalar 1 grid-index reaction-label-count internal kinematics-policy)],
+    [qw(NITTL scalar 1 grid-index observable-label-count excluded legacy-adapter)],
+    [qw(DER scalar 1 multipole-workspace active-real-multipole internal multipole-result)],
+    [qw(DEI scalar 1 multipole-workspace active-imaginary-multipole internal multipole-result)],
+    [qw(DPZ 99 99 uncertainty parameter-displacement optional uncertainty-model)],
+    [qw(OBSPRD scalar 1 observable-workspace active-observable required observable-result)],
+);
+
+my %field_by_name = map { $_->[0] => $_ } @fields;
+my @field_names = map { $_->[0] } @fields;
+
+sub implicit_type {
+    my ($name) = @_;
+    return $name =~ /^[I-N]/ ? 'implicit-INTEGER*4' : 'implicit-REAL*4';
+}
+
+sub legacy_encoding {
+    my ($field) = @_;
+    my ($name, undef, undef, $group) = @$field;
+    return $name =~ /^[I-N]/ ? 'packed-A4-in-INTEGER*4' : 'packed-A4-in-REAL*4'
+        if $group eq 'packed-text';
+    return $name =~ /^[I-N]/ ? 'numeric-INTEGER*4' : 'numeric-REAL*4';
+}
+
+sub source_lines {
+    my ($path) = @_;
+    open my $fh, '<', $path or die "open $path: $!";
+    my @lines = <$fh>;
+    close $fh;
+    return \@lines;
+}
+
+sub fixed_code {
+    my ($line) = @_;
+    return '' if $line =~ /^[Cc*!]/;
+    chomp $line;
+    return length($line) > 6 ? substr($line, 6) : '';
+}
+
+sub logical_statements {
+    my ($lines) = @_;
+    my @statements;
+    my $current;
+
+    for my $index (0 .. $#$lines) {
+        my $raw = $lines->[$index];
+        next if $raw =~ /^[Cc*!]/;
+        chomp $raw;
+        next if $raw =~ /^\s*$/;
+
+        my $continuation = length($raw) > 5 && substr($raw, 5, 1) !~ /[ 0]/;
+        my $code = length($raw) > 6 ? substr($raw, 6) : '';
+        $code =~ s/\s+$//;
+
+        if ($continuation && defined $current) {
+            $current->{code} .= ' ' . $code;
+            $current->{end} = $index + 1;
+            next;
+        }
+
+        push @statements, $current if defined $current;
+        $current = {
+            start => $index + 1,
+            end => $index + 1,
+            code => $code,
+        };
+    }
+    push @statements, $current if defined $current;
+    return \@statements;
+}
+
+sub routine_declaration {
+    my ($code) = @_;
+    my $upper = uc $code;
+    if ($upper =~ /^\s*PROGRAM\s+([A-Z][A-Z0-9_]*)/) {
+        return ('program', $1);
+    }
+    if ($upper =~ /^\s*(?:(?:RECURSIVE|PURE|ELEMENTAL)\s+)*SUBROUTINE\s+([A-Z][A-Z0-9_]*)/) {
+        return ('subroutine', $1);
+    }
+    if ($upper =~ /^\s*BLOCK\s+DATA(?:\s+([A-Z][A-Z0-9_]*))?/) {
+        return ('block-data', defined($1) ? $1 : '__BLOCK_DATA__');
+    }
+    if ($upper =~ /^\s*
+            (?:(?:RECURSIVE|PURE|ELEMENTAL)\s+)*
+            (?:
+                (?:DOUBLE\s+PRECISION|DOUBLE\s+COMPLEX|REAL|INTEGER|LOGICAL|COMPLEX|CHARACTER)
+                (?:\s*\*\s*\d+|\s*\([^)]*\))?\s+
+            )?
+            FUNCTION\s+([A-Z][A-Z0-9_]*)/x
+    ) {
+        return ('function', $1);
+    }
+    return;
+}
+
+sub parse_routines {
+    my ($lines, $statements) = @_;
+    my @starts;
+    for my $statement (@$statements) {
+        my ($kind, $name) = routine_declaration($statement->{code});
+        push @starts, [$statement->{start}, $kind, $name] if defined $kind;
+    }
+
+    my $first_decl = @starts ? $starts[0][0] : scalar(@$lines) + 1;
+    my $has_leading_code = 0;
+    for my $line_number (1 .. $first_decl - 1) {
+        my $code = fixed_code($lines->[$line_number - 1]);
+        $has_leading_code = 1 if $code =~ /\S/;
+    }
+    unshift @starts, [1, 'implicit-main', '__MAIN__']
+        if !@starts || $has_leading_code;
+
+    my @routines;
+    for my $index (0 .. $#starts) {
+        my ($start, $kind, $name) = @{$starts[$index]};
+        my $end = $index < $#starts ? $starts[$index + 1][0] - 1 : scalar @$lines;
+        push @routines, {
+            start => $start,
+            end => $end,
+            kind => $kind,
+            name => $name,
+        };
+    }
+    return \@routines;
+}
+
+sub routine_for_line {
+    my ($routines, $line) = @_;
+    for my $routine (@$routines) {
+        return $routine if $line >= $routine->{start} && $line <= $routine->{end};
+    }
+    die "no routine contains line $line";
+}
+
+sub normalize_common {
+    my ($code) = @_;
+    my $upper = uc $code;
+    return unless $upper =~ m{COMMON\s*/\s*PRSC\s*/(.*)$};
+    my $members = $1;
+    $members =~ s/\s+//g;
+    my (@parts, $part);
+    my $depth = 0;
+    for my $character (split //, $members) {
+        if ($character eq ',' && $depth == 0) {
+            push @parts, $part;
+            $part = '';
+            next;
+        }
+        $part .= $character;
+        $depth++ if $character eq '(';
+        $depth-- if $character eq ')';
+        die "unbalanced PRSC member list" if $depth < 0;
+    }
+    push @parts, $part if length $part;
+    die "unbalanced PRSC member list" unless $depth == 0;
+    return \@parts;
+}
+
+sub member_name {
+    my ($member) = @_;
+    $member =~ /^([A-Z][A-Z0-9_]*)/ or die "invalid COMMON member $member";
+    return $1;
+}
+
+sub member_dimension {
+    my ($member) = @_;
+    return 'scalar' unless $member =~ /\(([^)]*)\)/;
+    my $dimension = $1;
+    $dimension =~ s/,/x/g;
+    return lc $dimension;
+}
+
+sub cm12_stage {
+    my ($file, $routine) = @_;
+    my %stage = (
+        '__MAIN__' => 'legacy-request-orchestration',
+        'SETEK' => 'request-grid-setup',
+        'PRBAS' => 'retained-amplitude-pipeline',
+        'PROBS' => 'retained-observable-kernel',
+        'PROBSL' => 'uncontracted-observable-kernel',
+        'PRSOL' => 'solution-loader-and-dispatch',
+        'PRDLT' => 'multipole-evaluation-dispatch',
+        'PRDA' => 'partial-wave-amplitude-accumulation',
+        'CMMWP' => 'cm12-multipole-engine-adapter',
+    );
+    return $stage{$routine} // 'outside-current-cm12-contract';
+}
+
+sub token_present {
+    my ($text, $field) = @_;
+    return $text =~ /(?<![A-Z0-9_])\Q$field\E(?![A-Z0-9_])/;
+}
+
+sub classify_statement {
+    my ($statement, $field) = @_;
+    my $code = uc $statement->{code};
+    return () if $code =~ m{COMMON\s*/\s*PRSC\s*/};
+    return () unless token_present($code, $field);
+
+    my %categories;
+    my $line = $statement->{start};
+
+    if ($code =~ /^\s*(?:\d+\s+)?\Q$field\E(?:\s*\([^=]*\))?\s*=(?!=)/) {
+        $categories{'direct-write'} = 1;
+        my $rhs = $code;
+        $rhs =~ s/^[^=]*=//;
+        $categories{'read-or-control'} = 1 if token_present($rhs, $field);
+    }
+    if ($code =~ /^\s*(?:\d+\s+)?DATA\b/ && token_present($code, $field)) {
+        $categories{'direct-write'} = 1;
+    }
+    if ($code =~ /^\s*(?:\d+\s+)?READ\s*\(/ && token_present($code, $field)) {
+        $categories{'io-input'} = 1;
+    }
+    if ($code =~ /^\s*(?:\d+\s+)?CALL\b/ && token_present($code, $field)) {
+        $categories{'call-argument'} = 1;
+    }
+    if (!%categories) {
+        $categories{'read-or-control'} = 1;
+    }
+    return map { [$_, $line] } sort keys %categories;
+}
+
+my $canonical_signature =
+    join ',', map {
+        my ($name, $dimensions) = @$_;
+        my $source_dimensions = $dimensions;
+        $source_dimensions =~ s/x/,/g;
+        $dimensions eq 'scalar' ? $name : "$name($source_dimensions)";
+    } @fields;
+my $canonical_signature_sha256 = sha256_hex($canonical_signature);
+my $total_words = 0;
+$total_words += $_->[2] for @fields;
+die "field count changed: " . scalar(@fields) unless @fields == 60;
+die "word count changed: $total_words" unless $total_words == 22_370;
+
+my $field_map = File::Spec->catfile($report_root, 'prsc-field-map.tsv');
+open my $field_out, '>', $field_map or die "open $field_map: $!";
+print {$field_out} join(
+    "\t",
+    qw(ordinal offset_words_0based offset_bytes_0based name implicit_type
+       legacy_encoding dimensions elements bytes semantic_group legacy_role
+       cm12_contract_relevance target_owner)
+), "\n";
+
+my $offset_words = 0;
+for my $index (0 .. $#fields) {
+    my ($name, $dimensions, $elements, $group, $role, $relevance, $owner) =
+        @{$fields[$index]};
+    print {$field_out} join(
+        "\t",
+        $index + 1,
+        $offset_words,
+        $offset_words * 4,
+        $name,
+        implicit_type($name),
+        legacy_encoding($fields[$index]),
+        $dimensions,
+        $elements,
+        $elements * 4,
+        $group,
+        $role,
+        $relevance,
+        $owner,
+    ), "\n";
+    $offset_words += $elements;
+}
+close $field_out;
+
+my @declarations;
+my @routine_rows;
+my @usage_rows;
+
+for my $source_file (@source_files) {
+    my $path = File::Spec->catfile($source_root, $source_file);
+    my $lines = source_lines($path);
+    my $statements = logical_statements($lines);
+    my $routines = parse_routines($lines, $statements);
+
+    for my $statement (@$statements) {
+        my $members = normalize_common($statement->{code});
+        next unless defined $members;
+
+        my $routine = routine_for_line($routines, $statement->{start});
+        my @names = map { member_name($_) } @$members;
+        my @dimensions = map { member_dimension($_) } @$members;
+        my $signature = join ',', @$members;
+        my $signature_sha256 = sha256_hex($signature);
+        my $layout_match =
+            @names == @field_names
+            && join(',', @names) eq join(',', @field_names)
+            && join(',', @dimensions) eq join(',', map { $_->[1] } @fields);
+
+        push @declarations, {
+            file => $source_file,
+            routine_name => $routine->{name},
+            kind => $routine->{kind},
+            routine_start => $routine->{start},
+            routine_end => $routine->{end},
+            common_line => $statement->{start},
+            signature_sha256 => $signature_sha256,
+            field_count => scalar @names,
+            total_words => $total_words,
+            total_bytes => $total_words * 4,
+            layout_match => $layout_match ? 'yes' : 'no',
+            routine_object => $routine,
+            statements => $statements,
+        };
+    }
+}
+
+die "expected 43 active PRSC declarations, found " . scalar(@declarations)
+    unless @declarations == 43;
+for my $declaration (@declarations) {
+    die "$declaration->{file}:$declaration->{common_line} layout mismatch"
+        unless $declaration->{layout_match} eq 'yes';
+
+    my %usage;
+    for my $field (@field_names) {
+        $usage{$field} = {
+            'direct-write' => [],
+            'call-argument' => [],
+            'io-input' => [],
+            'read-or-control' => [],
+        };
+    }
+
+    for my $statement (@{$declaration->{statements}}) {
+        next if $statement->{start} < $declaration->{routine_object}{start};
+        next if $statement->{start} > $declaration->{routine_object}{end};
+        for my $field (@field_names) {
+            for my $evidence (classify_statement($statement, $field)) {
+                my ($category, $line) = @$evidence;
+                push @{$usage{$field}{$category}}, $line;
+            }
+        }
+    }
+
+    my (@referenced, @direct, @call, @read, @declaration_only);
+    for my $field (@field_names) {
+        my $entry = $usage{$field};
+        my $count =
+            @{$entry->{'direct-write'}}
+            + @{$entry->{'call-argument'}}
+            + @{$entry->{'io-input'}}
+            + @{$entry->{'read-or-control'}};
+        if ($count) {
+            push @referenced, $field;
+            push @direct, $field if @{$entry->{'direct-write'}} || @{$entry->{'io-input'}};
+            push @call, $field if @{$entry->{'call-argument'}};
+            push @read, $field if @{$entry->{'read-or-control'}};
+
+            my @line_numbers = sort { $a <=> $b } keys %{
+                +{map {
+                    $_ => 1
+                } map {
+                    @{$entry->{$_}}
+                } qw(direct-write call-argument io-input read-or-control)}
+            };
+            my @evidence;
+            for my $category (qw(direct-write call-argument io-input read-or-control)) {
+                push @evidence, "$category:" . join(',', @{$entry->{$category}})
+                    if @{$entry->{$category}};
+            }
+            push @usage_rows, [
+                $declaration->{file},
+                $declaration->{routine_name},
+                $field,
+                scalar @{$entry->{'direct-write'}},
+                scalar @{$entry->{'call-argument'}},
+                scalar @{$entry->{'io-input'}},
+                scalar @{$entry->{'read-or-control'}},
+                join(',', @line_numbers),
+                join(';', @evidence),
+                cm12_stage($declaration->{file}, $declaration->{routine_name}),
+            ];
+        } else {
+            push @declaration_only, $field;
+        }
+    }
+
+    push @routine_rows, [
+        $declaration->{file},
+        $declaration->{routine_name},
+        $declaration->{routine_object}{kind},
+        $declaration->{routine_object}{start},
+        $declaration->{routine_object}{end},
+        $declaration->{common_line},
+        cm12_stage($declaration->{file}, $declaration->{routine_name}),
+        join(',', @referenced),
+        join(',', @direct),
+        join(',', @call),
+        join(',', @read),
+        join(',', @declaration_only),
+    ];
+}
+
+my $declaration_map =
+    File::Spec->catfile($report_root, 'prsc-declaration-map.tsv');
+open my $declaration_out, '>', $declaration_map
+    or die "open $declaration_map: $!";
+print {$declaration_out} join(
+    "\t",
+    qw(file routine kind routine_start_line routine_end_line common_line
+       signature_sha256 field_count total_words total_bytes
+       canonical_layout_match)
+), "\n";
+for my $declaration (@declarations) {
+    print {$declaration_out} join(
+        "\t",
+        @{$declaration}{
+            qw(file routine_name kind routine_start routine_end common_line
+               signature_sha256 field_count total_words total_bytes
+               layout_match)
+        }
+    ), "\n";
+}
+close $declaration_out;
+
+my $routine_map = File::Spec->catfile($report_root, 'prsc-routine-map.tsv');
+open my $routine_out, '>', $routine_map or die "open $routine_map: $!";
+print {$routine_out} join(
+    "\t",
+    qw(file routine kind routine_start_line routine_end_line common_line
+       cm12_stage referenced_fields direct_write_fields call_argument_fields
+       read_or_control_fields declaration_only_fields)
+), "\n";
+print {$routine_out} join("\t", @$_), "\n" for @routine_rows;
+close $routine_out;
+
+my $usage_map = File::Spec->catfile($report_root, 'prsc-usage-map.tsv');
+open my $usage_out, '>', $usage_map or die "open $usage_map: $!";
+print {$usage_out} join(
+    "\t",
+    qw(file routine field direct_write_count call_argument_count io_input_count
+       read_or_control_count line_numbers access_evidence cm12_stage)
+), "\n";
+print {$usage_out} join("\t", @$_), "\n" for @usage_rows;
+close $usage_out;
+
+print "PRSC declarations: " . scalar(@declarations) . "\n";
+print "PRSC fields: " . scalar(@fields) . "\n";
+print "PRSC words: $total_words\n";
+print "PRSC bytes (4-byte ABI): " . ($total_words * 4) . "\n";
+print "Canonical signature SHA-256: $canonical_signature_sha256\n";
+print "Usage rows: " . scalar(@usage_rows) . "\n";

@@ -1,0 +1,216 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly state_root="${PHASE1_STATE_ROOT:-/workspace/phase1/reproducible}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}"
+readonly member_list="${phase1_root}/config/gplot-prsdd-members.txt"
+readonly gplot_patch="${phase1_root}/patches/gplot-modern-compiler.patch"
+readonly saidopen_patch="${phase1_root}/patches/saidopen-portable-data-root.patch"
+readonly compiler_patch="${phase1_root}/patches/pnpolw-modern-compiler.patch"
+readonly data_patch="${phase1_root}/patches/pnpolw-portable-data-root.patch"
+
+readonly commit="$(git -C "${source_root}" rev-parse HEAD)"
+readonly short_commit="$(git -C "${source_root}" rev-parse --short=12 HEAD)"
+
+mkdir -p "${state_root}" "${report_root}"
+readonly build_root="$(mktemp -d "${state_root}/pnpolw-${short_commit}.XXXXXX")"
+readonly artifact_root="${state_root}/artifacts/${short_commit}"
+readonly libraries_log="${report_root}/pnpolw-libraries-build.log"
+readonly gplot_log="${report_root}/pnpolw-gplot-build.log"
+readonly core_log="${report_root}/pnpolw-core-build.log"
+readonly link_log="${report_root}/pnpolw-link.log"
+
+: >"${libraries_log}"
+: >"${gplot_log}"
+: >"${core_log}"
+: >"${link_log}"
+
+readonly -a fixed_flags=(
+    -O1
+    -std=legacy
+    "-ffile-prefix-map=${build_root}=/phase1-build"
+    -ffixed-line-length-none
+    -fallow-argument-mismatch
+    -fallow-invalid-boz
+    -fdec-char-conversions
+    -fno-second-underscore
+    -fno-automatic
+)
+
+readonly -a gplot_flags=(
+    -O1
+    -cpp
+    -Dg77
+    -Dunix
+    -std=legacy
+    "-ffile-prefix-map=${build_root}=/phase1-build"
+    -ffixed-line-length-none
+    -fallow-argument-mismatch
+    -fallow-invalid-boz
+    -fdec-char-conversions
+    -fd-lines-as-comments
+    -fno-second-underscore
+    -fno-automatic
+)
+
+readonly -a gplot_c_flags=(
+    -O1
+    -std=gnu89
+    -Dg77
+    -Dunix
+    -D_POSIX_C_SOURCE=199506L
+    "-ffile-prefix-map=${build_root}=/phase1-build"
+    -fcommon
+    -Wno-implicit-int
+    -Wno-implicit-function-declaration
+    -Wno-incompatible-pointer-types
+    -I/usr/include/X11
+)
+
+gcc \
+    -std=gnu89 \
+    -D_POSIX_C_SOURCE=199506L \
+    -w \
+    "${source_root}/lib/fsplit.c" \
+    -o "${build_root}/fsplit"
+
+build_split_archive() {
+    local input="$1"
+    local archive_name="$2"
+    local source_patch="${3:-}"
+    local split_root="${build_root}/${archive_name%.a}"
+    local object_root="${split_root}/objects"
+    local copied_input="${split_root}/$(basename "${input}")"
+
+    mkdir -p "${split_root}" "${object_root}"
+    cp "${input}" "${copied_input}"
+
+    if [[ -n "${source_patch}" ]]; then
+        patch --fuzz=0 -d "${split_root}" -p1 -i "${source_patch}" \
+            >>"${libraries_log}" 2>&1
+    fi
+
+    (
+        cd "${split_root}"
+        "${build_root}/fsplit" "$(basename "${input}")"
+    ) >>"${libraries_log}" 2>&1
+
+    # Aggregate .f inputs would otherwise be compiled alongside their split units.
+    if [[ "${copied_input}" == *.f ]]; then
+        rm "${copied_input}"
+    fi
+
+    local source
+    for source in "${split_root}"/*.f; do
+        (
+            cd "${split_root}"
+            gfortran \
+                "${fixed_flags[@]}" \
+                -c "$(basename "${source}")" \
+                -o "objects/$(basename "${source%.f}.o")"
+        ) >>"${libraries_log}" 2>&1
+    done
+
+    ar rcs "${build_root}/${archive_name}" "${object_root}"/*.o
+}
+
+build_split_archive \
+    "${source_root}/said/saidopen.for" \
+    saidopen.a \
+    "${saidopen_patch}"
+build_split_archive "${source_root}/libxzl.for" libxz.a
+build_split_archive "${source_root}/said/pnu.f" pnu.a
+build_split_archive "${source_root}/mod01.for" mod01.a
+
+readonly gplot_root="${build_root}/gplot"
+mkdir -p "${gplot_root}"
+cp -a "${source_root}/gplot/." "${gplot_root}/"
+patch --fuzz=0 -d "${gplot_root}" -p1 -i "${gplot_patch}" \
+    >>"${gplot_log}" 2>&1
+
+mapfile -t gplot_members <"${member_list}"
+gplot_targets=()
+for member in "${gplot_members[@]}"; do
+    gplot_targets+=("gplot.a(${member})")
+done
+
+readonly gplot_fortran_command="gfortran ${gplot_flags[*]} -c"
+readonly gplot_c_command="gcc ${gplot_c_flags[*]} -c"
+
+make \
+    -C "${gplot_root}" \
+    -B \
+    "${gplot_targets[@]}" \
+    F77="${gplot_fortran_command}" \
+    CC="${gplot_c_command}" \
+    >>"${gplot_log}" 2>&1
+
+ar rcs "${build_root}/gplot.a" "${gplot_root}"/*.o
+
+readonly core_root="${build_root}/core"
+mkdir -p "${core_root}"
+cp "${source_root}/webplt/pnpolw.for" "${core_root}/"
+patch --fuzz=0 -d "${core_root}" -p1 -i "${compiler_patch}" \
+    >>"${core_log}" 2>&1
+patch --fuzz=0 -d "${core_root}" -p1 -i "${data_patch}" \
+    >>"${core_log}" 2>&1
+
+(
+    cd "${core_root}"
+    gfortran \
+        "${fixed_flags[@]}" \
+        -c pnpolw.for \
+        -o pnpolw.o
+) >>"${core_log}" 2>&1
+
+gfortran \
+    -O1 \
+    -fno-second-underscore \
+    -o "${build_root}/pnpolw" \
+    "${core_root}/pnpolw.o" \
+    "${build_root}/pnu.a" \
+    "${build_root}/mod01.a" \
+    "${build_root}/libxz.a" \
+    "${build_root}/saidopen.a" \
+    "${build_root}/gplot.a" \
+    -lm \
+    -lXt \
+    -lX11 \
+    -lpng \
+    -lgd \
+    >>"${link_log}" 2>&1
+
+if objdump -p "${build_root}/pnpolw" \
+    | grep -Eq 'NEEDED[[:space:]]+(libg2c|libgfortran\.so\.3|libpng12|libgd\.so\.1)'; then
+    printf 'Obsolete runtime dependency remains in pnpolw\n' >&2
+    exit 1
+fi
+
+mkdir -p "${artifact_root}"
+install -m 755 "${build_root}/pnpolw" "${artifact_root}/pnpolw"
+
+{
+    printf 'source_commit=%s\n' "${commit}"
+    printf 'build_architecture=%s\n' "$(uname -m)"
+    printf 'operating_system=%s\n' "$(. /etc/os-release; printf '%s %s' "${NAME}" "${VERSION_ID}")"
+    printf 'gfortran=%s\n' "$(gfortran --version | sed -n '1p')"
+    printf 'gcc=%s\n' "$(gcc --version | sed -n '1p')"
+    printf 'pnu_members=%s\n' "$(ar t "${build_root}/pnu.a" | wc -l)"
+    printf 'mod01_members=%s\n' "$(ar t "${build_root}/mod01.a" | wc -l)"
+    printf 'saidopen_members=%s\n' "$(ar t "${build_root}/saidopen.a" | wc -l)"
+    printf 'libxz_members=%s\n' "$(ar t "${build_root}/libxz.a" | wc -l)"
+    printf 'gplot_members=%s\n' "$(ar t "${build_root}/gplot.a" | wc -l)"
+    sha256sum "${artifact_root}/pnpolw"
+    sha256sum "${member_list}"
+    sha256sum "${gplot_patch}"
+    sha256sum "${saidopen_patch}"
+    sha256sum "${compiler_patch}"
+    sha256sum "${data_patch}"
+    printf 'runtime_dependencies:\n'
+    objdump -p "${artifact_root}/pnpolw" | sed -n '/NEEDED/p'
+} >"${report_root}/pnpolw-build-manifest.txt"
+
+printf 'Built %s\n' "${artifact_root}/pnpolw"
+printf 'Manifest %s\n' "${report_root}/pnpolw-build-manifest.txt"

@@ -1,0 +1,11 @@
+f37ba4e753fb1ff96081a9bc28a74e5fa667f70a93043efb6cf65bef94104aba  /workspace/gwdac/gwdac/cgi-bin/prsd
+ab0f1c5200d5d4f7a2d0632ea4f5fe23e5f9cca60410965558925c27bc728b46  /phase1/fixtures/go3pr-cm12-default.in
+3735eaa474870e12ac3703c5f64792ec42798bdd17e6ed1585b5153c37db425e  /phase1/reports/go3pr-historical-gwdac.stdout
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /phase1/reports/go3pr-historical-gwdac.stderr
+24fb83268030175bc27f17c53770da7785c643a46ba6d183f3617221bdcb982e  /phase1/reports/go3pr-historical-gwdac.file-trace
+c13cada9bda01e85f06466c741ac60810d47775ef92897c5ebc151dd6b367205  /phase1/reports/go3pr-historical-gwdac-opened-files.txt
+80868398e786c36ff11ef6ef4388e7896fc867d69e319c843b1923d5819a86c3  /phase1/reports/go3pr-historical-gwdac-dsg.tsv
+b41fa20c56f7758f64260fc259080bbbb97ceb454ecc9bbed4275f92ef10bd6f  /phase1/reports/go3pr-historical-gwdac.SAID.TMP
+0d438492859e721a4cbd8f4c246e9154cc8abdc58af66a1777cd3b485455d907  /phase1/reports/go3pr-historical-gwdac.SAID.PCT
+ee80a47e73002386599eabf570f79245f8f14d52388f536eb11ef76582cc059d  /phase1/reports/go3pr-historical-gwdac.SAID.LOG
+cb95a6bb17364a3b217afe9035238e31e87f726dbd7ad0dbd8ea2b8aed3c3e5d  /phase1/reports/go3pr-historical-gwdac.fort.7

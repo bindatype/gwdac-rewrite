@@ -1,0 +1,12 @@
+id	category	solution	reaction	independent_variable	grid_min	grid_step	grid_max	fixed_variable	fixed_value	observable	expected_rows	expected_behavior	description
+cm12_pi_plus_dsg_baseline	normal	CM12	pi+n	acm_deg	0	10	180	photon_lab_energy_mev	1000	DSG	19	normal	Phase 1 exact-oracle baseline with experimental-data lookup
+cm12_pi0p_dsg	normal	CM12	pi0p	acm_deg	0	30	180	photon_lab_energy_mev	400	DSG	7	normal	Neutral-pion proton channel
+cm12_pi_minus_dsg	normal	CM12	pi-p	acm_deg	0	30	180	photon_lab_energy_mev	500	DSG	7	normal	Negative-pion proton channel
+cm12_pi0n_dsg	normal	CM12	pi0n	acm_deg	0	30	180	photon_lab_energy_mev	800	DSG	7	normal	Neutral-pion neutron channel
+cm12_pi_plus_dsg_fixed_w	normal	CM12	pi+n	acm_deg	0	30	180	total_cm_energy_mev	1600	DSG	7	normal	Fixed center-of-mass energy
+cm12_pi_plus_dsg_energy_sweep	normal	CM12	pi+n	photon_lab_energy_mev	200	100	500	acm_deg	90	DSG	4	normal	Energy sweep at a fixed center-of-mass angle
+cm12_pi_plus_dsg_cosine_clamp	boundary	CM12	pi+n	cos_acm	-2	0.5	2	photon_lab_energy_mev	1000	DSG	5	legacy_clamp	Legacy clamps cosine endpoints to minus one and plus one
+cm12_pi_plus_dsg_dense_grid	boundary	CM12	pi+n	acm_deg	0	1	180	photon_lab_energy_mev	1000	DSG	61	legacy_reprompt_nan	Legacy rejects more than 70 points but corrupts state before accepting a replacement step
+cm12_invalid_reaction_recovery	malformed	CM12	invalid_then_pi+n	acm_deg	0	30	180	photon_lab_energy_mev	1000	DSG	7	legacy_reprompt	Invalid reaction number is rejected before a valid replacement
+cm12_unknown_observable_recovery	malformed	CM12	pi+n	acm_deg	0	30	180	photon_lab_energy_mev	1000	BOGUS_then_DSG	7	legacy_reprompt	Unknown observable is rejected before DSG is accepted
+cm12_pi_plus_below_threshold	scientifically_invalid	CM12	pi+n	acm_deg	0	30	180	photon_lab_energy_mev	100	DSG	7	legacy_zero_nan	Legacy returns zero center-of-mass DSG and NaN lab fields below threshold

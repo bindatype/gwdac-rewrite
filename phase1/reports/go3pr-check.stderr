@@ -1,0 +1,17 @@
+At line 7953 of file /workspace/arndt64/said/prsd.f
+Fortran runtime error: Index '-1' of dimension 1 of array 'nfg' below lower bound of 1
+
+Error termination. Backtrace:
+#0  0x7fffff4c6e59 in ???
+#1  0x7fffff4c7a71 in ???
+#2  0x7fffff4c8082 in ???
+#3  0x555555603e50 in pnmod_
+	at /workspace/arndt64/said/prsd.f:7953
+#4  0x5555556cadab in pnpwi_
+	at /workspace/arndt64/said/pru.f:25
+#5  0x555555578217 in prsol_
+	at /workspace/arndt64/said/prsd.f:2251
+#6  0x5555555efe38 in MAIN__
+	at /workspace/arndt64/said/prsd.f:201
+#7  0x555555600bd5 in main
+	at /workspace/arndt64/said/prsd.f:1044

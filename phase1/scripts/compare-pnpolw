@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}"
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly gwdac_root="${GWDAC_SOURCE:-/workspace/gwdac}"
+readonly summary="${report_root}/pnpol-oracle-comparison.md"
+readonly table="${report_root}/pnpol-oracle-comparison.tsv"
+
+relation() {
+    if cmp -s "$1" "$2"; then
+        printf 'byte-identical'
+    else
+        printf 'different'
+    fi
+}
+
+readonly modern_pct="${report_root}/pnpol-modern.normalized.PNPOL.PCT"
+readonly arndt_pct="${report_root}/pnpol-historical-arndt64.normalized.PNPOL.PCT"
+readonly gwdac_pct="${report_root}/pnpol-historical-gwdac.normalized.PNPOL.PCT"
+readonly modern_tmp="${report_root}/pnpol-modern.PNPOL.TMP"
+readonly arndt_tmp="${report_root}/pnpol-historical-arndt64.PNPOL.TMP"
+readonly gwdac_tmp="${report_root}/pnpol-historical-gwdac.PNPOL.TMP"
+readonly captured_arndt="${source_root}/webplt/PNPOL.PCT"
+readonly captured_gwdac="${gwdac_root}/gwdac/cgi-bin/PNPOL.PCT"
+
+{
+    printf 'comparison\tartifact\trelation\tsha256\n'
+    printf 'modern-vs-arndt64\tPNPOL.PCT.normalized\t%s\t%s\n' \
+        "$(relation "${modern_pct}" "${arndt_pct}")" \
+        "$(sha256sum "${modern_pct}" | awk '{print $1}')"
+    printf 'modern-vs-arndt64\tPNPOL.TMP\t%s\t%s\n' \
+        "$(relation "${modern_tmp}" "${arndt_tmp}")" \
+        "$(sha256sum "${modern_tmp}" | awk '{print $1}')"
+    printf 'modern-vs-gwdac\tPNPOL.PCT.normalized\t%s\t%s\n' \
+        "$(relation "${modern_pct}" "${gwdac_pct}")" \
+        "$(sha256sum "${gwdac_pct}" | awk '{print $1}')"
+    printf 'modern-vs-gwdac\tPNPOL.TMP\t%s\t%s\n' \
+        "$(relation "${modern_tmp}" "${gwdac_tmp}")" \
+        "$(sha256sum "${gwdac_tmp}" | awk '{print $1}')"
+    printf 'modern-vs-captured-arndt64\tPNPOL.PCT\t%s\t%s\n' \
+        "$(relation "${report_root}/pnpol-modern.PNPOL.PCT" "${captured_arndt}")" \
+        "$(sha256sum "${captured_arndt}" | awk '{print $1}')"
+    printf 'gwdac-oracle-vs-captured-gwdac\tPNPOL.PCT\t%s\t%s\n' \
+        "$(relation "${report_root}/pnpol-historical-gwdac.PNPOL.PCT" "${captured_gwdac}")" \
+        "$(sha256sum "${captured_gwdac}" | awk '{print $1}')"
+} >"${table}"
+
+cat >"${summary}" <<EOF
+# pnpolw oracle comparison
+
+The rebuilt source target and the checked-in arndt64 executable both exit 0
+with empty stderr for the retained two-file fixture. After replacing only the
+embedded calendar date, their PNPOL.PCT plot-command streams are byte-identical.
+Their 50-byte PNPOL.TMP files are byte-identical without normalization.
+
+The GWDAC executable is a separate behavioral lineage: it asks for an
+additional grid-count input and emits a different PNPOL.PCT stream for the
+same fixture. It is retained as deployment evidence, not treated as the source
+oracle for webplt/pnpolw.for.
+
+Neither checked-in PNPOL.PCT file matches a fresh run of its adjacent
+executable with the surviving PNPOL.IN and PNPOL.INP pair. Those captures are
+therefore unpaired evidence and must not be used as exact goldens.
+
+Machine-readable results: pnpol-oracle-comparison.tsv
+EOF
+
+cmp "${modern_pct}" "${arndt_pct}"
+cmp "${modern_tmp}" "${arndt_tmp}"
+
+printf 'pnpolw oracle gate passed\n'

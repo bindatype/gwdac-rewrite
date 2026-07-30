@@ -1,0 +1,58 @@
+--- a/prsd.f
++++ b/prsd.f
+@@ -1376,7 +1376,7 @@
+ C     CALL DATA3(SPW,1,SOP,1,SOPW,1,M)
+ C     WRITE(*,101) IR,SPW,SOP,SOPW
+ C 101 FORMAT('  Ir, Spw, Sopec, Sopecpw=',I2,3F6.1)
+-      KILL=PEM(25,6,2,6)
++      CALL CM12SOLUTIONKILL(KILL)
+ C add KILL for Workman 9/22/00
+       WT=WP
+       IF(IR.GT.2) WT=WN
+@@ -1426,11 +1426,11 @@
+       LL=L
+       IF(TITLE(1).EQ.BORN) NF(M,J,L)=50
+       IF(TITLE(1).EQ.BRNX) NF(M,J,L)=51
+-      NFX=NF(M,J,L)
++      CALL CM12SOLUTIONFORM(M,J,L,NFX)
+       EMR(I,M,J,L)=EMPI(M,J,L)
+       EMI(I,M,J,L)=0.0
+-      IF(NFX.EQ.0.AND.L.GT.2) NF(M,J,L)=3
+-      IF(NF(M,J,L).EQ.0) GO TO 3
++      IF(NFX.EQ.0.AND.L.GT.2) NFX=3
++      IF(NFX.EQ.0) GO TO 3
+       EMR(I,M,J,L)=0.0
+       CALL PRDLT
+       EMR(I,M,J,L)=DER
+@@ -1441,7 +1441,7 @@
+       IF(PEM(1,M,J,L).NE.0.0.OR.PEM(5,M,J,L).NE.0.0) GO TO 3
+       EMR(I,M,J,L)=0.0
+       EMI(I,M,J,L)=0.0
+-    3 NF(M,J,L)=NFX
++    3 CONTINUE
+     2 CONTINUE
+       IF(IR.EQ.0)  GO TO 99
+       II=1
+@@ -1472 +1472,2 @@
+-      IF(NF(M,J,L).EQ.0)  GO TO 8
++      CALL CM12SOLUTIONFORM(M,J,L,NFX)
++      IF(NFX.EQ.0)  GO TO 8
+@@ -1492 +1493 @@
+-      SUBROUTINE PROBS
++      SUBROUTINE PROBS_LEGACY
+@@ -2343,9 +2344,10 @@
+       ! >MWP 100930.v1
+       mjlmp=100*mm+10*jj+ll-1
+       !print *,'enter prdlt: ',mjlmp,nf(mm,jj,ll)
+-      if(nf(mm,jj,ll)>100.and.nf(mm,jj,ll)<200) then
++      CALL CM12SOLUTIONFORM(MM,JJ,LL,NNF)
++      if(NNF>100.and.NNF<200) then
+          call cmmwp
+-         !if (mjlmp.eq.320) write(1320,*) e(ie),der,dei,nf(mm,jj,ll)
++         !if (mjlmp.eq.320) write(1320,*) e(ie),der,dei,NNF
+          !goto 98
+          goto 199 ! Must do this for 'new' CM solution form 135 MWP 2011.07.29
+       endif
+@@ -4970 +4972 @@
+-      SUBROUTINE PRDA
++      SUBROUTINE PRDA_LEGACY

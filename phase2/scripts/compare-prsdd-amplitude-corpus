@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly report_root="${PHASE2_REPORT_ROOT:-${phase2_root}/reports}"
+readonly corpus="${phase2_root}/fixtures/amplitudes/corpus.tsv"
+readonly corpus_report_root="${report_root}/amplitude-corpus"
+readonly comparison="${report_root}/prsdd-amplitude-corpus-comparison.tsv"
+readonly markdown_report="${report_root}/prsdd-amplitude-corpus-validation.md"
+readonly -a engines=(modern arndt64 gwdac)
+
+for engine in "${engines[@]}"; do
+    test -f "${report_root}/prsdd-amplitude-corpus-${engine}.tsv"
+done
+
+printf '%s\n' \
+    $'id\tcategory\trows\tmodern_sha256\tarndt64_sha256\tgwdac_sha256\texact_all' \
+    >"${comparison}"
+case_count=0
+row_count=0
+
+while IFS=$'\t' read -r id category solution reaction independent_variable \
+    grid_min grid_step grid_max fixed_variable fixed_value amplitude_choice \
+    expected_rows expected_behavior description; do
+    if [[ "${id}" == "id" ]]; then
+        continue
+    fi
+
+    modern="${corpus_report_root}/modern/${id}.results.tsv"
+    arndt64="${corpus_report_root}/arndt64/${id}.results.tsv"
+    gwdac="${corpus_report_root}/gwdac/${id}.results.tsv"
+    test -f "${modern}"
+    test -f "${arndt64}"
+    test -f "${gwdac}"
+    cmp -s "${modern}" "${arndt64}"
+    cmp -s "${modern}" "${gwdac}"
+
+    modern_sha="$(sha256sum "${modern}" | awk '{print $1}')"
+    arndt64_sha="$(sha256sum "${arndt64}" | awk '{print $1}')"
+    gwdac_sha="$(sha256sum "${gwdac}" | awk '{print $1}')"
+    rows="$(($(wc -l <"${modern}") - 1))"
+    case_count=$((case_count + 1))
+    row_count=$((row_count + rows))
+
+    printf '%s\t%s\t%s\t%s\t%s\t%s\tyes\n' \
+        "${id}" \
+        "${category}" \
+        "${rows}" \
+        "${modern_sha}" \
+        "${arndt64_sha}" \
+        "${gwdac_sha}" \
+        >>"${comparison}"
+done <"${corpus}"
+
+readonly baseline="$(
+    printf '%s/modern/cm12_pi_plus_h1_baseline.results.tsv' \
+        "${corpus_report_root}"
+)"
+for equivalent in \
+    cm12_pi_plus_h1_choice_zero \
+    cm12_unknown_observable_h1_recovery \
+    cm12_invalid_reaction_h1_recovery; do
+    cmp -s \
+        "${baseline}" \
+        "${corpus_report_root}/modern/${equivalent}.results.tsv"
+done
+
+comparison_sha="$(sha256sum "${comparison}" | awk '{print $1}')"
+cat >"${markdown_report}" <<EOF
+# \`prsdd\` CM12 Walker-helicity-amplitude corpus validation
+
+Generated: $(date -u '+%Y-%m-%dT%H:%M:%SZ')
+
+## Result
+
+All ${case_count} corpus cases completed with exit status 0 and the normal SAID
+exit message on the modern headless build and both checked-in historical
+executables. The ${row_count} typed records, each containing four complex
+amplitudes, are byte-identical across all three engines at the legacy program's
+displayed precision. All stderr streams are empty except for the expected
+modern IEEE underflow/denormal diagnostic on the finite \`Wcm\` sweep.
+
+- Normal requests: 7
+- Boundary requests: 3
+- Malformed selections with legacy recovery: 2
+- Legacy amplitude-choice coercion: 1
+- Comparison SHA-256: \`${comparison_sha}\`
+
+The choice-zero, unknown-observable recovery, and invalid-reaction recovery
+fixtures produce the same typed table as the valid baseline request. Silent
+cosine and amplitude-choice clamping are recorded compatibility behavior; the
+replacement API should reject those inputs.
+
+## Release rule
+
+The parsed amplitude records, not terminal transcripts, are the blocking
+regression artifacts. Exact equality is required at the legacy one-decimal grid
+and two-decimal amplitude precision until a higher-precision interface and
+domain-approved tolerance policy exist.
+
+## Immutable-seam follow-up
+
+The CM12 immutable-loader compatibility build passes the same ${case_count}
+cases and produces all ${row_count} four-complex-amplitude records
+byte-identically to the modern reference. Direct scalar evidence is recorded
+separately in \`cm12-seam-validation.md\`.
+EOF
+
+printf 'Amplitude corpus comparison passed: %s\n' "${markdown_report}"

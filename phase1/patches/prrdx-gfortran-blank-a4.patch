@@ -1,0 +1,11 @@
+--- a/pru.f
++++ b/pru.f
+@@ -4836,6 +4836,8 @@
+   106 FORMAT(' ',2A4,' ',A4,'  ',10A4)
+       ZX=XNRM
+       ZE=XERR
++C Keep gfortran from treating an all-blank final A4 as end-of-record.
++      CSTR(57:57)='X'
+       READ(CSTR,159) INP,MMO,MMY
+    98 IF(M.NE.0) MTRN=10
+       NINX=NIN0

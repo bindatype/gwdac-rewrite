@@ -1,0 +1,188 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly gwdac_root="${GWDAC_SOURCE:-/workspace/gwdac}"
+readonly state_root="${ORACLE_STATE_ROOT:-/oracle-work}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}"
+readonly fixture="${phase1_root}/fixtures/go3pr-cm12-default.in"
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-120}"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly data_root="${source_root}/sdat"
+readonly source_commit="$(
+    awk -F= '$1 == "source_commit" { print $2 }' \
+        "${report_root}/build-manifest.txt"
+)"
+
+readonly -a labels=(arndt64 gwdac)
+readonly -a binaries=(
+    "${source_root}/said/prsdd"
+    "${gwdac_root}/gwdac/cgi-bin/prsd"
+)
+
+mkdir -p "${state_root}/runs" "${report_root}"
+failures=0
+
+extract_result() {
+    local stdout_report="$1"
+    local result_report="$2"
+
+    {
+        printf 'acm_deg\tobservable\terror\talab_deg\tdsg_lab\n'
+        awk '
+            /^[[:space:]]+Acm[[:space:]]+Obs,Err/ {
+                capture = 1
+                next
+            }
+            capture && /To see exp data/ {
+                exit
+            }
+            capture && NF == 5 {
+                print $1 "\t" $2 "\t" $3 "\t" $4 "\t" $5
+            }
+        ' "${stdout_report}"
+    } >"${result_report}"
+}
+
+run_oracle() {
+    local label="$1"
+    local binary="$2"
+    local prefix="${report_root}/go3pr-historical-${label}"
+    local stdout_report="${prefix}.stdout"
+    local stderr_report="${prefix}.stderr"
+    local exit_report="${prefix}.exit"
+    local trace_report="${prefix}.file-trace"
+    local opened_report="${prefix}-opened-files.txt"
+    local result_report="${prefix}-dsg.tsv"
+    local manifest_report="${prefix}-manifest.txt"
+    local checksum_report="${prefix}-artifacts.sha256"
+    local runtime_library_path="${LD_LIBRARY_PATH}"
+    local run_root
+    local status
+    local result_rows
+
+    if [[ "${label}" == "gwdac" ]]; then
+        runtime_library_path="/opt/oracle/gfortran-4.4/usr/lib:${LD_LIBRARY_PATH}"
+    fi
+
+    test -x "${binary}"
+    run_root="$(mktemp -d "${state_root}/runs/go3pr-${label}.XXXXXX")"
+    cp -a "${source_root}/pr" "${run_root}/pr"
+    rm -f \
+        "${run_root}/pr/SAID.TMP" \
+        "${run_root}/pr/SAID.PCT" \
+        "${run_root}/pr/SAID.LOG" \
+        "${run_root}/pr/SAID.PS" \
+        "${run_root}/pr/fort.3" \
+        "${run_root}/pr/fort.7"
+    rm -f \
+        "${prefix}.SAID.TMP" \
+        "${prefix}.SAID.PCT" \
+        "${prefix}.SAID.LOG" \
+        "${prefix}.SAID.PS" \
+        "${prefix}.fort.3" \
+        "${prefix}.fort.7"
+    ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+    ln -s "${data_root}" "${run_root}/sdat"
+    : >"${trace_report}"
+
+    set +e
+    (
+        cd "${run_root}/pr"
+        timeout "${timeout_seconds}" \
+            env \
+            LD_LIBRARY_PATH="${runtime_library_path}" \
+            LD_PRELOAD=/opt/oracle/file-trace.so \
+            ORACLE_FILE_TRACE="${trace_report}" \
+            "${binary}" \
+            <"${fixture}" \
+            >"${stdout_report}" \
+            2>"${stderr_report}"
+    )
+    status=$?
+    set -e
+    printf '%s\n' "${status}" >"${exit_report}"
+
+    cut -f2- "${trace_report}" \
+        | sort -u \
+        >"${opened_report}"
+
+    for name in SAID.TMP SAID.PCT SAID.LOG fort.3 fort.7; do
+        if [[ -f "${run_root}/pr/${name}" ]]; then
+            install -m 644 \
+                "${run_root}/pr/${name}" \
+                "${prefix}.${name}"
+        fi
+    done
+
+    extract_result "${stdout_report}" "${result_report}"
+    result_rows="$(($(wc -l <"${result_report}") - 1))"
+
+    {
+        printf 'label=%s\n' "${label}"
+        printf 'binary=%s\n' "${binary}"
+        printf 'binary_sha256=%s\n' "$(sha256sum "${binary}" | awk '{print $1}')"
+        printf 'source_commit=%s\n' "${source_commit}"
+        printf 'run_root=%s\n' "${run_root}"
+        printf 'fixture=%s\n' "${fixture}"
+        printf 'fixture_sha256=%s\n' "$(sha256sum "${fixture}" | awk '{print $1}')"
+        printf 'data_root=%s\n' "${data_root}"
+        printf 'kcm_root=%s\n' "${kcm_root}"
+        printf 'timeout_seconds=%s\n' "${timeout_seconds}"
+        printf 'runtime_library_path=%s\n' "${runtime_library_path}"
+        printf 'exit_status=%s\n' "${status}"
+        printf 'stdout_lines=%s\n' "$(wc -l <"${stdout_report}")"
+        printf 'stderr_lines=%s\n' "$(wc -l <"${stderr_report}")"
+        printf 'result_rows=%s\n' "${result_rows}"
+        printf 'opened_file_paths=%s\n' "$(wc -l <"${opened_report}")"
+        printf 'file_trace=LD_PRELOAD:/opt/oracle/file-trace.so\n'
+        printf 'operating_system=%s\n' "$(. /etc/os-release; printf '%s %s' "${NAME}" "${VERSION_ID}")"
+        LD_LIBRARY_PATH="${runtime_library_path}" \
+            ldd "${binary}" | sed 's/^/ldd=/'
+    } >"${manifest_report}"
+
+    sha_inputs=(
+        "${binary}"
+        "${fixture}"
+        "${stdout_report}"
+        "${stderr_report}"
+        "${trace_report}"
+        "${opened_report}"
+        "${result_report}"
+    )
+    for name in SAID.TMP SAID.PCT SAID.LOG fort.3 fort.7; do
+        if [[ -f "${prefix}.${name}" ]]; then
+            sha_inputs+=("${prefix}.${name}")
+        fi
+    done
+    sha256sum "${sha_inputs[@]}" >"${checksum_report}"
+
+    if [[ "${status}" -ne 0 ]]; then
+        printf '%s exited with status %s\n' "${label}" "${status}" >&2
+        failures=$((failures + 1))
+    elif [[ "${result_rows}" -ne 19 ]]; then
+        printf '%s produced %s DSG rows, expected 19\n' \
+            "${label}" "${result_rows}" >&2
+        failures=$((failures + 1))
+    elif [[ -s "${stderr_report}" ]]; then
+        printf '%s wrote to stderr\n' "${label}" >&2
+        failures=$((failures + 1))
+    elif ! grep -Fq 'Thanks for using SAID' "${stdout_report}"; then
+        printf '%s did not reach the normal exit message\n' "${label}" >&2
+        failures=$((failures + 1))
+    else
+        printf '%s completed in %s\n' "${label}" "${run_root}"
+    fi
+}
+
+for index in "${!labels[@]}"; do
+    run_oracle "${labels[index]}" "${binaries[index]}"
+done
+
+if [[ "${failures}" -ne 0 ]]; then
+    printf '%s historical oracle run(s) failed validation\n' "${failures}" >&2
+    exit 1
+fi
+
+printf 'Both historical oracle runs completed successfully\n'

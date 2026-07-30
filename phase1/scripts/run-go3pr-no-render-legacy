@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export PRSD_ARTIFACT_NAME=prsdd
+export PRSD_REPORT_LABEL=no-render-legacy
+export PRSD_RESULT_FILENAME=go3pr-no-render-legacy-dsg.tsv
+export PRSD_FIXTURE=/phase1/fixtures/go3pr-cm12-no-render.in
+export PRSD_FORBIDDEN_OUTPUTS="SAID.PS fort.3"
+
+exec /phase1/scripts/run-go3pr

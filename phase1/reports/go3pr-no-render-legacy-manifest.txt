@@ -1,0 +1,14 @@
+source_commit=f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+artifact_name=prsdd
+report_label=no-render-legacy
+run_root=/workspace/phase1/reproducible/runs/go3pr-no-render-legacy.8uUdPV
+executable=/workspace/phase1/reproducible/artifacts/f6c81d01a1fe/prsdd
+fixture=/phase1/fixtures/go3pr-cm12-no-render.in
+data_root=/workspace/arndt64/sdat
+kcm_root=/workspace/arndt64/said/KCM.100330
+timeout_seconds=120
+forbidden_outputs=SAID.PS fort.3
+exit_status=0
+stdout_lines=204
+stderr_lines=0
+result_rows=19

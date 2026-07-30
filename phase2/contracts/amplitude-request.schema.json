@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://said.arc.gwu.edu/schemas/pion-photoproduction-amplitude-request-v1.json",
+  "title": "CM12 Walker helicity-amplitude request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "solution",
+    "reaction",
+    "independent_variable",
+    "grid",
+    "fixed",
+    "representation"
+  ],
+  "properties": {
+    "solution": {
+      "const": "CM12"
+    },
+    "reaction": {
+      "enum": [
+        "pi0p",
+        "pi+n",
+        "pi-p",
+        "pi0n"
+      ]
+    },
+    "independent_variable": {
+      "enum": [
+        "acm_deg",
+        "cos_acm",
+        "photon_lab_energy_mev",
+        "total_cm_energy_mev"
+      ]
+    },
+    "grid": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minimum",
+        "step",
+        "maximum"
+      ],
+      "properties": {
+        "minimum": {
+          "type": "number"
+        },
+        "step": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maximum": {
+          "type": "number"
+        }
+      }
+    },
+    "fixed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "variable",
+        "value"
+      ],
+      "properties": {
+        "variable": {
+          "enum": [
+            "acm_deg",
+            "photon_lab_energy_mev",
+            "total_cm_energy_mev"
+          ]
+        },
+        "value": {
+          "type": "number"
+        }
+      }
+    },
+    "representation": {
+      "const": "legacy_choice_1_walker_vpi_su"
+    }
+  }
+}

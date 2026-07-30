@@ -1,0 +1,507 @@
+patching file saidopen.for
+Hunk #2 succeeded at 165 (offset 6 lines).
+Hunk #3 succeeded at 202 (offset 2 lines).
+saidopen.f
+saidmnu.f
+pwprt.f
+sddraw.f
+drwfil.f
+axy.f
+xyofm.f
+saidps.f
+saidpsx.f
+saidlog.f
+candpps.f
+apltps.f
+symbpsx.f
+agtops.f
+colorpsx.f
+seterm.f
+hp.f
+color.f
+toutpt.f
+tptxw.f
+symbol.f
+plot.f
+plotxw.f
+xwset.f
+tpt.f
+dcursr.f
+hpxw.f
+clrset.f
+hpc.f
+poutpt.f
+colrx.f
+cursr.f
+exit.f
+symb.f
+symbx.f
+asymb.f
+candpps.f
+apltps.f
+symbps.f
+agtops.f
+colorps.f
+xyofm.f
+ginp.f
+flt.f
+fltx.f
+intfp.f
+fpint.f
+dataf.f
+datai.f
+data1.f
+data2.f
+data3.f
+data4.f
+data5.f
+data6.f
+data7.f
+data8.f
+cdata.f
+daterr.f
+gon.f
+hpset.f
+random.f
+ran1.f
+gauspc.f
+prob.f
+setinc.f
+xchg.f
+datea.f
+kcvrt.f
+labcm.f
+alcvt.f
+tdelay.f
+number.f
+float.f
+errsr4.f
+scale.f
+factor.f
+axis.f
+picz.f
+draw.f
+pent.f
+polyg.f
+arrow.f
+box.f
+tptc.f
+plotc.f
+symbnr.f
+drawc2.f
+drawc1.f
+drawg1.f
+drawg2.f
+drawc3.f
+drawc.f
+iaofc.f
+syminv.f
+mult.f
+cmsinv.f
+mcmcv.f
+cmfn.f
+qkofw.f
+alg.f
+sqz.f
+cmfnr.f
+qjofx.f
+pjofx.f
+caps.f
+npwtos.f
+simp.f
+fsimp.f
+pvint.f
+drescl.f
+rddta.f
+polyft.f
+movbt.f
+match.f
+tput.f
+axis.f:61:30:
+
+   57 |       CALL SYMBOL (XA,YA,0.14,BCD,THETA,NAC)
+      |                              2
+......
+   61 |       CALL SYMBOL (XA,YA,0.14,8H (X10** ,THETA,8)
+      |                              1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+axis.f:67:28:
+
+   57 |       CALL SYMBOL (XA,YA,0.14,BCD,THETA,NAC)
+      |                              2
+......
+   67 |       CALL SYMBOL(XA,YA,.14,1H),THETA,1)
+      |                            1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+kcvrt.f:92:17:
+
+   33 |       CALL DATA1(IE,1,MTRN)
+      |                 2
+......
+   92 |       CALL DATA1(T,1,MTRN)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+number.f:38:32:
+
+   29 |    10 CALL SYMBOL (XT,YT,HGHT,1H-,THETA,1)
+      |                              2  
+......
+   38 |         CALL SYMBOL (XT,YT,HGHT,BB(4)  ,THETA,1)
+      |                                1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(1)/HOLLERITH).
+picz.f:60:17:
+
+   46 |       CALL DATA1(NFIL,1,M)
+      |                 2
+......
+   60 |       CALL DATA1(PIC,-14,M)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+picz.f:76:17:
+
+   46 |       CALL DATA1(NFIL,1,M)
+      |                 2
+......
+   76 |       CALL DATA1(NPC,NPIX,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+picz.f:125:16:
+
+  105 |       CALL DRAW(PIC,X0,Y0,THTA,SCL,NPC,NPIX)
+      |                2
+......
+  125 |       CALL DRAW('OLDX',X,Y,0.,1.,NPC,NPIX)
+      |                1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(4)/REAL(4)).
+picz.f:362:17:
+
+   46 |       CALL DATA1(NFIL,1,M)
+      |                 2
+......
+  362 |       CALL DATA1(LTL,-124,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pnu77.f
+rhoc.f
+vct.f
+pnread.f
+palias.f
+doft.f
+coul.f
+coulsg.f
+pnamp.f
+sglscl.f
+kxch.f
+vcp.f
+vcpa.f
+tmtx.f
+phssp.f
+gtphs.f
+isoamp.f
+tkprod.f
+eta33.f
+pnamp1.f
+pnamp2.f
+tcm.f
+gett5.f
+gett3.f
+mmbsb.f
+gett4.f
+mcmmcm.f
+ktotc.f
+barsoln.f
+barconj.f
+barzsc95.f
+barzsk95.f
+barzka84.f
+barzsm95.f
+pna1i.f
+pna2i.f
+pnfixd.f
+tmcm.f
+fwamp.f
+pnampk.f
+pnfg.f
+sgtei.f
+pnchit.f
+khamp.f
+pwxpi1.f
+formfa.f
+fx1.f
+qatr.f
+split3.f
+spchd.f
+trkoch.f
+pnrdh.f
+pnrdx.f
+addres.f
+addresp.f
+addres2.f
+addresk.f
+pwcc.f
+dtromb.f
+blgibbs.f
+tromf13.f
+qeta.f
+tetan.f
+pnrdx.f:50:17:
+
+   31 |       CALL DATA1(T,1,M)
+      |                 2
+......
+   50 |       CALL DATA1(DTA,II,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+qatr.f:73:10:
+
+   62 |       DO 7 I=2,NDIM
+      |                   2
+......
+   73 |       AUX(I)=.5*AUX(I-1)+P*SM
+      |          1
+Warning: Array reference at (1) out of bounds (2 > 1) in loop beginning at (2)
+mod01.f
+sdata.f
+shfpch.f
+spred.f
+schi.f
+ssch.f
+smtx.f
+sinv.f
+dsymi.f
+dmult.f
+smap.f
+sedit.f
+shfgin.f
+splot.f
+splotc.f
+funplt.f
+getxyp.f
+sinit.f
+ys.f
+conplt.f
+grafit.f
+resplt.f
+confun.f
+concrv.f
+side.f
+conmtx.f
+chimtx.f
+gin.f
+nbtset.f
+mcarlo.f
+addhc.f
+chimtx.f:91:17:
+
+   19 |       CALL DATA1(Z,-14,MTRN)
+      |                 2
+......
+   91 |       CALL DATA1(XLB,-104,MTRN)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+chimtx.f:95:17:
+
+   19 |       CALL DATA1(Z,-14,MTRN)
+      |                 2
+......
+   95 |       CALL DATA1(YLB,-104,MTRN)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+conmtx.f:100:17:
+
+   38 |       CALL DATA1(H,-11,MTRN)
+      |                 2
+......
+  100 |       CALL DATA1(ZLB,-104,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+conmtx.f:105:17:
+
+   52 |       CALL DATA6(X1,1,XMAX,1,ZX,1,Y1,1,YMAX,1,ZY,1,MTRN)
+      |                 2
+......
+  105 |       CALL DATA6(NX,1,X1,1,DX,1,NY,1,Y1,1,DY,1,M)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+conmtx.f:105:32:
+
+   52 |       CALL DATA6(X1,1,XMAX,1,ZX,1,Y1,1,YMAX,1,ZY,1,MTRN)
+      |                                  2
+......
+  105 |       CALL DATA6(NX,1,X1,1,DX,1,NY,1,Y1,1,DY,1,M)
+      |                                1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+conmtx.f:150:17:
+
+   38 |       CALL DATA1(H,-11,MTRN)
+      |                 2
+......
+  150 |       CALL DATA1(XLB,-104,MTRN)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+conmtx.f:155:17:
+
+   38 |       CALL DATA1(H,-11,MTRN)
+      |                 2
+......
+  155 |       CALL DATA1(YLB,-104,MTRN)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+conmtx.f:160:17:
+
+   38 |       CALL DATA1(H,-11,MTRN)
+      |                 2
+......
+  160 |       CALL DATA1(ZLB,-104,MTRN)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+conplt.f:245:31:
+
+  146 |       CALL DATA3(ZMIN,1,DZ,1,ZMAX,1,MTRN)
+      |                             2  
+......
+  245 |       CALL DATA3(AMIN,1,AMAX,1,NA,1,MTRN)
+      |                               1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+funplt.f:240:34:
+
+   97 |       CALL SYMBOL(-.5,-.4,.1,YZ,0.,50)
+      |                             2     
+......
+  240 |       CALL SYMBOL(X-.05,Y+.03,.15,'X',0.,1)
+      |                                  1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(1)/REAL(4)).
+gin.f:49:17:
+
+   16 |       CALL DATA1(EPS1,1,M)
+      |                 2
+......
+   49 |       CALL DATA1(N,-14,M)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+mcarlo.f:53:21:
+
+   18 |       CALL DATA2(ERRA,1,ERRP,1,NGO)
+      |                        2
+......
+   53 |       CALL DATA2(Z,1,P,50,NGO)
+      |                     1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+mod01.f:125:17:
+
+  112 |       CALL INTFP(NF,1)
+      |                 2
+......
+  125 |       CALL INTFP(NBT,NPMAX)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+mod01.f:130:17:
+
+  115 |       CALL FPINT(NF,1)
+      |                 2
+......
+  130 |       CALL FPINT(NBT,NPMAX)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+mod01.f:151:17:
+
+   61 |       CALL DATA1(H,-14,NGO)
+      |                 2
+......
+  151 |       CALL DATA1(M,1,NGO)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+sdata.f:36:17:
+
+   20 |       CALL DATA1(NMODE,1,NGO)
+      |                 2
+......
+   36 |       CALL DATA1(XY(I),1,NGO)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+sdata.f:76:17:
+
+   20 |       CALL DATA1(NMODE,1,NGO)
+      |                 2
+......
+   76 |       CALL DATA1(N1,-24,NGO)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+sedit.f:26:17:
+
+   14 |       CALL DATA1(DUM,-54,NGO)
+      |                 2
+......
+   26 |       CALL DATA1(H,-14,NGO)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+shfpch.f:23:17:
+
+   14 |       CALL DATA1(DPZ,-44,M)
+      |                 2
+......
+   23 |       CALL DATA1(NMODE,1,NGO)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+smap.f:30:17:
+
+   29 |       CALL INTFP(NNBT,1)
+      |                 2
+   30 |       CALL INTFP(NBT,NPMAX)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+smap.f:35:17:
+
+   34 |       CALL FPINT(NNBT,1)
+      |                 2
+   35 |       CALL FPINT(NBT,NPMAX)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+splot.f:78:17:
+
+   54 |       CALL DATA5(NXYPT,1,XYPT,10,XMN,1,XMX,1,NXPT,1,NGO)
+      |                 2
+......
+   78 |       CALL DATA5(YXP,1,Z,1,PMIN,1,DP,1,PMAX,1,NGO)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+splot.f:78:23:
+
+   54 |       CALL DATA5(NXYPT,1,XYPT,10,XMN,1,XMX,1,NXPT,1,NGO)
+      |                         2
+......
+   78 |       CALL DATA5(YXP,1,Z,1,PMIN,1,DP,1,PMAX,1,NGO)
+      |                       1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+splot.f:78:39:
+
+   54 |       CALL DATA5(NXYPT,1,XYPT,10,XMN,1,XMX,1,NXPT,1,NGO)
+      |                                             2
+......
+   78 |       CALL DATA5(YXP,1,Z,1,PMIN,1,DP,1,PMAX,1,NGO)
+      |                                       1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+splot.f:204:17:
+
+  131 |       CALL DATA1(H,-14,NGO)
+      |                 2
+......
+  204 |       CALL DATA1(TITLE,-154,NGO)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+splot.f:231:26:
+
+  113 |       CALL SYMBOL(1.,YL+.1,HT,YZ,0.,42)
+      |                              2
+......
+  231 |       CALL SYMBOL(XX,Y,HT,' M      P(M) ',0.0,13)
+      |                          1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(13)/REAL(4)).
+splotc.f:120:27:
+
+   32 |       CALL SYMBOL(XX,Y,HTX,'A',0.,1)
+      |                           2
+......
+  120 |       CALL SYMBOL(XX,Y,HTX,YZ,A,26)
+      |                           1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/CHARACTER(*)).

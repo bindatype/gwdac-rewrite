@@ -1,0 +1,43 @@
+label=arndt64
+binary=/workspace/arndt64/said/prsdd
+binary_sha256=8a3c925a3aa95314fb4ad4fa7a8cbfa0095df898ee6fa96dad2071d20789678a
+source_commit=f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+run_root=/oracle-work/runs/go3pr-arndt64.yzOX1F
+fixture=/phase1/fixtures/go3pr-cm12-default.in
+fixture_sha256=ab0f1c5200d5d4f7a2d0632ea4f5fe23e5f9cca60410965558925c27bc728b46
+data_root=/workspace/arndt64/sdat
+kcm_root=/workspace/arndt64/said/KCM.100330
+timeout_seconds=120
+runtime_library_path=/opt/oracle/root/usr/lib:/opt/oracle/root/usr/lib/x86_64-linux-gnu:/opt/oracle/root/lib/x86_64-linux-gnu
+exit_status=0
+stdout_lines=206
+stderr_lines=0
+result_rows=19
+opened_file_paths=71
+file_trace=LD_PRELOAD:/opt/oracle/file-trace.so
+operating_system=Ubuntu 24.04
+ldd=	libgd.so.2 => /opt/oracle/root/usr/lib/x86_64-linux-gnu/libgd.so.2 (0x00007fffff400000)
+ldd=	libgfortran.so.3 => /opt/oracle/root/usr/lib/x86_64-linux-gnu/libgfortran.so.3 (0x00007fffff69b000)
+ldd=	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fffff317000)
+ldd=	libX11.so.6 => /lib/x86_64-linux-gnu/libX11.so.6 (0x00007fffff1da000)
+ldd=	libg2c.so.0 => /opt/oracle/root/usr/lib/libg2c.so.0 (0x00007ffffee00000)
+ldd=	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fffff66b000)
+ldd=	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007ffffebee000)
+ldd=	libXpm.so.4 => /lib/x86_64-linux-gnu/libXpm.so.4 (0x00007fffff655000)
+ldd=	libjpeg.so.8 => /lib/x86_64-linux-gnu/libjpeg.so.8 (0x00007fffff157000)
+ldd=	libfontconfig.so.1 => /lib/x86_64-linux-gnu/libfontconfig.so.1 (0x00007fffff106000)
+ldd=	libfreetype.so.6 => /lib/x86_64-linux-gnu/libfreetype.so.6 (0x00007fffff03a000)
+ldd=	libpng12.so.0 => /opt/oracle/root/lib/x86_64-linux-gnu/libpng12.so.0 (0x00007ffffe800000)
+ldd=	libz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007ffffebd2000)
+ldd=	libquadmath.so.0 => /lib/x86_64-linux-gnu/libquadmath.so.0 (0x00007ffffeb89000)
+ldd=	/lib64/ld-linux-x86-64.so.2 (0x00007ffffffc6000)
+ldd=	libxcb.so.1 => /lib/x86_64-linux-gnu/libxcb.so.1 (0x00007ffffeb60000)
+ldd=	libexpat.so.1 => /lib/x86_64-linux-gnu/libexpat.so.1 (0x00007ffffeb34000)
+ldd=	libbz2.so.1.0 => /lib/x86_64-linux-gnu/libbz2.so.1.0 (0x00007ffffeb20000)
+ldd=	libpng16.so.16 => /lib/x86_64-linux-gnu/libpng16.so.16 (0x00007ffffeae8000)
+ldd=	libbrotlidec.so.1 => /lib/x86_64-linux-gnu/libbrotlidec.so.1 (0x00007ffffeada000)
+ldd=	libXau.so.6 => /lib/x86_64-linux-gnu/libXau.so.6 (0x00007fffff64b000)
+ldd=	libXdmcp.so.6 => /lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007fffff032000)
+ldd=	libbrotlicommon.so.1 => /lib/x86_64-linux-gnu/libbrotlicommon.so.1 (0x00007ffffeab7000)
+ldd=	libbsd.so.0 => /lib/x86_64-linux-gnu/libbsd.so.0 (0x00007ffffeaa1000)
+ldd=	libmd.so.0 => /lib/x86_64-linux-gnu/libmd.so.0 (0x00007ffffea92000)

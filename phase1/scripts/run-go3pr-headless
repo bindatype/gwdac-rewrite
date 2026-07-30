@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export PRSD_ARTIFACT_NAME=prsdd-headless
+export PRSD_REPORT_LABEL=headless
+export PRSD_RESULT_FILENAME=go3pr-headless-dsg.tsv
+export PRSD_FIXTURE=/phase1/fixtures/go3pr-cm12-no-render.in
+export PRSD_FORBIDDEN_OUTPUTS="SAID.PS fort.3"
+
+exec /phase1/scripts/run-go3pr

@@ -1,0 +1,320 @@
+patching file pnpolw.for
+patching file pnpolw.for
+pnpolw.for:5375:11:
+
+ 5374 |    10 DO 20 L=1,8
+      |                 2
+ 5375 |    20 ISYM(L)=IPW(NN,L)
+      |           1
+Warning: Array reference at (1) out of bounds (8 > 2) in loop beginning at (2)
+pnpolw.for:607:17:
+
+  599 |       CALL DATA1(P(39),1,MTRN)
+      |                 2
+......
+  607 |       CALL DATA1(NMP,1,MTRN)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pnpolw.for:726:17:
+
+  712 |       CALL ASYMB(4HREW ,2.3,-0.3,0.16,0.0)
+      |                 2
+......
+  726 |       CALL ASYMB(DTID(3),0.0,5.1,0.2,0.0)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/HOLLERITH).
+pnpolw.for:1619:17:
+
+ 1518 |       CALL DATA4(N,1,L,1,NFX,1,DUM,40,M)
+      |                 2
+......
+ 1619 |       CALL DATA4(Z,1,TMIN,1,DT,1,TMAX,1,NGO)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+pnpolw.for:1619:21:
+
+ 1518 |       CALL DATA4(N,1,L,1,NFX,1,DUM,40,M)
+      |                     2
+......
+ 1619 |       CALL DATA4(Z,1,TMIN,1,DT,1,TMAX,1,NGO)
+      |                     1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+pnpolw.for:1619:28:
+
+ 1518 |       CALL DATA4(N,1,L,1,NFX,1,DUM,40,M)
+      |                         2   
+......
+ 1619 |       CALL DATA4(Z,1,TMIN,1,DT,1,TMAX,1,NGO)
+      |                            1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+pnpolw.for:1619:33:
+
+ 1518 |       CALL DATA4(N,1,L,1,NFX,1,DUM,40,M)
+      |                               2  
+......
+ 1619 |       CALL DATA4(Z,1,TMIN,1,DT,1,TMAX,1,NGO)
+      |                                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pnpolw.for:5299:27:
+
+  702 |       CALL SYMBOL(-0.8,0.0,0.15,TTL,0.0,5)
+      |                                2
+......
+ 5299 |       CALL SYMBOL(XX,.1,.2,PWNAME,0.,4)
+      |                           1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pnpolw.for:6013:27:
+
+  702 |       CALL SYMBOL(-0.8,0.0,0.15,TTL,0.0,5)
+      |                                2
+......
+ 6013 |       CALL SYMBOL(XX,Y,0.1,'F,Int- FIT elas prms',0.0,20)
+      |                           1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(20)/REAL(4)).
+pnpolw.for:4744:32:
+
+ 1554 |       CALL XCHG(IDENT,TTLS(1,NS0))
+      |                2                
+......
+ 4744 |       IF(WI.GT.200.0) CALL XCHG(HC,4H+   )
+      |                                1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+pnpolw.for:4750:17:
+
+ 1625 |       CALL DATA2(ERRA,1,ERRP,1,NGO)
+      |                 2
+......
+ 4750 |       CALL DATA2(NNSOLP,1,NSOLP,7,NGO)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pnpolw.for:4750:26:
+
+ 1625 |       CALL DATA2(ERRA,1,ERRP,1,NGO)
+      |                        2  
+......
+ 4750 |       CALL DATA2(NNSOLP,1,NSOLP,7,NGO)
+      |                          1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pnpolw.for:4817:25:
+
+ 4817 |       CALL PWSYM(N,L,HPW)
+      |                         1
+Warning: Type mismatch in argument 'isym' at (1); passed REAL(4) to INTEGER(4)
+pnpolw.for:4919:24:
+
+ 1625 |       CALL DATA2(ERRA,1,ERRP,1,NGO)
+      |                        2
+......
+ 4919 |       CALL DATA2(ZNLX,1,DPZ,4,M)
+      |                        1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pnpolw.for:5163:38:
+
+  702 |       CALL SYMBOL(-0.8,0.0,0.15,TTL,0.0,5)
+      |                                2      
+......
+ 5163 |       CALL SYMBOL(XX-0.05,Y0-0.12,0.1,SR,0.0,1)
+      |                                      1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pnpolw.for:1812:25:
+
+ 1812 |       CALL PWSYM(N,L,HPW)
+      |                         1
+Warning: Type mismatch in argument 'isym' at (1); passed REAL(4) to INTEGER(4)
+pnpolw.for:4431:31:
+
+  702 |       CALL SYMBOL(-0.8,0.0,0.15,TTL,0.0,5)
+      |                                2
+......
+ 4431 |       CALL SYMBOL(6.2,5.05,0.2,SRX,0.0,4)
+      |                               1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pnpolw.for:4481:35:
+
+  702 |       CALL SYMBOL(-0.8,0.0,0.15,TTL,0.0,5)
+      |                                2   
+......
+ 4481 |       CALL SYMBOL(XX-0.05,2.35,0.1,SR,0.0,1)
+      |                                   1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pnpolw.for:2628:21:
+
+ 2628 |       CALL PWSYM(N,L,IPW)
+      |                     1
+Warning: Rank mismatch in argument 'isym' at (1) (rank-1 and scalar)
+pnpolw.for:2693:31:
+
+  702 |       CALL SYMBOL(-0.8,0.0,0.15,TTL,0.0,5)
+      |                                2
+......
+ 2693 |       CALL SYMBOL(4.0,5.05,0.2,SRX,0.0,4)
+      |                               1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pnpolw.for:2750:33:
+
+  702 |       CALL SYMBOL(-0.8,0.0,0.15,TTL,0.0,5)
+      |                                2 
+......
+ 2750 |       CALL SYMBOL(XX-0.05,YY,0.1,SR,0.0,1)
+      |                                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pnpolw.for:2872:17:
+
+ 2872 |       CALL GETWW(P0,WMIN,WMAX)
+      |                 1
+Warning: Actual argument contains too few elements for dummy argument 'pr' (50/100) at (1)
+pnpolw.for:2127:21:
+
+ 2127 |       CALL PWSYM(N,L,IPW)
+      |                     1
+Warning: Rank mismatch in argument 'isym' at (1) (rank-1 and scalar)
+pnpolw.for:2193:31:
+
+  702 |       CALL SYMBOL(-0.8,0.0,0.15,TTL,0.0,5)
+      |                                2
+......
+ 2193 |       CALL SYMBOL(4.0,5.05,0.2,SRX,0.0,4)
+      |                               1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pnpolw.for:2250:33:
+
+  702 |       CALL SYMBOL(-0.8,0.0,0.15,TTL,0.0,5)
+      |                                2 
+......
+ 2250 |       CALL SYMBOL(XX-0.05,YY,0.1,SR,0.0,1)
+      |                                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pnpolw.for:2376:17:
+
+ 2376 |       CALL GETWW(P,WMIN,WMAX)
+      |                 1
+Warning: Actual argument contains too few elements for dummy argument 'pr' (50/100) at (1)
+pnpolw.for:942:39:
+
+  942 |     3 if(nres.eq.0) call ldresx(4hSP06,pres,nres)
+      |                                       1
+Warning: Actual argument contains too few elements for dummy argument 'pres' (500/900) at (1)
+pnpolw.for:1346:29:
+
+  702 |       CALL SYMBOL(-0.8,0.0,0.15,TTL,0.0,5)
+      |                                2
+......
+ 1346 |     2 call symbol(xx,yy,0.12,znut,0.0,1)
+      |                             1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pnpolw.for:5915:37:
+
+  702 |       CALL SYMBOL(-0.8,0.0,0.15,TTL,0.0,5)
+      |                                2     
+......
+ 5915 |       CALL SYMBOL(XX-0.03,Y-0.03,0.1,ZS,0.0,1)
+      |                                     1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pnpolw.for:5923:32:
+
+  702 |       CALL SYMBOL(-0.8,0.0,0.15,TTL,0.0,5)
+      |                                2
+......
+ 5923 |       CALL SYMBOL(XX,Y-0.05,0.1,ZS,45.0,1)
+      |                                1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pnpolw.for:5527:21:
+
+ 5527 |       CALL CURSR(ICC,X,Y)
+      |                     1
+Warning: Rank mismatch in argument 'x' at (1) (scalar and rank-1)
+pnpolw.for:5575:32:
+
+  702 |       CALL SYMBOL(-0.8,0.0,0.15,TTL,0.0,5)
+      |                                2
+......
+ 5575 |       CALL SYMBOL(XC-0.05,Y,0.1,SR,0.0,1)
+      |                                1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pnpolw.for:1442:38:
+
+ 1442 |       call data4(wmnw,1,wmxw,1,wimw,1,sthw,3,m)
+      |                                      1
+......
+ 1518 |       CALL DATA4(N,1,L,1,NFX,1,DUM,40,M)
+      |                               2       
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pnpolw.for:6774:48:
+
+ 3341 |       IF(WIM.LE.0.0) CALL ADDRES2(WRL,WIM,DRL,DIM,TR,TI,NL,P(19))
+      |                                                  2
+......
+ 6774 |       IF(WIM.LE.0.0) CALL ADDRES2(WRL,WIM,DR,DI,TR,TI,NL,P(26))
+      |                                                1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pnpolw.for:6774:51:
+
+ 3341 |       IF(WIM.LE.0.0) CALL ADDRES2(WRL,WIM,DRL,DIM,TR,TI,NL,P(19))
+      |                                                     2
+......
+ 6774 |       IF(WIM.LE.0.0) CALL ADDRES2(WRL,WIM,DR,DI,TR,TI,NL,P(26))
+      |                                                   1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pnpolw.for:8830:19:
+
+ 1554 |       CALL XCHG(IDENT,TTLS(1,NS0))
+      |                      2
+......
+ 8830 |       CALL XCHG(H1,'(#q#')
+      |                   1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(4)/REAL(4)).
+pnpolw.for:8033:38:
+
+ 8033 |       CALL CMRHO(WRL,WIM,WC,WSE,0.,LE,RR,RI)
+      |                                      1
+Warning: Actual argument contains too few elements for dummy argument 'cr' (10/20) at (1)
+pnpolw.for:8033:41:
+
+ 8033 |       CALL CMRHO(WRL,WIM,WC,WSE,0.,LE,RR,RI)
+      |                                         1
+Warning: Actual argument contains too few elements for dummy argument 'ci' (10/20) at (1)
+pnpolw.for:170:37:
+
+  170 |       CALL DATA4(ZNL,1,ZNTP,1,TMIN,1,TMAX,1,NGO)
+      |                                     1
+......
+ 1518 |       CALL DATA4(N,1,L,1,NFX,1,DUM,40,M)
+      |                               2      
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pnpolw.for:286:17:
+
+  286 |       CALL DATA3(NLX,1,YX,NINT,ERR,NINT,M)
+      |                 1
+......
+  554 |       CALL DATA3(WMIN,1,WMAX,1,WIMN,1,MTRN)
+      |                 2
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pnpolw.for:286:23:
+
+  286 |       CALL DATA3(NLX,1,YX,NINT,ERR,NINT,M)
+      |                       1
+......
+  554 |       CALL DATA3(WMIN,1,WMAX,1,WIMN,1,MTRN)
+      |                        2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pnpolw.for:286:31:
+
+  286 |       CALL DATA3(NLX,1,YX,NINT,ERR,NINT,M)
+      |                               1
+......
+  554 |       CALL DATA3(WMIN,1,WMAX,1,WIMN,1,MTRN)
+      |                               2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pnpolw.for:384:24:
+
+  384 |       CALL DATA2(ZNLX,1,DPZ,4,M)
+      |                        1
+......
+ 1625 |       CALL DATA2(ERRA,1,ERRP,1,NGO)
+      |                        2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pnpolw.for:918:18:
+
+  918 |       COMMON/SFIT/NGO,NCYC,NCMAX,FCMTX,NTRY,CHI2
+      |                  1
+Warning: Named COMMON block 'sfit' at (1) shall be of the same size as elsewhere (24 vs 81252 bytes)

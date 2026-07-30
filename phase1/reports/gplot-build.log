@@ -1,0 +1,517 @@
+patching file src/aux_port_out.F
+patching file src/term_width.F
+make: Entering directory '/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB/gplot'
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/auto_scale.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/aux_port_out.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/bell.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/bitmap_free.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/bitmap_get.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/check_buff.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/check_buff2.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/chreal.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/clear_plot.F
+src/clear_plot.F:160:42:
+
+  160 |      &                         Z'80000000',Z'80000000'/
+      |                                          1
+Warning: BOZ literal constant near (1) cannot be assigned to a REAL variable
+src/clear_plot.F:160:54:
+
+  160 |      &                         Z'80000000',Z'80000000'/
+      |                                                      1
+Warning: BOZ literal constant near (1) cannot be assigned to a REAL variable
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/cltrans.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/conv_r_to_ch.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/copy_array.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/crosshair_r.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/dline.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/dwg.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/dwg_batch.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/dwg_batch_cl.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/dwg_close.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/dwg_format.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/dwg_list.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/dwg_next.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/dwg_open.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/end_plot.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/find_unit.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/flush_plot.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/formsg.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/generic_term.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/get_prcnam.F
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/g77/getc.c
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/getdyn.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/getlab.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/getnam.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/getpcnt.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gks_plot.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gksdum.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/gplot_cont.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/gplot_disp_n.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/gplot_line.F
+src/gplot/gplot_line.F:55:34:
+
+   54 |       CALL PSALPH('ANGL',ANGL,ANGL_OLD)
+      |                              2    
+   55 |       CALL PSALPH('ANGL',ANGL_OLD,IDUMMY)
+      |                                  1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/gplot_menu.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/gplot_rest_f.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/gplot_save_f.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/gplot_short.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/gplot_txt.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/gploti.F
+src/gplot/gploti.F:305:54:
+
+  305 |       LABELS(6)  = CHAR(Z'04') // CHAR(Z'07') // CHAR(Z'20')
+      |                                                      1
+Warning: BOZ literal constant at (1) cannot appear in CHAR intrinsic subprogram
+src/gplot/gploti.F:305:39:
+
+  305 |       LABELS(6)  = CHAR(Z'04') // CHAR(Z'07') // CHAR(Z'20')
+      |                                       1
+Warning: BOZ literal constant at (1) cannot appear in CHAR intrinsic subprogram
+src/gplot/gploti.F:305:24:
+
+  305 |       LABELS(6)  = CHAR(Z'04') // CHAR(Z'07') // CHAR(Z'20')
+      |                        1
+Warning: BOZ literal constant at (1) cannot appear in CHAR intrinsic subprogram
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/graphics_hc.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/hardcopy_rng.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/hex_to_ascii.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/houston_plot.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/hpsub.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/impress_plot.F
+src/impress_plot.F:43:30:
+
+   43 |       CALL IMPRESS_BUFF(IX,IY)
+      |                              1
+Warning: Type mismatch in argument 'ix' at (1); passed INTEGER(4) to LOGICAL(1)
+src/impress_plot.F:43:30:
+
+   43 |       CALL IMPRESS_BUFF(IX,IY)
+      |                              1
+Warning: Type mismatch in argument 'iy' at (1); passed INTEGER(4) to LOGICAL(1)
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/keypress.c
+src/keypress.c: In function 'do_MotionNotify':
+src/keypress.c:473:47: warning: embedded '\0' in format [-Wformat-contains-nul]
+  473 |       sprintf(banner,"X = %-13.6g  Y = %-13.6g\0", xuser, yuser);
+      |                                               ^~
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/lensig.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/lib_free_vm.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/lib_get_vm.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/line_thick.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/lswap.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/monitor_rng.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/movec.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/nargs.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/pack_buffer.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/pack_buffer2.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/pascebc.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/pen_down.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/pen_up.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/pfont.F
+src/pfont.F:485:22:
+
+  484 |       CALL COPY_ARRAY(LINEC1(1,MARKC(I)),LINE1,56)
+      |                      2
+  485 |       CALL COPY_ARRAY(LINEC2(1,MARKC(I)),LINE2,512)
+      |                      1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(2)/INTEGER(1)).
+src/pfont.F:485:41:
+
+  484 |       CALL COPY_ARRAY(LINEC1(1,MARKC(I)),LINE1,56)
+      |                                         2
+  485 |       CALL COPY_ARRAY(LINEC2(1,MARKC(I)),LINE2,512)
+      |                                         1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(2)/INTEGER(1)).
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/plot_color.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/plot_hardc.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/plot_level.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/plot_level2.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/plot_mode.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/plot_mode2.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/plot_mon.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/plot_mon2.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/plot_point.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/plot_r.F
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/png_setup.c
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/print_buff.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/print_buff2.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/ps_plot.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/psym.F
+src/psym.F:180:30:
+
+  180 |       INTEGER*2 LOCATN/Z'0000'/
+      |                              1
+Warning: BOZ at (1) cannot appear in an old-style initialization
+src/psym.F:189:30:
+
+  189 |       INTEGER*2 LENCHA/Z'0000'/
+      |                              1
+Warning: BOZ at (1) cannot appear in an old-style initialization
+src/psym.F:192:30:
+
+  192 |       INTEGER*2 WIDTHC/Z'0000'/
+      |                              1
+Warning: BOZ at (1) cannot appear in an old-style initialization
+src/psym.F:194:24:
+
+  194 |       BYTE CTRL(6)/Z'15',Z'16',Z'09',Z'38',Z'0A',Z'39'/
+      |                        1
+Warning: BOZ at (1) cannot appear in an old-style initialization
+src/psym.F:195:25:
+
+  195 |       BYTE CTRL2(6)/Z'15',Z'16',Z'05',Z'01',Z'03',Z'02'/
+      |                         1
+Warning: BOZ at (1) cannot appear in an old-style initialization
+src/psym.F:510:29:
+
+  510 |       BYTE INHEXL(2),FF/Z'FF'/
+      |                             1
+Warning: BOZ at (1) cannot appear in an old-style initialization
+src/psym.F:684:30:
+
+  684 |       INTEGER*2 LOCATN/Z'0000'/
+      |                              1
+Warning: BOZ at (1) cannot appear in an old-style initialization
+src/psym.F:692:30:
+
+  692 |       INTEGER*2 WIDTHC/Z'0000'/
+      |                              1
+Warning: BOZ at (1) cannot appear in an old-style initialization
+src/psym.F:694:24:
+
+  694 |       BYTE CTRL(6)/Z'15',Z'16',Z'09',Z'38',Z'0A',Z'39'/
+      |                        1
+Warning: BOZ at (1) cannot appear in an old-style initialization
+src/psym.F:695:25:
+
+  695 |       BYTE CTRL2(6)/Z'15',Z'16',Z'05',Z'01',Z'03',Z'02'/
+      |                         1
+Warning: BOZ at (1) cannot appear in an old-style initialization
+src/psym.F:199:26:
+
+  199 |       DATA ZM0/Z'80000000'/
+      |                          1
+Warning: BOZ literal constant near (1) cannot be assigned to a REAL variable
+src/psym.F:701:30:
+
+  701 |       CALL PFONT('STANDARD',0)
+      |                              1
+Warning: Missing alternate return spec in subroutine call at (1)
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/psym_dwg.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/put_dwg.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/put_formsg.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/put_sysmsg.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/rdgl.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/read_key.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/unix/read_key_res.F
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/unix/read_key_trp.c
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/regis_mode.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/regis_mode2.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/segment_cr.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/seiko_plot.F
+src/seiko_plot.F:85:28:
+
+   85 |       CALL SEIKO_BUFF(IXHIP)
+      |                            1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot.F:86:28:
+
+   86 |       CALL SEIKO_BUFF(IXMIP)
+      |                            1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot.F:87:28:
+
+   87 |       CALL SEIKO_BUFF(IXLOP)
+      |                            1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot.F:88:28:
+
+   88 |       CALL SEIKO_BUFF(IYHIP)
+      |                            1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot.F:89:28:
+
+   89 |       CALL SEIKO_BUFF(IYMIP)
+      |                            1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot.F:90:28:
+
+   90 |       CALL SEIKO_BUFF(IYLOP)
+      |                            1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot.F:29:28:
+
+   29 |         CALL SEIKO_BUFF(ESC)
+      |                            1
+Warning: Type mismatch in argument 'ich' at (1); passed CHARACTER(1) to INTEGER(1)
+src/seiko_plot.F:30:28:
+
+   30 |         CALL SEIKO_BUFF('A')
+      |                            1
+Warning: Type mismatch in argument 'ich' at (1); passed CHARACTER(1) to INTEGER(1)
+src/seiko_plot.F:35:29:
+
+   35 |         CALL SEIKO_BUFF(IXHI)
+      |                             1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot.F:39:29:
+
+   39 |         CALL SEIKO_BUFF(IXMI)
+      |                             1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot.F:42:27:
+
+   42 |       CALL SEIKO_BUFF(IXLO)
+      |                           1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot.F:46:29:
+
+   46 |         CALL SEIKO_BUFF(IYHI)
+      |                             1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot.F:50:29:
+
+   50 |         CALL SEIKO_BUFF(IYMI)
+      |                             1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot.F:53:27:
+
+   53 |       CALL SEIKO_BUFF(IYLO)
+      |                           1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/seiko_plot2.F
+src/seiko_plot2.F:86:29:
+
+   86 |       CALL SEIKO_BUFF2(IXHIP)
+      |                             1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot2.F:87:29:
+
+   87 |       CALL SEIKO_BUFF2(IXMIP)
+      |                             1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot2.F:88:29:
+
+   88 |       CALL SEIKO_BUFF2(IXLOP)
+      |                             1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot2.F:89:29:
+
+   89 |       CALL SEIKO_BUFF2(IYHIP)
+      |                             1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot2.F:90:29:
+
+   90 |       CALL SEIKO_BUFF2(IYMIP)
+      |                             1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot2.F:91:29:
+
+   91 |       CALL SEIKO_BUFF2(IYLOP)
+      |                             1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot2.F:29:29:
+
+   29 |         CALL SEIKO_BUFF2(ESC)
+      |                             1
+Warning: Type mismatch in argument 'ich' at (1); passed CHARACTER(1) to INTEGER(1)
+src/seiko_plot2.F:30:29:
+
+   30 |         CALL SEIKO_BUFF2('A')
+      |                             1
+Warning: Type mismatch in argument 'ich' at (1); passed CHARACTER(1) to INTEGER(1)
+src/seiko_plot2.F:35:30:
+
+   35 |         CALL SEIKO_BUFF2(IXHI)
+      |                              1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot2.F:39:30:
+
+   39 |         CALL SEIKO_BUFF2(IXMI)
+      |                              1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot2.F:42:28:
+
+   42 |       CALL SEIKO_BUFF2(IXLO)
+      |                            1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot2.F:46:30:
+
+   46 |         CALL SEIKO_BUFF2(IYHI)
+      |                              1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot2.F:50:30:
+
+   50 |         CALL SEIKO_BUFF2(IYMI)
+      |                              1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+src/seiko_plot2.F:53:28:
+
+   53 |       CALL SEIKO_BUFF2(IYLO)
+      |                            1
+Warning: Type mismatch in argument 'ich' at (1); passed INTEGER(4) to INTEGER(1)
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/setlab.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/setnam.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/sleep2.F
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/unix/tcgeta.c
+src/unix/tcgeta.c: In function 'tcgeta_':
+src/unix/tcgeta.c:24:18: warning: incompatible implicit declaration of built-in function 'printf' [-Wbuiltin-declaration-mismatch]
+   24 |    if (rc == -1) printf("TCGETA: error in ioctl\n");
+      |                  ^~~~~~
+src/unix/tcgeta.c:11:1: note: include '<stdio.h>' or provide a declaration of 'printf'
+   10 | #include <termio.h>
+  +++ |+#include <stdio.h>
+   11 | #ifdef __osf__
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/unix/tcseta.c
+src/unix/tcseta.c: In function 'tcseta_':
+src/unix/tcseta.c:19:18: warning: incompatible implicit declaration of built-in function 'printf' [-Wbuiltin-declaration-mismatch]
+   19 |    if (rc == -1) printf("TCSETA: error in ioctl (TCGETA)\n");
+      |                  ^~~~~~
+src/unix/tcseta.c:9:1: note: include '<stdio.h>' or provide a declaration of 'printf'
+    8 | #include <termio.h>
+  +++ |+#include <stdio.h>
+    9 | 
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/unix/tcsetaf.c
+src/unix/tcsetaf.c: In function 'tcsetaf_':
+src/unix/tcsetaf.c:19:18: warning: incompatible implicit declaration of built-in function 'printf' [-Wbuiltin-declaration-mismatch]
+   19 |    if (rc == -1) printf("TCSETAF: error in ioctl (TCGETA)\n");
+      |                  ^~~~~~
+src/unix/tcsetaf.c:9:1: note: include '<stdio.h>' or provide a declaration of 'printf'
+    8 | #include <termio.h>
+  +++ |+#include <stdio.h>
+    9 | 
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/term_width.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/transparent.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/upper_case.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/uprcase.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/window_clip.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/write_gks.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/write_houst.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/write_hp300.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/write_hp300c.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/write_hpjet.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/write_hpjetc.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/write_hpp.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/write_hppai.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/write_impr.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/write_la100.F
+src/write_la100.F:68:25:
+
+   68 |         LINE(ICOL)='77'O      !Offset the line buffer
+      |                         1
+Warning: BOZ constant at (1) uses nonstandard postfix syntax
+src/write_la100.F:87:29:
+
+   87 |             LINE(ICOL)='77'O      !Offset the line buffer
+      |                             1
+Warning: BOZ constant at (1) uses nonstandard postfix syntax
+src/write_la100.F:68:19:
+
+   68 |         LINE(ICOL)='77'O      !Offset the line buffer
+      |                   1
+Warning: BOZ literal constant at (1) is neither a DATA statement value nor an actual argument of INT/REAL/DBLE/CMPLX intrinsic subprogram
+src/write_la100.F:87:23:
+
+   87 |             LINE(ICOL)='77'O      !Offset the line buffer
+      |                       1
+Warning: BOZ literal constant at (1) is neither a DATA statement value nor an actual argument of INT/REAL/DBLE/CMPLX intrinsic subprogram
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/write_ln03.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/write_ps.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/write_px.F
+src/write_px.F:62:23:
+
+   62 |       BYTE CTRL_E/Z'05'/
+      |                       1
+Warning: BOZ at (1) cannot appear in an old-style initialization
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/write_rdgl.F
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/x_alpha.c
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/x_create_z.c
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/x_crosshair.c
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/x_define_col.c
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/x_draw_fsc.c
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/x_draw_zb.c
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/x_error.c
+src/x_error.c: In function 'xvst_error':
+src/x_error.c:19:44: warning: format '%d' expects argument of type 'int', but argument 4 has type 'long unsigned int' [-Wformat=]
+   19 |    fprintf(stderr, "Error code %d  Serial %d  Op code %d.%d\n",
+      |                                           ~^
+      |                                            |
+      |                                            int
+      |                                           %ld
+   20 |            errevent->error_code,
+   21 |            errevent->serial,
+      |            ~~~~~~~~~~~~~~~~                 
+      |                    |
+      |                    long unsigned int
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/x_plot.c
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/x_plot_col.c
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/x_replay.c
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/x_setup.c
+src/x_setup.c: In function 'xvst_setup_':
+src/x_setup.c:217:10: warning: incompatible implicit declaration of built-in function 'exit' [-Wbuiltin-declaration-mismatch]
+  217 |          exit(-1);
+      |          ^~~~
+src/x_setup.c:28:1: note: include '<stdlib.h>' or provide a declaration of 'exit'
+   27 | #include <X11/cursorfont.h>
+  +++ |+#include <stdlib.h>
+   28 | 
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/x_store.c
+src/x_store.c: In function 'xvst_store_reset_':
+src/x_store.c:92:29: warning: incompatible implicit declaration of built-in function 'free' [-Wbuiltin-declaration-mismatch]
+   92 |    for (i=1; i<=nbank; i++) free(bank[i]);
+      |                             ^~~~
+src/x_store.c:27:1: note: include '<stdlib.h>' or provide a declaration of 'free'
+   26 | #include <X11/Xlib.h>
+  +++ |+#include <stdlib.h>
+   27 | 
+src/x_store.c: In function 'xvst_allocate':
+src/x_store.c:116:25: warning: incompatible implicit declaration of built-in function 'malloc' [-Wbuiltin-declaration-mismatch]
+  116 |    bank[nbank] = (int *)malloc(NWORDS*4);
+      |                         ^~~~~~
+src/x_store.c:116:25: note: include '<stdlib.h>' or provide a declaration of 'malloc'
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/zero_array.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/ctrlc_trap.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/do_command.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/gline_sub.F
+src/gplot/gline_sub.F:49:36:
+
+   47 |           PLEN = PLEN + PSMLEN(TEXT,LEN,HEIGHT)
+      |                               2     
+   48 |         ELSE
+   49 |           PLEN = PLEN + PSMLEN(%REF(LINE),LEN,HEIGHT)
+      |                                    1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(*)/INTEGER(1)).
+src/gplot/gline_sub.F:55:40:
+
+   53 |           CALL PSYMBOLD(X,Y,HEIGHT,TEXT,ANGLE,LEN)
+      |                                   2     
+   54 |         ELSE
+   55 |           CALL PSYMBOLD(X,Y,HEIGHT,%REF(LINE),ANGLE,ILEN)
+      |                                        1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(*)/INTEGER(1)).
+gcc -O1 -std=gnu89 -Dg77 -Dunix -D_POSIX_C_SOURCE=199506L -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -fcommon -Wno-implicit-int -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -I/usr/include/X11 -c src/x_plot_rep.c
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/unix/ctrlc_hand.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/gplot_symbol.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/gplot/name_in_hex.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/psymbold.F
+src/psymbold.F:96:27:
+
+   96 |       DATA ZM0 /Z'80000000'/
+      |                           1
+Warning: BOZ literal constant near (1) cannot be assigned to a REAL variable
+src/psymbold.F:193:42:
+
+  193 |             IF( STRING(I) .EQ. ICHAR(char(Z'6C')) )TEST = .TRUE.
+      |                                          1
+Warning: BOZ literal constant at (1) cannot appear in CHAR intrinsic subprogram
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/dither.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/hatch.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/lwrcase.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/minmax.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/pixel_extent.F
+gfortran -O1 -cpp -Dg77 -Dunix -std=legacy -ffile-prefix-map=/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB=/phase1-build -ffixed-line-length-none -fallow-argument-mismatch -fallow-invalid-boz -fdec-char-conversions -fd-lines-as-comments -fno-second-underscore -fno-automatic -c src/segment_crh.F
+make: Leaving directory '/workspace/phase1/reproducible/build-f6c81d01a1fe.mDlEPB/gplot'

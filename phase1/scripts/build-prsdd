@@ -1,0 +1,323 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly state_root="${PHASE1_STATE_ROOT:-/workspace/phase1/reproducible}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}"
+readonly member_list="${phase1_root}/config/gplot-prsdd-members.txt"
+readonly headless_backend="${phase1_root}/compat/gplot-headless.f"
+readonly gplot_patch="${phase1_root}/patches/gplot-modern-compiler.patch"
+readonly prrdx_patch="${phase1_root}/patches/prrdx-gfortran-blank-a4.patch"
+readonly saidopen_patch="${phase1_root}/patches/saidopen-portable-data-root.patch"
+readonly cm12_seam_root="${CM12_SEAM_ROOT:-}"
+
+readonly commit="$(git -C "${source_root}" rev-parse HEAD)"
+readonly short_commit="$(git -C "${source_root}" rev-parse --short=12 HEAD)"
+
+mkdir -p "${state_root}" "${report_root}"
+readonly build_root="$(mktemp -d "${state_root}/build-${short_commit}.XXXXXX")"
+readonly artifact_root="${state_root}/artifacts/${short_commit}"
+
+readonly fsplit_log="${report_root}/fsplit.log"
+readonly libraries_log="${report_root}/local-libraries-build.log"
+readonly core_log="${report_root}/prsdd-core-build.log"
+readonly gplot_log="${report_root}/gplot-build.log"
+readonly link_log="${report_root}/prsdd-link.log"
+readonly headless_log="${report_root}/prsdd-headless-build.log"
+
+: >"${fsplit_log}"
+: >"${libraries_log}"
+: >"${core_log}"
+: >"${gplot_log}"
+: >"${link_log}"
+: >"${headless_log}"
+
+readonly -a fixed_flags=(
+    -O1
+    -std=legacy
+    "-ffile-prefix-map=${build_root}=/phase1-build"
+    -ffixed-line-length-none
+    -fallow-argument-mismatch
+    -fno-second-underscore
+    -fno-automatic
+)
+
+readonly -a free_flags=(
+    -O1
+    -std=legacy
+    "-ffile-prefix-map=${build_root}=/phase1-build"
+    -fallow-argument-mismatch
+    -fno-second-underscore
+    -fno-automatic
+)
+
+readonly -a seam_flags=(
+    -O1
+    -std=f2008
+    "-ffile-prefix-map=${build_root}=/phase2-build"
+    -fno-second-underscore
+)
+
+readonly -a gplot_flags=(
+    -O1
+    -cpp
+    -Dg77
+    -Dunix
+    -std=legacy
+    "-ffile-prefix-map=${build_root}=/phase1-build"
+    -ffixed-line-length-none
+    -fallow-argument-mismatch
+    -fallow-invalid-boz
+    -fdec-char-conversions
+    -fd-lines-as-comments
+    -fno-second-underscore
+    -fno-automatic
+)
+
+readonly -a gplot_c_flags=(
+    -O1
+    -std=gnu89
+    -Dg77
+    -Dunix
+    -D_POSIX_C_SOURCE=199506L
+    "-ffile-prefix-map=${build_root}=/phase1-build"
+    -fcommon
+    -Wno-implicit-int
+    -Wno-implicit-function-declaration
+    -Wno-incompatible-pointer-types
+    -I/usr/include/X11
+)
+
+gcc \
+    -std=gnu89 \
+    -D_POSIX_C_SOURCE=199506L \
+    -w \
+    "${source_root}/lib/fsplit.c" \
+    -o "${build_root}/fsplit"
+
+build_split_archive() {
+    local input="$1"
+    local archive_name="$2"
+    local split_root="${build_root}/${archive_name%.a}"
+    local object_root="${split_root}/objects"
+
+    mkdir -p "${split_root}" "${object_root}"
+    cp "${input}" "${split_root}/"
+
+    if [[ "${archive_name}" == "saidopen.a" ]]; then
+        patch --fuzz=0 -d "${split_root}" -p1 -i "${saidopen_patch}" \
+            >>"${libraries_log}" 2>&1
+    fi
+
+    (
+        cd "${split_root}"
+        "${build_root}/fsplit" "$(basename "${input}")"
+    ) >>"${fsplit_log}" 2>&1
+
+    local source
+    for source in "${split_root}"/*.f; do
+        (
+            cd "${split_root}"
+            gfortran \
+                "${fixed_flags[@]}" \
+                -c "$(basename "${source}")" \
+                -o "objects/$(basename "${source%.f}.o")"
+        ) >>"${libraries_log}" 2>&1
+    done
+
+    ar rcs "${build_root}/${archive_name}" "${object_root}"/*.o
+}
+
+build_split_archive "${source_root}/said/saidopen.for" saidopen.a
+build_split_archive "${source_root}/libxzl.for" libxz.a
+
+readonly core_root="${build_root}/core"
+mkdir -p "${core_root}"
+
+if [[ -n "${cm12_seam_root}" ]]; then
+    readonly build_variant=cm12-pure-kernel-seam
+    readonly -a fixed_core_names=(prsd prsd2 pru pwnam)
+    readonly -a free_core_names=(
+        cm12_kernel
+        cm12_solution
+        cm12_background_seam
+        cm12_legacy_context
+        cmmwp_seam
+        cm12_prda_probs_seam
+    )
+    cp \
+        "${source_root}/said/"{prsd,prsd2,pru,pwnam}.f \
+        "${cm12_seam_root}/"{cm12_kernel,cm12_solution}.f90 \
+        "${cm12_seam_root}/"{cm12_background_seam,cm12_legacy_context}.f90 \
+        "${cm12_seam_root}/"{cmmwp_seam,cm12_prda_probs_seam}.f90 \
+        "${core_root}/"
+else
+    readonly build_variant=phase1-reference
+    readonly -a fixed_core_names=(prsd prsd2 pru cmmwp gettm pwnam)
+    readonly -a free_core_names=(ysKCM mjl2cpw kos)
+    cp \
+        "${source_root}/said/"{prsd,prsd2,pru,cmmwp,gettm,pwnam}.f \
+        "${source_root}/said/"{ysKCM,mjl2cpw,kos}.f90 \
+        "${core_root}/"
+fi
+patch --fuzz=0 -d "${core_root}" -p1 -i "${prrdx_patch}" \
+    >>"${core_log}" 2>&1
+if [[ -n "${cm12_seam_root}" ]]; then
+    patch \
+        --fuzz=0 \
+        -d "${core_root}" \
+        -p1 \
+        -i "${cm12_seam_root}/cm12_prsd_pure.patch" \
+        >>"${core_log}" 2>&1
+fi
+
+for name in "${free_core_names[@]}"; do
+    (
+        cd "${core_root}"
+        if [[ -n "${cm12_seam_root}" ]]; then
+            gfortran \
+                "${seam_flags[@]}" \
+                -c "${name}.f90" \
+                -o "${name}.o"
+        else
+            gfortran \
+                "${free_flags[@]}" \
+                -c "${name}.f90" \
+                -o "${name}.o"
+        fi
+    ) >>"${core_log}" 2>&1
+done
+
+for name in "${fixed_core_names[@]}"; do
+    (
+        cd "${core_root}"
+        gfortran \
+            "${fixed_flags[@]}" \
+            -c "${name}.f" \
+            -o "${name}.o"
+    ) >>"${core_log}" 2>&1
+done
+
+readonly gplot_root="${build_root}/gplot"
+mkdir -p "${gplot_root}"
+cp -a "${source_root}/gplot/." "${gplot_root}/"
+patch --fuzz=0 -d "${gplot_root}" -p1 -i "${gplot_patch}" \
+    >>"${gplot_log}" 2>&1
+
+mapfile -t gplot_members <"${member_list}"
+gplot_targets=()
+for member in "${gplot_members[@]}"; do
+    gplot_targets+=("gplot.a(${member})")
+done
+
+readonly gplot_fortran_command="gfortran ${gplot_flags[*]} -c"
+readonly gplot_c_command="gcc ${gplot_c_flags[*]} -c"
+
+make \
+    -C "${gplot_root}" \
+    -B \
+    "${gplot_targets[@]}" \
+    F77="${gplot_fortran_command}" \
+    CC="${gplot_c_command}" \
+    >>"${gplot_log}" 2>&1
+
+ar rcs "${build_root}/gplot.a" "${gplot_root}"/*.o
+
+gfortran \
+    -O1 \
+    -fno-second-underscore \
+    -o "${build_root}/prsdd" \
+    "${core_root}"/*.o \
+    "${build_root}/libxz.a" \
+    "${build_root}/saidopen.a" \
+    "${build_root}/gplot.a" \
+    -lm \
+    -lXt \
+    -lX11 \
+    -lpng \
+    -lgd \
+    >>"${link_log}" 2>&1
+
+gfortran \
+    "${fixed_flags[@]}" \
+    -c "${headless_backend}" \
+    -o "${build_root}/gplot-headless.o" \
+    >>"${headless_log}" 2>&1
+
+gfortran \
+    -O1 \
+    -fno-second-underscore \
+    -o "${build_root}/prsdd-headless" \
+    "${core_root}"/*.o \
+    "${build_root}/gplot-headless.o" \
+    "${build_root}/libxz.a" \
+    "${build_root}/saidopen.a" \
+    -lm \
+    >>"${headless_log}" 2>&1
+
+if objdump -p "${build_root}/prsdd" \
+    | grep -Eq 'NEEDED[[:space:]]+(libg2c|libgfortran\.so\.3|libpng12)'; then
+    printf 'Obsolete runtime dependency remains in prsdd\n' >&2
+    exit 1
+fi
+
+if objdump -p "${build_root}/prsdd-headless" \
+    | grep -Eq \
+        'NEEDED[[:space:]]+lib(X11|Xt|gd|png|jpeg|fontconfig|freetype|tiff|webp|heif)'; then
+    printf 'Graphics or image runtime dependency remains in prsdd-headless\n' >&2
+    exit 1
+fi
+
+if nm "${build_root}/prsdd-headless" \
+    | grep -Eq \
+        '[[:space:]](x_plot|ps_plot|png_setup|write_ps|gdImage|saidlog|saidpsx|candpps|apltps|colorpsx|symbpsx|agtops)[^[:space:]]*'; then
+    printf 'Renderer implementation symbol remains in prsdd-headless\n' >&2
+    exit 1
+fi
+
+if strings "${build_root}/prsdd-headless" | grep -Fq '%!PS'; then
+    printf 'PostScript generator payload remains in prsdd-headless\n' >&2
+    exit 1
+fi
+
+mkdir -p "${artifact_root}"
+install -m 755 "${build_root}/prsdd" "${artifact_root}/prsdd"
+install -m 755 \
+    "${build_root}/prsdd-headless" \
+    "${artifact_root}/prsdd-headless"
+
+{
+    printf 'source_commit=%s\n' "${commit}"
+    printf 'build_variant=%s\n' "${build_variant}"
+    printf 'build_architecture=%s\n' "$(uname -m)"
+    printf 'operating_system=%s\n' "$(. /etc/os-release; printf '%s %s' "${NAME}" "${VERSION_ID}")"
+    printf 'gfortran=%s\n' "$(gfortran --version | sed -n '1p')"
+    printf 'gcc=%s\n' "$(gcc --version | sed -n '1p')"
+    printf 'saidopen_members=%s\n' "$(ar t "${build_root}/saidopen.a" | wc -l)"
+    printf 'libxz_members=%s\n' "$(ar t "${build_root}/libxz.a" | wc -l)"
+    printf 'gplot_members=%s\n' "$(ar t "${build_root}/gplot.a" | wc -l)"
+    printf 'headless_backend_members=13\n'
+    printf 'core_log_lines=%s\n' "$(wc -l <"${core_log}")"
+    printf 'gplot_log_lines=%s\n' "$(wc -l <"${gplot_log}")"
+    sha256sum "${artifact_root}/prsdd"
+    sha256sum "${artifact_root}/prsdd-headless"
+    sha256sum "${member_list}"
+    sha256sum "${headless_backend}"
+    sha256sum "${gplot_patch}"
+    sha256sum "${prrdx_patch}"
+    sha256sum "${saidopen_patch}"
+    if [[ "${build_variant}" == "cm12-immutable-seam" ]]; then
+        sha256sum \
+            "${cm12_seam_root}/cm12_kernel.f90" \
+            "${cm12_seam_root}/cmmwp_seam.f90"
+    fi
+    printf 'legacy_rendering_dependencies:\n'
+    objdump -p "${artifact_root}/prsdd" | sed -n '/NEEDED/p'
+    printf 'headless_dependencies:\n'
+    objdump -p "${artifact_root}/prsdd-headless" | sed -n '/NEEDED/p'
+} >"${report_root}/build-manifest.txt"
+
+printf 'Built %s\n' "${artifact_root}/prsdd"
+printf 'Built %s\n' "${artifact_root}/prsdd-headless"
+printf 'Manifest %s\n' "${report_root}/build-manifest.txt"

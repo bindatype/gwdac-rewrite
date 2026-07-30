@@ -1,0 +1,25 @@
+--- a/pnpolw.for
++++ b/pnpolw.for
+@@ -8827,14 +8827,14 @@
+       IF(NCOL.GT.6) NCOL=NCOL-3
+       CALL COLRX(NCOL)
+       YPT=YPT-0.4
+-      CALL XCHG(H1,4H(#q#)
+-      IF(NN.EQ.3.OR.NN.EQ.5.OR.NN.EQ.8) CALL XCHG(H1,4H(#D#)
+-      IF(NN.EQ.6.OR.NN.EQ.9) CALL XCHG(H1,4H(#r#)
+-      IF(NN.EQ.10) CALL XCHG(H1,4H(#g#)
+-      CALL XCHG(H2,4H#q#))
+-      IF(NN.GT.1) CALL XCHG(H2,4H#D#))
+-      IF(NN.GT.3) CALL XCHG(H2,4H#r#))
+-      IF(NN.GT.6) CALL XCHG(H2,4H#g#))
++      CALL XCHG(H1,'(#q#')
++      IF(NN.EQ.3.OR.NN.EQ.5.OR.NN.EQ.8) CALL XCHG(H1,'(#D#')
++      IF(NN.EQ.6.OR.NN.EQ.9) CALL XCHG(H1,'(#r#')
++      IF(NN.EQ.10) CALL XCHG(H1,'(#g#')
++      CALL XCHG(H2,'#q#)')
++      IF(NN.GT.1) CALL XCHG(H2,'#D#)')
++      IF(NN.GT.3) CALL XCHG(H2,'#r#)')
++      IF(NN.GT.6) CALL XCHG(H2,'#g#)')
+       WRITE(CSTR,128) H1,H2
+   128 FORMAT(A4,',',A4)
+       CALL SYMBOL(0.2,YPT,0.18,CSTR,0.0,9)

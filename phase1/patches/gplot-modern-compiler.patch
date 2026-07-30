@@ -1,0 +1,17 @@
+--- a/src/aux_port_out.F
++++ b/src/aux_port_out.F
+@@ -16 +16 @@
+-      PARAMETER ( ESC=27 )
++      PARAMETER ( ESC=CHAR(27) )
+@@ -19 +19 @@
+-      PARAMETER ( ESC=27 )
++      PARAMETER ( ESC=CHAR(27) )
+--- a/src/term_width.F
++++ b/src/term_width.F
+@@ -71,4 +71,5 @@
+-      CHARACTER*1 ESC /Z'1B'/
++      CHARACTER*1 ESC
+       CHARACTER*20 COMMAND/'stty columns '/
+ 
++      ESC = CHAR(27)
+       IF (IWIDTH .LT. 10) GO TO 1000

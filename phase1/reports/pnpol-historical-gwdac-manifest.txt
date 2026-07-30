@@ -1,0 +1,6 @@
+exit=0
+executable_sha256=0be93b7f11806c0a1a85290b928bc6b8630ba7fb9eff5283d553692428a79f2f
+outputs_sha256:
+94faf6e4084b0c86a577ba61f02a2dfda2efd12750be540c41cf5d1169fad489  /phase1/reports/pnpol-historical-gwdac.normalized.stdout
+ff9388bab36ab9e56dfadb9597fddbd2b898a8e8ab8a31eb346bb546dd4c93a6  /phase1/reports/pnpol-historical-gwdac.normalized.PNPOL.PCT
+1defea26860238416c249a7b756bd77eadca94d70e8599b337a048fe3aaaca08  /phase1/reports/pnpol-historical-gwdac.PNPOL.TMP

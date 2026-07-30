@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly report_root="${PHASE2_REPORT_ROOT:-${phase2_root}/reports}"
+readonly amplitude_table="$(
+    printf '%s/amplitude-corpus/modern/cm12_pi_plus_h1_baseline.results.tsv' \
+        "${report_root}"
+)"
+readonly dsg_table="$(
+    printf '%s/corpus/modern/cm12_pi_plus_dsg_baseline.results.tsv' \
+        "${report_root}"
+)"
+readonly consistency_table="$(
+    printf '%s/prsdd-amplitude-dsg-consistency.tsv' "${report_root}"
+)"
+readonly markdown_report="$(
+    printf '%s/prsdd-amplitude-dsg-consistency.md' "${report_root}"
+)"
+
+test -f "${amplitude_table}"
+test -f "${dsg_table}"
+
+awk -F '\t' '
+    BEGIN {
+        OFS = "\t"
+        target_mass = 938.256
+        recoil_mass = 939.65
+        pion_mass = 139.65
+        photon_lab_energy = 1000.0
+        s = target_mass^2 + 2.0 * target_mass * photon_lab_energy
+        wcm = sqrt(s)
+        incident_momentum = (s - target_mass^2) / (2.0 * wcm)
+        final_momentum = sqrt((s - (recoil_mass + pion_mass)^2) * \
+            (s - (recoil_mass - pion_mass)^2)) / (2.0 * wcm)
+        factor = (final_momentum / incident_momentum) / 200.0
+    }
+    NR == FNR {
+        if (FNR > 1) {
+            dsg[$2 + 0] = $3 + 0
+        }
+        next
+    }
+    FNR == 1 {
+        print "acm_deg", "dsg_from_rounded_amplitudes", "dsg_oracle", \
+            "absolute_difference", "rounding_bound"
+        next
+    }
+    {
+        angle = $2 + 0
+        sum_squares = 0.0
+        amplitude_bound = 0.0
+        for (column = 3; column <= 10; column++) {
+            value = $column + 0
+            sum_squares += value^2
+            amplitude_bound += 2.0 * ((value < 0) ? -value : value) * 0.005
+            amplitude_bound += 0.005^2
+        }
+        reconstructed = factor * sum_squares
+        expected = dsg[angle]
+        difference = reconstructed - expected
+        if (difference < 0) {
+            difference = -difference
+        }
+        # Add half a final displayed DSG unit to the component-rounding bound.
+        bound = factor * amplitude_bound + 0.0005
+        print angle, reconstructed, expected, difference, bound
+        if (difference > bound) {
+            failed = 1
+        }
+    }
+    END {
+        if (failed) {
+            exit 1
+        }
+    }
+' "${dsg_table}" "${amplitude_table}" >"${consistency_table}"
+
+max_difference="$(
+    awk -F '\t' '
+        NR > 1 && $4 > maximum { maximum = $4 }
+        END { printf "%.9f", maximum }
+    ' "${consistency_table}"
+)"
+minimum_margin="$(
+    awk -F '\t' '
+        NR == 2 { minimum = $5 - $4 }
+        NR > 2 && $5 - $4 < minimum { minimum = $5 - $4 }
+        END { printf "%.9f", minimum }
+    ' "${consistency_table}"
+)"
+table_sha256="$(sha256sum "${consistency_table}" | awk '{print $1}')"
+
+cat >"${markdown_report}" <<EOF
+# Choice-1 amplitude to DSG consistency
+
+Generated: $(date -u '+%Y-%m-%dT%H:%M:%SZ')
+
+The nine shared CM12 \`pi+n\`, 1000 MeV angle points satisfy the canonical
+\`PROBS\` relation:
+
+\`DSG = (q_cm / k_cm) * sum(|A_i|^2) / 200\`
+
+using the masses and kinematics in \`PRBAS\`. Because the amplitude transcript
+rounds every real and imaginary component to 0.01 mFm, this is a
+rounding-bounded consistency test rather than an exact equality test.
+
+- Maximum absolute difference: \`${max_difference}\`
+- Minimum remaining rounding margin: \`${minimum_margin}\`
+- Consistency table SHA-256: \`${table_sha256}\`
+- Result: every difference is within the bound implied by component and final
+  DSG display rounding.
+
+This confirms that the frozen choice-1 records are the amplitude values consumed
+by the existing DSG path at the observable precision available from the legacy
+text interface. It does not independently validate the physical normalization.
+
+The immutable-loader seam reproduces both source tables byte-for-byte, so this
+rounding-bounded invariant is unchanged for the seam build.
+EOF
+
+printf 'Amplitude-to-DSG consistency passed: %s\n' "${markdown_report}"

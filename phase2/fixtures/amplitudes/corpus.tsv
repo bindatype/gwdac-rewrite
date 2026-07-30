@@ -1,0 +1,14 @@
+id	category	solution	reaction	independent_variable	grid_min	grid_step	grid_max	fixed_variable	fixed_value	amplitude_choice	expected_rows	expected_behavior	description
+cm12_pi_plus_h1_baseline	normal	CM12	pi+n	acm_deg	10	20	170	photon_lab_energy_mev	1000	1	9	normal	Baseline Walker helicity amplitudes for the pi+n channel
+cm12_pi0p_h1	normal	CM12	pi0p	acm_deg	0	30	180	photon_lab_energy_mev	400	1	7	normal	Neutral-pion proton channel
+cm12_pi_minus_h1	normal	CM12	pi-p	acm_deg	0	30	180	photon_lab_energy_mev	500	1	7	normal	Negative-pion proton channel
+cm12_pi0n_h1	normal	CM12	pi0n	acm_deg	0	30	180	photon_lab_energy_mev	800	1	7	normal	Neutral-pion neutron channel
+cm12_pi_plus_h1_fixed_w	normal	CM12	pi+n	acm_deg	0	30	180	total_cm_energy_mev	1600	1	7	normal	Fixed center-of-mass energy
+cm12_pi_plus_h1_energy_sweep	normal	CM12	pi+n	photon_lab_energy_mev	200	200	1000	acm_deg	90	1	5	normal	Photon laboratory energy sweep at fixed angle
+cm12_pi_plus_h1_w_sweep	normal	CM12	pi+n	total_cm_energy_mev	1100	200	1900	acm_deg	90	1	5	finite_underflow_diagnostic	Center-of-mass energy sweep with finite results and a modern IEEE underflow diagnostic
+cm12_pi_plus_h1_cosine_clamp	boundary	CM12	pi+n	cos_acm	-2	0.5	2	photon_lab_energy_mev	1000	1	5	legacy_clamp	Legacy clamps cosine endpoints to minus one and plus one
+cm12_pi_plus_h1_max_grid	boundary	CM12	pi+n	acm_deg	0	2.6087	180	photon_lab_energy_mev	1000	1	70	maximum_grid	Maximum accepted 70-point legacy grid
+cm12_pi_plus_h1_single_point	boundary	CM12	pi+n	acm_deg	90	1	90	photon_lab_energy_mev	1000	1	1	single_point	Single-angle amplitude request
+cm12_pi_plus_h1_choice_zero	legacy_coercion	CM12	pi+n	acm_deg	10	20	170	photon_lab_energy_mev	1000	0	9	legacy_choice_clamp	Legacy coerces amplitude choice zero to choice one
+cm12_unknown_observable_h1_recovery	malformed	CM12	pi+n	acm_deg	10	20	170	photon_lab_energy_mev	1000	BOGUS_then_1	9	legacy_reprompt	Unknown observable is rejected before AMPL choice one
+cm12_invalid_reaction_h1_recovery	malformed	CM12	invalid_then_pi+n	acm_deg	10	20	170	photon_lab_energy_mev	1000	1	9	legacy_reprompt	Invalid reaction number is rejected before a valid replacement

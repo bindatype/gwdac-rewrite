@@ -1,0 +1,2 @@
+STOP 1
+status=2 cannot open /workspace/arndt64/said/KCM.100330/does-not-exist/cmmS11.dat iostat 2

@@ -1,0 +1,145 @@
+ This program uses MOD01 to fit PiN partial-waves
+ To see details enter "GO50" anytime
+ Enter 1(Pi-N), 2(K-N,K-D), or 3(K-N,K*N) -> Masses set for Pi-N with Pi-Delta inelastic
+ 7/29/26
+ RETURN for non-graphics
+ "TDL" to set PLOT time delay
+ or enter TERMINAL type (XW, TK41, or ?) -> To get Instructions for using MODEL enter "?"
+ In NORMAL mode data is entered as:
+ XY NXY Xs Ys Errs which is then repeated
+ In COLUMN mode data is entered as XY followed by X Y Err
+ which is repeated until RETURN goes back to XY
+ NMODE= 1 (1=NORMAL, -1=COLUMN)  Enter choice -> PICT file is ON
+
+ To reverse a CUT(eg piDelta) add D, R, N to the PHASE
+ (eg S11D would be S11 with piDelta reversed)
+ Enter Phase (eg "P11" or "P11D" ..) -> Enter Wmin Wmax Wimn sht(3) ->     112.0   0.005   0.005   0.000   0.005 SGR=    0.00
+     124.0  -0.006   0.005   0.000   0.005 SGR=    0.00
+     142.0   0.012   0.005   0.000   0.005 SGR=    0.00
+     170.0   0.011   0.005   0.000   0.005 SGR=    0.00
+     193.0   0.020   0.005   0.001   0.005 SGR=    0.00
+     217.0   0.030   0.005   0.002   0.005 SGR=    0.00
+     238.0   0.036   0.005   0.003   0.005 SGR=    0.01
+     266.0   0.044   0.005   0.002   0.005 SGR=    0.00
+     292.0   0.060   0.005   0.007   0.005 SGR=    0.01
+     309.0   0.081   0.005   0.014   0.005 SGR=    0.03
+     334.0   0.090   0.007   0.028   0.006 SGR=    0.08
+     352.0   0.111   0.005   0.020   0.005 SGR=    0.03
+     390.0   0.153   0.005   0.038   0.005 SGR=    0.05
+     425.0   0.191   0.005   0.070   0.005 SGR=    0.11
+     465.0   0.239   0.005   0.136   0.005 SGR=    0.24
+     500.0   0.294   0.005   0.210   0.005 SGR=    0.32
+     520.0   0.293   0.012   0.304   0.013 SGR=    0.50
+     535.0   0.297   0.008   0.356   0.008 SGR=    0.56
+     560.0   0.281   0.007   0.464   0.007 SGR=    0.68
+     580.0   0.149   0.013   0.588   0.011 SGR=    0.88
+     600.0   0.024   0.014   0.601   0.028 SGR=    0.96
+     625.0  -0.153   0.022   0.611   0.020 SGR=    0.86
+     660.0  -0.289   0.012   0.463   0.016 SGR=    0.66
+     720.0  -0.284   0.008   0.265   0.009 SGR=    0.46
+     745.0  -0.264   0.009   0.230   0.009 SGR=    0.43
+     765.0  -0.247   0.013   0.185   0.011 SGR=    0.36
+     782.0  -0.226   0.020   0.141   0.016 SGR=    0.28
+     800.0  -0.229   0.008   0.147   0.006 SGR=    0.29
+     820.0  -0.199   0.019   0.117   0.013 SGR=    0.25
+     875.0  -0.163   0.011   0.112   0.007 SGR=    0.29
+     890.0  -0.097   0.016   0.083   0.008 SGR=    0.27
+     900.0  -0.103   0.014   0.064   0.006 SGR=    0.20
+     930.0  -0.045   0.015   0.066   0.007 SGR=    0.24
+     960.0  -0.072   0.015   0.071   0.008 SGR=    0.24
+    1000.0  -0.063   0.013   0.075   0.009 SGR=    0.26
+    1030.0  -0.050   0.016   0.075   0.009 SGR=    0.27
+    1045.0  -0.029   0.015   0.072   0.008 SGR=    0.26
+    1075.0  -0.010   0.017   0.066   0.009 SGR=    0.25
+    1100.0  -0.026   0.017   0.090   0.009 SGR=    0.33
+    1150.0  -0.023   0.015   0.104   0.008 SGR=    0.37
+    1180.0  -0.021   0.016   0.117   0.009 SGR=    0.41
+    1210.0  -0.002   0.016   0.132   0.009 SGR=    0.46
+    1245.0   0.017   0.017   0.134   0.010 SGR=    0.46
+    1320.0  -0.002   0.014   0.152   0.008 SGR=    0.51
+    1370.0  -0.026   0.013   0.190   0.011 SGR=    0.61
+    1400.0   0.024   0.017   0.193   0.013 SGR=    0.62
+    1460.0   0.014   0.010   0.179   0.007 SGR=    0.59
+    1480.0   0.029   0.011   0.152   0.007 SGR=    0.51
+    1570.0   0.017   0.011   0.196   0.008 SGR=    0.63
+    1595.0   0.010   0.013   0.211   0.010 SGR=    0.66
+    1660.0  -0.032   0.011   0.228   0.010 SGR=    0.70
+    1720.0   0.020   0.017   0.241   0.016 SGR=    0.73
+    1755.0  -0.007   0.011   0.206   0.009 SGR=    0.65
+    1840.0  -0.023   0.010   0.259   0.010 SGR=    0.76
+    1870.0  -0.014   0.016   0.269   0.017 SGR=    0.78
+    1930.0  -0.001   0.010   0.252   0.010 SGR=    0.75
+    1970.0  -0.007   0.022   0.261   0.021 SGR=    0.77
+    2025.0  -0.014   0.014   0.299   0.018 SGR=    0.84
+    2075.0  -0.041   0.013   0.275   0.010 SGR=    0.79
+    2125.0   0.019   0.011   0.307   0.014 SGR=    0.85
+    2175.0  -0.038   0.021   0.285   0.022 SGR=    0.81
+    2225.0  -0.002   0.014   0.282   0.011 SGR=    0.81
+    2275.0  -0.012   0.015   0.327   0.019 SGR=    0.88
+    2325.0  -0.025   0.013   0.271   0.014 SGR=    0.79
+    2375.0  -0.076   0.016   0.290   0.018 SGR=    0.80
+    2425.0  -0.013   0.016   0.322   0.018 SGR=    0.87
+    2475.0  -0.040   0.019   0.327   0.026 SGR=    0.87
+    2525.0  -0.019   0.021   0.294   0.022 SGR=    0.83
+    2575.0  -0.023   0.014   0.331   0.023 SGR=    0.88
+ Sol 1-WI08 766276 57415/31339 P+=27207/13354 P-=22681/11978 CX= 5935/ 
+       WI08 766276 339 P+=27207/13354 P-=22681/11978 CX= 5935/ 2975    
+ Sol 2-WS08 766276 56792/31339 P+=26769/13354 P-=22983/11978 CX= 5630/ 
+       WS08 766276 339 P+=26769/13354 P-=22983/11978 CX= 5630/ 2975    
+ Sol 3-WP08 766276 57302/31339 P+=27726/13354 P-=22581/11978 CX= 5723/ 
+       WP08 766276 339 P+=27726/13354 P-=22581/11978 CX= 5723/ 2975    
+ Sol 4-SP06 766276 57255/31876 P+=27190/13344 P-=22702/11967 CX= 6084/ 
+       SP06 766276 876 P+=27190/13344 P-=22702/11967 CX= 6084/ 2933    
+ Sol 5-UP06 766276 55834/28501 P+=27001/13344 P-=22268/11967 CX= 5934/ 
+       UP06 766276 501 P+=27001/13344 P-=22268/11967 CX= 5934/ 2933    
+ Sol 6-EBAC PIN TO WCM=2000 MEV S..G WAVES JULIA-DIAZ, PRC76, 065201(20
+       EBAC PIN TO  MEV S..G WAVES JULIA-DIAZ, PRC76, 065201(2007)     
+ Enter NO of solution to be used (1 to 6) -> WI08 766276 339 P+=27207/13354 P-=22681/11978 CX NL? -> NL= 12 Form=  2
+ J,PJ= 1  0.2924E+00
+ J,PJ= 2  0.6135E+01
+ J,PJ= 3 -0.1811E+02
+ J,PJ= 6  0.8052E+01
+ J,PJ= 8 -0.8814E+02
+ J,PJ= 9  0.1768E+03
+ J,PJ=10 -0.1066E+02
+ J,PJ=11 -0.1287E+02
+ J,PJ=14 -0.4082E+02
+ J,PJ=16  0.6538E+00
+ J,PJ=33  0.2000E+01
+ To generate T-matrix "data" from this Solution
+ enter "GO25" here. Change Ps? -> Special CONTOUR plot, Cursor keystrokes will:
+ E- Plot VPI single energy amplitudes
+ R- Locate nearby 1st sheet pole- Write to file 7
+ Y- Locate nearby 2nd sheet pole- Write to file 7
+ Z- Locate nearby zero- Write to file 7
+ B- Begin anew with this prompt
+ C- Clear and Redraw plot
+ D- Draw Delta branch point
+ I(or Q)- Return to SINIT prompt
+ K(M)- Plot Karlsruhe(or CMB) amplitudes
+ A- Change Namp
+ L- Enter contour Levels
+ H- Plot Particle Data Book Resonances
+ F,Int- Plot Poles for soln(Int), Int=0 for ALL solns
+ G,Int- Plot Zeroes as for F,Int
+ W- Toggles ERRORS on pole positions
+ S,Int- Reverse "cut" for sheet Int(1=piD, 2=rhoN, 3=etaN)
+ Wmin, Wmax,ImW(min)= 1400.00 1750.00 -150.00
+ IT2 = 1 1=modT, -1=T**2, "GO16" to toggle
+ Enter Wmin, Wmax, ImW(min) ->
+ Namp < 0 to map K-mtx 
+ Namp=1(pi,pi), 2(pi,D), 3(D,D), 4(pi,rho), 5(D,rho)
+ 6(rho,rho), 7(pi,eta), 8(D,eta), 9(rho,eta), 10(eta,eta)
+ Enter Namp -> Using KM4CH  T = K*Inv[I-C*K] (Chew-Mandelstam)
+ do 4x4 K-matrix to channels pipi, pid, pieta(or pid+)
+ P= K11(4), WkP, K12(2), K22(2), K13(2), K23(2), K33(2)
+ K14(2), K24(2), K34(2), K44(2), dWk, dGk, addres(4)
+ piD, rhoN, etaN SHEETS set for    1.  -1.   1.
+ Enter choices ->WI08    D13          7/29/26
+ Sheets= 1.-1. 1.
+ Fmin, Fmax=     0.0     2.4 Enter F-, DF, F+ -> RETURN for 3-d Pole-Plot -> Phi, Alfa = 180.00  65.00 x0, y0, f0=    0.00    0.00    0.00
+  Phi,Alpha? -> Phi, Alfa = 180.00  65.00 x0, y0, f0= 1400.00    0.00    0.00
+  Phi,Alpha? -> Phi, Alfa = 180.00  65.00 x0, y0, f0= 1400.00    0.00    0.00
+  Phi,Alpha? -> Phi, Alfa = 180.00  65.00 x0, y0, f0= 1400.00    0.00    0.00
+  Phi,Alpha? -> Phi, Alfa = 180.00  65.00 x0, y0, f0= 1400.00    0.00    0.00
+  Phi,Alpha? ->

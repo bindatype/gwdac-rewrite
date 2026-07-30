@@ -1,0 +1,24 @@
+--- a/pnpolw.for
++++ b/pnpolw.for
+@@ -7,14 +7,14 @@
+       DATA IR/1/
+ C VAX/W-S  8 OPEN STATEMENTS ARE FOR WORK-STATION VERSION ONLY
+       OPEN(UNIT=10,FILE='PNPOL.PCT',STATUS='UNKNOWN')
+-      OPEN(UNIT=2,FILE='/home/arndt/sdat/pnintp.dat',STATUS='OLD')
+-      OPEN(UNIT=18,FILE='/home/arndt/sdat/ka84.dat',STATUS='OLD')
+-      OPEN(UNIT=17,FILE='/home/arndt/sdat/karls.dat',STATUS='OLD')
+-      OPEN(UNIT=16,FILE='/home/arndt/sdat/karlc.dat',STATUS='OLD')
+-      OPEN(UNIT=3,FILE='/home/arndt/sdat/pnsol.dat',STATUS='OLD')
+-      OPEN(UNIT=1,FILE='/home/arndt/sdat/pnses.dat',STATUS='OLD')
++      OPEN(UNIT=2,FILE='data/pnintp.dat',STATUS='OLD')
++      OPEN(UNIT=18,FILE='data/ka84.dat',STATUS='OLD')
++      OPEN(UNIT=17,FILE='data/karls.dat',STATUS='OLD')
++      OPEN(UNIT=16,FILE='data/karlc.dat',STATUS='OLD')
++      OPEN(UNIT=3,FILE='data/pnsol.dat',STATUS='OLD')
++      OPEN(UNIT=1,FILE='data/pnses.dat',STATUS='OLD')
+       OPEN(UNIT=7,FILE='PNPOL.TMP',STATUS='UNKNOWN')
+-      OPEN(UNIT=8,FILE='/home/arndt/sdat/polzer.dat',STATUS='OLD')
++      OPEN(UNIT=8,FILE='data/polzer.dat',STATUS='OLD')
+       OPEN(77,FILE='PNPOL.IN',STATUS='UNKNOWN')
+       WRITE(*,150)
+   150 FORMAT(' This program uses MOD01 to fit PiN partial-waves'

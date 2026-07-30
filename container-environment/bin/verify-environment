@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly workspace="${GWDAC_WORKSPACE:-/workspace}"
+readonly report_dir="${workspace}/verification"
+
+if [[ "$(uname -m)" != "x86_64" ]]; then
+    printf 'Expected x86_64 container, found %s\n' "$(uname -m)" >&2
+    exit 1
+fi
+
+for path in \
+    gwdac/gwdac/html/JPAC.html \
+    gwdac/gwdac/html/jpac.html \
+    arndt64/pn/GO08.DAT \
+    arndt64/pn/go08.dat \
+    arndt64/pr/DU06X.DAT \
+    arndt64/pr/du06x.dat \
+    arndt64/sim/SAID.PCT \
+    arndt64/sim/said.pct; do
+    if [[ ! -f "${workspace}/${path}" ]]; then
+        printf 'Missing case-sensitive checkout path: %s\n' "${path}" >&2
+        exit 1
+    fi
+done
+
+for repository in gwdac arndt64; do
+    if [[ -n "$(git -C "${workspace}/${repository}" status --porcelain)" ]]; then
+        printf '%s working tree is not clean\n' "${repository}" >&2
+        git -C "${workspace}/${repository}" status --short >&2
+        exit 1
+    fi
+done
+
+mkdir -p "${report_dir}"
+
+(
+    cd "${workspace}/arndt64/said"
+    gfortran \
+        -fsyntax-only \
+        -std=legacy \
+        -ffixed-line-length-none \
+        -fallow-argument-mismatch \
+        -fno-second-underscore \
+        -fno-automatic \
+        prsd.f prsd2.f pru.f
+) >"${report_dir}/gfortran-syntax.log" 2>&1
+
+objdump -p "${workspace}/gwdac/gwdac/cgi-bin/prsd" \
+    >"${report_dir}/historical-prsd-elf.txt"
+
+printf 'Architecture: %s\n' "$(uname -m)"
+gfortran --version | sed -n '1p'
+printf 'Case-sensitive checkouts and PRSD syntax pass verified.\n'
+printf 'Reports: %s\n' "${report_dir}"
