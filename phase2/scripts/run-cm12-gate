@@ -1,0 +1,193 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly phase2_root="$(cd "${script_root}/.." && pwd)"
+readonly outputs_root="$(cd "${phase2_root}/.." && pwd)"
+readonly compose_file="${outputs_root}/container-environment/compose.yaml"
+readonly commit="$(git -C "${outputs_root}" rev-parse HEAD)"
+readonly short_commit="${commit:0:12}"
+readonly timestamp="$(date -u '+%Y%m%dT%H%M%SZ')"
+readonly run_id="${short_commit}-${timestamp}"
+readonly project="${GWDAC_GATE_PROJECT:-gwdac-gate-${short_commit}}"
+readonly host_report_root="${phase2_root}/reports/gate/${run_id}"
+readonly container_report_root="/phase2/reports/gate/${run_id}"
+readonly gate_table="${host_report_root}/fixture-gate.tsv"
+readonly command_table="${host_report_root}/commands.tsv"
+readonly summary="${host_report_root}/summary.txt"
+readonly keep_environment="${GWDAC_GATE_KEEP_ENVIRONMENT:-0}"
+readonly -a compose=(
+    docker compose
+    -p "${project}"
+    -f "${compose_file}"
+)
+
+mkdir -p "${host_report_root}"
+printf '%s\n' $'step\tstatus' >"${command_table}"
+
+cleanup() {
+    if [[ "${keep_environment}" != "1" ]]; then
+        "${compose[@]}" down --volumes >/dev/null 2>&1 || true
+    fi
+}
+trap cleanup EXIT
+
+command_failures=0
+run_step() {
+    local label="$1"
+    shift
+    printf 'RUN  %s\n' "${label}"
+    if "$@"; then
+        printf '%s\tpass\n' "${label}" >>"${command_table}"
+        return 0
+    fi
+    printf '%s\tfail\n' "${label}" >>"${command_table}"
+    command_failures=$((command_failures + 1))
+    return 0
+}
+
+run_step compose-build "${compose[@]}" build
+run_step compose-up "${compose[@]}" up -d dev oracle
+run_step bootstrap-repos \
+    "${compose[@]}" exec -T dev bootstrap-repos
+run_step verify-environment \
+    "${compose[@]}" exec -T dev verify-environment
+run_step build-modern \
+    "${compose[@]}" exec -T dev bash /phase1/scripts/build-prsdd
+run_step build-candidate \
+    "${compose[@]}" exec -T \
+    -e "PHASE2_REPORT_ROOT=${container_report_root}" \
+    dev bash /phase2/scripts/build-cm12-seam
+
+for engine in modern seam; do
+    run_step "dsg-${engine}" \
+        "${compose[@]}" exec -T \
+        -e "PRSD_ENGINE=${engine}" \
+        -e "PHASE2_REPORT_ROOT=${container_report_root}" \
+        dev bash /phase2/scripts/run-prsdd-corpus
+    run_step "amplitude-${engine}" \
+        "${compose[@]}" exec -T \
+        -e "PRSD_ENGINE=${engine}" \
+        -e "PHASE2_REPORT_ROOT=${container_report_root}" \
+        dev bash /phase2/scripts/run-prsdd-amplitude-corpus
+done
+
+for engine in arndt64 gwdac; do
+    run_step "dsg-${engine}" \
+        "${compose[@]}" exec -T \
+        -e "PRSD_ENGINE=${engine}" \
+        -e "PHASE2_REPORT_ROOT=${container_report_root}" \
+        oracle bash /phase2/scripts/run-prsdd-corpus
+    run_step "amplitude-${engine}" \
+        "${compose[@]}" exec -T \
+        -e "PRSD_ENGINE=${engine}" \
+        -e "PHASE2_REPORT_ROOT=${container_report_root}" \
+        oracle bash /phase2/scripts/run-prsdd-amplitude-corpus
+done
+
+printf '%s\n' \
+    $'contract\tid\texpected_rows\tmodern_sha256\tarndt64_sha256\tgwdac_sha256\tcandidate_sha256\toracle_exact\tcandidate_exact' \
+    >"${gate_table}"
+
+hash_or_missing() {
+    local path="$1"
+    if [[ -f "${path}" ]]; then
+        shasum -a 256 "${path}" | awk '{print $1}'
+    else
+        printf 'missing'
+    fi
+}
+
+fixture_failures=0
+fixture_count=0
+row_count=0
+compare_fixture() {
+    local contract="$1"
+    local id="$2"
+    local expected_rows="$3"
+    local result_subdir="$4"
+    local modern="${host_report_root}/${result_subdir}/modern/${id}.results.tsv"
+    local arndt64="${host_report_root}/${result_subdir}/arndt64/${id}.results.tsv"
+    local gwdac="${host_report_root}/${result_subdir}/gwdac/${id}.results.tsv"
+    local candidate="${host_report_root}/${result_subdir}/seam/${id}.results.tsv"
+    local modern_sha
+    local arndt64_sha
+    local gwdac_sha
+    local candidate_sha
+    local oracle_exact=no
+    local candidate_exact=no
+
+    modern_sha="$(hash_or_missing "${modern}")"
+    arndt64_sha="$(hash_or_missing "${arndt64}")"
+    gwdac_sha="$(hash_or_missing "${gwdac}")"
+    candidate_sha="$(hash_or_missing "${candidate}")"
+    if [[ "${modern_sha}" != "missing" ]] &&
+        [[ "${modern_sha}" == "${arndt64_sha}" ]] &&
+        [[ "${modern_sha}" == "${gwdac_sha}" ]]; then
+        oracle_exact=yes
+    fi
+    if [[ "${modern_sha}" != "missing" ]] &&
+        [[ "${modern_sha}" == "${candidate_sha}" ]]; then
+        candidate_exact=yes
+    fi
+    if [[ "${oracle_exact}" != "yes" || "${candidate_exact}" != "yes" ]]; then
+        fixture_failures=$((fixture_failures + 1))
+    fi
+    fixture_count=$((fixture_count + 1))
+    row_count=$((row_count + expected_rows))
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+        "${contract}" \
+        "${id}" \
+        "${expected_rows}" \
+        "${modern_sha}" \
+        "${arndt64_sha}" \
+        "${gwdac_sha}" \
+        "${candidate_sha}" \
+        "${oracle_exact}" \
+        "${candidate_exact}" \
+        >>"${gate_table}"
+    printf '%-10s %-45s oracle=%-3s candidate=%-3s\n' \
+        "${contract}" "${id}" "${oracle_exact}" "${candidate_exact}"
+}
+
+while IFS=$'\t' read -r id category solution reaction independent_variable \
+    grid_min grid_step grid_max fixed_variable fixed_value observable \
+    expected_rows expected_behavior description; do
+    if [[ "${id}" == "id" ]]; then
+        continue
+    fi
+    compare_fixture dsg "${id}" "${expected_rows}" corpus
+done <"${phase2_root}/fixtures/corpus.tsv"
+
+while IFS=$'\t' read -r id category solution reaction independent_variable \
+    grid_min grid_step grid_max fixed_variable fixed_value amplitude_choice \
+    expected_rows expected_behavior description; do
+    if [[ "${id}" == "id" ]]; then
+        continue
+    fi
+    compare_fixture \
+        amplitude "${id}" "${expected_rows}" amplitude-corpus
+done <"${phase2_root}/fixtures/amplitudes/corpus.tsv"
+
+{
+    printf 'outputs_commit=%s\n' "${commit}"
+    printf 'compose_project=%s\n' "${project}"
+    printf 'fixtures=%s\n' "${fixture_count}"
+    printf 'typed_records=%s\n' "${row_count}"
+    printf 'command_failures=%s\n' "${command_failures}"
+    printf 'fixture_failures=%s\n' "${fixture_failures}"
+    printf 'gate_table_sha256=%s\n' "$(
+        shasum -a 256 "${gate_table}" | awk '{print $1}'
+    )"
+    if [[ "${command_failures}" -eq 0 && "${fixture_failures}" -eq 0 ]]; then
+        printf 'result=pass\n'
+    else
+        printf 'result=fail\n'
+    fi
+} >"${summary}"
+
+printf 'Gate evidence: %s\n' "${gate_table}"
+printf 'Gate summary:  %s\n' "${summary}"
+if [[ "${command_failures}" -ne 0 || "${fixture_failures}" -ne 0 ]]; then
+    exit 1
+fi

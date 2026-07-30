@@ -35,6 +35,23 @@ docker compose exec -T -e PRSD_ENGINE=seam dev \
 docker compose exec -T dev bash /phase2/scripts/compare-cm12-seam
 ```
 
+## Run the clean-checkout gate
+
+From the `outputs` repository root:
+
+```sh
+phase2/scripts/run-cm12-gate
+```
+
+The gate creates an isolated Docker Compose project and source volume, restores
+the pinned repository bundles, rebuilds the modern reference and candidate
+seam, and runs every DSG and amplitude fixture through the modern reference,
+checked-in arndt64 executable, checked-in GWDAC executable, and candidate. It
+writes one pass/fail row per fixture under `phase2/reports/gate/` and exits
+nonzero after reporting all mismatches. Set
+`GWDAC_GATE_KEEP_ENVIRONMENT=1` to retain the containers and volumes for
+diagnosis.
+
 The oracle container remains network-disabled and read-only apart from its
 dedicated work volume and report mount.
 
