@@ -90,39 +90,34 @@ f54532e diagnostic: preserve failed PRBAS orchestration attempt
 abfc13c chore: reconstruct accepted CM12 baseline
 ```
 
-## Likely next step
+## Latest diagnostic result
 
-Do not redesign orchestration again. Isolate the first upstream mismatch in the
-18 non-1xx forms.
+The authorized forced-legacy versus candidate hadronic-input comparison is
+complete. Read:
 
-1. Complete the instrumented legacy build from `9cb0009`. The two patches now
-   pass sequential zero-fuzz dry-runs against the checksummed frozen source.
-2. Run the forced-legacy target request with
-   `CM12_FORCE_LEGACY_PRBAS=1`. Capture every `CM12DIAG HADRONIC` row emitted
-   for pion-plus, 1000 MeV, 90 degrees.
-3. Add a diagnostic-only probe for the candidate side and compare, per form:
-   `EPX`, `EPXX`, `TER`, `TEI`, `QCM`, `ZKCM`, state index, and form selector.
-4. Stop at the first differing input. Do not change the translated formulas
-   until the input divergence is identified.
+`phase2/reports/hadronic-input-diagnostic/README.md`
 
-The leading hypothesis is an unmapped energy-scaling or hadronic-state
-boundary around legacy `PNPWI`/`PNSM05`, possibly involving `EPXX` or saved
-state. This is inferred, not confirmed.
+The first divergence occurs on
+`family=1, branch=1, legacy_l=5, selector=25, state=3`:
 
-The strict request fixture intentionally stops `build-cm12-seam` before the
-later form-diagnostic probe is linked. Preserve that fixture. If needed, move
-diagnostic-probe compilation earlier or create a dedicated diagnostic build
-entry point; do not bypass or weaken the exact check.
-
-If all 18 non-1xx multipoles become exact, rerun the focused attribution first.
-Only then run:
-
-```sh
-phase2/scripts/run-cm12-gate
+```text
+legacy EPX/EPXX    = 0.0
+candidate EPX/EPXX = 849.95721435546875
 ```
 
-A 24-fixture/288-record byte-identical pass is still only a candidate result.
-Report it and stop for explicit acceptance.
+The frozen `PRDLT` initializes saved `BCOFFM=-1` and zeros `EPX` once when the
+current `BCOFF` differs. The candidate unconditionally calls `PNSM05` with the
+calculated final-meson energy. This source mechanism corroborates the captured
+first divergence.
+
+Across all 18 applicable rows, rotation form, base form, state, selector,
+`QCM`, and `ZKCM` are exact. `EPX/EPXX` are exact for 17/18 rows. `TER/TEI`
+match 0/18, but those later differences were not investigated because the
+authorized stop condition was the first differing input.
+
+No fix is authorized. Do not infer that modeling the one-time reset alone
+will close the final DSG mismatch. Wait for explicit direction before
+investigating the later `TER/TEI` divergence or changing the candidate.
 
 ## Constraints still in force
 
