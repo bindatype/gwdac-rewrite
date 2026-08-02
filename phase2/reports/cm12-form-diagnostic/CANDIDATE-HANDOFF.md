@@ -41,11 +41,16 @@ full build was stopped for this handoff before completion.
 
 ## Next isolation point
 
+**Resolved by later diagnostic evidence:** outputs commit `516c375` confirms
+that the frozen path does not call `PNSM05` directly for this fixture. Read
+`phase2/reports/hadronic-pipeline-diagnostic/README.md` before using the
+historical isolation instructions below.
+
 Run the instrumented legacy target and compare each emitted
 `CM12DIAG HADRONIC` row (`EPX`, `EPXX`, `TER`, `TEI`, `QCM`, and `ZKCM`) with
 the values used by `cm12_non_cm12_seam.f90`. The leading hypothesis is an
 unmapped legacy hadronic-input or energy-scaling boundary around
-`PNPWI`/`PNSM05`; it is not yet confirmed.
+`PNPWI`/`PNSM05`; it was not yet confirmed at this historical checkpoint.
 
 Do not change orchestration again, alter fixtures or tolerances, decide formula
 porting, or begin Phase 3 from this checkpoint.

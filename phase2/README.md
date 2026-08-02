@@ -90,9 +90,16 @@ dedicated work volume and report mount.
   invalid-domain tests.
 - The seam compatibility binary matches all 138 DSG and 150 choice-1
   amplitude records byte-for-byte at displayed precision.
+- The experimental 60-form request candidate remains intentionally failing at
+  commit `9cb0009`; it is not an accepted replacement for `PRBAS`.
+- Diagnostic commit `516c375` shows that, for the focused CM12 pion-plus
+  target, frozen `PNPWI` skips dispatch once and then selects `PNTEST`, while
+  the candidate directly calls `PNSM05`. `PNMOD` and `ADDRESK` are no-ops for
+  all 18 retained non-`1xx` rows.
 
 ## Pause gate
 
-This extraction milestone is complete. Do not start pure `PRBAS`
-orchestration, native background-formula replacement, or target-language work
-until the user sends the exact command `RESUME`.
+The focused hadronic-pipeline diagnostic is complete. Do not modify the
+candidate, title dispatch, saved-state sequencing, orchestration, formulas,
+fixtures, tolerances, or begin Phase 3 until the user sends a new explicit
+direction.
