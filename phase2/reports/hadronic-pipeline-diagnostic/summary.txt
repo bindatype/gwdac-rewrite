@@ -1,0 +1,13 @@
+evidence_label=captured
+scope=CM12 pion-plus Elab=1000 MeV Acm=90 degrees
+captured_pipeline_rows=26
+retained_rows=18
+epx_exact_rows=17
+no_dispatch_rows=1
+dispatch_branch_7_rows=17
+dispatch_branch_10_rows=0
+pnmod_noop_rows=18
+addresk_noop_rows=18
+ter_exact_rows=0
+tei_exact_rows=0
+first_ter_tei_divergence=row=1,family=1,branch=1,legacy_l=5,selector=25
