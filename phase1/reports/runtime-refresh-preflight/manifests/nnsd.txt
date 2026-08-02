@@ -1,0 +1,44 @@
+evidence_label=reference
+engine=nnsd
+rank=3
+source_commit=f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+gwdac_commit=aacdf975295d11eb0ec7529edd8fd549025dcd4d
+working_directory=/workspace/arndt64/nn
+source_files=3/3
+local_files=5/5
+data_files=4/4
+historical_binary=/workspace/arndt64/said/nnsd
+historical_binary_status=present
+command_deck=/workspace/arndt64/nn/NNF.INP
+command_deck_status=present
+captured_transcript=/workspace/arndt64/nn/NNF.OUT
+captured_transcript_status=present
+wrapper_count=4
+oracle_evidence=historical binary plus plausible deck/transcript pair; pairing requires execution
+preflight_status=ready-for-build-attempt
+binary_file=ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.15, BuildID[sha1]=bf02f4bb5cd841895ab61f2ef051d274d0b62c69, with debug_info, not stripped
+needed=libpng12.so.0
+needed=libgd.so.2
+needed=libgfortran.so.3
+needed=libm.so.6
+needed=libXt.so.6
+needed=libX11.so.6
+needed=libg2c.so.0
+needed=libgcc_s.so.1
+needed=libc.so.6
+c5d1a635cd33cfcdb6ca207bbe5f3f7034b68c944e4012db814e8f8db4df24ff  /workspace/arndt64/said/nnsd
+981c2235060d2a9af245c6fcad689acda42022bed9c3b535e3d2945e65b3eb47  /workspace/arndt64/said/mkS.ksh
+22e623b484449a59c03dd4dd3603c706d626cce362ba87ed2fb22a5a2c3420e1  /workspace/arndt64/said/nn.f
+c8489e06897afa6cdd4de57ea1efd6b4754d40318e96b719939cb557d831468d  /workspace/arndt64/said/nn1.f
+7eeb3a41a4af39aa3a556728ab74616d14c57fe4be8abb4d88f23f48db6fdb58  /workspace/arndt64/said/nnu.f
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /workspace/arndt64/nn/NNAMP.DAT
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /workspace/arndt64/nn/NNPRFD.DAT
+c2dcbc1db2e53b9451ba8e8c2abbbffc5bbded95446f03a54bd36999d39c248b  /workspace/arndt64/nn/NNSOL.USR
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /workspace/arndt64/nn/SAID.DS
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /workspace/arndt64/nn/NEWDAT.DAT
+19f12c1edd5fc0099dafe882fbe5d31c91df8b891b24d7f1ec0014f33e65bc85  /workspace/arndt64/sdat/nnmsg.dat
+783a92d24676910f0a3d424c71058a79c289d7e5cf560324d8752316afb367e0  /workspace/arndt64/sdat/nndat.dat
+6602b60b4449180b387bfeb4ba89925cecf2fd4c69979ad45a84bebb3488096e  /workspace/arndt64/sdat/nnsol.dat
+d607658d17b36b9da76b1c6da9435800e6177107fc7c38ee3a1246054cb236c8  /workspace/arndt64/sdat/nnses.dat
+f6a5fb975e4cce352e1352bf2a4f7ceedd21b77c5bc132929e1f3d609cff194f  /workspace/arndt64/nn/NNF.INP
+59c787f5f0ce75d520052c3444d87755fc7935380d2d781e90f192f1dcc762f0  /workspace/arndt64/nn/NNF.OUT

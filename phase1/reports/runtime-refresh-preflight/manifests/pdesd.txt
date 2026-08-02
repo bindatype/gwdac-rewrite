@@ -1,0 +1,41 @@
+evidence_label=reference
+engine=pdesd
+rank=6
+source_commit=f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+gwdac_commit=aacdf975295d11eb0ec7529edd8fd549025dcd4d
+working_directory=/workspace/arndt64/said
+source_files=2/2
+local_files=3/3
+data_files=5/5
+historical_binary=/workspace/arndt64/said/pdesd
+historical_binary_status=present
+command_deck=-
+command_deck_status=absent
+captured_transcript=/workspace/gwdac/gwdac/cgi-bin/TPDE
+captured_transcript_status=present
+wrapper_count=3
+oracle_evidence=historical binary and captured transcript; exact command deck absent
+preflight_status=buildable-oracle-deck-blocked
+binary_file=ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.15, BuildID[sha1]=773ce7f036d5f34ffdf7b657dae518e4e6eb5486, with debug_info, not stripped
+needed=libpng12.so.0
+needed=libgd.so.2
+needed=libgfortran.so.3
+needed=libm.so.6
+needed=libXt.so.6
+needed=libX11.so.6
+needed=libg2c.so.0
+needed=libgcc_s.so.1
+needed=libc.so.6
+a2aa3815647cc73814b6af9566973576dd053d2082d2d145483a0b24de532cdc  /workspace/arndt64/said/pdesd
+981c2235060d2a9af245c6fcad689acda42022bed9c3b535e3d2945e65b3eb47  /workspace/arndt64/said/mkS.ksh
+97dde4468a68c92e68f7759477e9f9c0a2f1dcb91c1fcdbf5662e165c702e940  /workspace/arndt64/said/pdesaid.f
+fce90edea29f2186402d31826d98c41cc1ea7a2d1c149bf748b05b8af1c3c648  /workspace/arndt64/said/pdeu.f
+ffa94608e990fca3db22398bcb2f02915a4153f76ceb01147a220f64355a2361  /workspace/arndt64/said/PDESOL.USR
+a0b6f20af6b4edb1dbd0f40de4b4fcf26b9f77a478ab0162f1a94236af87431c  /workspace/arndt64/said/SAID.DS
+f8de92fb24d65096c56f73b8eeb995b94a8b02e3420e2069285afcb9bed6af30  /workspace/arndt64/said/NEWDAT.DAT
+6963d811d249e29cf82cf0ad059fd8044900ad7f1a1e69e1316990c455b8e719  /workspace/arndt64/sdat/ppamp.dat
+4707c60322d1bf0d109a346d3722c64cf5ef6a3c83f2f91012c48c69b6a55e73  /workspace/arndt64/sdat/pdemsg.dat
+4f603c3ab0e49a240d1588471ea9577b2dfb0ac89cbe91bb9417d2706a050e94  /workspace/arndt64/sdat/pdedat.dat
+91f8166cadf7d57b108738e1b2f714ffabebcda810bd285c05dd661aed982197  /workspace/arndt64/sdat/pdesol.dat
+86df653ba4aef1684d492a230ceaeefc041dae14274822666191dc13362c2e9c  /workspace/arndt64/sdat/pdeses.dat
+c751e8db7136eba13728827b2a89525935d471aba58a04a4315eab400d1d7122  /workspace/gwdac/gwdac/cgi-bin/TPDE

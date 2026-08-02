@@ -1,0 +1,45 @@
+evidence_label=reference
+engine=knsd
+rank=4
+source_commit=f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+gwdac_commit=aacdf975295d11eb0ec7529edd8fd549025dcd4d
+working_directory=/workspace/arndt64/KN
+source_files=4/4
+local_files=4/4
+data_files=5/5
+historical_binary=/workspace/arndt64/said/knsd
+historical_binary_status=present
+command_deck=/workspace/arndt64/KN/INPUT
+command_deck_status=present
+captured_transcript=/workspace/gwdac/gwdac/cgi-bin/TKN
+captured_transcript_status=present
+wrapper_count=3
+oracle_evidence=historical binary plus surviving unpaired deck and captured transcript
+preflight_status=ready-for-build-attempt
+binary_file=ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.15, BuildID[sha1]=d6396576847bbc1ac8521e22641e0b05a10a14aa, with debug_info, not stripped
+needed=libpng12.so.0
+needed=libgd.so.2
+needed=libgfortran.so.3
+needed=libm.so.6
+needed=libXt.so.6
+needed=libX11.so.6
+needed=libg2c.so.0
+needed=libgcc_s.so.1
+needed=libc.so.6
+064a7fe51e3c2d4c2a8c12be0254c68491d01c3b12db8eeac93657c6d8d79e20  /workspace/arndt64/said/knsd
+981c2235060d2a9af245c6fcad689acda42022bed9c3b535e3d2945e65b3eb47  /workspace/arndt64/said/mkS.ksh
+4a6feaf65fd1a101edd169307721cbeeda8eaab8191592efbd4564280e5f4e62  /workspace/arndt64/said/knsd.f
+f8cdd84a5abc2318219f745f4c57b37bf44de80b8e1731a54c7115fc88818370  /workspace/arndt64/said/pn1.f
+af96a6bd15539f11640435c0bf2161381206116bd6d3f7f6f2220cba55f650ed  /workspace/arndt64/said/pn2.f
+fbadac901506aaade5de24b386b0a07cff31f047302fa6042f50919cf2f95f12  /workspace/arndt64/said/pnu.f
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /workspace/arndt64/KN/PNAMP.DAT
+0ecf96f4e00fa0e648943417fba0d8a06e3be4438a6834952b0dfc72f259bdef  /workspace/arndt64/KN/KNSOL.USR
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /workspace/arndt64/KN/SAID.DS
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /workspace/arndt64/KN/NEWDAT.DAT
+9b25cc6c76f0f9352d02f1430cc5a54992c572ead3170acdce286be67984271c  /workspace/arndt64/sdat/kndat.dat
+51fa53502c0fccb5b53712981beeeeb21fbe4b4bc1a2a8bccc6b3ff4df2b1e66  /workspace/arndt64/sdat/knsol.dat
+b6332ca3a9494ce6bf6a25503406314a4b6a6108cf22d7cd0bb1d9d12653e431  /workspace/arndt64/sdat/knses.dat
+d5c9b6473d78a73a2ffcb6ce0a3b5f7ea6e8f6b8ae6defdcaca4ac124849bda6  /workspace/arndt64/sdat/knmsg.dat
+507ccbecfd08be7946dfb16679c2848d6731af0fe79728e279d2589982b7c8e3  /workspace/arndt64/sdat/pnintp.dat
+3a00f7eee4037226762e53be35920319d6292a6914936223574deed8a042c445  /workspace/arndt64/KN/INPUT
+4ca055b50c08c22fa4fb21f589e126c4de911a73300758da4d17dc253364ea9a  /workspace/gwdac/gwdac/cgi-bin/TKN

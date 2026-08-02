@@ -1,0 +1,41 @@
+evidence_label=reference
+engine=pdsd
+rank=5
+source_commit=f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+gwdac_commit=aacdf975295d11eb0ec7529edd8fd549025dcd4d
+working_directory=/workspace/arndt64/said
+source_files=2/2
+local_files=3/3
+data_files=5/5
+historical_binary=/workspace/arndt64/said/pdsd
+historical_binary_status=present
+command_deck=-
+command_deck_status=absent
+captured_transcript=/workspace/gwdac/gwdac/cgi-bin/TPD
+captured_transcript_status=present
+wrapper_count=3
+oracle_evidence=historical binary and captured transcript; exact command deck absent
+preflight_status=buildable-oracle-deck-blocked
+binary_file=ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.15, BuildID[sha1]=c80a2f7cf71f9ce79fe2dc91ade4cf54c1698b61, with debug_info, not stripped
+needed=libpng12.so.0
+needed=libgd.so.2
+needed=libgfortran.so.3
+needed=libm.so.6
+needed=libXt.so.6
+needed=libX11.so.6
+needed=libg2c.so.0
+needed=libgcc_s.so.1
+needed=libc.so.6
+494f732b1c92ce5e5dd0ba1af8235a9557087456106ed81e00981b1c02f75f72  /workspace/arndt64/said/pdsd
+981c2235060d2a9af245c6fcad689acda42022bed9c3b535e3d2945e65b3eb47  /workspace/arndt64/said/mkS.ksh
+472b5140f27f25d7b8b9ebf98e68603c0d90052f06e99a0144ff8f70e11858eb  /workspace/arndt64/said/pidsaid.f
+76f22dadebc448921749a91e7a0427178691f65363b64892a087fa3534bc9daa  /workspace/arndt64/said/pidu.f
+507f540435d6e76a35baa3035f1782579eaf15b1580a77a58477085299c2545f  /workspace/arndt64/said/PIDSOL.USR
+a0b6f20af6b4edb1dbd0f40de4b4fcf26b9f77a478ab0162f1a94236af87431c  /workspace/arndt64/said/SAID.DS
+f8de92fb24d65096c56f73b8eeb995b94a8b02e3420e2069285afcb9bed6af30  /workspace/arndt64/said/NEWDAT.DAT
+6963d811d249e29cf82cf0ad059fd8044900ad7f1a1e69e1316990c455b8e719  /workspace/arndt64/sdat/ppamp.dat
+f6b701507499d493a9feca2895453fe6d9fa3f89db92b240f6e200d8904a6cf4  /workspace/arndt64/sdat/pidmsg.dat
+69bd62bce188384bf78140a02b10be35411565e712ea7c28ed2d68a277be62c4  /workspace/arndt64/sdat/pidcd.dat
+39eeb19f41c11a059d5460d1c87edd662795fba803e8b3139938a3caabb7bdcc  /workspace/arndt64/sdat/pidsol.dat
+9dcadabd7ad0c61d447865d8b6710630916cdef4bc2a9a5703ae687a1dfdfe21  /workspace/arndt64/sdat/pidses.dat
+039442f93ca5ba7c3a9bd1ef35b95a4b3be3a3281648487f279a442d7bad6f2c  /workspace/gwdac/gwdac/cgi-bin/TPD

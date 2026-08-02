@@ -1,0 +1,172 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly gwdac_root="${GWDAC_SOURCE:-/workspace/gwdac}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly config="${phase1_root}/config/runtime-refresh-engines.tsv"
+readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}/runtime-refresh-preflight"
+readonly matrix="${report_root}/engine-matrix.tsv"
+readonly source_commit="$(git -C "${source_root}" rev-parse HEAD)"
+readonly gwdac_commit="$(git -C "${gwdac_root}" rev-parse HEAD)"
+
+mkdir -p "${report_root}/manifests"
+test -f "${config}"
+test "${source_commit}" = f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+test "${gwdac_commit}" = aacdf975295d11eb0ec7529edd8fd549025dcd4d
+
+resolve_evidence_path() {
+    local specification="$1"
+    local repository="${specification%%:*}"
+    local relative_path="${specification#*:}"
+
+    case "${repository}" in
+        arndt64) printf '%s/%s\n' "${source_root}" "${relative_path}" ;;
+        gwdac) printf '%s/%s\n' "${gwdac_root}" "${relative_path}" ;;
+        *) return 1 ;;
+    esac
+}
+
+count_paths() {
+    local root="$1"
+    local list="$2"
+    local path
+    local count=0
+
+    IFS=';' read -ra paths <<<"${list}"
+    for path in "${paths[@]}"; do
+        if [[ -f "${root}/${path}" ]]; then
+            count=$((count + 1))
+        fi
+    done
+    printf '%s\n' "${count}"
+}
+
+list_count() {
+    local list="$1"
+    local -a paths
+    IFS=';' read -ra paths <<<"${list}"
+    printf '%s\n' "${#paths[@]}"
+}
+
+printf '%s\n' \
+    $'engine\trank\tsource_files\tsource_files_present\tlocal_files\tlocal_files_present\tdata_files\tdata_files_present\thistorical_binary\tcommand_deck\tcaptured_transcript\twrapper_count\toracle_evidence\tpreflight_status' \
+    >"${matrix}"
+
+engine_count=0
+while IFS=$'\t' read -r engine rank sources working_dir local_files \
+    data_files command_deck captured_transcript oracle_evidence; do
+    if [[ "${engine}" == "engine" ]]; then
+        continue
+    fi
+
+    binary="${source_root}/said/${engine}"
+    manifest="${report_root}/manifests/${engine}.txt"
+    source_expected="$(list_count "${sources}")"
+    source_present="$(count_paths "${source_root}" "${sources}")"
+    local_expected="$(list_count "${local_files}")"
+    local_present="$(count_paths "${source_root}" "${local_files}")"
+    data_expected="$(list_count "${data_files}")"
+    data_present="$(count_paths "${source_root}" "${data_files}")"
+
+    binary_status=missing
+    if [[ -x "${binary}" ]] && file "${binary}" | grep -Fq 'ELF 64-bit'; then
+        binary_status=present
+    fi
+
+    deck_status=absent
+    deck_path=-
+    if [[ "${command_deck}" != "-" ]]; then
+        deck_path="$(resolve_evidence_path "${command_deck}")"
+        if [[ -f "${deck_path}" ]]; then
+            deck_status=present
+        else
+            deck_status=missing
+        fi
+    fi
+
+    transcript_status=missing
+    transcript_path="$(resolve_evidence_path "${captured_transcript}")"
+    if [[ -f "${transcript_path}" ]]; then
+        transcript_status=present
+    fi
+
+    wrapper_count="$({
+        grep -Il "${engine}" "${gwdac_root}"/gwdac/cgi-bin/go* || true
+    } | wc -l | tr -d ' ')"
+
+    preflight_status=ready-for-build-attempt
+    if [[ "${source_present}" -ne "${source_expected}" ]] ||
+        [[ "${local_present}" -ne "${local_expected}" ]] ||
+        [[ "${data_present}" -ne "${data_expected}" ]] ||
+        [[ "${binary_status}" != present ]] ||
+        [[ "${transcript_status}" != present ]]; then
+        preflight_status=blocked-inventory-gap
+    elif [[ "${deck_status}" != present ]]; then
+        preflight_status=buildable-oracle-deck-blocked
+    fi
+
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+        "${engine}" "${rank}" "${source_expected}" "${source_present}" \
+        "${local_expected}" "${local_present}" "${data_expected}" \
+        "${data_present}" "${binary_status}" "${deck_status}" \
+        "${transcript_status}" "${wrapper_count}" "${oracle_evidence}" \
+        "${preflight_status}" >>"${matrix}"
+
+    hash_inputs=("${binary}" "${source_root}/said/mkS.ksh")
+    IFS=';' read -ra paths <<<"${sources};${local_files};${data_files}"
+    for path in "${paths[@]}"; do
+        if [[ -f "${source_root}/${path}" ]]; then
+            hash_inputs+=("${source_root}/${path}")
+        fi
+    done
+    if [[ "${deck_status}" == present ]]; then
+        hash_inputs+=("${deck_path}")
+    fi
+    if [[ "${transcript_status}" == present ]]; then
+        hash_inputs+=("${transcript_path}")
+    fi
+
+    {
+        printf 'evidence_label=reference\n'
+        printf 'engine=%s\n' "${engine}"
+        printf 'rank=%s\n' "${rank}"
+        printf 'source_commit=%s\n' "${source_commit}"
+        printf 'gwdac_commit=%s\n' "${gwdac_commit}"
+        printf 'working_directory=%s/%s\n' "${source_root}" "${working_dir}"
+        printf 'source_files=%s/%s\n' "${source_present}" "${source_expected}"
+        printf 'local_files=%s/%s\n' "${local_present}" "${local_expected}"
+        printf 'data_files=%s/%s\n' "${data_present}" "${data_expected}"
+        printf 'historical_binary=%s\n' "${binary}"
+        printf 'historical_binary_status=%s\n' "${binary_status}"
+        printf 'command_deck=%s\n' "${deck_path}"
+        printf 'command_deck_status=%s\n' "${deck_status}"
+        printf 'captured_transcript=%s\n' "${transcript_path}"
+        printf 'captured_transcript_status=%s\n' "${transcript_status}"
+        printf 'wrapper_count=%s\n' "${wrapper_count}"
+        printf 'oracle_evidence=%s\n' "${oracle_evidence}"
+        printf 'preflight_status=%s\n' "${preflight_status}"
+        printf 'binary_file=%s\n' "$(file -b "${binary}")"
+        objdump -p "${binary}" | sed -n 's/^[[:space:]]*NEEDED[[:space:]]*/needed=/p'
+        sha256sum "${hash_inputs[@]}"
+    } >"${manifest}"
+
+    engine_count=$((engine_count + 1))
+done <"${config}"
+
+test "${engine_count}" -eq 6
+test "$(($(wc -l <"${matrix}") - 1))" -eq 6
+
+{
+    printf 'evidence_label=reference\n'
+    printf 'source_commit=%s\n' "${source_commit}"
+    printf 'gwdac_commit=%s\n' "${gwdac_commit}"
+    printf 'engines=%s\n' "${engine_count}"
+    sha256sum \
+        "${config}" \
+        "${phase1_root}/scripts/inventory-runtime-refresh" \
+        "${matrix}" \
+        "${report_root}"/manifests/*.txt
+} >"${report_root}/manifest.txt"
+
+printf 'Runtime-refresh preflight complete: %s\n' "${matrix}"

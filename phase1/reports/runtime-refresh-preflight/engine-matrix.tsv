@@ -1,0 +1,7 @@
+engine	rank	source_files	source_files_present	local_files	local_files_present	data_files	data_files_present	historical_binary	command_deck	captured_transcript	wrapper_count	oracle_evidence	preflight_status
+pnsd	1	4	4	4	4	20	20	present	present	present	12	historical binary plus plausible deck/transcript pair; pairing requires execution	ready-for-build-attempt
+eprsd	2	4	4	5	5	26	26	present	present	present	4	historical binary plus plausible deck/transcript pair; pairing requires execution	ready-for-build-attempt
+nnsd	3	3	3	5	5	4	4	present	present	present	4	historical binary plus plausible deck/transcript pair; pairing requires execution	ready-for-build-attempt
+knsd	4	4	4	4	4	5	5	present	present	present	3	historical binary plus surviving unpaired deck and captured transcript	ready-for-build-attempt
+pdsd	5	2	2	3	3	5	5	present	absent	present	3	historical binary and captured transcript; exact command deck absent	buildable-oracle-deck-blocked
+pdesd	6	2	2	3	3	5	5	present	absent	present	3	historical binary and captured transcript; exact command deck absent	buildable-oracle-deck-blocked

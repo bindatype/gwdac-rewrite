@@ -1,0 +1,60 @@
+evidence_label=reference
+engine=pnsd
+rank=1
+source_commit=f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+gwdac_commit=aacdf975295d11eb0ec7529edd8fd549025dcd4d
+working_directory=/workspace/arndt64/pn
+source_files=4/4
+local_files=4/4
+data_files=20/20
+historical_binary=/workspace/arndt64/said/pnsd
+historical_binary_status=present
+command_deck=/workspace/arndt64/pn/PNF.INP
+command_deck_status=present
+captured_transcript=/workspace/arndt64/pn/PNF.OUT
+captured_transcript_status=present
+wrapper_count=12
+oracle_evidence=historical binary plus plausible deck/transcript pair; pairing requires execution
+preflight_status=ready-for-build-attempt
+binary_file=ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.15, BuildID[sha1]=48299c4e07eec07ed196a65364e7e2d63b03a969, not stripped
+needed=libpng12.so.0
+needed=libgd.so.2
+needed=libgfortran.so.3
+needed=libm.so.6
+needed=libXt.so.6
+needed=libX11.so.6
+needed=libg2c.so.0
+needed=libgcc_s.so.1
+needed=libc.so.6
+184232e664a6883751b2a4e68f73fc82f53c8e165572a46caf8b5a1a30f571de  /workspace/arndt64/said/pnsd
+981c2235060d2a9af245c6fcad689acda42022bed9c3b535e3d2945e65b3eb47  /workspace/arndt64/said/mkS.ksh
+5c3814ebe7d40e1253c731c47323d6c42f7b111337e3cc483eb24cb30fc4b169  /workspace/arndt64/said/pnsd.f
+f8cdd84a5abc2318219f745f4c57b37bf44de80b8e1731a54c7115fc88818370  /workspace/arndt64/said/pn1.f
+af96a6bd15539f11640435c0bf2161381206116bd6d3f7f6f2220cba55f650ed  /workspace/arndt64/said/pn2.f
+fbadac901506aaade5de24b386b0a07cff31f047302fa6042f50919cf2f95f12  /workspace/arndt64/said/pnu.f
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /workspace/arndt64/pn/PNAMP.DAT
+dd91e033b22ee4789e2db266773a3296dff3f9886c108d7d821d21cf28b2be1c  /workspace/arndt64/pn/PNSOL.USR
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /workspace/arndt64/pn/SAID.DS
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /workspace/arndt64/pn/NEWDAT.DAT
+2d38e959413270b1fa020069786399a9602f2ecae2b6f5ae3547bf76821275f5  /workspace/arndt64/sdat/pndat.dat
+45bdd954a222bbbb5c70094382a9bea5ce5616fe6c6c223a8c1d8dfb49349860  /workspace/arndt64/sdat/pnsol.dat
+11e2bea0845e9c5be2d8d0e5058e8f37cec9d67da9b1cf0dfa43ecead848676b  /workspace/arndt64/sdat/pnses.dat
+f696d9cacc9df4bef47369291f902bad2e72a16f28cbfa2da57c78d6553deb0b  /workspace/arndt64/sdat/pnmsg.dat
+a5e9697798752e0c450afe7464f6b09f2ce51808e5c39a6f17b113adbff643b3  /workspace/arndt64/sdat/polzer.dat
+a99213f44e70dd2135eb03ddda738b2b2a2282be6d63d73ac3fb5daa3a3c1064  /workspace/arndt64/sdat/karlc.dat
+6830e153d7c2bdda84324a94d7e46d49b601bc5c63372102e7b762ad924ae0cf  /workspace/arndt64/sdat/karls.dat
+d6dbaaa513f0753ded393fdb0f7148aabcc134660b0a682edc257756615b583d  /workspace/arndt64/sdat/ka84.dat
+72afc6c91a60b1f7402a6d0b9d9afff83ab98c95ee9b73e93276242fb5829569  /workspace/arndt64/sdat/pnprod.dat
+507ccbecfd08be7946dfb16679c2848d6731af0fe79728e279d2589982b7c8e3  /workspace/arndt64/sdat/pnintp.dat
+d47b774c32921b411c6e50b228896e8223580e90ae21b27cf11497394b089ffd  /workspace/arndt64/sdat/etandat.dat
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /workspace/arndt64/sdat/pnsecpr.dat
+ea4c75fb75f7568e4017bfcc9fa824976b44eccadffd151bc66313ebfea5ec1f  /workspace/arndt64/sdat/GEISSEN.DAT
+ed835d1cb7621b735b243f71544f1b458f1d2b739d10480dff6eeef6c0f24fac  /workspace/arndt64/sdat/JUELICHPW.DAT
+d4a6756ece42ee855be18a72466f40802796f1bbe9a086ab55ffff2fe734d24d  /workspace/arndt64/sdat/pi2pix.dat
+64d9a7e4c6d68d14e6c750b51ef717953023d48326ee07b64b60634166f9ebee  /workspace/arndt64/sdat/OMNPARIS.DAT
+f77c75c9f98c74fb192083489c96b65448bc6cc20c2553166f8286e64dc68689  /workspace/arndt64/sdat/PNRF.DAT
+6a4d12c646bd10e9c1320c740c16fbaa731538227a841a17e70a76737aff0d58  /workspace/arndt64/sdat/EBACPN.DAT
+5f400acc538750deafc2d098628d7d90908ddab6414d421fecdd8e187e4f2382  /workspace/arndt64/sdat/MAINZPN.DAT
+d8f03ee830e36411fb443ce576610fbc2c073b7183bbb1a4708e13fbceadb584  /workspace/arndt64/sdat/BGPN.DAT
+618f2b710fc6ad5154ddac0adfc5e35cabaf7a555b5cdf716ffb43a284f6bf08  /workspace/arndt64/pn/PNF.INP
+be016da2611db1a8f9c11442fdf71082a497780f57d5ad57cad16b456bc27d5b  /workspace/arndt64/pn/PNF.OUT
