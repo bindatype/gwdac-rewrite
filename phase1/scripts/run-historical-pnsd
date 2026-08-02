@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly state_root="${ORACLE_STATE_ROOT:-/oracle-work/runtime-refresh/pnsd}"
+readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}/runtime-refresh/pnsd/historical"
+readonly fixture="${phase1_root}/fixtures/pnsd-sp06-no-render.in"
+readonly binary="${source_root}/said/pnsd"
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-120}"
+readonly stdout_file="${report_root}/stdout.txt"
+readonly stderr_file="${report_root}/stderr.txt"
+readonly result_file="${report_root}/results.tsv"
+readonly trace_file="${report_root}/file-trace.tsv"
+readonly opened_file="${report_root}/opened-files.txt"
+readonly manifest="${report_root}/manifest.txt"
+readonly preflight_manifest="${phase1_root}/reports/runtime-refresh-preflight/manifests/pnsd.txt"
+readonly source_commit="$(
+    awk -F= '$1 == "source_commit" { print $2 }' "${preflight_manifest}"
+)"
+
+mkdir -p "${state_root}/runs" "${report_root}"
+test -x "${binary}"
+test -f "${fixture}"
+test -f "${preflight_manifest}"
+test "${source_commit}" = f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+
+run_root="$(mktemp -d "${state_root}/runs/oracle.XXXXXX")"
+cp -a "${source_root}/pn" "${run_root}/pn"
+rm -f \
+    "${run_root}/pn/SAID.TMP" \
+    "${run_root}/pn/SAID.PCT" \
+    "${run_root}/pn/SAID.LOG" \
+    "${run_root}/pn/SAID.PS" \
+    "${run_root}/pn/fort.3" \
+    "${run_root}/pn/fort.7"
+: >"${trace_file}"
+
+set +e
+(
+    cd "${run_root}/pn"
+    timeout "${timeout_seconds}" \
+        env \
+        LD_PRELOAD=/opt/oracle/file-trace.so \
+        ORACLE_FILE_TRACE="${trace_file}" \
+        "${binary}" \
+        <"${fixture}" \
+        >"${stdout_file}" \
+        2>"${stderr_file}"
+)
+status=$?
+set -e
+
+cut -f2- "${trace_file}" | sort -u >"${opened_file}"
+
+awk '
+    BEGIN {
+        OFS = "\t"
+        print "independent_variable", "independent_value", \
+            "observable", "uncertainty", "lab_angle_deg", \
+            "lab_differential_cross_section"
+    }
+    /^[[:space:]]+(Acm|ACM|CosA|COSA|Tlab|TLAB|Wcm|WCM)[[:space:]]+Obs,Err/ {
+        variable = $1
+        capture = 1
+        next
+    }
+    capture && /For exp data/ { exit }
+    capture && NF == 5 &&
+        $1 ~ /^[-+]?[0-9]*\.?[0-9]+([Ee][-+]?[0-9]+)?$/ {
+        print variable, $1, $2, $3, $4, $5
+    }
+' "${stdout_file}" >"${result_file}"
+
+result_rows="$(($(wc -l <"${result_file}") - 1))"
+test "${status}" -eq 0
+test ! -s "${stderr_file}"
+test "${result_rows}" -eq 7
+grep -Fq 'Thanks for using SAID' "${stdout_file}"
+
+artifact_inputs=()
+for name in SAID.TMP SAID.PCT SAID.LOG SAID.PS fort.3 fort.7; do
+    if [[ -f "${run_root}/pn/${name}" ]]; then
+        install -m 644 "${run_root}/pn/${name}" "${report_root}/${name}"
+        artifact_inputs+=("${report_root}/${name}")
+    fi
+done
+
+{
+    printf 'evidence_label=oracle\n'
+    printf 'engine=pnsd\n'
+    printf 'source_commit=%s\n' "${source_commit}"
+    printf 'binary=%s\n' "${binary}"
+    printf 'binary_sha256=%s\n' "$(sha256sum "${binary}" | awk '{print $1}')"
+    printf 'fixture=%s\n' "${fixture}"
+    printf 'fixture_sha256=%s\n' "$(sha256sum "${fixture}" | awk '{print $1}')"
+    printf 'exit_status=%s\n' "${status}"
+    printf 'stderr_bytes=%s\n' "$(wc -c <"${stderr_file}")"
+    printf 'result_rows=%s\n' "${result_rows}"
+    printf 'opened_file_paths=%s\n' "$(wc -l <"${opened_file}")"
+    printf 'operating_system=%s\n' "$(
+        . /etc/os-release
+        printf '%s %s' "${NAME}" "${VERSION_ID}"
+    )"
+    ldd "${binary}" | sed 's/^/ldd=/'
+    sha256sum \
+        "${binary}" \
+        "${fixture}" \
+        "${stdout_file}" \
+        "${stderr_file}" \
+        "${result_file}" \
+        "${trace_file}" \
+        "${opened_file}" \
+        "${artifact_inputs[@]}"
+} >"${manifest}"
+
+printf 'Historical pnsd oracle passed: %s\n' "${result_file}"

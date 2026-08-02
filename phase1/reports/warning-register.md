@@ -66,6 +66,23 @@ The new category counts sum to every warning line in:
 - `pnpolw-gplot-build.log`
 - `pnpolw-link.log`
 
+## `pnsd` extension
+
+The clean `pnsd` build emits 233 warnings: 8 while rebuilding the local
+libraries, 166 in `pnsd.f`, `pn1.f`, `pn2.f`, and `pnu.f`, 59 in the same
+`gplot` closure, and none while linking.
+
+| Build area | Compatibility debt | Suspected defect | Confirmed defect | Total |
+| --- | ---: | ---: | ---: | ---: |
+| Local libraries | 6 | 2 | 0 | 8 |
+| `pnsd` core | 103 | 36 | 27 | 166 |
+| `gplot` | 55 | 4 | 0 | 59 |
+| Total | 164 | 42 | 27 | 233 |
+
+The SP06 runtime fixture also exposes an unwarned internal formatted-read
+failure at `pnu.f:4569` under modern libgfortran. It is recorded in
+`runtime-refresh/pnsd/warnings.md`; no source fix was attempted.
+
 ## Runtime-check finding
 
 A disposable `-fcheck=all` build stops in `PNMOD` at `prsd.f:7953` because it

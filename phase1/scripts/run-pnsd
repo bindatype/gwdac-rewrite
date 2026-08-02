@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly state_root="${PHASE1_STATE_ROOT:-/workspace/phase1/runtime-refresh/pnsd}"
+readonly report_base="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}/runtime-refresh/pnsd"
+readonly report_root="${report_base}/modern"
+readonly oracle_root="${report_base}/historical"
+readonly fixture="${phase1_root}/fixtures/pnsd-sp06-no-render.in"
+readonly preflight_manifest="${phase1_root}/reports/runtime-refresh-preflight/manifests/pnsd.txt"
+readonly source_commit="$(
+    awk -F= '$1 == "source_commit" { print $2 }' "${preflight_manifest}"
+)"
+readonly short_commit="${source_commit:0:12}"
+readonly binary="${state_root}/artifacts/${short_commit}/pnsd"
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-120}"
+readonly stdout_file="${report_root}/stdout.txt"
+readonly stderr_file="${report_root}/stderr.txt"
+readonly result_file="${report_root}/results.tsv"
+readonly comparison="${report_base}/comparison.tsv"
+readonly manifest="${report_root}/manifest.txt"
+
+mkdir -p "${state_root}/runs" "${report_root}"
+test -x "${binary}"
+test -f "${fixture}"
+test -f "${oracle_root}/results.tsv"
+
+run_root="$(mktemp -d "${state_root}/runs/modern.XXXXXX")"
+cp -a "${source_root}/pn" "${run_root}/pn"
+rm -f \
+    "${run_root}/pn/SAID.TMP" \
+    "${run_root}/pn/SAID.PCT" \
+    "${run_root}/pn/SAID.LOG" \
+    "${run_root}/pn/SAID.PS" \
+    "${run_root}/pn/fort.3" \
+    "${run_root}/pn/fort.7"
+
+set +e
+(
+    cd "${run_root}/pn"
+    timeout "${timeout_seconds}" \
+        env SAID_DATA_ROOT="${source_root}/sdat" \
+        "${binary}" \
+        <"${fixture}" \
+        >"${stdout_file}" \
+        2>"${stderr_file}"
+)
+status=$?
+set -e
+
+awk '
+    BEGIN {
+        OFS = "\t"
+        print "independent_variable", "independent_value", \
+            "observable", "uncertainty", "lab_angle_deg", \
+            "lab_differential_cross_section"
+    }
+    /^[[:space:]]+(Acm|ACM|CosA|COSA|Tlab|TLAB|Wcm|WCM)[[:space:]]+Obs,Err/ {
+        variable = $1
+        capture = 1
+        next
+    }
+    capture && /For exp data/ { exit }
+    capture && NF == 5 &&
+        $1 ~ /^[-+]?[0-9]*\.?[0-9]+([Ee][-+]?[0-9]+)?$/ {
+        print variable, $1, $2, $3, $4, $5
+    }
+' "${stdout_file}" >"${result_file}"
+
+result_rows="$(($(wc -l <"${result_file}") - 1))"
+stderr_bytes="$(wc -c <"${stderr_file}")"
+normal_exit=no
+if grep -Fq 'Thanks for using SAID' "${stdout_file}"; then
+    normal_exit=yes
+fi
+oracle_result_exact=no
+if cmp -s "${result_file}" "${oracle_root}/results.tsv"; then
+    oracle_result_exact=yes
+fi
+
+artifact_inputs=()
+for name in SAID.TMP SAID.PCT SAID.LOG SAID.PS fort.3 fort.7; do
+    if [[ -f "${run_root}/pn/${name}" ]]; then
+        install -m 644 "${run_root}/pn/${name}" "${report_root}/${name}"
+        artifact_inputs+=("${report_root}/${name}")
+    fi
+done
+
+printf '%s\n' $'artifact\thistorical_sha256\tmodern_sha256\texact' \
+    >"${comparison}"
+for name in stdout.txt results.tsv SAID.TMP SAID.PCT SAID.LOG SAID.PS fort.3 fort.7; do
+    historical="${oracle_root}/${name}"
+    modern="${report_root}/${name}"
+    if [[ ! -f "${historical}" || ! -f "${modern}" ]]; then
+        continue
+    fi
+    historical_sha="$(sha256sum "${historical}" | awk '{print $1}')"
+    modern_sha="$(sha256sum "${modern}" | awk '{print $1}')"
+    exact=no
+    if [[ "${historical_sha}" == "${modern_sha}" ]]; then
+        exact=yes
+    fi
+    printf '%s\t%s\t%s\t%s\n' \
+        "${name}" "${historical_sha}" "${modern_sha}" "${exact}" \
+        >>"${comparison}"
+done
+
+{
+    printf 'evidence_label=reference\n'
+    printf 'engine=pnsd\n'
+    printf 'source_commit=%s\n' "${source_commit}"
+    printf 'binary=%s\n' "${binary}"
+    printf 'binary_sha256=%s\n' "$(sha256sum "${binary}" | awk '{print $1}')"
+    printf 'fixture=%s\n' "${fixture}"
+    printf 'fixture_sha256=%s\n' "$(sha256sum "${fixture}" | awk '{print $1}')"
+    printf 'data_root=%s/sdat\n' "${source_root}"
+    printf 'exit_status=%s\n' "${status}"
+    printf 'stderr_bytes=%s\n' "${stderr_bytes}"
+    printf 'result_rows=%s\n' "${result_rows}"
+    printf 'normal_exit=%s\n' "${normal_exit}"
+    printf 'oracle_result_exact=%s\n' "${oracle_result_exact}"
+    objdump -p "${binary}" | sed -n 's/^[[:space:]]*NEEDED[[:space:]]*/needed=/p'
+    sha256sum \
+        "${binary}" \
+        "${fixture}" \
+        "${stdout_file}" \
+        "${stderr_file}" \
+        "${result_file}" \
+        "${comparison}" \
+        "${artifact_inputs[@]}"
+} >"${manifest}"
+
+if [[ "${status}" -ne 0 || "${stderr_bytes}" -ne 0 || \
+    "${result_rows}" -ne 7 || "${normal_exit}" != yes || \
+    "${oracle_result_exact}" != yes ]]; then
+    printf 'Modern pnsd oracle comparison blocked: %s\n' "${manifest}" >&2
+    exit 1
+fi
+
+printf 'Modern pnsd oracle comparison passed: %s\n' "${comparison}"

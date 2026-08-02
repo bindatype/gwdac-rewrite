@@ -1,0 +1,30 @@
+evidence_label=reference
+engine=pnsd
+source_commit=f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+build_architecture=x86_64
+operating_system=Ubuntu 24.04
+gfortran=GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+gcc=gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+source_files=pnsd.f,pn1.f,pn2.f,pnu.f
+saidopen_members=15
+libxz_members=101
+gplot_members=145
+warning_instances=233
+link_status=0
+5c3814ebe7d40e1253c731c47323d6c42f7b111337e3cc483eb24cb30fc4b169  /workspace/arndt64/said/pnsd.f
+f8cdd84a5abc2318219f745f4c57b37bf44de80b8e1731a54c7115fc88818370  /workspace/arndt64/said/pn1.f
+af96a6bd15539f11640435c0bf2161381206116bd6d3f7f6f2220cba55f650ed  /workspace/arndt64/said/pn2.f
+fbadac901506aaade5de24b386b0a07cff31f047302fa6042f50919cf2f95f12  /workspace/arndt64/said/pnu.f
+426a1184788004ff8847932819d5f78a381d4c56c6720c1095eb14736727abc0  /workspace/arndt64/said/saidopen.for
+4bfb31e960ba1a1d0ac1e27e5ff5cc157a70d4064a0844e2615cdcb8fde44823  /workspace/arndt64/libxzl.for
+1d1dcbe0d8235a441e13289eb832cbbe43192cbabf1431d7e99669af7866ed43  /phase1/config/gplot-prsdd-members.txt
+b0c3e32843e004a450aa43b17587e47b76ac68a933ea652372cbaaa9aaa55d04  /phase1/patches/gplot-modern-compiler.patch
+6b386ca9d16c4c670f46c2777b6d3a875a1589474b3d9024b36f59546ed30599  /phase1/patches/saidopen-portable-data-root.patch
+5c1a18a5ff69b3a9e02397db1ae6b4444d352a56f470ec84915323ff2ca2067f  /phase1/scripts/build-pnsd
+c5a4baf28c9e1c1119ba0376d3d9ea9bbed7e4c4ac476ab7a0f71a972a32b20d  /workspace/phase1/runtime-refresh/pnsd/build-f6c81d01a1fe.DFHlQ2/pnsd
+  NEEDED               libgfortran.so.5
+  NEEDED               libm.so.6
+  NEEDED               libX11.so.6
+  NEEDED               libgd.so.3
+  NEEDED               libgcc_s.so.1
+  NEEDED               libc.so.6

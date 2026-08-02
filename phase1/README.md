@@ -37,6 +37,9 @@ docker compose exec dev /phase1/scripts/build-pnpolw
 docker compose exec dev /phase1/scripts/run-pnpolw
 docker compose exec oracle /phase1/scripts/run-historical-pnpolw
 docker compose exec dev /phase1/scripts/compare-pnpolw
+docker compose exec oracle /phase1/scripts/run-historical-pnsd
+docker compose exec dev /phase1/scripts/build-pnsd
+docker compose exec dev /phase1/scripts/run-pnsd
 ```
 
 The executables are written to the Docker named volume under
@@ -86,6 +89,15 @@ goldens for the surviving input pair.
 These are equivalence results for the captured CM12 workflow at displayed
 precision and the retained D13 `pnpolw` plot-command workflow, not a general
 claim of scientific or hidden floating-point equivalence.
+
+The Legacy Runtime Refresh inventory ranks the remaining six archived engines
+by surviving source, local dependencies, datasets, executable, input deck, and
+captured transcript. Its first attempt, `pnsd`, builds reproducibly with modern
+gfortran and produces a byte-identical seven-row SP06 DSG table. It then stops
+at an internal formatted read in `pnu.f:4569`, where the checked-in executable
+continues normally. `reports/runtime-refresh/pnsd/README.md` records that first
+divergence and the resulting blocked gate; no source fix or second engine was
+started.
 
 Phase 1 is complete for the retained scope. `build-prsdd` keeps the original
 reference build as its default and also accepts the Phase 2

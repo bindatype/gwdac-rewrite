@@ -1,0 +1,65 @@
+
+ New CONTOUR plot! Enter CONP or "GO60" to see.
+ Try the "GO55" alternate to "GO5" (Chi2) option
+ "GO58" compares some SOLNS to S-E fits
+ The experimental data file is
+ PN091f  PI-N data VPI&SU  01/09   Arndt 05/20/10                
+
+ CAUTION! do NOT use any solution outside its range of
+ validity. Extrapolation properties are generally BAD!
+ New RESONANCE fitting at "GO29" or "speed"
+ Add a "smeared" resonance with "GO34"
+ "GO37" to PLOT coupled-channel amplitudes (eg PiN->etaN)
+ "GO22" to compare multiple solutions 
+ RETURN to continue ->  Your solution is
+  WI08 766276 57415/31339 P+=27207/13354 P-=22681/11978 CX= 5935/ 2 
+ For PiN only enter "R" to replace a wave with RESONANCE
+ For PiN only enter "F" to "flip" etaN couplings
+ RETURN (or "GON") to continue ->  Q                                                                     
+
+ An ALTERNATE solution can be defined with a "GO51"
+ It can be used for comparison when plotting or with the
+ CONTOUR/3-D plot option ("CONP" or "GO60")
+  Enter ? for instructions, Return to continue -> Input* GO2                                                                     
+
+  Enter first four letters of desired solution
+ Entry of "V   " will change to alternate solution file.
+ Entry of "SES " will setup from Single-Energy file.
+ Enter  OWN to enter solution.   -Return for choices ->  SP06                                                                  
+  Your solution is
+  SP06 766276 57255/31876 P+=27190/13344 P-=22702/11967 CX= 6084/ 2 
+ For PiN only enter "R" to replace a wave with RESONANCE
+ For PiN only enter "F" to "flip" etaN couplings
+ RETURN (or "GON") to continue ->  GO3                                                                   
+
+ An ALTERNATE solution can be defined with a "GO51"
+ It can be used for comparison when plotting or with the
+ CONTOUR/3-D plot option ("CONP" or "GO60")
+ Reaction?  -  1(PI+P) 2(PI-P) 3(CXS ) 4(PNI1) 5(PNI3) 6(ETAN)
+ Enter reaction no -> Input* 1                                                                       
+
+ Note: TOTAL X-sections MUST be done at 0 deg
+ Vs? A(Acm),L(Alab),T(Tlab),P(Plab),W(Wcm),-t, or C(cos Acm) -> Input* A                                                                       
+ (Min Inc Max) for ACM  ? GO9 to quit -> Input* 0 30 180                                                                
+  Fixed variable? T(Tlab),P(Plab), or W(Wcm) -> Input* T                                                                       
+ Value of TLAB ? -> Input* 500                                                                     
+  You are set to calculate PI+P scattering at TLAB =  500.000
+  ACM  goes from    0.000 to  180.000 in increments of   30.000
+  Enter N to change, -GO9 to quit -> Input* Q                                                                       
+ Enter Y(A) to see Phases(Amplitudes) at TLAB=  500.00 Mev -> Input* Q                                                                       
+
+  Enter observable (or MULT), -Return for choices -> Input* DSG                                                                     
+
+    SP06 766276 57255/31876 P+=27190/13344 P-=22702/11967 CX= 6084/ 
+     PI+P  DSG  at TLAB =   500.00     8/ 2/26
+     ACM     Obs,Err
+   A(cm)     DSG(cm)       Err     A(lab)    DSG(lab)
+     0.000  0.4980E+01  0.0000E+00    0.00  0.1188E+02
+    30.000  0.4648E+01  0.0000E+00   19.67  0.1027E+02
+    60.000  0.2396E+01  0.0000E+00   40.89  0.4213E+01
+    90.000  0.4795E+00  0.0000E+00   65.50  0.5844E+00
+   120.000  0.4823E-01  0.0000E+00   95.85  0.3696E-01
+   150.000  0.2677E+00  0.0000E+00  134.26  0.1312E+00
+   180.000  0.2894E+00  0.0000E+00    0.00  0.2894E-10
+  To see exp data enter a range(min max) for TLAB -> Input* 495 505                                                                 
+ Enter "Y" to normalize, "R" to enter references-> Input* Q                                                                       
