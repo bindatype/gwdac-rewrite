@@ -181,6 +181,12 @@ if [[ -n "${cm12_seam_root}" ]]; then
         -p1 \
         -i "${cm12_seam_root}/cm12_prsd_hadronic_trace.patch" \
         >>"${core_log}" 2>&1
+    patch \
+        --fuzz=0 \
+        -d "${core_root}" \
+        -p1 \
+        -i "${cm12_seam_root}/cm12_prsd_pipeline_trace.patch" \
+        >>"${core_log}" 2>&1
 fi
 
 for name in "${free_core_names[@]}"; do
@@ -319,7 +325,9 @@ install -m 755 \
     sha256sum "${prrdx_patch}"
     sha256sum "${saidopen_patch}"
     if [[ -n "${cm12_seam_root}" ]]; then
-        sha256sum "${cm12_seam_root}/cm12_prsd_hadronic_trace.patch"
+        sha256sum \
+            "${cm12_seam_root}/cm12_prsd_hadronic_trace.patch" \
+            "${cm12_seam_root}/cm12_prsd_pipeline_trace.patch"
     fi
     if [[ "${build_variant}" == "cm12-immutable-seam" ]]; then
         sha256sum \

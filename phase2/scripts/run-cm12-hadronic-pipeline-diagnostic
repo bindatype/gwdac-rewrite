@@ -1,0 +1,224 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly phase1_report_root="${PHASE1_REPORT_ROOT:-/phase2/reports/cm12-seam-build}"
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly report_root="${PHASE2_REPORT_ROOT:-${phase2_root}/reports}"
+readonly diagnostic_root="${report_root}/hadronic-pipeline-diagnostic"
+readonly state_root="${PRSD_STATE_ROOT:-/workspace/phase2/hadronic-pipeline-diagnostic}"
+readonly source_commit="$(
+    awk -F= '$1 == "source_commit" { print $2 }' \
+        "${phase1_report_root}/build-manifest.txt"
+)"
+readonly short_commit="${source_commit:0:12}"
+readonly executable="/workspace/phase2/reproducible/artifacts/${short_commit}/prsdd-headless"
+readonly fixture="${phase2_root}/fixtures/amplitudes/decks/cm12_pi_plus_h1_single_point.in"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly data_root="${source_root}/sdat"
+readonly solution_file="${data_root}/prsol.dat"
+readonly solution_sha256="dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522"
+readonly stdout_file="${diagnostic_root}/legacy-target.stdout"
+readonly stderr_file="${diagnostic_root}/legacy-target.stderr"
+readonly result_file="${diagnostic_root}/legacy-target-result.tsv"
+readonly pipeline_table="${diagnostic_root}/legacy-pipeline-trace.tsv"
+readonly candidate_table="${phase2_root}/reports/hadronic-input-diagnostic/candidate-hadronic-inputs.tsv"
+readonly comparison_table="${diagnostic_root}/retained-candidate-comparison.tsv"
+readonly summary_file="${diagnostic_root}/summary.txt"
+readonly manifest_file="${diagnostic_root}/manifest.txt"
+readonly accepted_result="${phase2_root}/reports/amplitude-corpus/modern/cm12_pi_plus_h1_single_point.results.tsv"
+
+mkdir -p "${diagnostic_root}" "${state_root}/runs"
+test -x "${executable}"
+test -f "${fixture}"
+test -f "${candidate_table}"
+test -f "${accepted_result}"
+
+readonly run_root="$(mktemp -d "${state_root}/runs/target.XXXXXX")"
+cp -a "${source_root}/pr" "${run_root}/pr"
+rm -f \
+    "${run_root}/pr/SAID.TMP" \
+    "${run_root}/pr/SAID.PCT" \
+    "${run_root}/pr/SAID.LOG" \
+    "${run_root}/pr/SAID.PS" \
+    "${run_root}/pr/fort.3" \
+    "${run_root}/pr/fort.7"
+ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+ln -s "${data_root}" "${run_root}/sdat"
+
+set +e
+(
+    cd "${run_root}/pr"
+    timeout 120 \
+        env \
+        CM12_FORCE_LEGACY_PRBAS=1 \
+        CM12_KCM_ROOT="${kcm_root}" \
+        CM12_SOLUTION_FILE="${solution_file}" \
+        CM12_SOLUTION_SHA256="${solution_sha256}" \
+        CM12_SOLUTION_ID=CM12 \
+        SAID_DATA_ROOT="${data_root}" \
+        "${executable}" \
+        <"${fixture}" \
+        >"${stdout_file}" \
+        2>"${stderr_file}"
+)
+readonly status=$?
+set -e
+
+test "${status}" -eq 0
+test ! -s "${stderr_file}"
+
+awk '
+    BEGIN {
+        OFS = "\t"
+        print "independent_variable", "independent_value", \
+            "a1_real_mfm", "a1_imag_mfm", \
+            "a2_real_mfm", "a2_imag_mfm", \
+            "a3_real_mfm", "a3_imag_mfm", \
+            "a4_real_mfm", "a4_imag_mfm"
+    }
+    /^[[:space:]]+Acm[[:space:]]+A1\(Re,Im\)/ {
+        capture = 1
+        next
+    }
+    capture && /Enter observable/ { exit }
+    capture && NF == 9 && \
+        $1 ~ /^[-+]?[0-9]*\.?[0-9]+([Ee][-+]?[0-9]+)?$/ {
+        print "Acm", $1, $2, $3, $4, $5, $6, $7, $8, $9
+    }
+' "${stdout_file}" >"${result_file}"
+
+test "$(($(wc -l <"${result_file}") - 1))" -eq 1
+cmp "${result_file}" "${accepted_result}"
+test "$(grep -c 'CM12DIAG PRDLT' "${stdout_file}")" -eq 26
+test "$(grep -c 'CM12DIAG PNMOD' "${stdout_file}")" -eq 26
+test "$(grep -c 'CM12DIAG PNPWI POSTMOD' "${stdout_file}")" -eq 26
+test "$(grep -c 'CM12DIAG PNPWI DISPATCH' "${stdout_file}")" -eq 25
+test "$(grep -c 'CM12DIAG PNPWI RESULT' "${stdout_file}")" -eq 25
+test "$(grep -c 'CM12DIAG ADDRESK PRE' "${stdout_file}")" -eq 26
+test "$(grep -c 'CM12DIAG ADDRESK POST' "${stdout_file}")" -eq 26
+
+awk -f "${phase2_root}/scripts/parse-cm12-hadronic-pipeline.awk" \
+    "${stdout_file}" >"${pipeline_table}"
+test "$(($(wc -l <"${pipeline_table}") - 1))" -eq 26
+
+awk -F '\t' '
+    BEGIN {
+        OFS = "\t"
+        print "row_id", "family", "branch", "legacy_l", \
+            "form_selector", "legacy_epx", "candidate_epx", \
+            "epx_exact", "dispatch_n", "dispatch_title", \
+            "legacy_ter", "legacy_tei", "candidate_ter", \
+            "candidate_tei", "ter_exact", "tei_exact", \
+            "pnmod_nfx", "pnmod_branch", "addresk_nf", \
+            "addresk_changed"
+    }
+    NR == FNR {
+        if (FNR == 1) next
+        key = $1 FS $2 FS $3
+        candidate_epx[key] = $8
+        candidate_ter[key] = $10
+        candidate_tei[key] = $11
+        next
+    }
+    FNR == 1 { next }
+    $2 <= 4 {
+        key = $2 FS $3 FS $4
+        print $1, $2, $3, $4, $8, $9, candidate_epx[key], \
+            ($9 == candidate_epx[key] ? "T" : "F"), $26, $27, \
+            $37, $38, candidate_ter[key], candidate_tei[key], \
+            ($37 == candidate_ter[key] ? "T" : "F"), \
+            ($38 == candidate_tei[key] ? "T" : "F"), $13, $14, \
+            $33, ($37 == $39 && $38 == $40 ? "F" : "T")
+    }
+' "${candidate_table}" "${pipeline_table}" >"${comparison_table}"
+test "$(($(wc -l <"${comparison_table}") - 1))" -eq 18
+
+awk -F '\t' '
+    BEGIN {
+        OFS = "="
+        epx_exact = 0
+        no_dispatch = 0
+        dispatch_7 = 0
+        dispatch_10 = 0
+        ter_exact = 0
+        tei_exact = 0
+        pnmod_noop = 0
+        addresk_noop = 0
+    }
+    NR == 1 { next }
+    {
+        rows++
+        if ($8 == "T") epx_exact++
+        if ($9 == "NA") no_dispatch++
+        if ($9 == 7) dispatch_7++
+        if ($9 == 10) dispatch_10++
+        if ($15 == "T") ter_exact++
+        if ($16 == "T") tei_exact++
+        if ($17 == 0 && $18 == 0) pnmod_noop++
+        if ($19 == 0 && $20 == "F") addresk_noop++
+        if (first == "" && ($15 == "F" || $16 == "F")) {
+            first = "row=" $1 ",family=" $2 ",branch=" $3 \
+                ",legacy_l=" $4 ",selector=" $5
+        }
+    }
+    END {
+        print "evidence_label", "captured"
+        print "scope", "CM12 pion-plus Elab=1000 MeV Acm=90 degrees"
+        print "captured_pipeline_rows", 26
+        print "retained_rows", rows
+        print "epx_exact_rows", epx_exact
+        print "no_dispatch_rows", no_dispatch
+        print "dispatch_branch_7_rows", dispatch_7
+        print "dispatch_branch_10_rows", dispatch_10
+        print "pnmod_noop_rows", pnmod_noop
+        print "addresk_noop_rows", addresk_noop
+        print "ter_exact_rows", ter_exact
+        print "tei_exact_rows", tei_exact
+        print "first_ter_tei_divergence", first
+    }
+' "${comparison_table}" >"${summary_file}"
+
+grep -Fxq 'captured_pipeline_rows=26' "${summary_file}"
+grep -Fxq 'retained_rows=18' "${summary_file}"
+grep -Fxq 'epx_exact_rows=17' "${summary_file}"
+grep -Fxq 'no_dispatch_rows=1' "${summary_file}"
+grep -Fxq 'dispatch_branch_7_rows=17' "${summary_file}"
+grep -Fxq 'dispatch_branch_10_rows=0' "${summary_file}"
+grep -Fxq 'pnmod_noop_rows=18' "${summary_file}"
+grep -Fxq 'addresk_noop_rows=18' "${summary_file}"
+grep -Fxq 'ter_exact_rows=0' "${summary_file}"
+grep -Fxq 'tei_exact_rows=0' "${summary_file}"
+
+gzip -n -c "${stdout_file}" >"${diagnostic_root}/legacy-target.stdout.gz"
+
+{
+    printf 'evidence_label=captured\n'
+    printf 'scope=CM12 pion-plus Elab=1000 MeV Acm=90 degrees\n'
+    printf 'source_commit=%s\n' "${source_commit}"
+    printf 'instrumented_binary=%s\n' "${executable}"
+    printf 'instrumented_binary_sha256=%s\n' "$(
+        sha256sum "${executable}" | awk '{print $1}'
+    )"
+    printf 'solution_sha256=%s\n' "${solution_sha256}"
+    sha256sum \
+        "${fixture}" \
+        "${source_root}/said/prsd.f" \
+        "${source_root}/said/pru.f" \
+        "${phase1_root}/scripts/build-prsdd" \
+        "${phase2_root}/kernel/cm12_prsd_pipeline_trace.patch" \
+        "${phase2_root}/kernel/cm12_hadronic_input_probe.f90" \
+        "${phase2_root}/kernel/cm12_non_cm12_seam.f90" \
+        "${phase2_root}/scripts/parse-cm12-hadronic-pipeline.awk" \
+        "${phase2_root}/scripts/run-cm12-hadronic-pipeline-diagnostic" \
+        "${candidate_table}" \
+        "${accepted_result}" \
+        "${result_file}" \
+        "${pipeline_table}" \
+        "${comparison_table}" \
+        "${summary_file}" \
+        "${diagnostic_root}/legacy-target.stdout.gz"
+} >"${manifest_file}"
+
+printf 'Captured CM12 hadronic pipeline: %s\n' "${stdout_file}"
