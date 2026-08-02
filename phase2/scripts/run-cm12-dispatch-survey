@@ -1,0 +1,264 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_report_root="${PHASE1_REPORT_ROOT:-/phase2/reports/cm12-seam-build}"
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly report_root="${PHASE2_REPORT_ROOT:-${phase2_root}/reports}"
+readonly survey_root="${report_root}/cm12-dispatch-survey"
+readonly state_root="${PRSD_STATE_ROOT:-/workspace/phase2/cm12-dispatch-survey}"
+readonly survey="${phase2_root}/fixtures/dispatch-survey.tsv"
+readonly data_root="${source_root}/sdat"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly solution_file="${data_root}/prsol.dat"
+readonly solution_sha256="dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522"
+readonly source_commit="$(
+    awk -F= '$1 == "source_commit" { print $2 }' \
+        "${phase1_report_root}/build-manifest.txt"
+)"
+readonly short_commit="${source_commit:0:12}"
+readonly executable="/workspace/phase2/reproducible/artifacts/${short_commit}/prsdd-headless"
+readonly fixture_summary="${survey_root}/fixture-summary.tsv"
+readonly energy_summary="${survey_root}/energy-summary.tsv"
+readonly detail_table="${survey_root}/dispatch-detail.tsv"
+readonly manifest="${survey_root}/manifest.txt"
+readonly build_manifest="${phase1_report_root}/build-manifest.txt"
+
+rm -rf "${survey_root}/fixtures"
+mkdir -p "${survey_root}/fixtures" "${state_root}/runs"
+test -x "${executable}"
+test -f "${survey}"
+test -f "${build_manifest}"
+
+extract_results() {
+    local stdout_file="$1"
+    local result_file="$2"
+
+    awk '
+        BEGIN {
+            OFS = "\t"
+            print "independent_variable", "independent_value", \
+                "a1_real_mfm", "a1_imag_mfm", \
+                "a2_real_mfm", "a2_imag_mfm", \
+                "a3_real_mfm", "a3_imag_mfm", \
+                "a4_real_mfm", "a4_imag_mfm"
+        }
+        /^[[:space:]]+(Acm|CosA|Elab|Wcm)[[:space:]]+A1\(Re,Im\)/ {
+            variable = $1
+            capture = 1
+            next
+        }
+        capture && /Enter observable/ { exit }
+        capture && NF == 9 &&
+            $1 ~ /^[-+]?[0-9]*\.?[0-9]+([Ee][-+]?[0-9]+)?$/ {
+            print variable, $1, $2, $3, $4, $5, $6, $7, $8, $9
+        }
+    ' "${stdout_file}" >"${result_file}"
+}
+
+printf '%s\n' \
+    $'fixture_id\texpected_energy_groups\tenergy_groups\ttrace_rows\tretained_rows\tall_no_dispatch\tall_branch_7\tall_branch_10\tall_other_dispatch\tretained_no_dispatch\tretained_branch_7\tretained_branch_10\tretained_other_dispatch\toutput_exact\tstderr_bytes' \
+    >"${fixture_summary}"
+printf '%s\n' \
+    $'fixture_id\tenergy_group\tfirst_epx\ttrace_rows\tretained_rows\tall_no_dispatch\tall_branch_7\tall_branch_10\tall_other_dispatch\tretained_no_dispatch\tretained_branch_7\tretained_branch_10\tretained_other_dispatch\tfirst_previous_title\tfirst_dispatch_title' \
+    >"${energy_summary}"
+
+detail_header_written=0
+fixture_count=0
+expected_group_total=0
+manifest_inputs=()
+
+while IFS=$'\t' read -r id expected_groups description; do
+    if [[ "${id}" == "id" ]]; then
+        continue
+    fi
+
+    fixture="${phase2_root}/fixtures/amplitudes/decks/${id}.in"
+    accepted="${phase2_root}/reports/amplitude-corpus/modern/${id}.results.tsv"
+    prefix="${survey_root}/fixtures/${id}"
+    stdout_file="${prefix}.stdout"
+    stderr_file="${prefix}.stderr"
+    result_file="${prefix}.results.tsv"
+    trace_file="${prefix}.pipeline.tsv"
+    run_root="$(mktemp -d "${state_root}/runs/${id}.XXXXXX")"
+
+    test -f "${fixture}"
+    test -f "${accepted}"
+    cp -a "${source_root}/pr" "${run_root}/pr"
+    rm -f \
+        "${run_root}/pr/SAID.TMP" \
+        "${run_root}/pr/SAID.PCT" \
+        "${run_root}/pr/SAID.LOG" \
+        "${run_root}/pr/SAID.PS" \
+        "${run_root}/pr/fort.3" \
+        "${run_root}/pr/fort.7"
+    ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+    ln -s "${data_root}" "${run_root}/sdat"
+
+    set +e
+    (
+        cd "${run_root}/pr"
+        timeout 120 \
+            env \
+            CM12_FORCE_LEGACY_PRBAS=1 \
+            CM12_KCM_ROOT="${kcm_root}" \
+            CM12_SOLUTION_FILE="${solution_file}" \
+            CM12_SOLUTION_SHA256="${solution_sha256}" \
+            CM12_SOLUTION_ID=CM12 \
+            SAID_DATA_ROOT="${data_root}" \
+            "${executable}" \
+            <"${fixture}" \
+            >"${stdout_file}" \
+            2>"${stderr_file}"
+    )
+    status=$?
+    set -e
+    test "${status}" -eq 0
+    grep -Fq 'Thanks for using SAID' "${stdout_file}"
+
+    extract_results "${stdout_file}" "${result_file}"
+    cmp "${result_file}" "${accepted}"
+    awk -f "${phase2_root}/scripts/parse-cm12-hadronic-pipeline.awk" \
+        "${stdout_file}" >"${trace_file}"
+
+    trace_rows="$(($(wc -l <"${trace_file}") - 1))"
+    test "${trace_rows}" -eq "$((expected_groups * 26))"
+
+    awk -F '\t' -v fixture_id="${id}" '
+        BEGIN { OFS = "\t" }
+        NR == 1 {
+            print "fixture_id", "energy_group", "candidate_relevant", $0
+            next
+        }
+        {
+            energy_group = int(($1 - 1) / 26) + 1
+            candidate_relevant = ($2 <= 4 ? "yes" : "no")
+            print fixture_id, energy_group, candidate_relevant, $0
+        }
+    ' "${trace_file}" >"${prefix}.detail.tsv"
+    if [[ "${detail_header_written}" -eq 0 ]]; then
+        cat "${prefix}.detail.tsv" >"${detail_table}"
+        detail_header_written=1
+    else
+        tail -n +2 "${prefix}.detail.tsv" >>"${detail_table}"
+    fi
+    rm -f "${prefix}.detail.tsv"
+
+    awk -F '\t' -v fixture_id="${id}" '
+        BEGIN { OFS = "\t" }
+        NR == 1 { next }
+        {
+            group = int(($1 - 1) / 26) + 1
+            if (!(group in seen)) {
+                seen[group] = 1
+                group_count++
+            }
+            rows[group]++
+            if (first_epx[group] == "") first_epx[group] = $9
+            if ($26 == "NA") all_none[group]++
+            else if ($26 == 7) all_7[group]++
+            else if ($26 == 10) all_10[group]++
+            else all_other[group]++
+            if ($2 <= 4) {
+                retained[group]++
+                if ($26 == "NA") retained_none[group]++
+                else if ($26 == 7) retained_7[group]++
+                else if ($26 == 10) retained_10[group]++
+                else retained_other[group]++
+                if (first_previous[group] == "" && $28 != "NA") {
+                    first_previous[group] = $28
+                }
+                if (first_title[group] == "" && $27 != "NA") {
+                    first_title[group] = $27
+                }
+            }
+        }
+        END {
+            for (group = 1; group <= group_count; group++) {
+                print fixture_id, group, first_epx[group], rows[group] + 0, \
+                    retained[group] + 0, all_none[group] + 0, \
+                    all_7[group] + 0, all_10[group] + 0, \
+                    all_other[group] + 0, retained_none[group] + 0, \
+                    retained_7[group] + 0, retained_10[group] + 0, \
+                    retained_other[group] + 0, first_previous[group], \
+                    first_title[group]
+            }
+        }
+    ' "${trace_file}" >>"${energy_summary}"
+
+    fixture_metrics="$(awk -F '\t' '
+        BEGIN { OFS = "\t" }
+        NR == 1 { next }
+        {
+            energy_group = int(($1 - 1) / 26) + 1
+            if (!(energy_group in group)) {
+                group[energy_group] = 1
+                group_count++
+            }
+            rows++
+            if ($26 == "NA") all_none++
+            else if ($26 == 7) all_7++
+            else if ($26 == 10) all_10++
+            else all_other++
+            if ($2 <= 4) {
+                retained++
+                if ($26 == "NA") retained_none++
+                else if ($26 == 7) retained_7++
+                else if ($26 == 10) retained_10++
+                else retained_other++
+            }
+        }
+        END {
+            print group_count, rows + 0, retained + 0, \
+                all_none + 0, all_7 + 0, all_10 + 0, all_other + 0, \
+                retained_none + 0, retained_7 + 0, retained_10 + 0, \
+                retained_other + 0
+        }
+    ' "${trace_file}")"
+    printf '%s\t%s\t%s\tyes\t%s\n' \
+        "${id}" "${expected_groups}" "${fixture_metrics}" \
+        "$(wc -c <"${stderr_file}")" >>"${fixture_summary}"
+
+    gzip -n -f "${stdout_file}"
+    manifest_inputs+=("${fixture}" "${accepted}")
+    fixture_count=$((fixture_count + 1))
+    expected_group_total=$((expected_group_total + expected_groups))
+done <"${survey}"
+
+test "${fixture_count}" -eq 10
+test "${expected_group_total}" -eq 18
+test "$(($(wc -l <"${energy_summary}") - 1))" -eq 18
+test "$(($(wc -l <"${detail_table}") - 1))" -eq 468
+
+{
+    printf 'evidence_label=captured\n'
+    printf 'scope=retained CM12 pion-plus amplitude requests\n'
+    printf 'source_commit=%s\n' "${source_commit}"
+    printf 'instrumented_binary=%s\n' "${executable}"
+    printf 'instrumented_binary_sha256=%s\n' "$(
+        sha256sum "${executable}" | awk '{print $1}'
+    )"
+    printf 'solution_sha256=%s\n' "${solution_sha256}"
+    printf 'build_manifest_sha256=%s\n' "$(
+        sha256sum "${build_manifest}" | awk '{print $1}'
+    )"
+    printf 'fixtures=%s\n' "${fixture_count}"
+    printf 'energy_groups=%s\n' "${expected_group_total}"
+    printf 'trace_rows=%s\n' "$(($(wc -l <"${detail_table}") - 1))"
+    sha256sum \
+        "${survey}" \
+        "${build_manifest}" \
+        "${phase2_root}/kernel/cm12_prsd_pipeline_trace.patch" \
+        "${phase2_root}/scripts/parse-cm12-hadronic-pipeline.awk" \
+        "${phase2_root}/scripts/run-cm12-dispatch-survey" \
+        "${manifest_inputs[@]}" \
+        "${fixture_summary}" \
+        "${energy_summary}" \
+        "${detail_table}" \
+        "${survey_root}"/fixtures/*.results.tsv \
+        "${survey_root}"/fixtures/*.pipeline.tsv \
+        "${survey_root}"/fixtures/*.stdout.gz \
+        "${survey_root}"/fixtures/*.stderr
+} >"${manifest}"
+
+printf 'CM12 dispatch survey passed: %s\n' "${fixture_summary}"

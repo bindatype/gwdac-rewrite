@@ -1,0 +1,11 @@
+fixture_id	expected_energy_groups	energy_groups	trace_rows	retained_rows	all_no_dispatch	all_branch_7	all_branch_10	all_other_dispatch	retained_no_dispatch	retained_branch_7	retained_branch_10	retained_other_dispatch	output_exact	stderr_bytes
+cm12_pi_plus_h1_baseline	1	1	26	18	1	25	0	0	1	17	0	0	yes	0
+cm12_pi_plus_h1_fixed_w	1	1	26	18	1	25	0	0	1	17	0	0	yes	0
+cm12_pi_plus_h1_energy_sweep	5	5	130	90	1	129	0	0	1	89	0	0	yes	0
+cm12_pi_plus_h1_w_sweep	5	5	130	90	1	129	0	0	1	89	0	0	yes	96
+cm12_pi_plus_h1_cosine_clamp	1	1	26	18	1	25	0	0	1	17	0	0	yes	0
+cm12_pi_plus_h1_max_grid	1	1	26	18	1	25	0	0	1	17	0	0	yes	0
+cm12_pi_plus_h1_single_point	1	1	26	18	1	25	0	0	1	17	0	0	yes	0
+cm12_pi_plus_h1_choice_zero	1	1	26	18	1	25	0	0	1	17	0	0	yes	0
+cm12_unknown_observable_h1_recovery	1	1	26	18	1	25	0	0	1	17	0	0	yes	0
+cm12_invalid_reaction_h1_recovery	1	1	26	18	1	25	0	0	1	17	0	0	yes	0

@@ -1,0 +1,33 @@
+source_commit=f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+build_variant=cm12-pure-kernel-seam
+build_architecture=x86_64
+operating_system=Ubuntu 24.04
+gfortran=GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+gcc=gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+saidopen_members=15
+libxz_members=101
+gplot_members=145
+headless_backend_members=13
+core_log_lines=2807
+gplot_log_lines=517
+82d641737ccf0ab77cd499aff7c5f9fa27b2b0e6f62f432667e478a4fa1d7e39  /workspace/phase2/reproducible/artifacts/f6c81d01a1fe/prsdd
+994eb29df9d037f1cfa34040506ddbe070411426a2999fdfbcca3c4d800da00e  /workspace/phase2/reproducible/artifacts/f6c81d01a1fe/prsdd-headless
+1d1dcbe0d8235a441e13289eb832cbbe43192cbabf1431d7e99669af7866ed43  /phase1/config/gplot-prsdd-members.txt
+c4bb0ac728ab1f8f3c7353d4e205a20cc0bde13ae44013dfbb77887aa7696632  /phase1/compat/gplot-headless.f
+b0c3e32843e004a450aa43b17587e47b76ac68a933ea652372cbaaa9aaa55d04  /phase1/patches/gplot-modern-compiler.patch
+b82f775fa5dcbb491552d860b77d80fbf98d23411d0f225884391dfa02b6433a  /phase1/patches/prrdx-gfortran-blank-a4.patch
+6b386ca9d16c4c670f46c2777b6d3a875a1589474b3d9024b36f59546ed30599  /phase1/patches/saidopen-portable-data-root.patch
+ec7c20c5df3c5fafd65068709737f9d6d639d23e712d344d963de703861bbabe  /phase2/kernel/cm12_prsd_hadronic_trace.patch
+f0714ccc5897deb1040ceef045c308c20cc519fc06e848717f48c542d8df3b98  /phase2/kernel/cm12_prsd_pipeline_trace.patch
+legacy_rendering_dependencies:
+  NEEDED               libgfortran.so.5
+  NEEDED               libm.so.6
+  NEEDED               libX11.so.6
+  NEEDED               libgd.so.3
+  NEEDED               libgcc_s.so.1
+  NEEDED               libc.so.6
+headless_dependencies:
+  NEEDED               libgfortran.so.5
+  NEEDED               libm.so.6
+  NEEDED               libgcc_s.so.1
+  NEEDED               libc.so.6

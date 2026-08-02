@@ -1,0 +1,11 @@
+id	expected_energy_groups	description
+cm12_pi_plus_h1_baseline	1	Baseline angle grid at Elab 1000 MeV
+cm12_pi_plus_h1_fixed_w	1	Angle grid at fixed Wcm 1600 MeV
+cm12_pi_plus_h1_energy_sweep	5	Elab sweep from 200 through 1000 MeV
+cm12_pi_plus_h1_w_sweep	5	Wcm sweep from 1100 through 1900 MeV
+cm12_pi_plus_h1_cosine_clamp	1	Legacy cosine endpoint clamp at Elab 1000 MeV
+cm12_pi_plus_h1_max_grid	1	Maximum accepted angle grid at Elab 1000 MeV
+cm12_pi_plus_h1_single_point	1	Single angle at Elab 1000 MeV
+cm12_pi_plus_h1_choice_zero	1	Legacy amplitude-choice coercion at Elab 1000 MeV
+cm12_unknown_observable_h1_recovery	1	Observable re-prompt ending at pion-plus AMPL
+cm12_invalid_reaction_h1_recovery	1	Reaction re-prompt ending at pion-plus AMPL
