@@ -92,6 +92,15 @@ Additional non-exact support/current-lineage files are:
 /home/arndt64/said/prux.f       different
 ```
 
+`content-diff/README.md` resolves the content-level question. The drift is
+substantive: it includes dataset-root and output handling changes, an `LL=8`
+partial-wave boundary, `QLEGY` return typing, broad non-CM12 `prsd.f`
+observable/background changes, a partial `epru.f`, and a `prux.f` variant that
+changes its PiN solution and disables background terms. None of the ten files
+is one of the nine sources used by the public CM12 `prsdd`, so this does not
+alter the CM12 archive-equivalence result. Behavioral relevance outside CM12
+still requires per-engine source/binary pairing and fixtures.
+
 This refines the Track 2 gap: `/home/arndt` is a distinct deployed binary
 lineage, but most surviving source/build content is copied unchanged from the
 archive. The production binaries remain separate captured witnesses, and
@@ -112,3 +121,5 @@ Supporting files:
 - `manifest.txt`
 - `production.sha256`
 - `source-comparison.tsv`
+- `content-diff/README.md`
+- `content-diff/files.tsv`

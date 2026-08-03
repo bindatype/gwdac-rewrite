@@ -135,3 +135,9 @@ independently generated production SHA-256 manifest. Captured binaries and
 datasets remain outside Git under `work/production-20260803`; the allowlist,
 hashes, and source comparison are committed. `RESUME` never authorizes a
 production write, deployment, configuration change, or live execution.
+
+`reports/live-production-capture/content-diff/README.md` classifies all eight
+differing and two production-only source/build files at file and routine
+levels. The drift includes real operational and physics-relevant changes, but
+none is in the nine-file public CM12 `prsdd` build. Outside CM12, static source
+drift remains separate from source-to-binary pairing and behavioral approval.

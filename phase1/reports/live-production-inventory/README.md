@@ -88,8 +88,10 @@ Most public non-CM12 wrappers target `/home/arndt/said`, not the checked-in
 `/home/arndt64/said` executables used by the first Legacy Runtime Refresh
 preflight. The two sets have different hashes. The `/home/arndt` tree has no
 Git provenance; its shared source files are largely copied from arndt64, but
-`epru.f`, `nn1.f`, `prsd.f`, `pru.f`, and `saidopen.for` differ, and
-`junk.f` exists only there.
+`nn1.f`, `prsd.f`, `pru.f`, and `saidopen.for` differ, and `junk.f` and
+`mkS.sh` exist only there. The differing `epru.f` and `prux.f` identified by
+the completed capture comparison are under `/home/arndt64/said`, not
+`/home/arndt/said`. See `../live-production-capture/content-diff/README.md`.
 
 The active binaries still depend on obsolete runtime families including
 `libg2c.so.0`, old GD/PNG libraries, and X11. Source/binary pairing is not
