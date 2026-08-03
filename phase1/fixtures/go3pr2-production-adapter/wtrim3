@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+my $i=0;
+while(<>)  { 
+	if(/WEB/)    { $i++; }
+	else {
+		print	if ($i == 3);
+	}
+}

@@ -1,0 +1,215 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly mode="${ADAPTER_DIAGNOSTIC_MODE:?set ADAPTER_DIAGNOSTIC_MODE to modern, historical, or compare}"
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly gwdac_root="${GWDAC_SOURCE:-/workspace/gwdac}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}/go3pr2-adapter-diagnostic"
+readonly fixture_root="${phase1_root}/fixtures/go3pr2-production-adapter"
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-120}"
+readonly data_root="${source_root}/sdat"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly captured_live_value="0.2098E+01"
+
+combine_results() {
+    local combined="${report_root}/results.tsv"
+    local comparison="${report_root}/comparison.tsv"
+    local label
+    local archived_value
+    local live_value
+    local adapter_equal
+    local website_equal
+
+    test -f "${report_root}/modern/results.tsv"
+    test -f "${report_root}/historical/results.tsv"
+
+    {
+        head -n 1 "${report_root}/modern/results.tsv"
+        tail -n +2 "${report_root}/modern/results.tsv"
+        tail -n +2 "${report_root}/historical/results.tsv"
+    } >"${combined}"
+
+    test "$(($(wc -l <"${combined}") - 1))" -eq 6
+
+    printf 'label\tarchived_obs\tlive_obs\tadapter_equal\tcaptured_website_obs\twebsite_equal\n' \
+        >"${comparison}"
+    for label in modern-headless arndt64 gwdac; do
+        archived_value="$(awk -F '\t' -v label="${label}" \
+            '$1 == label && $2 == "archived" { print $8 }' "${combined}")"
+        live_value="$(awk -F '\t' -v label="${label}" \
+            '$1 == label && $2 == "live" { print $8 }' "${combined}")"
+        test -n "${archived_value}"
+        test -n "${live_value}"
+        adapter_equal=no
+        website_equal=no
+        if [[ "${archived_value}" == "${live_value}" ]]; then
+            adapter_equal=yes
+        fi
+        if [[ "${live_value}" == "${captured_live_value}" ]]; then
+            website_equal=yes
+        fi
+        printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+            "${label}" \
+            "${archived_value}" \
+            "${live_value}" \
+            "${adapter_equal}" \
+            "${captured_live_value}" \
+            "${website_equal}" \
+            >>"${comparison}"
+    done
+
+    sha256sum \
+        "${fixture_root}/archived.in" \
+        "${fixture_root}/live.in" \
+        "${fixture_root}/wtrim3" \
+        "${combined}" \
+        "${comparison}" \
+        >"${report_root}/manifest.sha256"
+
+    cat "${comparison}"
+}
+
+if [[ "${mode}" == "compare" ]]; then
+    combine_results
+    exit 0
+fi
+
+case "${mode}" in
+    modern)
+        readonly state_root="${PHASE1_STATE_ROOT:-/workspace/phase1/reproducible}"
+        readonly short_commit="$(git -C "${source_root}" rev-parse --short=12 HEAD)"
+        readonly -a labels=(modern-headless)
+        readonly -a binaries=(
+            "${state_root}/artifacts/${short_commit}/prsdd-headless"
+        )
+        ;;
+    historical)
+        readonly state_root="${ORACLE_STATE_ROOT:-/oracle-work}"
+        readonly -a labels=(arndt64 gwdac)
+        readonly -a binaries=(
+            "${source_root}/said/prsdd"
+            "${gwdac_root}/gwdac/cgi-bin/prsd"
+        )
+        ;;
+    *)
+        printf 'Unknown ADAPTER_DIAGNOSTIC_MODE: %s\n' "${mode}" >&2
+        exit 2
+        ;;
+esac
+
+readonly mode_report_root="${report_root}/${mode}"
+readonly results="${mode_report_root}/results.tsv"
+mkdir -p "${mode_report_root}" "${state_root}/runs"
+printf 'label\tdeck\tbinary_sha256\tfixture_sha256\tweb_sections\tselected_section\tformatter_exact\tobs\terror\talab_deg\tdsg_lab\tstderr_lines\tstderr_sha256\n' \
+    >"${results}"
+
+run_case() {
+    local label="$1"
+    local binary="$2"
+    local deck="$3"
+    local fixture="${fixture_root}/${deck}.in"
+    local selected_section=1
+    local formatter="${gwdac_root}/gwdac/cgi-bin/wtrim"
+    local prefix="${mode_report_root}/${label}-${deck}"
+    local run_root
+    local runtime_library_path="${LD_LIBRARY_PATH:-}"
+    local status
+    local web_sections
+    local formatter_exact
+    local result_count
+    local result_line
+    local acm
+    local obs
+    local error
+    local alab
+    local dsg_lab
+
+    if [[ "${deck}" == "live" ]]; then
+        selected_section=3
+        formatter="${fixture_root}/wtrim3"
+    fi
+    if [[ "${label}" == "gwdac" ]]; then
+        runtime_library_path="/opt/oracle/gfortran-4.4/usr/lib:${runtime_library_path}"
+    fi
+
+    test -x "${binary}"
+    test -f "${fixture}"
+    test -f "${formatter}"
+    run_root="$(mktemp -d "${state_root}/runs/go3pr2-${label}-${deck}.XXXXXX")"
+    cp -a "${source_root}/pr" "${run_root}/pr"
+    rm -f \
+        "${run_root}/pr/SAID.TMP" \
+        "${run_root}/pr/SAID.PCT" \
+        "${run_root}/pr/SAID.LOG" \
+        "${run_root}/pr/SAID.PS" \
+        "${run_root}/pr/fort.3" \
+        "${run_root}/pr/fort.7"
+    ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+    ln -s "${data_root}" "${run_root}/sdat"
+
+    set +e
+    (
+        cd "${run_root}/pr"
+        timeout "${timeout_seconds}" \
+            env \
+            SAID_DATA_ROOT="${data_root}" \
+            LD_LIBRARY_PATH="${runtime_library_path}" \
+            "${binary}" \
+            <"${fixture}" \
+            >"${prefix}.stdout" \
+            2>"${prefix}.stderr"
+    )
+    status=$?
+    set -e
+    printf '%s\n' "${status}" >"${prefix}.exit"
+    test "${status}" -eq 0
+    grep -Fq 'Thanks for using SAID' "${prefix}.stdout"
+
+    perl "${formatter}" <"${prefix}.stdout" >"${prefix}.formatted"
+    env WANTED_SECTION="${selected_section}" perl -ne '
+        if (/WEB/) {
+            $section++;
+            next;
+        }
+        print if $section == $ENV{WANTED_SECTION};
+    ' "${prefix}.stdout" >"${prefix}.section"
+
+    formatter_exact=no
+    if cmp -s "${prefix}.formatted" "${prefix}.section"; then
+        formatter_exact=yes
+    fi
+    test "${formatter_exact}" == yes
+
+    web_sections="$(grep -c 'WEB' "${prefix}.stdout")"
+    result_count="$(awk '$1 == "90.000" && NF == 5 { count++ } END { print count+0 }' \
+        "${prefix}.formatted")"
+    test "${result_count}" -eq 1
+    result_line="$(awk '$1 == "90.000" && NF == 5 { print; exit }' \
+        "${prefix}.formatted")"
+    read -r acm obs error alab dsg_lab <<<"${result_line}"
+
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+        "${label}" \
+        "${deck}" \
+        "$(sha256sum "${binary}" | awk '{ print $1 }')" \
+        "$(sha256sum "${fixture}" | awk '{ print $1 }')" \
+        "${web_sections}" \
+        "${selected_section}" \
+        "${formatter_exact}" \
+        "${obs}" \
+        "${error}" \
+        "${alab}" \
+        "${dsg_lab}" \
+        "$(wc -l <"${prefix}.stderr")" \
+        "$(sha256sum "${prefix}.stderr" | awk '{ print $1 }')" \
+        >>"${results}"
+}
+
+for index in "${!labels[@]}"; do
+    for deck in archived live; do
+        run_case "${labels[index]}" "${binaries[index]}" "${deck}"
+    done
+done
+
+cat "${results}"
