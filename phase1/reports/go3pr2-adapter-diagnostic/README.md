@@ -61,6 +61,13 @@ Fixture hashes:
 | `archived.in` | `8ccb1ef6c38c1a0c0401129de35bbabe8bb4405fb341dd9a7aef430a0e4c6e7e` |
 | `live.in` | `22c693d850379b63804ff693e4cb5d716d5173a49b73a6813d654f56cc7db3d7` |
 
+The final pre-`qt` record in each deck intentionally contains one space,
+matching the wrapper's `echo " "`. The captured `wtrim3` also retains its
+original trailing space on `while(<>)  { `. Consequently `git show --check`
+reports those three provenance-preserving lines; they are not accidental
+formatting debt and must not be normalized without changing the fixture and
+capture hashes.
+
 Executable hashes:
 
 | Witness | SHA-256 |
