@@ -1,0 +1,4 @@
+capture_files=542
+capture_bytes=34218873
+allowlist_sha256=8738ccf3ff0b1fd7e6fd63b61dcc4c64f2c5e3e6752498210c74fc8f697c8281
+production_manifest_sha256=0d4bbdf1dded207caefd5c749d29121a8940e4c1c8014ce455b2c678303a82a2

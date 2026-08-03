@@ -94,10 +94,33 @@ usable result. The public interface can reproduce the user-visible DSG
 calculation, but it cannot by itself establish whether production dispatched
 SP00 or SM05.
 
-The cause of the live/frozen difference is **unresolved**. Plausible boundaries
-include a different production executable, changed CM12 data/title alignment,
-or other production-only source or data changes. No one of those explanations
-is established by this website check.
+At this checkpoint, the cause of the live/frozen difference was
+**unresolved**. Plausible boundaries included a different production
+executable, changed CM12 data/title alignment, or other production-only source
+or data changes. No one of those explanations was established by this website
+check alone.
+
+## Follow-up: Offline Adapter Replay
+
+On 2026-08-03, a separately authorized offline diagnostic reproduced the
+captured website token exactly. The live `go3pr2` wrapper primes the selected
+CM12 process with a `GO5` DSG request before issuing `GO3`. With otherwise
+identical source, data, and final request, all three accepted executables
+produce:
+
+```text
+fresh GO3=0.2036E+01
+GO5-primed GO3=0.2098E+01
+captured website=0.2098E+01
+```
+
+The captured `wtrim3` formatter only selects the third `WEB` output section;
+it does not calculate or alter the value. This resolves the current website
+mechanism at displayed precision, but does not decide which request history is
+scientifically preferred or authorize a compatibility change.
+
+Evidence:
+`outputs/phase1/reports/go3pr2-adapter-diagnostic/README.md`
 
 ## Manual Reproduction
 

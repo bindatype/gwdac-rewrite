@@ -119,3 +119,15 @@ Supporting manifests:
 - `cm12-artifacts.tsv`
 - `engine-binaries.tsv`
 - `source-roots.tsv`
+
+## Follow-up: 2026-08-03
+
+The separately authorized offline adapter diagnostic resolved the captured
+website-value mechanism at displayed precision. Replaying the live `GO5`
+priming before the same `GO3` request changes all three accepted executable
+results from `0.2036E+01` to `0.2098E+01`, exactly matching the website.
+`wtrim3` only selects the later output section. See
+`../go3pr2-adapter-diagnostic/README.md`.
+
+The path-allowlisted production capture is documented in
+`../live-production-capture/README.md`. Production remained read-only.

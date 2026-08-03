@@ -1,0 +1,3 @@
+label	deck	binary_sha256	fixture_sha256	web_sections	selected_section	formatter_exact	obs	error	alab_deg	dsg_lab	stderr_lines	stderr_sha256
+modern-headless	archived	958889882d91fce225c04bc18021725fec757bde6ea047df1bf93a4136c7aa4f	8ccb1ef6c38c1a0c0401129de35bbabe8bb4405fb341dd9a7aef430a0e4c6e7e	1	1	yes	0.2036E+01	0.0000E+00	58.15	0.2845E+01	0	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+modern-headless	live	958889882d91fce225c04bc18021725fec757bde6ea047df1bf93a4136c7aa4f	22c693d850379b63804ff693e4cb5d716d5173a49b73a6813d654f56cc7db3d7	3	3	yes	0.2098E+01	0.0000E+00	58.15	0.2932E+01	1	cde5e7d17e64813704a51a756095eaf585d28601c664fa68a1f27038b6399fcc

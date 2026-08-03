@@ -113,3 +113,18 @@ CM12 build sources, deployed `prsdd`, all 18 KCM files, and the complete first
 CM12 solution record are byte-identical to the archived snapshot. The public
 `go3pr2` adapter and the containing `prsol.dat` are newer deployment state.
 This is captured/reference evidence only; no live CGI or engine was executed.
+
+`reports/go3pr2-adapter-diagnostic/README.md` closes the current website-value
+mechanism at displayed precision. The live wrapper's `GO5` priming changes the
+subsequent 1000 MeV, 90-degree pion-plus DSG token from `0.2036E+01` to
+`0.2098E+01` on the modern headless build and both checked-in executables,
+exactly matching the captured website. The captured `wtrim3` only selects the
+third `WEB` section and does not change the value. This is a request-sequencing
+result, not authorization to change compatibility behavior.
+
+`reports/live-production-capture/README.md` records the path-allowlisted,
+one-way production capture. All 542 files and 34,218,873 bytes match the
+independently generated production SHA-256 manifest. Captured binaries and
+datasets remain outside Git under `work/production-20260803`; the allowlist,
+hashes, and source comparison are committed. `RESUME` never authorizes a
+production write, deployment, configuration change, or live execution.
