@@ -122,6 +122,13 @@ exactly matching the captured website. The captured `wtrim3` only selects the
 third `WEB` section and does not change the value. This is a request-sequencing
 result, not authorization to change compatibility behavior.
 
+`reports/defect-register.md` names this deployed behavior as
+`SAID-DEFECT-001`. The public website-fidelity target `public-go3pr2-v1`
+preserves the `GO5`-primed displayed token `0.2098E+01`; fresh-process `GO3`
+and `0.2036E+01` remain a separate engine-level contract. The registration is
+a compatibility decision, not scientific approval or an implementation,
+fixture, tolerance, or Phase 2 contract change.
+
 `reports/live-production-capture/README.md` records the path-allowlisted,
 one-way production capture. All 542 files and 34,218,873 bytes match the
 independently generated production SHA-256 manifest. Captured binaries and
