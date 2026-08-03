@@ -104,3 +104,12 @@ reference build as its default and also accepts the Phase 2
 `CM12_SEAM_ROOT` overlay. That conditional mode replaces only the legacy
 CM12 solution, `cmmwp`/`ysKCM`, `PRDA`, and DSG calculation path; it does not
 alter the default frozen Phase 1 binaries or their evidence.
+
+`reports/live-production-inventory/README.md` records a read-only static
+inventory of the deployed SAID host. Production is a hybrid tree: public
+adapters under `/home/www/gwdac`, CM12 under `/home/arndt64`, most other
+engines under `/home/arndt`, and selected sessions under `/home/ron`. The nine
+CM12 build sources, deployed `prsdd`, all 18 KCM files, and the complete first
+CM12 solution record are byte-identical to the archived snapshot. The public
+`go3pr2` adapter and the containing `prsol.dat` are newer deployment state.
+This is captured/reference evidence only; no live CGI or engine was executed.

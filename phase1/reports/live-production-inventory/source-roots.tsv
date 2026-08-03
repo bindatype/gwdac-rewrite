@@ -1,0 +1,5 @@
+root	git_origin	git_head	deployment_role	captured_finding
+/home/www	https://github.com/bindatype/gwdac.git	199a8f1ad6d733f5cc6cecfe8b6da3139dd07efa	public_web_tree	git_is_stale;working_tree_contains_adapter_and_content_changes
+/home/arndt64	https://github.com/bindatype/arndt64.git	bb410ba04df673ffbb9a6072721dc37e32832dc3	CM12_and_selected_pion_nucleon	CM12_selected_sources_and_prsdd_exact_to_archive;prsol_container_expanded
+/home/arndt	none	none	most_non_CM12_public_engines	older_distinct_binary_lineage;five_shared_sources_differ;source_binary_pairing_not_uniform
+/home/ron/pn	none	none	external_pion_nucleon_sessions	XP08.SES;XP15.SES;SP06.SES

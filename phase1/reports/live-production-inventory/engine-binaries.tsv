@@ -1,0 +1,9 @@
+family	public_wrapper_target	sha256	archive_relationship	observed_legacy_dependencies
+pion_photoproduction_CM12	/home/arndt64/said/prsdd	8a3c925a3aa95314fb4ad4fa7a8cbfa0095df898ee6fa96dad2071d20789678a	exact_to_arndt64_archive	libgd.so.2;libgfortran.so.3;libg2c.so.0;X11
+pion_nucleon_plotting	/home/arndt64/said/pnsdd	a10e266a4c968e5e546539f959e344e763c85150000795342b114bc7e6eeae2b	exact_to_arndt64_archive	legacy_runtime
+pion_nucleon	/home/arndt/said/pnsd	00ac7a5ef8b80f0029d4a581355ee07a22dfe4eb72538059ee76b4b97741dae4	distinct_from_arndt64_archive	libg2c.so.0;libgd.so.1;libpng12;X11
+eta_photoproduction	/home/arndt/said/eprsd	a252e20a76ad44b37e1f710a81d1d3f80d832eaeb383342d53f31a68e2d27bb9	distinct_from_arndt64_archive	libg2c.so.0;libgd.so.1;libpng12;X11
+nucleon_nucleon	/home/arndt/said/nnsd	1ae8b3aeafba704b2de408e18fd8113223cec3ccb47869ae588fc55c8beb2cd4	distinct_from_arndt64_archive	libg2c.so.0;libgd.so.2;libpng12;X11
+kaon_nucleon	/home/arndt/said/knsd	937666744876d732f0cfed5ed6f6de7431a65b29e01da9339e811c024f69ad26	distinct_from_arndt64_archive	libg2c.so.0;libgd.so.1;libpng12;X11
+proton_deuteron	/home/arndt/said/pdsd	ed20f0bd36c7fad5e6312a4a4d4027bd521e44edb34ef95eb56ecbb279fd559b	distinct_from_arndt64_archive	libg2c.so.0;libgd.so.2;libpng12;X11
+proton_deuteron_elastic	/home/arndt/said/pdesd	4f4de4fc8518eb4edaa31a2096987f64c3ee0d621808dec9cc5eae2a83f2e5af	distinct_from_arndt64_archive	libg2c.so.0;libgd.so.2;libpng12;X11
