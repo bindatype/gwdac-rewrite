@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly state_root="${ORACLE_STATE_ROOT:-/oracle-work/prsdd-go5-diagnostic}"
+readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}/prsdd-go5-diagnostic"
+readonly fixture="${phase1_root}/fixtures/prsdd-go5-diagnostic/go5pr-database-list.in"
+readonly binary="${source_root}/said/prsdd"
+readonly data_root="${source_root}/sdat"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-120}"
+readonly prefix="${report_root}/historical-arndt64-database"
+
+normalize_selection_projection() {
+    awk '
+        /PI\+N DSG/ {
+            print
+            skip_title=1
+            next
+        }
+        skip_title {
+            skip_title=0
+            next
+        }
+        /DELeted from analyses/ { next }
+        /Pictures converted to Post-Script/ { next }
+        {
+            sub(/ Picture  1 has.*/, "")
+            print
+        }
+    ' "$1" >"$2"
+}
+
+test -x "${binary}"
+test -f "${fixture}"
+test -f "${report_root}/accepted-database.stdout"
+test -f "${report_root}/unpatched-database-1.stdout"
+mkdir -p "${state_root}/runs" "${report_root}"
+
+run_root="$(mktemp -d "${state_root}/runs/run.XXXXXX")"
+cp -a "${source_root}/pr" "${run_root}/pr"
+rm -f \
+    "${run_root}/pr/SAID.TMP" \
+    "${run_root}/pr/SAID.PCT" \
+    "${run_root}/pr/SAID.LOG" \
+    "${run_root}/pr/SAID.PS" \
+    "${run_root}/pr/fort.3" \
+    "${run_root}/pr/fort.7"
+ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+ln -s "${data_root}" "${run_root}/sdat"
+
+set +e
+(
+    cd "${run_root}/pr"
+    timeout "${timeout_seconds}" \
+        env LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}" \
+        "${binary}" \
+        <"${fixture}" \
+        >"${prefix}.stdout" \
+        2>"${prefix}.stderr"
+)
+status=$?
+set -e
+printf '%s\n' "${status}" >"${prefix}.exit"
+
+thanks_marker=no
+if grep -Fq 'Thanks for using SAID' "${prefix}.stdout"; then
+    thanks_marker=yes
+fi
+total_data="$(awk '/Total Data=/ { for (i=1;i<=NF;i++) if ($i == "Data=") { print $(i+1); exit } }' "${prefix}.stdout")"
+patched_exact=no
+unpatched_exact=no
+patched_selection_exact=no
+unpatched_selection_exact=no
+if cmp -s "${prefix}.stdout" "${report_root}/accepted-database.stdout"; then
+    patched_exact=yes
+fi
+if cmp -s "${prefix}.stdout" "${report_root}/unpatched-database-1.stdout"; then
+    unpatched_exact=yes
+fi
+normalize_selection_projection \
+    "${prefix}.stdout" \
+    "${prefix}.selection-projection"
+normalize_selection_projection \
+    "${report_root}/accepted-database.stdout" \
+    "${report_root}/accepted-database.selection-projection"
+normalize_selection_projection \
+    "${report_root}/unpatched-database-1.stdout" \
+    "${report_root}/unpatched-database-1.selection-projection"
+if cmp -s \
+    "${prefix}.selection-projection" \
+    "${report_root}/accepted-database.selection-projection"; then
+    patched_selection_exact=yes
+fi
+if cmp -s \
+    "${prefix}.selection-projection" \
+    "${report_root}/unpatched-database-1.selection-projection"; then
+    unpatched_selection_exact=yes
+fi
+
+diff -u "${prefix}.stdout" "${report_root}/accepted-database.stdout" \
+    >"${report_root}/historical-vs-patched.diff" || true
+diff -u "${prefix}.stdout" "${report_root}/unpatched-database-1.stdout" \
+    >"${report_root}/historical-vs-unpatched.diff" || true
+
+printf 'case\tbinary_sha256\tfixture_sha256\texit_status\tthanks_marker\ttotal_data\tpatched_stdout_exact\tunpatched_stdout_exact\tpatched_selection_exact\tunpatched_selection_exact\tstderr_lines\n' \
+    >"${report_root}/historical-results.tsv"
+printf 'historical-arndt64\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+    "$(sha256sum "${binary}" | awk '{ print $1 }')" \
+    "$(sha256sum "${fixture}" | awk '{ print $1 }')" \
+    "${status}" \
+    "${thanks_marker}" \
+    "${total_data}" \
+    "${patched_exact}" \
+    "${unpatched_exact}" \
+    "${patched_selection_exact}" \
+    "${unpatched_selection_exact}" \
+    "$(wc -l <"${prefix}.stderr")" \
+    >>"${report_root}/historical-results.tsv"
+
+{
+    printf 'binary=%s\n' "${binary}"
+    printf 'binary_sha256=%s\n' "$(sha256sum "${binary}" | awk '{ print $1 }')"
+    printf 'fixture=%s\n' "${fixture}"
+    printf 'fixture_sha256=%s\n' "$(sha256sum "${fixture}" | awk '{ print $1 }')"
+    printf 'data_root=%s\n' "${data_root}"
+    printf 'kcm_root=%s\n' "${kcm_root}"
+    printf 'exit_status=%s\n' "${status}"
+    printf 'total_data=%s\n' "${total_data}"
+    printf 'operating_system=%s\n' "$(. /etc/os-release; printf '%s %s' "${NAME}" "${VERSION_ID}")"
+    ldd "${binary}" | sed 's/^/ldd=/'
+} >"${report_root}/historical-environment.txt"
+
+test "${status}" -eq 0
+test "${thanks_marker}" = yes
+test -n "${total_data}"
+test "${total_data}" -gt 0
+test "${patched_selection_exact}" = no
+test "${unpatched_selection_exact}" = yes
+
+(
+    cd "${report_root}"
+    find . -type f ! -name manifest.sha256 -print0 \
+        | sort -z \
+        | xargs -0 sha256sum \
+        | sed 's#  \./#  #'
+) >"${report_root}/manifest.sha256"
+
+cat "${report_root}/historical-results.tsv"

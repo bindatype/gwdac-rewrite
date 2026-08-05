@@ -1,0 +1,8 @@
+metric	value
+total_reads	3740
+divergent_reads	2580
+divergent_fields	3634
+first_record	1
+first_field	MMO
+first_patched_integer	540483652
+first_unpatched_integer	538976324

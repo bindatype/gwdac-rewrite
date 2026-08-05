@@ -1,0 +1,650 @@
+--- /phase1/reports/prsdd-go5-diagnostic/historical-arndt64-database.stdout	2026-08-05 22:02:06.996574172 +0000
++++ /phase1/reports/prsdd-go5-diagnostic/accepted-database.stdout	2026-08-05 22:02:03.032720391 +0000
+@@ -100,16 +100,14 @@
+   300.
+   320.
+ SM95 2000 MEV P(135) CHI/DP=31810/13415      8/95       SM95   8
+-  238 Expt Dat
++  204 Expt Dat
+     32.9/  27
+     75.3/  75
+     11.5/   5
+     44.3/  29
+      5.0/   8
+     13.5/  14
+-    20.8/  30
+     13.2/  11
+-     5.8/   4
+     12.6/  13
+      7.0/   4
+     96.1/  13
+@@ -132,435 +130,439 @@
+                        8/ 5/26  
+     
+    9 PI+N DSG  at   300.00 Mev A(CM)=   30.50 to   150.20
+-  FU(77)   TOKY   FUJII, NPB120, 395(77)          Chi,M=  14.815   1.646
++  FU(77)   TOKY   FUJII   NPB120  395(77)         Chi,M=  14.815   1.646
+  N,NE,Nchi=   1.01  0.070    0.01
+     
+    1 PI+N DSG  at   300.00 Mev A(CM)=   26.60
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   0.000   0.000
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   0.000   0.000
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   300.00 Mev A(CM)=   39.50
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   4.528   4.528
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   4.528   4.528
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   300.00 Mev A(CM)=   52.10
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   9.849   9.849
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   9.849   9.849
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   300.00 Mev A(CM)=   64.20
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   0.947   0.947
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   0.947   0.947
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   300.00 Mev A(CM)=   75.80
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   0.325   0.325
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   0.325   0.325
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   300.00 Mev A(CM)=   97.30
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   1.167   1.167
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   1.167   1.167
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   300.00 Mev A(CM)=  125.70
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   0.064   0.064
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   0.064   0.064
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   300.00 Mev A(CM)=  150.30
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   1.697   1.697
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   1.697   1.697
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   300.00 Mev A(CM)=  158.00
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=  21.310  21.310
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=  21.310  21.310
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   300.00 Mev A(CM)=  165.40
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   9.224   9.224
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   9.224   9.224
++ DELeted from analyses-    10/2
+     
+   31 PI+N DSG  at   300.00 Mev A(CM)=   15.00 to   180.00
+-  FI(72)   BONN   FISCHER, ZP253, 38(72)          Chi,M=  32.684   1.054
++  FI(72)   BONN   FISCHER     ZP253   38(72)      Chi,M=  32.684   1.054
+  N,NE,Nchi=   0.95  0.060    0.64
+     
+    1 PI+N DSG  at   300.00 Mev A(CM)=  180.00
+-  FU(71)   TOKY   FUJII, PRL26, 1672(71)          Chi,M=   2.534   2.534
++  FU(71)   TOKY   FUJII   PRL26   1672(71)        Chi,M=   2.534   2.534
+     
+    9 PI+N DSG  at   300.00 Mev A(CM)=   15.00 to    60.00
+-  FI(70)   BONN   FISCHER, NPB16, 119(70)         Chi,M=  16.407   1.823
++  FI(70)   BONN   FISCHER     NPB16   119(70)     Chi,M=  16.407   1.823
+  N,NE,Nchi=   0.96  0.050    0.69
+     
+    6 PI+N DSG  at   300.00 Mev A(CM)=   26.50 to   120.00
+-  FA(84)   SACL   FAURE, NPA424, 383(84)          Chi,M=   1.859   0.310
++  FA(84)   SACL   FAURE   NPA424  383(84)         Chi,M=   1.859   0.310
+  N,NE,Nchi=   0.96  0.070    0.27
+     
+    6 PI+N DSG  at   300.00 Mev A(CM)=    0.00 to    13.30
+-  BT(68)   ORSA   BETOURNE, PR172, 1343(68)       Chi,M=   0.983   0.164
++  BT(68)   ORSA   BETOURNE    PR172   1343(68)    Chi,M=   0.983   0.164
+  N,NE,Nchi=   1.01  0.042    0.07
+     
+    1 PI+N DSG  at   300.00 Mev A(CM)=   44.00
+-  AV(66)   STAN   ALVAREZ, PR142, 957(66)         Chi,M=   0.001   0.001
+- DELeted from analyses-10/24/06
++  AV(66)   STAN   ALVAREZ     PR142   957(66)     Chi,M=   0.001   0.001
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   300.00 Mev A(CM)=   63.00
+-  AV(66)   STAN   ALVAREZ, PR142, 957(66)         Chi,M=   0.045   0.045
+- DELeted from analyses-10/24/06
++  AV(66)   STAN   ALVAREZ     PR142   957(66)     Chi,M=   0.045   0.045
++ DELeted from analyses-    10/2
+     
+   10 PI+N DSG  at   300.00 Mev A(CM)=   45.00 to   135.00
+-  BE(00)   MAIN   BECK, PRC61, 034604(2000), PC 0 Chi,M=  11.142   1.114
++  BE(00)   MAIN   BECK    PRC61   034604(2000)    Chi,M=  11.142   1.114
+  N,NE,Nchi=   0.94  0.040    2.62
++ DELeted from analyses- PC 0   
+     
+   11 PI+N DSG  at   300.00 Mev A(CM)=   72.00 to   138.50
+-  BR(00)   MAIN   BRANFORD, PRC61, 014603(2000),  Chi,M=  13.238   1.203
++  BR(00)   MAIN   BRANFORD    PRC61   014603(2000 Chi,M=  13.238   1.203
+  N,NE,Nchi=   0.94  0.070    0.75
+     
+    1 PI+N DSG  at   301.00 Mev A(CM)=  107.30
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   0.039   0.039
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   0.039   0.039
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   301.00 Mev A(CM)=  116.00
+-  AV(66)   STAN   ALVAREZ, PR142, 957(66)         Chi,M=   0.000   0.000
+- DELeted from analyses-10/24/06
++  AV(66)   STAN   ALVAREZ     PR142   957(66)     Chi,M=   0.000   0.000
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   301.00 Mev A(CM)=  131.00
+-  AV(66)   STAN   ALVAREZ, PR142, 957(66)         Chi,M=   0.100   0.100
+- DELeted from analyses-10/24/06
++  AV(66)   STAN   ALVAREZ     PR142   957(66)     Chi,M=   0.100   0.100
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   302.00 Mev A(CM)=   39.40
+-  AL(63)   BONN   ALTHOFF, ZP175, 19(63)          Chi,M=   0.910   0.910
+- DELeted from analyses-10/24/06
++  AL(63)   BONN   ALTHOFF     ZP175   19(63)      Chi,M=   0.910   0.910
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   302.00 Mev A(CM)=   52.00
+-  AL(63)   BONN   ALTHOFF, ZP175, 19(63)          Chi,M=   0.296   0.296
+- DELeted from analyses-10/24/06
++  AL(63)   BONN   ALTHOFF     ZP175   19(63)      Chi,M=   0.296   0.296
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   302.00 Mev A(CM)=   52.00
+-  AL(63)   BONN   ALTHOFF, ZP175, 19(63)          Chi,M=   2.176   2.176
+- DELeted from analyses-10/24/06
++  AL(63)   BONN   ALTHOFF     ZP175   19(63)      Chi,M=   2.176   2.176
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   302.00 Mev A(CM)=   75.70
+-  AL(63)   BONN   ALTHOFF, ZP175, 19(63)          Chi,M=   0.004   0.004
+- DELeted from analyses-10/24/06
++  AL(63)   BONN   ALTHOFF     ZP175   19(63)      Chi,M=   0.004   0.004
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   302.50 Mev A(CM)=   45.90
+-  DU(80)P  BONN   E.J.DURWEN, PRP IR-80-7 80      Chi,M=   3.861   3.861
+- DELeted from analyses-10/07/91
++  DU(80)P  BONN   E.J.DURWEN  PRP IR-80-7 80      Chi,M=   3.861   3.861
++ DELeted from analyses-10/07/9 
+     
+    1 PI+N DSG  at   303.00 Mev A(CM)=   86.90
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   2.302   2.302
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   2.302   2.302
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   303.00 Mev A(CM)=  107.00
+-  AL(63)   BONN   ALTHOFF, ZP175, 19(63)          Chi,M=   0.378   0.378
+- DELeted from analyses-10/24/06
++  AL(63)   BONN   ALTHOFF     ZP175   19(63)      Chi,M=   0.378   0.378
++ DELeted from analyses-    10/2
+     
+    4 PI+N DSG  at   303.00 Mev A(CM)=   45.00 to   120.00
+-  BU(94)   BONN   BUECHLER, NPA570, 580(94), EXCI Chi,M=   5.804   1.451
++  BU(94)   BONN   BUECHLER    NPA570  580(94)     Chi,M=   5.804   1.451
+  N,NE,Nchi=   0.96  0.050    0.56
++ DELeted from analyses- EXCI   
+     
+    1 PI+N DSG  at   303.00 Mev A(CM)=  146.60
+-  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)   Chi,M=   3.517   3.517
++  DA(01)   BONN   DANNHAUSEN  EPJA11  441(2001)   Chi,M=   3.517   3.517
+     
+    1 PI+N DSG  at   304.00 Mev A(CM)=  134.00
+-  AL(63)   BONN   ALTHOFF, ZP175, 19(63)          Chi,M=   0.128   0.128
+- DELeted from analyses-10/24/06
++  AL(63)   BONN   ALTHOFF     ZP175   19(63)      Chi,M=   0.128   0.128
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   304.00 Mev A(CM)=  178.50
+-  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)   Chi,M=   0.710   0.710
++  DA(01)   BONN   DANNHAUSEN  EPJA11  441(2001)   Chi,M=   0.710   0.710
+     
+    1 PI+N DSG  at   305.00 Mev A(CM)=  157.00
+-  AL(63)   BONN   ALTHOFF, ZP175, 19(63)          Chi,M=   0.663   0.663
+- DELeted from analyses-10/24/06
++  AL(63)   BONN   ALTHOFF     ZP175   19(63)      Chi,M=   0.663   0.663
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   305.00 Mev A(CM)=  157.00
+-  AL(63)   BONN   ALTHOFF, ZP175, 19(63)          Chi,M=   0.101   0.101
+- DELeted from analyses-10/24/06
++  AL(63)   BONN   ALTHOFF     ZP175   19(63)      Chi,M=   0.101   0.101
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   305.00 Mev A(CM)=  180.00
+-  FU(71)   TOKY   FUJII, PRL26, 1672(71)          Chi,M=   5.556   5.556
++  FU(71)   TOKY   FUJII   PRL26   1672(71)        Chi,M=   5.556   5.556
+     
+    1 PI+N DSG  at   305.00 Mev A(CM)=  158.10
+-  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)   Chi,M=   1.263   1.263
++  DA(01)   BONN   DANNHAUSEN  EPJA11  441(2001)   Chi,M=   1.263   1.263
+     
+    1 PI+N DSG  at   306.00 Mev A(CM)=  165.00
+-  AL(63)   BONN   ALTHOFF, ZP175, 19(63)          Chi,M=   0.350   0.350
+- DELeted from analyses-10/24/06
++  AL(63)   BONN   ALTHOFF     ZP175   19(63)      Chi,M=   0.350   0.350
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   306.60 Mev A(CM)=  102.50
+-  DU(80)P  BONN   E.J.DURWEN, PRP IR-80-7 80      Chi,M=   2.386   2.386
++  DU(80)P  BONN   E.J.DURWEN  PRP IR-80-7 80      Chi,M=   2.386   2.386
+     
+    1 PI+N DSG  at   308.00 Mev A(CM)=  178.50
+-  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)   Chi,M=   1.485   1.485
++  DA(01)   BONN   DANNHAUSEN  EPJA11  441(2001)   Chi,M=   1.485   1.485
+     
+    1 PI+N DSG  at   309.00 Mev A(CM)=  138.50
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   0.007   0.007
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   0.007   0.007
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   309.00 Mev A(CM)=  108.00
+-  AV(66)   STAN   ALVAREZ, PR142, 957(66)         Chi,M=   0.022   0.022
+- DELeted from analyses-10/24/06
++  AV(66)   STAN   ALVAREZ     PR142   957(66)     Chi,M=   0.022   0.022
++ DELeted from analyses-    10/2
+     
+    8 PI+N DSG  at   309.60 Mev A(CM)=   20.00 to   170.00
+-  BL(01)   LEGS   BLANPIED, PRC64, 025203(01)     Chi,M= 124.650  15.581
++  BL(01)   LEGS   BLANPIED    PRC64   025203(01)  Chi,M= 124.650  15.581
+  N,NE,Nchi=   1.02  0.020    1.22
+- DELeted from analyses-08/07/00
++ DELeted from analyses-   08/07
+     
+    9 PI+N DSG  at   310.00 Mev A(CM)=   30.40 to   150.40
+-  FU(77)   TOKY   FUJII, NPB120, 395(77)          Chi,M=   9.942   1.105
++  FU(77)   TOKY   FUJII   NPB120  395(77)         Chi,M=   9.942   1.105
+  N,NE,Nchi=   1.01  0.070    0.01
+     
+    1 PI+N DSG  at   310.00 Mev A(CM)=   26.70
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   3.258   3.258
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   3.258   3.258
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   310.00 Mev A(CM)=   39.70
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   8.342   8.342
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   8.342   8.342
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   310.00 Mev A(CM)=   52.30
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   7.776   7.776
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   7.776   7.776
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   310.00 Mev A(CM)=   64.40
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   0.377   0.377
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   0.377   0.377
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   310.00 Mev A(CM)=   76.00
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   0.298   0.298
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   0.298   0.298
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   310.00 Mev A(CM)=   87.10
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   1.822   1.822
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   1.822   1.822
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   310.00 Mev A(CM)=   97.50
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   1.489   1.489
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   1.489   1.489
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   310.00 Mev A(CM)=  125.90
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   1.330   1.330
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   1.330   1.330
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   310.00 Mev A(CM)=  150.40
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   7.781   7.781
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   7.781   7.781
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   310.00 Mev A(CM)=  158.00
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   7.647   7.647
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   7.647   7.647
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   310.00 Mev A(CM)=  165.50
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=  18.690  18.690
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=  18.690  18.690
++ DELeted from analyses-    10/2
+     
+   12 PI+N DSG  at   310.00 Mev A(CM)=   15.00 to   120.00
+-  FI(72)   BONN   FISCHER, ZP253, 38(72)          Chi,M=  10.588   0.882
++  FI(72)   BONN   FISCHER     ZP253   38(72)      Chi,M=  10.588   0.882
+  N,NE,Nchi=   0.94  0.060    1.09
+     
+    1 PI+N DSG  at   310.00 Mev A(CM)=  180.00
+-  FU(71)   TOKY   FUJII, PRL26, 1672(71)          Chi,M=   1.241   1.241
++  FU(71)   TOKY   FUJII   PRL26   1672(71)        Chi,M=   1.241   1.241
+     
+   10 PI+N DSG  at   310.00 Mev A(CM)=   15.00 to    70.00
+-  FI(70)   BONN   FISCHER, NPB16, 119(70)         Chi,M=  12.784   1.278
++  FI(70)   BONN   FISCHER     NPB16   119(70)     Chi,M=  12.784   1.278
+  N,NE,Nchi=   0.94  0.050    1.47
+     
+    1 PI+N DSG  at   310.00 Mev A(CM)=   46.10
+-  DU(80)P  BONN   E.J.DURWEN, PRP IR-80-7 80      Chi,M=   2.237   2.237
+- DELeted from analyses-10/13/89
++  DU(80)P  BONN   E.J.DURWEN  PRP IR-80-7 80      Chi,M=   2.237   2.237
++ DELeted from analyses-10/13/8 
+     
+    8 PI+N DSG  at   310.00 Mev A(CM)=   50.00 to   120.00
+-  BT(68)   ORSA   BETOURNE, PR172, 1343(68)       Chi,M=  12.546   1.568
++  BT(68)   ORSA   BETOURNE    PR172   1343(68)    Chi,M=  12.546   1.568
+  N,NE,Nchi=   0.89  0.042    7.28
+     
+   10 PI+N DSG  at   310.00 Mev A(CM)=   45.00 to   135.00
+-  BE(00)   MAIN   BECK, PRC61, 034604(2000), PC 0 Chi,M=   4.563   0.456
++  BE(00)   MAIN   BECK    PRC61   034604(2000)    Chi,M=   4.563   0.456
+  N,NE,Nchi=   0.93  0.040    2.67
++ DELeted from analyses- PC 0   
+     
+   13 PI+N DSG  at   310.00 Mev A(CM)=   36.00 to   156.00
+-  AH(04)   MAIN   AHRENS, EPJA21, 323(2004), PEDR Chi,M=  96.082   7.391
++  AH(04)   MAIN   AHRENS  EPJA21  323(2004)   PED Chi,M=  96.082   7.391
+     
+    1 PI+N DSG  at   311.00 Mev A(CM)=   26.60
+-  FR(63)   BONN   FREITAG, ZP186, 1(65)           Chi,M=   2.444   2.444
+- DELeted from analyses-10/24/06
++  FR(63)   BONN   FREITAG     ZP186   1(65)       Chi,M=   2.444   2.444
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   311.00 Mev A(CM)=   39.60
+-  FR(63)   BONN   FREITAG, ZP175, 1(63)           Chi,M=   7.055   7.055
+- DELeted from analyses-10/24/06
++  FR(63)   BONN   FREITAG     ZP175   1(63)       Chi,M=   7.055   7.055
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   311.00 Mev A(CM)=  150.40
+-  FR(63)   BONN   FREITAG, ZP175, 1(63)           Chi,M=   0.773   0.773
+- DELeted from analyses-10/24/06
++  FR(63)   BONN   FREITAG     ZP175   1(63)       Chi,M=   0.773   0.773
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   311.00 Mev A(CM)=  107.50
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   0.503   0.503
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   0.503   0.503
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   311.00 Mev A(CM)=  134.40
+-  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)   Chi,M=   0.317   0.317
++  DA(01)   BONN   DANNHAUSEN  EPJA11  441(2001)   Chi,M=   0.317   0.317
+     
+    1 PI+N DSG  at   311.20 Mev A(CM)=  146.70
+-  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)   Chi,M=   0.939   0.939
++  DA(01)   BONN   DANNHAUSEN  EPJA11  441(2001)   Chi,M=   0.939   0.939
+     
+    1 PI+N DSG  at   312.00 Mev A(CM)=   52.20
+-  FR(63)   BONN   FREITAG, ZP175, 1(63)           Chi,M=   1.634   1.634
+- DELeted from analyses-10/24/06
++  FR(63)   BONN   FREITAG     ZP175   1(63)       Chi,M=   1.634   1.634
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   312.00 Mev A(CM)=   52.20
+-  AL(63)   BONN   ALTHOFF, ZP175, 19(63)          Chi,M=   0.076   0.076
+- DELeted from analyses-10/24/06
++  AL(63)   BONN   ALTHOFF     ZP175   19(63)      Chi,M=   0.076   0.076
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   313.00 Mev A(CM)=  178.50
+-  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)   Chi,M=   0.126   0.126
++  DA(01)   BONN   DANNHAUSEN  EPJA11  441(2001)   Chi,M=   0.126   0.126
+     
+    1 PI+N DSG  at   313.00 Mev A(CM)=  112.30
+-  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)   Chi,M=   0.168   0.168
++  DA(01)   BONN   DANNHAUSEN  EPJA11  441(2001)   Chi,M=   0.168   0.168
+     
+    1 PI+N DSG  at   313.40 Mev A(CM)=   92.50
+-  DU(80)P  BONN   E.J.DURWEN, PRP IR-80-7 80      Chi,M=   0.555   0.555
++  DU(80)P  BONN   E.J.DURWEN  PRP IR-80-7 80      Chi,M=   0.555   0.555
+     
+    1 PI+N DSG  at   314.00 Mev A(CM)=   70.30
+-  FR(63)   BONN   FREITAG, ZP175, 1(63)           Chi,M=   4.863   4.863
+- DELeted from analyses-10/24/06
++  FR(63)   BONN   FREITAG     ZP175   1(63)       Chi,M=   4.863   4.863
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   314.00 Mev A(CM)=  158.20
+-  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)   Chi,M=   0.577   0.577
++  DA(01)   BONN   DANNHAUSEN  EPJA11  441(2001)   Chi,M=   0.577   0.577
+     
+    1 PI+N DSG  at   314.20 Mev A(CM)=  102.70
+-  DU(80)P  BONN   E.J.DURWEN, PRP IR-80-7 80      Chi,M=   3.147   3.147
++  DU(80)P  BONN   E.J.DURWEN  PRP IR-80-7 80      Chi,M=   3.147   3.147
+     
+    1 PI+N DSG  at   314.50 Mev A(CM)=   58.50
+-  DU(80)P  BONN   E.J.DURWEN, PRP IR-80-7 80      Chi,M=   0.867   0.867
++  DU(80)P  BONN   E.J.DURWEN  PRP IR-80-7 80      Chi,M=   0.867   0.867
+     
+    1 PI+N DSG  at   315.00 Mev A(CM)=  107.60
+-  FR(63)   BONN   FREITAG, ZP175, 1(63)           Chi,M=   2.680   2.680
+- DELeted from analyses-10/24/06
++  FR(63)   BONN   FREITAG     ZP175   1(63)       Chi,M=   2.680   2.680
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   315.00 Mev A(CM)=  180.00
+-  FU(71)   TOKY   FUJII, PRL26, 1672(71)          Chi,M=   2.168   2.168
++  FU(71)   TOKY   FUJII   PRL26   1672(71)        Chi,M=   2.168   2.168
+     
+    1 PI+N DSG  at   316.00 Mev A(CM)=   87.20
+-  FR(63)   BONN   FREITAG, ZP175, 1(63)           Chi,M=  11.235  11.235
+- DELeted from analyses-10/24/06
++  FR(63)   BONN   FREITAG     ZP175   1(63)       Chi,M=  11.235  11.235
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   316.00 Mev A(CM)=  178.50
+-  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)   Chi,M=   0.050   0.050
++  DA(01)   BONN   DANNHAUSEN  EPJA11  441(2001)   Chi,M=   0.050   0.050
+     
+    1 PI+N DSG  at   316.00 Mev A(CM)=  134.50
+-  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)   Chi,M=   0.530   0.530
++  DA(01)   BONN   DANNHAUSEN  EPJA11  441(2001)   Chi,M=   0.530   0.530
+     
+    1 PI+N DSG  at   317.00 Mev A(CM)=  125.90
+-  FR(63)   BONN   FREITAG, ZP175, 1(63)           Chi,M=   2.372   2.372
+- DELeted from analyses-10/24/06
++  FR(63)   BONN   FREITAG     ZP175   1(63)       Chi,M=   2.372   2.372
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   317.00 Mev A(CM)=   46.20
+-  DU(80)P  BONN   E.J.DURWEN, PRP IR-80-7 80      Chi,M=   1.929   1.929
+- DELeted from analyses-10/07/91
++  DU(80)P  BONN   E.J.DURWEN  PRP IR-80-7 80      Chi,M=   1.929   1.929
++ DELeted from analyses-10/07/9 
+     
+    1 PI+N DSG  at   318.00 Mev A(CM)=  138.70
+-  FR(63)   BONN   FREITAG, ZP175, 1(63)           Chi,M=   3.046   3.046
+- DELeted from analyses-10/24/06
++  FR(63)   BONN   FREITAG     ZP175   1(63)       Chi,M=   3.046   3.046
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   318.00 Mev A(CM)=  165.50
+-  FR(63)   BONN   FREITAG, ZP175, 1(63)           Chi,M=   0.747   0.747
+- DELeted from analyses-10/24/06
++  FR(63)   BONN   FREITAG     ZP175   1(63)       Chi,M=   0.747   0.747
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   318.60 Mev A(CM)=   50.00
+-  AK(71)   LEBE   ALEKSANDROV, SJNP12, 416(71)    Chi,M=  11.887  11.887
++  AK(71)   LEBE   ALEKSANDROV     SJNP12  416(71) Chi,M=  11.887  11.887
+     
+    1 PI+N DSG  at   319.00 Mev A(CM)=  112.50
+-  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)   Chi,M=   2.671   2.671
++  DA(01)   BONN   DANNHAUSEN  EPJA11  441(2001)   Chi,M=   2.671   2.671
+     
+    1 PI+N DSG  at   319.50 Mev A(CM)=  163.40
+-  AK(71)   LEBE   ALEKSANDROV, SJNP12, 416(71)    Chi,M=  12.788  12.788
++  AK(71)   LEBE   ALEKSANDROV     SJNP12  416(71) Chi,M=  12.788  12.788
+     
+    1 PI+N DSG  at   319.50 Mev A(CM)=  172.90
+-  AK(71)   LEBE   ALEKSANDROV, SJNP12, 416(71)    Chi,M=   2.726   2.726
++  AK(71)   LEBE   ALEKSANDROV     SJNP12  416(71) Chi,M=   2.726   2.726
+     
+    1 PI+N DSG  at   319.80 Mev A(CM)=  137.80
+-  AK(71)   LEBE   ALEKSANDROV, SJNP12, 416(71)    Chi,M=   0.833   0.833
++  AK(71)   LEBE   ALEKSANDROV     SJNP12  416(71) Chi,M=   0.833   0.833
+     
+    1 PI+N DSG  at   319.90 Mev A(CM)=  105.80
+-  AK(71)   LEBE   ALEKSANDROV, SJNP12, 416(71)    Chi,M=   3.817   3.817
++  AK(71)   LEBE   ALEKSANDROV     SJNP12  416(71) Chi,M=   3.817   3.817
+     
+    9 PI+N DSG  at   320.00 Mev A(CM)=   30.70 to   150.30
+-  FU(77)   TOKY   FUJII, NPB120, 395(77)          Chi,M=   8.156   0.906
++  FU(77)   TOKY   FUJII   NPB120  395(77)         Chi,M=   8.156   0.906
+  N,NE,Nchi=   1.00  0.070    0.00
+     
+    1 PI+N DSG  at   320.00 Mev A(CM)=   26.80
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   7.156   7.156
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   7.156   7.156
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   320.00 Mev A(CM)=   39.80
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=  23.762  23.762
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=  23.762  23.762
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   320.00 Mev A(CM)=   52.50
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=  21.064  21.064
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=  21.064  21.064
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   320.00 Mev A(CM)=   64.60
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   5.642   5.642
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   5.642   5.642
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   320.00 Mev A(CM)=   76.30
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   2.732   2.732
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   2.732   2.732
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   320.00 Mev A(CM)=   87.30
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   2.180   2.180
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   2.180   2.180
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   320.00 Mev A(CM)=   97.80
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   0.429   0.429
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   0.429   0.429
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   320.00 Mev A(CM)=  126.10
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   5.349   5.349
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   5.349   5.349
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   320.00 Mev A(CM)=  138.70
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   0.041   0.041
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   0.041   0.041
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   320.00 Mev A(CM)=  150.60
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   3.908   3.908
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   3.908   3.908
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   320.00 Mev A(CM)=  158.10
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=   9.006   9.006
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=   9.006   9.006
++ DELeted from analyses-    10/2
+     
+    1 PI+N DSG  at   320.00 Mev A(CM)=  165.50
+-  FR(65)   BONN   FREYTAG, ZP186, 1(65)           Chi,M=  18.076  18.076
+- DELeted from analyses-10/24/06
++  FR(65)   BONN   FREYTAG     ZP186   1(65)       Chi,M=  18.076  18.076
++ DELeted from analyses-    10/2
+     
+   32 PI+N DSG  at   320.00 Mev A(CM)=   15.00 to   180.00
+-  FI(72)   BONN   FISCHER, ZP253, 38(72)          Chi,M=  32.063   1.002
++  FI(72)   BONN   FISCHER     ZP253   38(72)      Chi,M=  32.063   1.002
+  N,NE,Nchi=   0.94  0.060    0.85
+     
+    1 PI+N DSG  at   320.00 Mev A(CM)=  180.00
+-  FU(71)   TOKY   FUJII, PRL26, 1672(71)          Chi,M=   0.013   0.013
++  FU(71)   TOKY   FUJII   PRL26   1672(71)        Chi,M=   0.013   0.013
+     
+   10 PI+N DSG  at   320.00 Mev A(CM)=   15.00 to    70.00
+-  FI(70)   BONN   FISCHER, NPB16, 119(70)         Chi,M=  15.064   1.506
++  FI(70)   BONN   FISCHER     NPB16   119(70)     Chi,M=  15.064   1.506
+  N,NE,Nchi=   0.93  0.050    1.70
+     
+    2 PI+N DSG  at   320.00 Mev A(CM)=   26.80 to    70.50
+-  FA(84)   SACL   FAURE, NPA424, 383(84)          Chi,M=   3.187   1.593
++  FA(84)   SACL   FAURE   NPA424  383(84)         Chi,M=   3.187   1.593
+     
+   10 PI+N DSG  at   320.00 Mev A(CM)=   45.00 to   135.00
+-  BE(00)   MAIN   BECK, PRC61, 034604(2000), PC 0 Chi,M=   5.060   0.506
++  BE(00)   MAIN   BECK    PRC61   034604(2000)    Chi,M=   5.060   0.506
+  N,NE,Nchi=   0.94  0.040    2.53
++ DELeted from analyses- PC 0   
+     
+    1 PI+N DSG  at   320.00 Mev A(CM)=  146.80
+-  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)   Chi,M=   0.239   0.239
+-  PI+N  Data=  238  Chi2=  0.37007E+03
++  DA(01)   BONN   DANNHAUSEN  EPJA11  441(2001)   Chi,M=   0.239   0.239
++  PI+N  Data=  204  Chi2=  0.34350E+03
+ 
+  Summary for all 0* data
+- Total Data=  238 Chi2=    370.07
++ Total Data=  204 Chi2=    343.50
+ 
+ 
+  Data "Flagged" for deletion from analyses-
+-  PI+N  Data=   73  Chi2=  0.38490E+03
++  PI+N  Data=  107  Chi2=  0.41147E+03
+ 
+  Summary for all 0* data
+- Total Data=   73 Chi2=    384.90
++ Total Data=  107 Chi2=    411.47
+  "Scratch" data is: IN   "GO13" will toggle IN/OUT
+  Data file is-prdat.dat                      "GO14" to change
+  "GO50" to "centralize" DB on SAID.PCT
+@@ -572,5 +574,4 @@
+  mparis@gwu.edu or rworkman@gwu.edu
+  Thanks for using SAID
+  The SAID files can be retrieved through MAIL
+- by entering "M". Enter "M" or RETURN(to skip)-> Picture  1 has 2209 plotsteps and 37 "titles"
+- 1 Pictures converted to Post-Script on SAID.PS(U3) 
++ by entering "M". Enter "M" or RETURN(to skip)->
+\ No newline at end of file

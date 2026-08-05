@@ -9,6 +9,8 @@ readonly member_list="${phase1_root}/config/gplot-prsdd-members.txt"
 readonly headless_backend="${phase1_root}/compat/gplot-headless.f"
 readonly gplot_patch="${phase1_root}/patches/gplot-modern-compiler.patch"
 readonly prrdx_patch="${phase1_root}/patches/prrdx-gfortran-blank-a4.patch"
+readonly prrdx_patch_mode="${PRRDX_PATCH_MODE:-apply}"
+readonly prrdx_diagnostic_patch="${PRRDX_DIAGNOSTIC_PATCH:-}"
 readonly saidopen_patch="${phase1_root}/patches/saidopen-portable-data-root.patch"
 readonly cm12_seam_root="${CM12_SEAM_ROOT:-}"
 
@@ -166,8 +168,24 @@ else
         "${source_root}/said/"{ysKCM,mjl2cpw,kos}.f90 \
         "${core_root}/"
 fi
-patch --fuzz=0 -d "${core_root}" -p1 -i "${prrdx_patch}" \
-    >>"${core_log}" 2>&1
+case "${prrdx_patch_mode}" in
+    apply)
+        patch --fuzz=0 -d "${core_root}" -p1 -i "${prrdx_patch}" \
+            >>"${core_log}" 2>&1
+        ;;
+    skip)
+        printf 'Skipped PRRDX compatibility patch for diagnostic build\n' \
+            >>"${core_log}"
+        ;;
+    *)
+        printf 'Unknown PRRDX_PATCH_MODE: %s\n' "${prrdx_patch_mode}" >&2
+        exit 2
+        ;;
+esac
+if [[ -n "${prrdx_diagnostic_patch}" ]]; then
+    patch --fuzz=0 -d "${core_root}" -p1 -i "${prrdx_diagnostic_patch}" \
+        >>"${core_log}" 2>&1
+fi
 if [[ -n "${cm12_seam_root}" ]]; then
     patch \
         --fuzz=0 \
@@ -307,6 +325,8 @@ install -m 755 \
 {
     printf 'source_commit=%s\n' "${commit}"
     printf 'build_variant=%s\n' "${build_variant}"
+    printf 'prrdx_patch_mode=%s\n' "${prrdx_patch_mode}"
+    printf 'prrdx_diagnostic_patch=%s\n' "${prrdx_diagnostic_patch}"
     printf 'build_architecture=%s\n' "$(uname -m)"
     printf 'operating_system=%s\n' "$(. /etc/os-release; printf '%s %s' "${NAME}" "${VERSION_ID}")"
     printf 'gfortran=%s\n' "$(gfortran --version | sed -n '1p')"
@@ -323,6 +343,9 @@ install -m 755 \
     sha256sum "${headless_backend}"
     sha256sum "${gplot_patch}"
     sha256sum "${prrdx_patch}"
+    if [[ -n "${prrdx_diagnostic_patch}" ]]; then
+        sha256sum "${prrdx_diagnostic_patch}"
+    fi
     sha256sum "${saidopen_patch}"
     if [[ -n "${cm12_seam_root}" ]]; then
         sha256sum \

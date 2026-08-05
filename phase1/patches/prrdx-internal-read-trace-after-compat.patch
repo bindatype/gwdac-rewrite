@@ -1,0 +1,28 @@
+--- a/pru.f
++++ b/pru.f
+@@ -4792,7 +4792,7 @@
+       DIMENSION INP(12),DTA(200),NVAR(6),TITL(20)
+       CHARACTER CSTR*80
+ C VAX/IBM/UNIX    NRAW=0(COMPRESSED), 1(RAW) DATA FILES
+-      DATA NRAW/1/
++      DATA NRAW/1/,NTRACE/0/
+       SAVE
+       N=MTRN
+       MTRN=0
+@@ -4838,7 +4838,15 @@
+       ZE=XERR
+ C Keep gfortran from treating an all-blank final A4 as end-of-record.
+       CSTR(57:57)='X'
+-      READ(CSTR,159) INP,MMO,MMY
++      READ(CSTR,159,IOSTAT=IOS) INP,MMO,MMY
++      NTRACE=NTRACE+1
++      WRITE(0,901) NTRACE,IOS,LEN(CSTR),LEN_TRIM(CSTR)
++  901 FORMAT('PRRDX_READ_STATUS ',4(I12,1X))
++      IF(NTRACE.EQ.1.OR.IOS.NE.0)
++     C WRITE(0,902) NTRACE,(ICHAR(CSTR(I:I)),I=1,80)
++  902 FORMAT('PRRDX_CSTR_BYTES ',I12,1X,80(I3,1X))
++      WRITE(0,903) NTRACE,(INP(I),I=1,12),MMO,MMY
++  903 FORMAT('PRRDX_READ_VALUES ',15(I12,1X))
+    98 IF(M.NE.0) MTRN=10
+       NINX=NIN0
+    99 RETURN

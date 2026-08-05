@@ -1,0 +1,256 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}/prsdd-go5-diagnostic"
+readonly fixture_root="${phase1_root}/fixtures/prsdd-go5-diagnostic"
+readonly accepted_state_root="${PHASE1_STATE_ROOT:-/workspace/phase1/reproducible}"
+readonly diagnostic_state_root="${PRSD_GO5_STATE_ROOT:-/workspace/phase1/prsdd-go5-diagnostic}"
+readonly reuse_builds="${REUSE_DIAGNOSTIC_BUILDS:-no}"
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-120}"
+readonly commit="$(git -C "${source_root}" rev-parse HEAD)"
+readonly short_commit="$(git -C "${source_root}" rev-parse --short=12 HEAD)"
+readonly data_root="${source_root}/sdat"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly accepted_binary="${accepted_state_root}/artifacts/${short_commit}/prsdd-headless"
+readonly patched_state_root="${diagnostic_state_root}/patched"
+readonly unpatched_state_root="${diagnostic_state_root}/unpatched"
+readonly patched_traced_state_root="${diagnostic_state_root}/patched-traced"
+readonly unpatched_traced_state_root="${diagnostic_state_root}/unpatched-traced"
+readonly patched_binary="${patched_state_root}/artifacts/${short_commit}/prsdd-headless"
+readonly unpatched_binary="${unpatched_state_root}/artifacts/${short_commit}/prsdd-headless"
+readonly patched_traced_binary="${patched_traced_state_root}/artifacts/${short_commit}/prsdd-headless"
+readonly unpatched_traced_binary="${unpatched_traced_state_root}/artifacts/${short_commit}/prsdd-headless"
+readonly priming_fixture="${fixture_root}/go3pr2-priming.in"
+readonly database_fixture="${fixture_root}/go5pr-database-list.in"
+readonly unpatched_trace_patch="${phase1_root}/patches/prrdx-internal-read-trace.patch"
+readonly patched_trace_patch="${phase1_root}/patches/prrdx-internal-read-trace-after-compat.patch"
+readonly results="${report_root}/results.tsv"
+
+test -x "${accepted_binary}"
+test -f "${priming_fixture}"
+test -f "${database_fixture}"
+test -f "${unpatched_trace_patch}"
+test -f "${patched_trace_patch}"
+test -d "${data_root}"
+test -d "${kcm_root}"
+mkdir -p "${report_root}" "${diagnostic_state_root}/runs"
+
+cmp "${priming_fixture}" \
+    "${phase1_root}/fixtures/go3pr2-production-adapter/live.in"
+diff -u "${priming_fixture}" "${database_fixture}" \
+    >"${report_root}/deck-comparison.diff" || true
+
+build_variant() {
+    local label="$1"
+    local mode="$2"
+    local diagnostic_patch="$3"
+    local state_root="$4"
+    local binary="${state_root}/artifacts/${short_commit}/prsdd-headless"
+
+    if [[ "${reuse_builds}" == yes && -x "${binary}" ]]; then
+        return
+    fi
+    PRRDX_PATCH_MODE="${mode}" \
+    PRRDX_DIAGNOSTIC_PATCH="${diagnostic_patch}" \
+    PHASE1_STATE_ROOT="${state_root}" \
+    PHASE1_REPORT_ROOT="${report_root}/build-${label}" \
+        "${phase1_root}/scripts/build-prsdd"
+}
+
+build_variant patched apply "" "${patched_state_root}"
+build_variant unpatched skip "" "${unpatched_state_root}"
+build_variant patched-traced apply "${patched_trace_patch}" "${patched_traced_state_root}"
+build_variant unpatched-traced skip "${unpatched_trace_patch}" "${unpatched_traced_state_root}"
+
+printf 'case\tbinary_variant\tfixture\tbinary_sha256\tfixture_sha256\texit_status\tthanks_marker\tdata_headers\ttotal_data\tobs_90\tstderr_lines\tprrdx_fatal\ttrace_status\n' \
+    >"${results}"
+
+run_case() {
+    local case_name="$1"
+    local variant="$2"
+    local binary="$3"
+    local fixture="$4"
+    local prefix="${report_root}/${case_name}"
+    local run_root
+    local status
+    local thanks_marker=no
+    local prrdx_fatal=no
+    local trace_status="not_traced"
+    local total_data=""
+    local obs_90=""
+
+    test -x "${binary}"
+    run_root="$(mktemp -d "${diagnostic_state_root}/runs/${case_name}.XXXXXX")"
+    cp -a "${source_root}/pr" "${run_root}/pr"
+    rm -f \
+        "${run_root}/pr/SAID.TMP" \
+        "${run_root}/pr/SAID.PCT" \
+        "${run_root}/pr/SAID.LOG" \
+        "${run_root}/pr/SAID.PS" \
+        "${run_root}/pr/fort.3" \
+        "${run_root}/pr/fort.7"
+    ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+    ln -s "${data_root}" "${run_root}/sdat"
+
+    set +e
+    (
+        cd "${run_root}/pr"
+        timeout "${timeout_seconds}" \
+            env SAID_DATA_ROOT="${data_root}" \
+            "${binary}" \
+            <"${fixture}" \
+            >"${prefix}.stdout" \
+            2>"${prefix}.stderr"
+    )
+    status=$?
+    set -e
+    printf '%s\n' "${status}" >"${prefix}.exit"
+
+    if grep -Fq 'Thanks for using SAID' "${prefix}.stdout"; then
+        thanks_marker=yes
+    fi
+    if grep -Eq 'End of record|End of file' "${prefix}.stderr" \
+        && grep -Fq 'pru.f' "${prefix}.stderr"; then
+        prrdx_fatal=yes
+    fi
+    if grep -Fq 'PRRDX_READ_STATUS' "${prefix}.stderr"; then
+        trace_status="$(awk '/PRRDX_READ_STATUS/ { print $3; exit }' "${prefix}.stderr")"
+    fi
+    total_data="$(awk '/Total Data=/ { for (i=1;i<=NF;i++) if ($i == "Data=") { print $(i+1); exit } }' "${prefix}.stdout")"
+    obs_90="$(awk '
+        /WEB/ { section++ }
+        section == 3 && $1 == "90.000" && NF == 5 { print $2; exit }
+    ' "${prefix}.stdout")"
+
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+        "${case_name}" \
+        "${variant}" \
+        "$(basename "${fixture}")" \
+        "$(sha256sum "${binary}" | awk '{ print $1 }')" \
+        "$(sha256sum "${fixture}" | awk '{ print $1 }')" \
+        "${status}" \
+        "${thanks_marker}" \
+        "$(grep -c '^ E=' "${prefix}.stdout" || true)" \
+        "${total_data}" \
+        "${obs_90}" \
+        "$(wc -l <"${prefix}.stderr")" \
+        "${prrdx_fatal}" \
+        "${trace_status}" \
+        >>"${results}"
+}
+
+run_case accepted-priming accepted-patched "${accepted_binary}" "${priming_fixture}"
+run_case accepted-database accepted-patched "${accepted_binary}" "${database_fixture}"
+run_case fresh-patched-database fresh-patched "${patched_binary}" "${database_fixture}"
+run_case unpatched-database-1 unpatched "${unpatched_binary}" "${database_fixture}"
+run_case unpatched-database-2 unpatched "${unpatched_binary}" "${database_fixture}"
+run_case patched-traced-database patched-traced "${patched_traced_binary}" "${database_fixture}"
+run_case unpatched-traced-database unpatched-traced "${unpatched_traced_binary}" "${database_fixture}"
+
+awk '/PRRDX_CSTR_BYTES/ { print; exit }' \
+    "${report_root}/unpatched-traced-database.stderr" \
+    >"${report_root}/first-unpatched-cstr-bytes.txt"
+grep -F 'PRRDX_READ_STATUS' \
+    "${report_root}/patched-traced-database.stderr" \
+    >"${report_root}/patched-read-status.txt"
+grep -F 'PRRDX_READ_STATUS' \
+    "${report_root}/unpatched-traced-database.stderr" \
+    >"${report_root}/unpatched-read-status.txt"
+grep -F 'PRRDX_READ_VALUES' \
+    "${report_root}/patched-traced-database.stderr" \
+    >"${report_root}/patched-read-values.txt"
+grep -F 'PRRDX_READ_VALUES' \
+    "${report_root}/unpatched-traced-database.stderr" \
+    >"${report_root}/unpatched-read-values.txt"
+diff -u \
+    "${report_root}/patched-read-values.txt" \
+    "${report_root}/unpatched-read-values.txt" \
+    | sed -n '1,120p' \
+    >"${report_root}/read-values.diff" || true
+awk '
+    NR == FNR {
+        for (i=3; i<=16; i++) patched[$2,i]=$i
+        next
+    }
+    {
+        read_diff=0
+        for (i=3; i<=16; i++) {
+            if ($i != patched[$2,i]) {
+                fields++
+                read_diff=1
+                if (!first) {
+                    first=1
+                    first_record=$2
+                    first_column=i
+                    first_patched=patched[$2,i]
+                    first_unpatched=$i
+                }
+            }
+        }
+        if (read_diff) reads++
+    }
+    END {
+        if (first_column <= 14) {
+            field="INP(" first_column-2 ")"
+        } else if (first_column == 15) {
+            field="MMO"
+        } else {
+            field="MMY"
+        }
+        print "metric\tvalue"
+        print "total_reads\t" FNR
+        print "divergent_reads\t" reads
+        print "divergent_fields\t" fields
+        print "first_record\t" first_record
+        print "first_field\t" field
+        print "first_patched_integer\t" first_patched
+        print "first_unpatched_integer\t" first_unpatched
+    }
+' \
+    "${report_root}/patched-read-values.txt" \
+    "${report_root}/unpatched-read-values.txt" \
+    >"${report_root}/read-value-summary.tsv"
+
+test "$(awk -F '\t' '$1 == "accepted-priming" { print $6 }' "${results}")" -eq 0
+test "$(awk -F '\t' '$1 == "accepted-priming" { print $7 }' "${results}")" = yes
+test "$(awk -F '\t' '$1 == "accepted-priming" { print $10 }' "${results}")" = 0.2098E+01
+test "$(awk -F '\t' '$1 == "accepted-database" { print $6 }' "${results}")" -eq 0
+test "$(awk -F '\t' '$1 == "accepted-database" { print $7 }' "${results}")" = yes
+test "$(awk -F '\t' '$1 == "accepted-database" { print $9 }' "${results}")" -gt 0
+test "$(sha256sum "${accepted_binary}" | awk '{ print $1 }')" = \
+    "$(sha256sum "${patched_binary}" | awk '{ print $1 }')"
+cmp "${report_root}/accepted-database.stdout" \
+    "${report_root}/fresh-patched-database.stdout"
+cmp "${report_root}/unpatched-database-1.stdout" \
+    "${report_root}/unpatched-database-2.stdout"
+test "$(awk -F '\t' '$1 == "unpatched-database-1" { print $6 }' "${results}")" -eq 0
+test "$(awk -F '\t' '$1 == "patched-traced-database" { print $6 }' "${results}")" -eq 0
+test "$(awk -F '\t' '$1 == "unpatched-traced-database" { print $6 }' "${results}")" -eq 0
+test -s "${report_root}/patched-read-status.txt"
+test -s "${report_root}/unpatched-read-status.txt"
+test -s "${report_root}/patched-read-values.txt"
+test -s "${report_root}/unpatched-read-values.txt"
+test "$(awk -F '\t' '$1 == "first_field" { print $2 }' "${report_root}/read-value-summary.tsv")" = MMO
+
+{
+    printf 'source_commit=%s\n' "${commit}"
+    printf 'compiler=%s\n' "$(gfortran --version | sed -n '1p')"
+    printf 'operating_system=%s\n' "$(. /etc/os-release; printf '%s %s' "${NAME}" "${VERSION_ID}")"
+    printf 'accepted_prrdx_patch_sha256=%s\n' "$(sha256sum "${phase1_root}/patches/prrdx-gfortran-blank-a4.patch" | awk '{ print $1 }')"
+    printf 'unpatched_trace_patch_sha256=%s\n' "$(sha256sum "${unpatched_trace_patch}" | awk '{ print $1 }')"
+    printf 'patched_trace_patch_sha256=%s\n' "$(sha256sum "${patched_trace_patch}" | awk '{ print $1 }')"
+    printf 'pru_sha256=%s\n' "$(sha256sum "${source_root}/said/pru.f" | awk '{ print $1 }')"
+    printf 'pnu_sha256=%s\n' "$(sha256sum "${source_root}/said/pnu.f" | awk '{ print $1 }')"
+} >"${report_root}/environment.txt"
+
+(
+    cd "${report_root}"
+    find . -type f ! -name manifest.sha256 -print0 \
+        | sort -z \
+        | xargs -0 sha256sum \
+        | sed 's#  \./#  #'
+) >"${report_root}/manifest.sha256"
+
+cat "${results}"
