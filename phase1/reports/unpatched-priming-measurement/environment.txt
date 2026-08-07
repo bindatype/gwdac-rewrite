@@ -1,0 +1,6 @@
+source_commit=f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+binary_sha256=39323448ef9315c157895910d5c1cd7e69586f7b18e932432d90fd52c1fdd715
+fixture_sha256=22c693d850379b63804ff693e4cb5d716d5173a49b73a6813d654f56cc7db3d7
+accepted_stdout_sha256=0f98981bc8ed63fc568a2d567103818a9cbf7aa2a87f4619a9fdc572948c550e
+compiler=GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+operating_system=Ubuntu 24.04

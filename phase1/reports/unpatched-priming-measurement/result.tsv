@@ -1,0 +1,6 @@
+metric	value
+engine_exit_status	2
+thanks_marker	no
+prrdx_eof	yes
+witness_row_survives	yes
+compatibility_gate	fail

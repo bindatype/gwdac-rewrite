@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}/unpatched-priming-measurement"
+readonly state_root="${PRSD_GO5_STATE_ROOT:-/workspace/phase1/prsdd-go5-diagnostic}"
+readonly fixture="${phase1_root}/fixtures/prsdd-go5-diagnostic/go3pr2-priming.in"
+readonly accepted_stdout="${phase1_root}/reports/prsdd-go5-diagnostic/accepted-priming.stdout"
+readonly short_commit="$(git -C "${source_root}" rev-parse --short=12 HEAD)"
+readonly binary="${state_root}/unpatched/artifacts/${short_commit}/prsdd-headless"
+readonly data_root="${source_root}/sdat"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-120}"
+readonly reuse_capture="${REUSE_CAPTURE:-no}"
+
+test -x "${binary}"
+test -f "${fixture}"
+test -f "${accepted_stdout}"
+test -d "${data_root}"
+test -d "${kcm_root}"
+
+mkdir -p "${report_root}" "${state_root}/runs"
+if [[ "${reuse_capture}" == yes ]]; then
+    test -f "${report_root}/unpatched-priming.stdout"
+    test -f "${report_root}/unpatched-priming.stderr"
+    test -f "${report_root}/unpatched-priming.exit"
+    status="$(cat "${report_root}/unpatched-priming.exit")"
+else
+    run_root="$(mktemp -d "${state_root}/runs/unpatched-priming.XXXXXX")"
+    cp -a "${source_root}/pr" "${run_root}/pr"
+    rm -f \
+        "${run_root}/pr/SAID.TMP" \
+        "${run_root}/pr/SAID.PCT" \
+        "${run_root}/pr/SAID.LOG" \
+        "${run_root}/pr/SAID.PS" \
+        "${run_root}/pr/fort.3" \
+        "${run_root}/pr/fort.7"
+    ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+    ln -s "${data_root}" "${run_root}/sdat"
+
+    set +e
+    (
+        cd "${run_root}/pr"
+        timeout "${timeout_seconds}" \
+            env SAID_DATA_ROOT="${data_root}" \
+            "${binary}" \
+            <"${fixture}" \
+            >"${report_root}/unpatched-priming.stdout" \
+            2>"${report_root}/unpatched-priming.stderr"
+    )
+    status=$?
+    set -e
+    printf '%s\n' "${status}" >"${report_root}/unpatched-priming.exit"
+fi
+
+awk '
+    /WEB/ { section++ }
+    section == 3 && $1 == "90.000" && NF == 5 { print $0; exit }
+' "${accepted_stdout}" >"${report_root}/patched-row.txt"
+awk '
+    /WEB/ { section++ }
+    section == 3 && $1 == "90.000" && NF == 5 { print $0; exit }
+' "${report_root}/unpatched-priming.stdout" >"${report_root}/unpatched-row.txt"
+awk '/Total Data=/ { print $0; exit }' \
+    "${accepted_stdout}" >"${report_root}/patched-total-chi2.txt"
+awk '/Total Data=/ { print $0; exit }' \
+    "${report_root}/unpatched-priming.stdout" >"${report_root}/unpatched-total-chi2.txt"
+
+test -s "${report_root}/patched-row.txt"
+test -s "${report_root}/unpatched-row.txt"
+test -s "${report_root}/patched-total-chi2.txt"
+test -s "${report_root}/unpatched-total-chi2.txt"
+
+if cmp -s "${report_root}/patched-row.txt" "${report_root}/unpatched-row.txt"; then
+    verdict=yes
+else
+    verdict=no
+fi
+printf '%s\n' "${verdict}" >"${report_root}/witness-row-survives.txt"
+
+thanks_marker=no
+if grep -Fq 'Thanks for using SAID' "${report_root}/unpatched-priming.stdout"; then
+    thanks_marker=yes
+fi
+prrdx_eof=no
+if grep -Fq 'At line 4839 of file pru.f' "${report_root}/unpatched-priming.stderr" \
+    && grep -Fq 'Fortran runtime error: End of file' "${report_root}/unpatched-priming.stderr"; then
+    prrdx_eof=yes
+fi
+{
+    printf 'metric\tvalue\n'
+    printf 'engine_exit_status\t%s\n' "${status}"
+    printf 'thanks_marker\t%s\n' "${thanks_marker}"
+    printf 'prrdx_eof\t%s\n' "${prrdx_eof}"
+    printf 'witness_row_survives\t%s\n' "${verdict}"
+    printf 'compatibility_gate\tfail\n'
+} >"${report_root}/result.tsv"
+
+test "${status}" -eq 2
+test "${thanks_marker}" = no
+test "${prrdx_eof}" = yes
+test "${verdict}" = yes
+
+{
+    printf 'source_commit=%s\n' "$(git -C "${source_root}" rev-parse HEAD)"
+    printf 'binary_sha256=%s\n' "$(sha256sum "${binary}" | awk '{ print $1 }')"
+    printf 'fixture_sha256=%s\n' "$(sha256sum "${fixture}" | awk '{ print $1 }')"
+    printf 'accepted_stdout_sha256=%s\n' "$(sha256sum "${accepted_stdout}" | awk '{ print $1 }')"
+    printf 'compiler=%s\n' "$(gfortran --version | sed -n '1p')"
+    printf 'operating_system=%s\n' "$(. /etc/os-release; printf '%s %s' "${NAME}" "${VERSION_ID}")"
+} >"${report_root}/environment.txt"
+
+(
+    cd "${report_root}"
+    find . -type f ! -name manifest.sha256 -print0 \
+        | sort -z \
+        | xargs -0 sha256sum \
+        | sed 's#  \./#  #'
+) >"${report_root}/manifest.sha256"
+
+printf 'patched row:   %s\n' "$(cat "${report_root}/patched-row.txt")"
+printf 'unpatched row: %s\n' "$(cat "${report_root}/unpatched-row.txt")"
+printf 'patched GO5:   %s\n' "$(cat "${report_root}/patched-total-chi2.txt")"
+printf 'unpatched GO5: %s\n' "$(cat "${report_root}/unpatched-total-chi2.txt")"
+printf 'witness row survives: %s\n' "${verdict}"
+printf 'unpatched engine exit: %s (PRRDX EOF: %s)\n' "${status}" "${prrdx_eof}"
+printf 'compatibility gate: FAIL\n'
