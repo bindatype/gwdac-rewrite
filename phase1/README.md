@@ -129,6 +129,14 @@ and `0.2036E+01` remain a separate engine-level contract. The registration is
 a compatibility decision, not scientific approval or an implementation,
 fixture, tolerance, or Phase 2 contract change.
 
+`reports/unpatched-priming-measurement/README.md` records the bounded removal
+measurement for the `PRRDX` blank-A4 compatibility patch. The unpatched binary
+prints the exact accepted five-column `0.2098E+01` witness row and exact GO5
+`Total Data=1533 Chi2=5563.03` summary, then aborts at `pru.f:4839` with an
+end-of-file error and exit status 2 instead of completing normally. Evidence
+reproduction passes, but the absolute compatibility gate fails. No patch,
+fixture, legacy source, or production system was changed.
+
 `reports/live-production-capture/README.md` records the path-allowlisted,
 one-way production capture. All 542 files and 34,218,873 bytes match the
 independently generated production SHA-256 manifest. Captured binaries and
