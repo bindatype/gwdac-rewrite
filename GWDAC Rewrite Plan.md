@@ -2,7 +2,7 @@
 ace: effort
 status: active
 created: 2026-07-29
-updated: 2026-07-29
+updated: 2026-08-12
 tags:
   - gwdac
   - said
@@ -34,6 +34,16 @@ Treat this as a source-recovery, behavior-characterization, and incremental rewr
 7. Select the target language with an architecture decision record.
 8. Replace workflows vertically, keeping every completed slice runnable and testable.
 
+Program boundary recorded 2026-08-08:
+
+- The current finish line is a reproducible modern Ubuntu compatibility
+  container that runs retained SAID workflows without `g77`, `libg2c`, or the
+  obsolete production operating system and reproduces documented website
+  behavior.
+- Executive-decision items 6-8 remain the longer-term rewrite roadmap, but
+  Phases 3-6 are deferred pending an explicit decision after the compatibility
+  container is reviewed. They are not prerequisites for the intermediate win.
+
 The first reference-build slice is `prsdd`, which the GWDAC
 pion-photoproduction CGI wrappers invoke. The first rewrite slice is one narrow,
 non-plotting `prsd` observable path driven by committed `go3pr` command decks.
@@ -64,7 +74,8 @@ Audited checkout: `aacdf97` on `master`
 Computational repository: [bindatype/arndt64](https://github.com/bindatype/arndt64)  
 Audited checkout: `f6c81d0` on `master`
 
-Both repositories are private and have no declared license.
+Both repositories are private. Licensing is not treated as a blocker under the
+owner's current project direction.
 
 System provenance: these repositories are a historical check-in of the code and web assets behind [said.arc.gwu.edu](https://said.arc.gwu.edu/), the GWU SAID partial-wave analysis service.
 
@@ -102,7 +113,8 @@ Important technical findings:
 - Several CGI scripts construct shell variables with `eval`, interpolate untrusted query values, write shared filenames, and run commands directly. The legacy application must never be exposed on a network during recovery.
 - `JPAC.html` and `jpac.html` collide on case-insensitive filesystems.
 - `arndt64` has three more case-collision pairs: `pn/GO08.DAT` and `pn/go08.dat`, `pr/DU06X.DAT` and `pr/du06x.dat`, and `sim/SAID.PCT` and `sim/said.pct`.
-- No license file is present. Ownership and redistribution terms must be resolved before a public release.
+- The recovery environment remains private and offline. Publication and
+  redistribution policy are outside the current compatibility milestone.
 
 ## Recovered Product Shape
 
@@ -441,49 +453,30 @@ Progress recorded 2026-07-29:
   routines. Valid retained requests use the new typed seams, and both full
   corpora remain byte-identical at displayed precision.
 
-PRBAS orchestration regression-gate result, 2026-07-29:
+PRBAS orchestration diagnostic chronology, 2026-07-29 through 2026-08-03:
 
-- The user authorized only pure single-request orchestration to replace
-  `PRBAS` and a written decision on whether or when to port the frozen
-  background formulas. All other workflow and language-selection work
-  remained out of scope.
-- **Reference evidence:** an experimental compiler-enforced pure
-  `cm12_evaluate_request` operation accepted explicit solution, dataset,
-  request, and prepared-background values. Its direct probe completed one
-  finite request for each pion channel, evaluated 34 CM12 `1xx` multipoles per
-  request, reproduced an exact A-B-A request result, and returned typed errors
-  for an invalid angle and a below-threshold request.
-- **Oracle/corroborated-reference gate:** the compatibility build completed
-  both corpus runners, but its typed result files failed exact comparison
-  against the already-correlated modern, checked-in arndt64, and checked-in
-  GWDAC results. Nine of 11 DSG fixture files differed and 12 of 13
-  choice-1 amplitude fixture files differed. Only the dense-grid and
-  below-threshold DSG fixtures and the maximum-grid amplitude fixture remained
-  exact.
-- The mismatch is material, not a display-rounding edge. At
-  `Elab=1000 MeV`, `Acm=90 degrees`, pion-plus DSG changed from the gated
-  `2.036` to `6.593`. The associated choice-1 amplitude components also
-  changed substantially.
-- **Inferred, not yet proven:** treating the 34 CM12 `1xx` selectors plus
-  explicit OPEC/HOPEC values as the complete retained amplitude is
-  insufficient. The immutable solution contains 60 active forms, so the 26
-  non-`1xx` forms require explicit behavioral accounting. The experiment also
-  accumulated in a different loop order than frozen `PRBAS`; legacy
-  `family -> branch -> orbital_l` order must be preserved until exact parity
-  proves reordering safe.
-- The experimental request module, compatibility adapter, and generated
-  failed seam outputs are diagnostic evidence only. They are not an accepted
-  Phase 2 slice and must not be used as an oracle or described as a completed
-  `PRBAS` replacement.
-- Work stopped at the absolute regression gate. No tolerance, fixture, oracle,
-  frozen-source comment, or warning-driven source fix was changed. The
-  requested CI entry point, background-formula porting decision, and accepted
-  seam-validation report were not completed after the mismatch.
-- The next bounded investigation, if explicitly authorized, is to contract
-  the 26 non-`1xx` active-form contributions and reproduce frozen
-  `family -> branch -> orbital_l` sequencing before attempting another
-  request-orchestration gate. Formula porting remains undecided and must not
-  begin as a side effect of that investigation.
+- The first compiler-enforced pure request candidate evaluated only 34 CM12
+  `1xx` multipoles. It failed 21 of 24 corpus fixtures, including a focused
+  pion-plus DSG change from the displayed oracle `2.036` to `6.593`.
+- A frozen-order attribution then accounted for all 40 forms applicable to that
+  pion-plus request. Every per-form delta, the final amplitudes, and the exact
+  frozen replay DSG `2.03560233` matched; the public oracle token remains
+  `0.2036E+01` at displayed precision.
+- Extending the experimental candidate to those 40 forms did not close the
+  gate. Its focused DSG was `2.69659853`, 32.47% above the exact frozen replay,
+  and none of the 18 non-`1xx` multipoles matched.
+- The forced-legacy trace found the first meaningful divergence in hadronic
+  dispatch. After one no-dispatch row caused by the frozen zero-energy reset,
+  rows 2-18 selected `PNTEST` branch 7; the candidate directly selected
+  `PNSM05` branch 10. `PNMOD` and `ADDRESK` were no-ops for those rows.
+- A 468-row dispatch survey observed 10 no-dispatch rows and 458 `PNTEST` rows,
+  with zero `PNSM05` selections. Saved title state and the legacy energy dither
+  remain hidden orchestration boundaries.
+- These candidates and diagnostics are captured/reference evidence only. They
+  are not an accepted `PRBAS` replacement and do not alter the absolute 138-DSG
+  and 150-amplitude oracle gate.
+- Formula porting remains undecided. No formula, orchestration, fixture,
+  tolerance, warning-driven source fix, or frozen Fortran comment was changed.
 
 ### Phase 3: Select the Target Language
 
@@ -790,7 +783,6 @@ Week 3:
 
 - Which workflow families are still scientifically or operationally required?
 - Who can approve numerical tolerances and domain terminology?
-- Is a public release intended, and who owns the historical code and data?
 - Which of the multiple `arndt64` source and binary variants represents the last trusted production behavior?
 - Are publications or independent implementations available to corroborate recovered workflows?
 - What deployment form is required: public web service, internal service, CLI, library, or a combination?
@@ -800,28 +792,44 @@ None of these decisions blocks `ARCH-001`.
 ## Current Status
 
 Status: Phase 0 preservation and retained-scope Phase 1 are complete. Accepted
-Phase 2 work includes contracts, shared-state mapping, immutable CM12
-solution/dataset loading, scalar multipole evaluation, explicit background
-isolation, pure amplitude accumulation, and pure DSG calculation. Physics
-review remains pending.
+Phase 2 work includes contracts, shared-state mapping, immutable CM12 solution
+and dataset loading, scalar multipole evaluation, explicit background
+isolation, pure amplitude accumulation, and pure DSG calculation. The modern
+reference and both historical executables agree on 138 typed DSG records and
+150 typed choice-1 amplitude records. Physics review remains pending.
 
-The modern reference and both historical executables agree on 138 typed DSG
-records and 150 typed choice-1 amplitude records. Direct evidence adds 42
-synthetic zero-Born scalar cases, 42 actual-solution nonzero-Born scalar
-cases, six unrounded `PRDA` cases, and three pure DSG contract cases.
+Legacy `PRBAS` still owns command grids, request sequencing, title-dependent
+hadronic dispatch, and saved-state behavior. The pure request candidates remain
+failed diagnostics, not accepted replacements. The explicit background seam
+still invokes frozen formula routines internally, and the formula-porting
+decision remains open.
 
-The accepted pure boundary still stops before request orchestration. A
-2026-07-29 attempt to replace `PRBAS` passed its direct reference probe but
-failed the absolute corpus gate: 9/11 DSG fixture files and 12/13 amplitude
-fixture files differed from the frozen three-engine result. The attempt is
-diagnostic, not accepted. Legacy `PRBAS` therefore still owns command grids
-and sequencing in the gated build, and the explicit background seam still
-invokes frozen legacy formula routines internally.
+Read-only production inventory established that the public CM12 `prsdd` binary,
+its nine build sources, all 18 KCM files, and the first CM12 solution record are
+byte-identical to the archive. The deployed adapter and surrounding
+`prsol.dat` are newer state. Offline replay proves that the adapter's `GO5`
+priming changes the later pion-plus DSG token from `0.2036E+01` to
+`0.2098E+01` on all three accepted executables, matching the captured website.
+That history dependence is registered as `SAID-DEFECT-001`, preserved for
+compatibility, and not scientifically endorsed.
 
-The background-formula porting decision remains open because the regression
-gate stopped the authorized session before that decision could be supported
-and recorded. Phase 3 and further vertical slices have not started.
+The modern blank-A4 patch remains an accepted compatibility mitigation, not a
+general fidelity correction. It changes the isolated GO5 database selection
+from the historical/unpatched 238 records to 204. In the retained priming deck,
+the unpatched executable still prints the exact witness row and exact
+` Total Data= 1533 Chi2=   5563.03` summary but then aborts in `PRRDX` with
+exit status 2; the patched build exits 0. Patch disposition requires a separate
+fixture-backed decision.
 
-**STOPPED AT REGRESSION GATE: wait for explicit user direction before
-investigating the 26 non-`1xx` forms, changing orchestration, deciding formula
-porting, or starting Phase 3.**
+The Legacy Runtime Refresh preflight found complete source/data closures for
+six remaining engines. `pnsd` builds reproducibly on Ubuntu 24.04 with GNU
+Fortran 13.3.0 and matches seven displayed SP06 DSG rows, then fails on a
+post-table `PNRDX` formatted read. Per the early-stop rule, that gate is blocked
+and the other five engines have not started.
+
+The current program finish line is the modern Ubuntu compatibility container.
+Phases 3-6 are deferred pending explicit direction. The private GitHub remote
+holds the stable reconstructed baseline on `main` and current evidence on
+`dev`. After this documentation/security checkpoint is reviewed, the next code
+slice is a reviewer harness with read-only verification, disposable
+reproduction, deterministic labels/build paths, and unambiguous exit semantics.

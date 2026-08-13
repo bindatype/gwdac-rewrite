@@ -96,10 +96,21 @@ dedicated work volume and report mount.
   target, frozen `PNPWI` skips dispatch once and then selects `PNTEST`, while
   the candidate directly calls `PNSM05`. `PNMOD` and `ADDRESK` are no-ops for
   all 18 retained non-`1xx` rows.
+- The 468-row dispatch survey records 10 no-dispatch rows and 458 `PNTEST`
+  selections, with no `PNSM05` selections. Saved title state and legacy energy
+  dither remain explicit hidden-state boundaries; no orchestration change was
+  accepted.
+
+The current program finish line is a modern Ubuntu compatibility container.
+Phase 3 language selection and later rewrite phases are deferred pending an
+explicit program decision. After the documentation/security checkpoint is
+reviewed, the next code slice is the reviewer harness, not another PRBAS
+candidate: read-only evidence verification, disposable reproduction,
+deterministic labels/build paths, and unambiguous exit semantics.
 
 ## Pause gate
 
-The focused hadronic-pipeline diagnostic is complete. Do not modify the
-candidate, title dispatch, saved-state sequencing, orchestration, formulas,
-fixtures, tolerances, or begin Phase 3 until the user sends a new explicit
-direction.
+The focused hadronic-pipeline diagnostic is complete. A general `RESUME` does
+not modify the candidate, title dispatch, saved-state sequencing,
+orchestration, formulas, fixtures, tolerances, or start Phase 3. Each such
+change requires its own explicit scope.

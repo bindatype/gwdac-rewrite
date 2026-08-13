@@ -132,10 +132,15 @@ fixture, tolerance, or Phase 2 contract change.
 `reports/unpatched-priming-measurement/README.md` records the bounded removal
 measurement for the `PRRDX` blank-A4 compatibility patch. The unpatched binary
 prints the exact accepted five-column `0.2098E+01` witness row and exact GO5
-`Total Data=1533 Chi2=5563.03` summary, then aborts at `pru.f:4839` with an
-end-of-file error and exit status 2 instead of completing normally. Evidence
-reproduction passes, but the absolute compatibility gate fails. No patch,
-fixture, legacy source, or production system was changed.
+` Total Data= 1533 Chi2=   5563.03` summary, then aborts at `pru.f:4839` with
+an end-of-file error and exit status 2 instead of completing normally. The
+accepted patched build exits 0. The patch is therefore not load-bearing for the
+displayed witness but is load-bearing for clean completion of this retained
+deck. Separately, the isolated GO5 database diagnostic shows that the patch
+changes historical data selection from 238 records to 204. It remains an
+accepted compatibility mitigation with a known fidelity cost, not a general
+GO5 correction. No patch, fixture, legacy source, or production system was
+changed by either measurement.
 
 `reports/live-production-capture/README.md` records the path-allowlisted,
 one-way production capture. All 542 files and 34,218,873 bytes match the
