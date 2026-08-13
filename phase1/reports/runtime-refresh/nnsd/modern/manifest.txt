@@ -1,0 +1,34 @@
+evidence_label=reference
+role=modern_runtime_smoke
+engine=nnsd
+source_commit=f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+binary_sha256=7ca0035e4e78fbb0042805892838fcf0208c0b4abc77e100f24083141242e7c9
+trace_source_sha256=b4b5dc6bba40a898a06c47f9f4fab97032868618ca6ec861dbcf8c0ab73b8021
+trace_library_sha256=29f2b36b7e5e19c8ba90342c05081c8306145e14dfc57ec1b1868229b6083496
+input_kind=archived_deck
+input_sha256=f6a5fb975e4cce352e1352bf2a4f7ceedd21b77c5bc132929e1f3d609cff194f
+transcript_relation=plausible_pair
+transcript_exact=no
+exit_status=0
+timed_out=no
+normal_exit=yes
+stdout_bytes=8439
+stderr_bytes=0
+opened_file_paths=14
+historical_stdout_exact=yes
+needed=libgfortran.so.5
+needed=libm.so.6
+needed=libX11.so.6
+needed=libgd.so.3
+needed=libgcc_s.so.1
+needed=libc.so.6
+7ca0035e4e78fbb0042805892838fcf0208c0b4abc77e100f24083141242e7c9  /workspace/phase1/runtime-refresh/nnsd/artifacts/f6c81d01a1fe/nnsd
+f6a5fb975e4cce352e1352bf2a4f7ceedd21b77c5bc132929e1f3d609cff194f  /phase1/reports/runtime-refresh/nnsd/modern/input.txt
+5b94d421759de07f6731b72af706dddb833f7a1281e4af8ad3798fe6eb18455d  /phase1/reports/runtime-refresh/nnsd/modern/stdout.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /phase1/reports/runtime-refresh/nnsd/modern/stderr.txt
+5d229bba450249a93e9d9e50c2186ac37f5f9348925bff610bd4bf889a8c2624  /phase1/reports/runtime-refresh/nnsd/modern/file-trace.txt
+fe86aa2f3c7e28db414683810c59081604cb23837fa8201fd4bec2442f2bd55b  /phase1/reports/runtime-refresh/nnsd/modern/opened-files.txt
+2253f78b856cb5c34c45a2114f84f4e89ef2088d8d42a4ba1e6d4b73563c30bd  /phase1/reports/runtime-refresh/nnsd/modern/SAID.TMP
+eb86b55fcbbabec5c1d45df2e8fe612e932ef7dc086613bfed366040ac228a56  /phase1/reports/runtime-refresh/nnsd/modern/SAID.PCT
+3df7f8223ae5f8a6e62900c36f007e0ebf8e97caf79290f41bd5070de44d6d5e  /phase1/reports/runtime-refresh/nnsd/modern/SAID.LOG
+cb95a6bb17364a3b217afe9035238e31e87f726dbd7ad0dbd8ea2b8aed3c3e5d  /phase1/reports/runtime-refresh/nnsd/modern/fort.7

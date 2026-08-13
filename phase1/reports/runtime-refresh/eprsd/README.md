@@ -29,12 +29,12 @@ This is runtime-compatibility evidence, not physics approval.
 - The modern executable has no dependency on `libg2c`, `libgfortran.so.3`, or
   `libpng12`; its dependency list remains recorded in `modern/manifest.txt`.
 
-Run the three scripts in order from the `dev` container:
+Run the three scripts in order, using the named Compose services:
 
 ```sh
-/phase1/scripts/build-runtime-engine-smoke eprsd
-/phase1/scripts/run-historical-runtime-engine-smoke eprsd
-/phase1/scripts/run-runtime-engine-smoke eprsd
+docker compose exec -T dev /phase1/scripts/build-runtime-engine-smoke eprsd
+docker compose exec -T oracle /phase1/scripts/run-historical-runtime-engine-smoke eprsd
+docker compose exec -T dev /phase1/scripts/run-runtime-engine-smoke eprsd
 ```
 
 Verify the committed evidence from `phase1/`:
