@@ -1,0 +1,244 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly outputs_root="$(cd "${script_root}/.." && pwd)"
+source "${script_root}/lib/exit-codes.sh"
+
+usage() {
+    printf 'usage: %s\n' "$0"
+    printf 'Verify committed evidence without invoking generators or Docker.\n'
+}
+
+if [[ "$#" -ne 0 ]]; then
+    usage >&2
+    exit 64
+fi
+
+for tool in git awk cmp wc mktemp; do
+    if ! command -v "${tool}" >/dev/null 2>&1; then
+        printf 'INFRASTRUCTURE FAIL missing tool: %s\n' "${tool}" >&2
+        exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+    fi
+done
+
+if command -v sha256sum >/dev/null 2>&1; then
+    hash_file() { sha256sum "$1" | awk '{print $1}'; }
+elif command -v shasum >/dev/null 2>&1; then
+    hash_file() { shasum -a 256 "$1" | awk '{print $1}'; }
+else
+    printf 'INFRASTRUCTURE FAIL missing SHA-256 tool\n' >&2
+    exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+fi
+
+if ! git -C "${outputs_root}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    printf 'INFRASTRUCTURE FAIL not a Git worktree: %s\n' "${outputs_root}" >&2
+    exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+fi
+
+readonly before_status="$(mktemp)"
+readonly after_status="$(mktemp)"
+cleanup() {
+    rm -f "${before_status}" "${after_status}"
+}
+trap cleanup EXIT
+
+git -C "${outputs_root}" status --porcelain=v1 --untracked-files=all \
+    >"${before_status}"
+
+integrity_failures=0
+pass_count=0
+
+integrity_failure() {
+    printf 'INTEGRITY FAIL %s\n' "$*" >&2
+    integrity_failures=$((integrity_failures + 1))
+}
+
+check_tracked_file() {
+    local relative="$1"
+    local absolute="${outputs_root}/${relative}"
+
+    if ! git -C "${outputs_root}" ls-files --error-unmatch -- "${relative}" \
+        >/dev/null 2>&1; then
+        integrity_failure "untracked or absent from HEAD: ${relative}"
+        return 1
+    fi
+    if [[ ! -f "${absolute}" ]]; then
+        integrity_failure "missing file: ${relative}"
+        return 1
+    fi
+    if ! git -C "${outputs_root}" diff --quiet HEAD -- "${relative}"; then
+        integrity_failure "working copy differs from HEAD: ${relative}"
+        return 1
+    fi
+    return 0
+}
+
+manifest_target() {
+    local base="$1"
+    local target="$2"
+
+    case "${target}" in
+        /phase1/*)
+            printf 'phase1/%s' "${target#/phase1/}"
+            ;;
+        /*)
+            return 1
+            ;;
+        *)
+            if [[ "${base}" == . ]]; then
+                printf '%s' "${target#./}"
+            else
+                printf '%s/%s' "${base%/}" "${target#./}"
+            fi
+            ;;
+    esac
+}
+
+verify_manifest() {
+    local label="$1"
+    local base="$2"
+    local manifest="$3"
+    local expected
+    local target
+    local relative
+    local actual
+    local package_failed=0
+    local checked=0
+
+    if ! check_tracked_file "${manifest}"; then
+        printf 'PACKAGE FAIL %-28s manifest unavailable\n' "${label}"
+        return
+    fi
+
+    while read -r expected target; do
+        if [[ -z "${expected:-}" || -z "${target:-}" ]]; then
+            continue
+        fi
+        if ! relative="$(manifest_target "${base}" "${target}")"; then
+            integrity_failure "${label}: unsupported absolute path ${target}"
+            package_failed=1
+            continue
+        fi
+        if ! check_tracked_file "${relative}"; then
+            package_failed=1
+            continue
+        fi
+        actual="$(hash_file "${outputs_root}/${relative}")"
+        if [[ "${actual}" != "${expected}" ]]; then
+            integrity_failure "${label}: SHA-256 mismatch ${relative}"
+            package_failed=1
+        fi
+        checked=$((checked + 1))
+    done <"${outputs_root}/${manifest}"
+
+    if [[ "${package_failed}" -eq 0 ]]; then
+        printf 'PACKAGE PASS %-28s files=%s\n' "${label}" "${checked}"
+        pass_count=$((pass_count + 1))
+    else
+        printf 'PACKAGE FAIL %-28s files_checked=%s\n' "${label}" "${checked}"
+    fi
+}
+
+verify_corpus() {
+    local label="$1"
+    local fixture_table="$2"
+    local report_subdir="$3"
+    local expected_cases="$4"
+    local expected_records="$5"
+    local id
+    local expected_rows
+    local engine
+    local relative
+    local baseline
+    local actual_rows
+    local cases=0
+    local records=0
+    local corpus_failed=0
+    local -a engines=(modern arndt64 gwdac seam)
+
+    if ! check_tracked_file "${fixture_table}"; then
+        printf 'CORPUS  FAIL %-28s fixture table unavailable\n' "${label}"
+        return
+    fi
+
+    while IFS=$'\t' read -r id expected_rows; do
+        baseline="${outputs_root}/phase2/reports/${report_subdir}/modern/${id}.results.tsv"
+        for engine in "${engines[@]}"; do
+            relative="phase2/reports/${report_subdir}/${engine}/${id}.results.tsv"
+            if ! check_tracked_file "${relative}"; then
+                corpus_failed=1
+                continue
+            fi
+            if ! cmp -s "${baseline}" "${outputs_root}/${relative}"; then
+                integrity_failure "${label}: ${engine}/${id} differs from modern"
+                corpus_failed=1
+            fi
+            actual_rows="$(($(wc -l <"${outputs_root}/${relative}") - 1))"
+            if [[ "${actual_rows}" -ne "${expected_rows}" ]]; then
+                integrity_failure \
+                    "${label}: ${engine}/${id} rows=${actual_rows} expected=${expected_rows}"
+                corpus_failed=1
+            fi
+        done
+        cases=$((cases + 1))
+        records=$((records + expected_rows))
+    done < <(
+        awk -F '\t' 'NR > 1 {print $1 "\t" $12}' \
+            "${outputs_root}/${fixture_table}"
+    )
+
+    if [[ "${cases}" -ne "${expected_cases}" || \
+        "${records}" -ne "${expected_records}" ]]; then
+        integrity_failure \
+            "${label}: cases=${cases}/${expected_cases} records=${records}/${expected_records}"
+        corpus_failed=1
+    fi
+
+    if [[ "${corpus_failed}" -eq 0 ]]; then
+        printf 'CORPUS  PASS %-28s cases=%s records=%s engines=4\n' \
+            "${label}" "${cases}" "${records}"
+        pass_count=$((pass_count + 1))
+    else
+        printf 'CORPUS  FAIL %-28s cases=%s records=%s\n' \
+            "${label}" "${cases}" "${records}"
+    fi
+}
+
+readonly manifest_config='reviewer/config/evidence-manifests.tsv'
+if check_tracked_file "${manifest_config}"; then
+    while IFS=$'\t' read -r label base manifest; do
+        if [[ "${label}" == label ]]; then
+            continue
+        fi
+        verify_manifest "${label}" "${base}" "${manifest}"
+    done <"${outputs_root}/${manifest_config}"
+fi
+
+verify_corpus \
+    cm12-dsg \
+    phase2/fixtures/corpus.tsv \
+    corpus \
+    11 \
+    138
+verify_corpus \
+    cm12-amplitude \
+    phase2/fixtures/amplitudes/corpus.tsv \
+    amplitude-corpus \
+    13 \
+    150
+
+git -C "${outputs_root}" status --porcelain=v1 --untracked-files=all \
+    >"${after_status}"
+if ! cmp -s "${before_status}" "${after_status}"; then
+    integrity_failure 'verifier changed the working-tree status'
+fi
+
+if [[ "${integrity_failures}" -ne 0 ]]; then
+    printf 'RESULT evidence_integrity_fail failures=%s exit=%s\n' \
+        "${integrity_failures}" "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}"
+    exit "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}"
+fi
+
+printf 'RESULT pass packages=%s exit=%s\n' \
+    "${pass_count}" "${REVIEWER_EXIT_SUCCESS}"

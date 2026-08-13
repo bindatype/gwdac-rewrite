@@ -200,6 +200,15 @@ warning_count="$({
         "${libraries_log}" "${core_log}" "${gplot_log}" || true
 } | wc -l | tr -d ' ')"
 
+for log in \
+    "${fsplit_log}" \
+    "${libraries_log}" \
+    "${core_log}" \
+    "${gplot_log}" \
+    "${link_log}"; do
+    sed -i "s#${build_root}#/phase1-${engine}-smoke-build#g" "${log}"
+done
+
 build_status=compile_failed
 if [[ "${core_status}" -eq 0 && "${gplot_status}" -ne 0 ]]; then
     build_status=gplot_failed

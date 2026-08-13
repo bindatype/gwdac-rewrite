@@ -165,6 +165,8 @@ grep -F 'PRRDX_READ_VALUES' \
     "${report_root}/unpatched-traced-database.stderr" \
     >"${report_root}/unpatched-read-values.txt"
 diff -u \
+    --label patched-read-values \
+    --label unpatched-read-values \
     "${report_root}/patched-read-values.txt" \
     "${report_root}/unpatched-read-values.txt" \
     | sed -n '1,120p' \

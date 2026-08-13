@@ -99,9 +99,15 @@ if cmp -s \
     unpatched_selection_exact=yes
 fi
 
-diff -u "${prefix}.stdout" "${report_root}/accepted-database.stdout" \
+diff -u \
+    --label historical-arndt64-database \
+    --label accepted-database \
+    "${prefix}.stdout" "${report_root}/accepted-database.stdout" \
     >"${report_root}/historical-vs-patched.diff" || true
-diff -u "${prefix}.stdout" "${report_root}/unpatched-database-1.stdout" \
+diff -u \
+    --label historical-arndt64-database \
+    --label unpatched-database-1 \
+    "${prefix}.stdout" "${report_root}/unpatched-database-1.stdout" \
     >"${report_root}/historical-vs-unpatched.diff" || true
 
 printf 'case\tbinary_sha256\tfixture_sha256\texit_status\tthanks_marker\ttotal_data\tpatched_stdout_exact\tunpatched_stdout_exact\tpatched_selection_exact\tunpatched_selection_exact\tstderr_lines\n' \

@@ -1,0 +1,224 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly outputs_root="$(cd "${script_root}/.." && pwd)"
+source "${script_root}/lib/exit-codes.sh"
+
+usage() {
+    printf 'usage: %s [--scope all|cm12|runtime-refresh]\n' "$0"
+}
+
+scope=all
+if [[ "$#" -gt 0 ]]; then
+    if [[ "$#" -ne 2 || "$1" != --scope ]]; then
+        usage >&2
+        exit 64
+    fi
+    scope="$2"
+fi
+case "${scope}" in
+    all|cm12|runtime-refresh) ;;
+    *)
+        usage >&2
+        exit 64
+        ;;
+esac
+
+for tool in git docker awk cmp mktemp; do
+    if ! command -v "${tool}" >/dev/null 2>&1; then
+        printf 'INFRASTRUCTURE FAIL missing tool: %s\n' "${tool}" >&2
+        exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+    fi
+done
+if ! docker compose version >/dev/null 2>&1; then
+    printf 'INFRASTRUCTURE FAIL Docker Compose unavailable\n' >&2
+    exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+fi
+
+readonly commit="$(git -C "${outputs_root}" rev-parse HEAD)"
+readonly short_commit="${commit:0:12}"
+readonly original_status="$(mktemp)"
+readonly final_status="$(mktemp)"
+readonly workspace="$(mktemp -d "${TMPDIR:-/tmp}/gwdac-reviewer.XXXXXX")"
+readonly disposable="${workspace}/outputs"
+readonly runtime_project="gwdac-reviewer-runtime-${short_commit}-$$"
+runtime_started=0
+
+cleanup() {
+    if [[ "${runtime_started}" -eq 1 && -f "${disposable}/container-environment/compose.yaml" ]]; then
+        docker compose \
+            -p "${runtime_project}" \
+            -f "${disposable}/container-environment/compose.yaml" \
+            down --volumes >/dev/null 2>&1 || true
+    fi
+    rm -f "${original_status}" "${final_status}"
+    if [[ "${REVIEWER_KEEP_WORKSPACE:-0}" == 1 ]]; then
+        printf 'Disposable workspace retained: %s\n' "${workspace}"
+    else
+        rm -rf "${workspace}"
+    fi
+}
+trap cleanup EXIT
+
+git -C "${outputs_root}" status --porcelain=v1 --untracked-files=all \
+    >"${original_status}"
+
+if ! git clone --quiet --no-hardlinks --no-checkout \
+    "${outputs_root}" "${disposable}"; then
+    printf 'INFRASTRUCTURE FAIL could not create disposable clone\n' >&2
+    exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+fi
+if ! git -C "${disposable}" checkout --quiet --detach "${commit}"; then
+    printf 'INFRASTRUCTURE FAIL could not check out %s\n' "${commit}" >&2
+    exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+fi
+
+printf 'REPRODUCE commit=%s scope=%s workspace=%s\n' \
+    "${commit}" "${scope}" "${workspace}"
+"${disposable}/reviewer/verify-committed-evidence"
+verify_status=$?
+if [[ "${verify_status}" -ne 0 ]]; then
+    exit "${verify_status}"
+fi
+
+compatibility_failures=0
+reproduction_failures=0
+
+reproduce_cm12() {
+    local run_id="reviewer-${short_commit}"
+    local report_root="${disposable}/phase2/reports/gate/${run_id}"
+    local summary="${report_root}/summary.txt"
+    local gate_status
+    local command_failures
+    local fixture_failures
+
+    printf 'RUN cm12-corpus-gate\n'
+    GWDAC_GATE_RUN_ID="${run_id}" \
+    GWDAC_GATE_PROJECT="gwdac-reviewer-cm12-${short_commit}-$$" \
+        "${disposable}/phase2/scripts/run-cm12-gate"
+    gate_status=$?
+
+    if [[ ! -f "${summary}" ]]; then
+        printf 'REPRODUCTION FAIL cm12 summary missing\n' >&2
+        reproduction_failures=$((reproduction_failures + 1))
+        return
+    fi
+    command_failures="$(awk -F= '$1 == "command_failures" {print $2}' "${summary}")"
+    fixture_failures="$(awk -F= '$1 == "fixture_failures" {print $2}' "${summary}")"
+    if [[ -z "${command_failures}" || -z "${fixture_failures}" ]]; then
+        printf 'REPRODUCTION FAIL cm12 summary incomplete\n' >&2
+        reproduction_failures=$((reproduction_failures + 1))
+        return
+    fi
+    if [[ "${command_failures}" -ne 0 ]]; then
+        printf 'REPRODUCTION FAIL cm12 command_failures=%s\n' "${command_failures}" >&2
+        reproduction_failures=$((reproduction_failures + 1))
+    fi
+    if [[ "${fixture_failures}" -ne 0 ]]; then
+        printf 'COMPATIBILITY FAIL cm12 fixture_failures=%s\n' "${fixture_failures}" >&2
+        compatibility_failures=$((compatibility_failures + 1))
+    fi
+    if [[ "${gate_status}" -ne 0 && "${command_failures}" -eq 0 && \
+        "${fixture_failures}" -eq 0 ]]; then
+        printf 'REPRODUCTION FAIL cm12 unexplained exit=%s\n' "${gate_status}" >&2
+        reproduction_failures=$((reproduction_failures + 1))
+    fi
+    if [[ "${gate_status}" -eq 0 ]]; then
+        printf 'PASS cm12 fixtures=24 records=288\n'
+    fi
+}
+
+reproduce_runtime_refresh() {
+    local compose_file="${disposable}/container-environment/compose.yaml"
+    local expectations="${disposable}/reviewer/config/runtime-refresh-expectations.tsv"
+    local engine
+    local expected
+    local actual
+    local step_status
+    local -a compose=(
+        docker compose
+        -p "${runtime_project}"
+        -f "${compose_file}"
+    )
+
+    printf 'RUN runtime-refresh-environment\n'
+    if ! "${compose[@]}" up -d --build dev oracle; then
+        printf 'INFRASTRUCTURE FAIL runtime-refresh containers unavailable\n' >&2
+        exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+    fi
+    runtime_started=1
+    if ! "${compose[@]}" exec -T dev bootstrap-repos; then
+        printf 'INFRASTRUCTURE FAIL source bootstrap failed\n' >&2
+        exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+    fi
+
+    while IFS=$'\t' read -r engine _; do
+        if [[ "${engine}" == engine ]]; then
+            continue
+        fi
+        printf 'RUN runtime-refresh engine=%s\n' "${engine}"
+        step_status=0
+        "${compose[@]}" exec -T dev \
+            /phase1/scripts/build-runtime-engine-smoke "${engine}" || step_status=1
+        "${compose[@]}" exec -T oracle \
+            /phase1/scripts/run-historical-runtime-engine-smoke "${engine}" || step_status=1
+        "${compose[@]}" exec -T dev \
+            /phase1/scripts/run-runtime-engine-smoke "${engine}" || step_status=1
+        if [[ "${step_status}" -ne 0 ]]; then
+            printf 'REPRODUCTION FAIL engine=%s command failed\n' "${engine}" >&2
+            reproduction_failures=$((reproduction_failures + 1))
+            continue
+        fi
+
+        expected="$(awk -F '\t' -v engine="${engine}" \
+            '$1 == engine {print; exit}' "${expectations}")"
+        actual="$(sed -n '2p' \
+            "${disposable}/phase1/reports/runtime-refresh/${engine}/smoke-summary.tsv")"
+        if [[ -z "${actual}" ]]; then
+            printf 'REPRODUCTION FAIL engine=%s summary missing\n' "${engine}" >&2
+            reproduction_failures=$((reproduction_failures + 1))
+        elif [[ "${actual}" != "${expected}" ]]; then
+            printf 'COMPATIBILITY FAIL engine=%s\n' "${engine}" >&2
+            printf 'expected: %s\nactual:   %s\n' "${expected}" "${actual}" >&2
+            compatibility_failures=$((compatibility_failures + 1))
+        else
+            printf 'PASS runtime-refresh engine=%s\n' "${engine}"
+        fi
+    done <"${expectations}"
+}
+
+case "${scope}" in
+    all)
+        reproduce_cm12
+        reproduce_runtime_refresh
+        ;;
+    cm12)
+        reproduce_cm12
+        ;;
+    runtime-refresh)
+        reproduce_runtime_refresh
+        ;;
+esac
+
+git -C "${outputs_root}" status --porcelain=v1 --untracked-files=all \
+    >"${final_status}"
+if ! cmp -s "${original_status}" "${final_status}"; then
+    printf 'REPRODUCTION FAIL authoritative working-tree status changed\n' >&2
+    reproduction_failures=$((reproduction_failures + 1))
+fi
+
+if [[ "${reproduction_failures}" -ne 0 ]]; then
+    printf 'RESULT reproduction_fail failures=%s compatibility_failures=%s exit=%s\n' \
+        "${reproduction_failures}" \
+        "${compatibility_failures}" \
+        "${REVIEWER_EXIT_REPRODUCTION}"
+    exit "${REVIEWER_EXIT_REPRODUCTION}"
+fi
+if [[ "${compatibility_failures}" -ne 0 ]]; then
+    printf 'RESULT compatibility_fail failures=%s exit=%s\n' \
+        "${compatibility_failures}" "${REVIEWER_EXIT_COMPATIBILITY}"
+    exit "${REVIEWER_EXIT_COMPATIBILITY}"
+fi
+
+printf 'RESULT pass scope=%s exit=%s\n' "${scope}" "${REVIEWER_EXIT_SUCCESS}"

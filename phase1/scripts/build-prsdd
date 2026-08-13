@@ -322,6 +322,16 @@ install -m 755 \
     "${build_root}/prsdd-headless" \
     "${artifact_root}/prsdd-headless"
 
+for log in \
+    "${fsplit_log}" \
+    "${libraries_log}" \
+    "${core_log}" \
+    "${gplot_log}" \
+    "${link_log}" \
+    "${headless_log}"; do
+    sed -i "s#${build_root}#/phase1-build#g" "${log}"
+done
+
 {
     printf 'source_commit=%s\n' "${commit}"
     printf 'build_variant=%s\n' "${build_variant}"
