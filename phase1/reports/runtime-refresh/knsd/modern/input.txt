@@ -1,0 +1,30 @@
+xw
+Q
+Q
+go250
+2
+/home/arndt64/KN/KNSOL.USR
+Q
+go2
+v
+KS13
+go3
+1
+W
+1480 20 2000
+A
+0
+Q
+Q
+SGT
+0 0
+r
+MA(76)
+
+Q
+PLOT
+Q
+GO99
+C
+Q
+~                                

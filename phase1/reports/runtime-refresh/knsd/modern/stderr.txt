@@ -1,0 +1,10 @@
+At line 268 of file saidopen.f (unit = 11)
+Fortran runtime error: Cannot open file '/home/arndt64/KN/KNSOL.USR': No such file or directory
+
+Error termination. Backtrace:
+#0  0x7fffff4bfe59 in ???
+#1  0x7fffff4c0a71 in ???
+#2  0x7fffff752e30 in ???
+#3  0x555555617772 in saidopen_
+#4  0x55555557f534 in MAIN__
+#5  0x555555586e31 in main

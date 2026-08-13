@@ -1,0 +1,22 @@
+
+ New CONTOUR plot! Enter CONP or "GO60" to see.
+ Try the "GO55" alternate to "GO5" (Chi2) option
+ "GO58" compares some SOLNS to S-E fits
+ The experimental data file is
+ KN941  DATA VPI&SU MODIFIED BY JHS 1990(KNDATBAS)             02
+
+ CAUTION! do NOT use any solution outside its range of
+ validity. Extrapolation properties are generally BAD!
+ New RESONANCE fitting at "GO29" or "speed"
+ Add a "smeared" resonance with "GO34"
+ "GO37" to PLOT coupled-channel amplitudes (eg PiN->etaN)
+ RETURN to continue ->  Your solution is
+  SP92 0-2650(1100)  K+P = 4871/ 3663 I0= 3172/ 1746 PRMS=(62 27) 08
+ For PiN only enter "R" to replace a wave with RESONANCE
+ For PiN only enter "F" to "flip" etaN couplings
+ RETURN (or "GON") to continue ->  Q                                                                     
+
+ An ALTERNATE solution can be defined with a "GO51"
+ It can be used for comparison when plotting or with the
+ CONTOUR/3-D plot option ("CONP" or "GO60")
+  Enter ? for instructions, Return to continue -> Input* GO250                                                                   
