@@ -25,10 +25,18 @@ The six modified and 59 untracked working-tree status entries were outside this
 committed-history publication check and were not staged, committed, or pushed.
 Any future publication must scan the exact staged change separately.
 
-The exact seven-file documentation/security checkpoint staged after this scan
-was also scanned as a redacted patch with the same Gitleaks release and default
-rules. It produced zero findings. That staged-patch check was repeated after
-the final documentation and manifest content was established.
+Publication checks are retained separately from repository-history checks:
+
+| Scope type | Target | Findings |
+| --- | --- | ---: |
+| staged patch | initial seven-file documentation/security patch | 0 |
+| staged patch | finalized seven-file documentation/security patch | 0 |
+| commit range | `c59040711fed2748de9eb294ba15d7e5fff33d63..c7f1918da2f4f86d44a99748ed9f0776f0c9f735` | 0 |
+
+Both staged snapshots were scanned as redacted patches with the same release
+and default rules. The commit-range check verified the published checkpoint
+after commit creation. These results do not broaden the three repository-
+history scopes above and do not include the unrelated dirty report entries.
 
 ## Scanner provenance
 
@@ -53,6 +61,10 @@ gitleaks git --no-banner --no-color --redact=100 --log-level error \
   --exit-code 0 --log-opts="--all --full-history" \
   --report-format json --report-path <temporary-redacted-report> <repository>
 ```
+
+Staged patches were scanned with `gitleaks dir` against a temporary binary
+patch file. The finalized publication range was scanned with `gitleaks git`
+and the explicit range shown above.
 
 Raw reports and the scanner binary remained in temporary storage and are not
 part of this repository. Because all reports were empty JSON arrays, this

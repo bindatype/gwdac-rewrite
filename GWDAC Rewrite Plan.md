@@ -2,7 +2,7 @@
 ace: effort
 status: active
 created: 2026-07-29
-updated: 2026-08-12
+updated: 2026-08-13
 tags:
   - gwdac
   - said
@@ -821,15 +821,25 @@ the unpatched executable still prints the exact witness row and exact
 exit status 2; the patched build exits 0. Patch disposition requires a separate
 fixture-backed decision.
 
-The Legacy Runtime Refresh preflight found complete source/data closures for
-six remaining engines. `pnsd` builds reproducibly on Ubuntu 24.04 with GNU
-Fortran 13.3.0 and matches seven displayed SP06 DSG rows, then fails on a
-post-table `PNRDX` formatted read. Per the early-stop rule, that gate is blocked
-and the other five engines have not started.
+In the normalized captured comparison, the patch restores 74 of 132 historical
+citation fields; the unpatched build restores none, and 58 remain nonhistorical
+in both. All 132 displayed `Chi,M=` numeric tails are byte-identical in this
+comparison. No broader internal-physics equality is claimed.
+
+The Legacy Runtime Refresh attempted all six additional engines on Ubuntu 24.04
+with GNU Fortran 13.3.0. `pnsd` matches seven displayed SP06 DSG rows before a
+post-table `PNRDX` formatted-read failure. `eprsd` and `nnsd` exactly match
+retained historical decks; `pdsd` and `pdesd` exactly match startup/quit smoke
+tests. `knsd` remains blocked because both binaries request a hard-coded
+absolute dataset path; no source or path-layout fix was attempted.
 
 The current program finish line is the modern Ubuntu compatibility container.
 Phases 3-6 are deferred pending explicit direction. The private GitHub remote
 holds the stable reconstructed baseline on `main` and current evidence on
-`dev`. After this documentation/security checkpoint is reviewed, the next code
-slice is a reviewer harness with read-only verification, disposable
-reproduction, deterministic labels/build paths, and unambiguous exit semantics.
+`dev`. The reviewer harness now separates read-only committed-evidence
+verification from disposable regeneration, uses deterministic labels and build
+paths, and returns distinct integrity, compatibility, reproduction,
+infrastructure, and usage exits. Its clean run verifies the 24-fixture CM12
+gate and all five runtime-refresh sweep engines without modifying the
+authoritative checkout. `main` remains at the stable accepted checkpoint until
+a separate reviewed promotion is authorized.

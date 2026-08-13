@@ -1,6 +1,6 @@
 # GWDAC rewrite artifacts
 
-Documentation reviewed: 2026-08-12
+Documentation reviewed: 2026-08-13
 
 This private repository is the authoritative build, contract, diagnostic, and
 evidence checkout for the GWDAC/SAID modernization effort. Historical source
@@ -35,10 +35,13 @@ choice-1 amplitude records at displayed precision. `PRBAS` request orchestration
 has not been replaced. The latest candidate remains intentionally failing and
 is diagnostic evidence only.
 
-The runtime-refresh track has established that `pnsd` builds reproducibly on
-Ubuntu 24.04 with GNU Fortran 13.3.0 and matches its seven displayed DSG rows,
-but it is blocked by a post-table `PNRDX` end-of-file failure. The other five
-archived runtime-refresh engines have not yet been attempted.
+The runtime-refresh track has now attempted all six additional engines on
+Ubuntu 24.04 with GNU Fortran 13.3.0. `eprsd` and `nnsd` exactly match retained
+historical decks; `pdsd` and `pdesd` exactly match startup/quit smoke tests.
+`pnsd` matches seven displayed DSG rows before its post-table `PNRDX`
+end-of-file failure, and `knsd` remains blocked at a hard-coded absolute data
+path. These runtime results establish compatibility evidence, not physics
+approval.
 
 ## Compatibility boundaries
 
@@ -63,12 +66,14 @@ physics review remains pending.
 - `phase1/README.md`: modern Fortran baseline, runtime refresh, production
   lineage, and compatibility diagnostics.
 - `phase2/README.md`: reproducible CM12 contract and diagnostic commands.
+- `reviewer/README.md`: read-only evidence verification, disposable
+  reproduction, and process exit semantics.
 - `phase1/reports/defect-register.md`: known deployed compatibility defects.
 - `security/reports/credential-scan-20260812/README.md`: bundle-aware committed-
   history credential-scan scope and sanitized result.
 
-After this documentation/security checkpoint is reviewed, the next code slice
-is the reviewer harness: read-only evidence verification, disposable
-reproduction, stable diff/build-path labels, and unambiguous process exit
-semantics. It must not absorb the existing six modified or 59 untracked report
-entries.
+The reviewer harness is now available through `make reviewer-verify` and
+`make reviewer-reproduce`. The first command only verifies committed evidence;
+the second clones the exact commit into a disposable workspace before running
+the 24-fixture CM12 gate and five-engine runtime-refresh sweep. The authoritative
+six modified and 59 untracked report entries remain outside these commits.

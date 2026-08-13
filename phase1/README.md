@@ -92,12 +92,14 @@ claim of scientific or hidden floating-point equivalence.
 
 The Legacy Runtime Refresh inventory ranks the remaining six archived engines
 by surviving source, local dependencies, datasets, executable, input deck, and
-captured transcript. Its first attempt, `pnsd`, builds reproducibly with modern
-gfortran and produces a byte-identical seven-row SP06 DSG table. It then stops
-at an internal formatted read in `pnu.f:4569`, where the checked-in executable
-continues normally. `reports/runtime-refresh/pnsd/README.md` records that first
-divergence and the resulting blocked gate; no source fix or second engine was
-started.
+captured transcript. `pnsd` builds reproducibly with modern gfortran and
+produces a byte-identical seven-row SP06 DSG table before stopping at an
+internal formatted read in `pnu.f:4569`, where the checked-in executable
+continues normally. The subsequent five-engine sweep records exact deck-driven
+smoke passes for `eprsd` and `nnsd`, exact startup/quit smoke passes for `pdsd`
+and `pdesd`, and a shared hard-coded-path failure for `knsd`. No source fix was
+made. `reports/runtime-refresh/README.md` and `summary.tsv` define the evidence
+and its limits.
 
 Phase 1 is complete for the retained scope. `build-prsdd` keeps the original
 reference build as its default and also accepts the Phase 2
@@ -142,6 +144,12 @@ accepted compatibility mitigation with a known fidelity cost, not a general
 GO5 correction. No patch, fixture, legacy source, or production system was
 changed by either measurement.
 
+In the normalized captured GO5 comparison, the patch restores 74 of 132
+historical citation fields; the unpatched build restores none, and 58 remain
+nonhistorical in both. All 132 displayed `Chi,M=` numeric tails are
+byte-identical in this comparison. This is a narrow displayed-output result;
+no broader internal-physics equality is claimed.
+
 `reports/live-production-capture/README.md` records the path-allowlisted,
 one-way production capture. All 542 files and 34,218,873 bytes match the
 independently generated production SHA-256 manifest. Captured binaries and
@@ -154,3 +162,8 @@ differing and two production-only source/build files at file and routine
 levels. The drift includes real operational and physics-relevant changes, but
 none is in the nine-file public CM12 `prsdd` build. Outside CM12, static source
 drift remains separate from source-to-binary pairing and behavioral approval.
+
+From the repository root, `make reviewer-verify` checks the committed runtime,
+GO5, adapter, security, DSG, and amplitude evidence without invoking Docker or
+any generator. `make reviewer-reproduce` performs the CM12 and five-engine
+runtime-refresh regeneration only in a disposable clone.

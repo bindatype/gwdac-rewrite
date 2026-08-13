@@ -56,6 +56,20 @@ diagnosis.
 The oracle container remains network-disabled and read-only apart from its
 dedicated work volume and report mount.
 
+For review, use the repository-level harness instead of writing generated
+reports into the authoritative checkout:
+
+```sh
+make reviewer-verify
+make reviewer-reproduce-cm12
+```
+
+The verifier reads only committed evidence. The reproducer clones the exact
+commit into a disposable workspace, runs all 24 fixtures and 288 displayed
+records, and gates only the modern build plus the two checked-in historical
+executables. The failed PRBAS request candidate is still executed and its
+mismatches are reported as diagnostic evidence.
+
 ## Current result
 
 - 11 normal, boundary, malformed-recovery, and scientifically invalid decks.
@@ -103,10 +117,9 @@ dedicated work volume and report mount.
 
 The current program finish line is a modern Ubuntu compatibility container.
 Phase 3 language selection and later rewrite phases are deferred pending an
-explicit program decision. After the documentation/security checkpoint is
-reviewed, the next code slice is the reviewer harness, not another PRBAS
-candidate: read-only evidence verification, disposable reproduction,
-deterministic labels/build paths, and unambiguous exit semantics.
+explicit program decision. The reviewer harness now provides read-only evidence
+verification, disposable reproduction, deterministic labels/build paths, and
+unambiguous exit semantics. It does not accept the PRBAS candidate.
 
 ## Pause gate
 
@@ -114,3 +127,21 @@ The focused hadronic-pipeline diagnostic is complete. A general `RESUME` does
 not modify the candidate, title dispatch, saved-state sequencing,
 orchestration, formulas, fixtures, tolerances, or start Phase 3. Each such
 change requires its own explicit scope.
+
+## Control-language changes
+
+Changes to text that defines authorization, gates, pause conditions, or the
+meaning of `RESUME` must be announced before editing and classified by practical
+effect as `no_authority_change`, `tightening`, or `loosening`.
+
+- `no_authority_change` and `tightening` edits may land only inside an
+  authorized documentation checkpoint after their files and classification are
+  announced.
+- `loosening` always requires direct, separate user authorization.
+- Review must verify the classification against practical effect rather than
+  wording alone.
+- The commit must carry a `Control-language:` trailer naming the classification
+  and affected file.
+
+This policy records how control-language edits are audited; it grants no new
+authority and does not alter the active pause gate.
