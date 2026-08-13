@@ -1,0 +1,34 @@
+evidence_label=reference
+engine=eprsd
+source_commit=f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+build_architecture=x86_64
+operating_system=Ubuntu 24.04
+gfortran=GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+gcc=gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+source_files=eprsd,eprsd2,epru,pru
+saidopen_members=15
+libxz_members=101
+gplot_members=145
+warning_instances=463
+core_status=0
+gplot_status=0
+link_status=0
+build_status=linked
+92998b8874a91916af07849827c3d512d8f6159a4ed6d737419e206266e15850  /workspace/arndt64/said/eprsd.f
+27b320fb0aa25a47b128a9e17602d14354ab4ce091f43fc656cdd5e6cf5b7e38  /workspace/arndt64/said/eprsd2.f
+5e5b320215282decbea3d1c44d1dabc140bf51957d14fa1137bb8395fb07ebe5  /workspace/arndt64/said/epru.f
+462395fee5d67538e49ddbef24a9b0c292a63f6183da1cb56dff9d391dfa89ba  /workspace/arndt64/said/pru.f
+426a1184788004ff8847932819d5f78a381d4c56c6720c1095eb14736727abc0  /workspace/arndt64/said/saidopen.for
+4bfb31e960ba1a1d0ac1e27e5ff5cc157a70d4064a0844e2615cdcb8fde44823  /workspace/arndt64/libxzl.for
+1d1dcbe0d8235a441e13289eb832cbbe43192cbabf1431d7e99669af7866ed43  /phase1/config/gplot-prsdd-members.txt
+b0c3e32843e004a450aa43b17587e47b76ac68a933ea652372cbaaa9aaa55d04  /phase1/patches/gplot-modern-compiler.patch
+6b386ca9d16c4c670f46c2777b6d3a875a1589474b3d9024b36f59546ed30599  /phase1/patches/saidopen-portable-data-root.patch
+edc70561d985202210f1b0d130c03d059cbb73a5fb043aa7a7900c0b85fe663b  /phase1/scripts/build-runtime-engine-smoke
+8afc77ae2b9c23ccd4a76d8af1325358dafb9f5d84208ca491a0adfef6bc0f46  /workspace/phase1/runtime-refresh/eprsd/build-f6c81d01a1fe.2pyBqM/eprsd
+  NEEDED               libgfortran.so.5
+  NEEDED               libm.so.6
+  NEEDED               libX11.so.6
+  NEEDED               libgd.so.3
+  NEEDED               libgcc_s.so.1
+  NEEDED               libc.so.6
+obsolete_runtime_dependency=no

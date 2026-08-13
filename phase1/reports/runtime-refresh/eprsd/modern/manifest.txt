@@ -1,0 +1,34 @@
+evidence_label=reference
+role=modern_runtime_smoke
+engine=eprsd
+source_commit=f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+binary_sha256=8afc77ae2b9c23ccd4a76d8af1325358dafb9f5d84208ca491a0adfef6bc0f46
+trace_source_sha256=b4b5dc6bba40a898a06c47f9f4fab97032868618ca6ec861dbcf8c0ab73b8021
+trace_library_sha256=29f2b36b7e5e19c8ba90342c05081c8306145e14dfc57ec1b1868229b6083496
+input_kind=archived_deck
+input_sha256=0586fe239a724577990b27229eeb932a9fa87720a0d03c14b4d9e6563ba34d7d
+transcript_relation=plausible_pair
+transcript_exact=no
+exit_status=0
+timed_out=no
+normal_exit=yes
+stdout_bytes=103437
+stderr_bytes=0
+opened_file_paths=35
+historical_stdout_exact=yes
+needed=libgfortran.so.5
+needed=libm.so.6
+needed=libX11.so.6
+needed=libgd.so.3
+needed=libgcc_s.so.1
+needed=libc.so.6
+8afc77ae2b9c23ccd4a76d8af1325358dafb9f5d84208ca491a0adfef6bc0f46  /workspace/phase1/runtime-refresh/eprsd/artifacts/f6c81d01a1fe/eprsd
+0586fe239a724577990b27229eeb932a9fa87720a0d03c14b4d9e6563ba34d7d  /phase1/reports/runtime-refresh/eprsd/modern/input.txt
+afede70b7e54b58a95d4d59d00dbf2e446ecb3b9bd160761a49fe8e1b2d4e352  /phase1/reports/runtime-refresh/eprsd/modern/stdout.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /phase1/reports/runtime-refresh/eprsd/modern/stderr.txt
+9186e36520f98e2efb27153274b083af0a14b803421ebce4249526860f79a412  /phase1/reports/runtime-refresh/eprsd/modern/file-trace.txt
+af44754ca028283859bba8ad051151d48283e9533c8219a8fe9395c856ef246d  /phase1/reports/runtime-refresh/eprsd/modern/opened-files.txt
+f2a6bd5657b6bea25984236a125c4576d9c8a6951139f70d1554132f2f94d8b6  /phase1/reports/runtime-refresh/eprsd/modern/SAID.TMP
+eb86b55fcbbabec5c1d45df2e8fe612e932ef7dc086613bfed366040ac228a56  /phase1/reports/runtime-refresh/eprsd/modern/SAID.PCT
+3df7f8223ae5f8a6e62900c36f007e0ebf8e97caf79290f41bd5070de44d6d5e  /phase1/reports/runtime-refresh/eprsd/modern/SAID.LOG
+cb95a6bb17364a3b217afe9035238e31e87f726dbd7ad0dbd8ea2b8aed3c3e5d  /phase1/reports/runtime-refresh/eprsd/modern/fort.7

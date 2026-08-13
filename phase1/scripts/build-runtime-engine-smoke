@@ -1,0 +1,267 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "$#" -ne 1 ]]; then
+    printf 'usage: %s <eprsd|nnsd|knsd|pdsd|pdesd>\n' "$0" >&2
+    exit 2
+fi
+
+readonly engine="$1"
+case "${engine}" in
+    eprsd) sources=(eprsd eprsd2 epru pru) ;;
+    nnsd) sources=(nn nn1 nnu) ;;
+    knsd) sources=(knsd pn1 pn2 pnu) ;;
+    pdsd) sources=(pidsaid pidu) ;;
+    pdesd) sources=(pdesaid pdeu) ;;
+    *)
+        printf 'unsupported runtime-refresh engine: %s\n' "${engine}" >&2
+        exit 2
+        ;;
+esac
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly state_root="${PHASE1_STATE_ROOT:-/workspace/phase1/runtime-refresh/${engine}}"
+readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}/runtime-refresh/${engine}/build"
+readonly member_list="${phase1_root}/config/gplot-prsdd-members.txt"
+readonly gplot_patch="${phase1_root}/patches/gplot-modern-compiler.patch"
+readonly saidopen_patch="${phase1_root}/patches/saidopen-portable-data-root.patch"
+readonly source_commit="$(git -C "${source_root}" rev-parse HEAD)"
+readonly short_commit="${source_commit:0:12}"
+mkdir -p "${state_root}" "${report_root}"
+readonly build_root="$(mktemp -d "${state_root}/build-${short_commit}.XXXXXX")"
+readonly artifact_root="${state_root}/artifacts/${short_commit}"
+readonly fsplit_log="${report_root}/fsplit.log"
+readonly libraries_log="${report_root}/libraries.log"
+readonly core_log="${report_root}/core.log"
+readonly gplot_log="${report_root}/gplot.log"
+readonly link_log="${report_root}/link.log"
+readonly manifest="${report_root}/manifest.txt"
+
+readonly -a fixed_flags=(
+    -O1
+    -std=legacy
+    "-ffile-prefix-map=${build_root}=/phase1-${engine}-smoke-build"
+    -ffixed-line-length-none
+    -fallow-argument-mismatch
+    -fno-second-underscore
+    -fno-automatic
+)
+
+readonly -a gplot_flags=(
+    -O1
+    -cpp
+    -Dg77
+    -Dunix
+    -std=legacy
+    "-ffile-prefix-map=${build_root}=/phase1-${engine}-smoke-build"
+    -ffixed-line-length-none
+    -fallow-argument-mismatch
+    -fallow-invalid-boz
+    -fdec-char-conversions
+    -fd-lines-as-comments
+    -fno-second-underscore
+    -fno-automatic
+)
+
+readonly -a gplot_c_flags=(
+    -O1
+    -std=gnu89
+    -Dg77
+    -Dunix
+    -D_POSIX_C_SOURCE=199506L
+    "-ffile-prefix-map=${build_root}=/phase1-${engine}-smoke-build"
+    -fcommon
+    -Wno-implicit-int
+    -Wno-implicit-function-declaration
+    -Wno-incompatible-pointer-types
+    -I/usr/include/X11
+)
+
+mkdir -p "${artifact_root}"
+: >"${fsplit_log}"
+: >"${libraries_log}"
+: >"${core_log}"
+: >"${gplot_log}"
+: >"${link_log}"
+test "${source_commit}" = f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+
+gcc \
+    -std=gnu89 \
+    -D_POSIX_C_SOURCE=199506L \
+    -w \
+    "${source_root}/lib/fsplit.c" \
+    -o "${build_root}/fsplit"
+
+build_split_archive() {
+    local input="$1"
+    local archive_name="$2"
+    local split_root="${build_root}/${archive_name%.a}"
+    local object_root="${split_root}/objects"
+    local source
+
+    mkdir -p "${split_root}" "${object_root}"
+    cp "${input}" "${split_root}/"
+    if [[ "${archive_name}" == saidopen.a ]]; then
+        patch --fuzz=0 -d "${split_root}" -p1 -i "${saidopen_patch}" \
+            >>"${libraries_log}" 2>&1
+    fi
+    (
+        cd "${split_root}"
+        "${build_root}/fsplit" "$(basename "${input}")"
+    ) >>"${fsplit_log}" 2>&1
+    for source in "${split_root}"/*.f; do
+        (
+            cd "${split_root}"
+            gfortran \
+                "${fixed_flags[@]}" \
+                -c "$(basename "${source}")" \
+                -o "objects/$(basename "${source%.f}.o")"
+        ) >>"${libraries_log}" 2>&1
+    done
+    ar rcs "${build_root}/${archive_name}" "${object_root}"/*.o
+}
+
+build_split_archive "${source_root}/said/saidopen.for" saidopen.a
+build_split_archive "${source_root}/libxzl.for" libxz.a
+
+readonly core_root="${build_root}/core"
+mkdir -p "${core_root}"
+for source in "${sources[@]}"; do
+    cp "${source_root}/said/${source}.f" "${core_root}/"
+done
+
+core_status=0
+for source in "${sources[@]}"; do
+    set +e
+    (
+        cd "${core_root}"
+        gfortran \
+            "${fixed_flags[@]}" \
+            -c "${source}.f" \
+            -o "${source}.o"
+    ) >>"${core_log}" 2>&1
+    source_status=$?
+    set -e
+    if [[ "${source_status}" -ne 0 && "${core_status}" -eq 0 ]]; then
+        core_status="${source_status}"
+    fi
+done
+
+readonly gplot_root="${build_root}/gplot"
+mkdir -p "${gplot_root}"
+cp -a "${source_root}/gplot/." "${gplot_root}/"
+patch --fuzz=0 -d "${gplot_root}" -p1 -i "${gplot_patch}" \
+    >>"${gplot_log}" 2>&1
+mapfile -t gplot_members <"${member_list}"
+gplot_targets=()
+for member in "${gplot_members[@]}"; do
+    gplot_targets+=("gplot.a(${member})")
+done
+readonly gplot_fortran_command="gfortran ${gplot_flags[*]} -c"
+readonly gplot_c_command="gcc ${gplot_c_flags[*]} -c"
+set +e
+make \
+    -C "${gplot_root}" \
+    -B \
+    "${gplot_targets[@]}" \
+    F77="${gplot_fortran_command}" \
+    CC="${gplot_c_command}" \
+    >>"${gplot_log}" 2>&1
+gplot_status=$?
+set -e
+if [[ "${gplot_status}" -eq 0 ]]; then
+    ar rcs "${build_root}/gplot.a" "${gplot_root}"/*.o
+fi
+
+link_status=not_run
+if [[ "${core_status}" -eq 0 && "${gplot_status}" -eq 0 ]]; then
+    set +e
+    gfortran \
+        -O1 \
+        -fno-second-underscore \
+        -o "${build_root}/${engine}" \
+        "${core_root}"/*.o \
+        "${build_root}/libxz.a" \
+        "${build_root}/saidopen.a" \
+        "${build_root}/gplot.a" \
+        -lm \
+        -lXt \
+        -lX11 \
+        -lpng \
+        -lgd \
+        >"${link_log}" 2>&1
+    link_status=$?
+    set -e
+fi
+
+warning_count="$({
+    grep -hF 'Warning:' \
+        "${libraries_log}" "${core_log}" "${gplot_log}" || true
+} | wc -l | tr -d ' ')"
+
+build_status=compile_failed
+if [[ "${core_status}" -eq 0 && "${gplot_status}" -ne 0 ]]; then
+    build_status=gplot_failed
+elif [[ "${core_status}" -eq 0 && "${gplot_status}" -eq 0 && \
+    "${link_status}" != 0 ]]; then
+    build_status=link_failed
+elif [[ "${core_status}" -eq 0 && "${gplot_status}" -eq 0 && \
+    "${link_status}" == 0 ]]; then
+    build_status=linked
+fi
+
+source_paths=()
+for source in "${sources[@]}"; do
+    source_paths+=("${source_root}/said/${source}.f")
+done
+
+{
+    printf 'evidence_label=reference\n'
+    printf 'engine=%s\n' "${engine}"
+    printf 'source_commit=%s\n' "${source_commit}"
+    printf 'build_architecture=%s\n' "$(uname -m)"
+    printf 'operating_system=%s\n' "$(
+        . /etc/os-release
+        printf '%s %s' "${NAME}" "${VERSION_ID}"
+    )"
+    printf 'gfortran=%s\n' "$(gfortran --version | sed -n '1p')"
+    printf 'gcc=%s\n' "$(gcc --version | sed -n '1p')"
+    printf 'source_files=%s\n' "$(IFS=,; printf '%s' "${sources[*]}")"
+    printf 'saidopen_members=%s\n' "$(ar t "${build_root}/saidopen.a" | wc -l)"
+    printf 'libxz_members=%s\n' "$(ar t "${build_root}/libxz.a" | wc -l)"
+    if [[ -f "${build_root}/gplot.a" ]]; then
+        printf 'gplot_members=%s\n' "$(ar t "${build_root}/gplot.a" | wc -l)"
+    fi
+    printf 'warning_instances=%s\n' "${warning_count}"
+    printf 'core_status=%s\n' "${core_status}"
+    printf 'gplot_status=%s\n' "${gplot_status}"
+    printf 'link_status=%s\n' "${link_status}"
+    printf 'build_status=%s\n' "${build_status}"
+    sha256sum \
+        "${source_paths[@]}" \
+        "${source_root}/said/saidopen.for" \
+        "${source_root}/libxzl.for" \
+        "${member_list}" \
+        "${gplot_patch}" \
+        "${saidopen_patch}" \
+        "${phase1_root}/scripts/build-runtime-engine-smoke"
+    if [[ "${build_status}" == linked ]]; then
+        sha256sum "${build_root}/${engine}"
+        objdump -p "${build_root}/${engine}" | sed -n '/NEEDED/p'
+    fi
+} >"${manifest}"
+
+if [[ "${build_status}" == linked ]]; then
+    if objdump -p "${build_root}/${engine}" \
+        | grep -Eq 'NEEDED[[:space:]]+(libg2c|libgfortran\.so\.3|libpng12)'; then
+        printf 'obsolete_runtime_dependency=yes\n' >>"${manifest}"
+        build_status=obsolete_runtime_dependency
+    else
+        printf 'obsolete_runtime_dependency=no\n' >>"${manifest}"
+        install -m 755 "${build_root}/${engine}" "${artifact_root}/${engine}"
+    fi
+fi
+
+printf 'Runtime-refresh build smoke: engine=%s status=%s manifest=%s\n' \
+    "${engine}" "${build_status}" "${manifest}"

@@ -1,0 +1,151 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "$#" -ne 1 ]]; then
+    printf 'usage: %s <eprsd|nnsd|knsd|pdsd|pdesd>\n' "$0" >&2
+    exit 2
+fi
+
+readonly engine="$1"
+case "${engine}" in
+    eprsd)
+        run_subdir=pr/epr
+        input_rel=pr/epr/EPRF.INP
+        transcript_rel=pr/epr/EPRF.OUT
+        input_kind=archived_deck
+        transcript_relation=plausible_pair
+        ;;
+    nnsd)
+        run_subdir=nn
+        input_rel=nn/NNF.INP
+        transcript_rel=nn/NNF.OUT
+        input_kind=archived_deck
+        transcript_relation=plausible_pair
+        ;;
+    knsd)
+        run_subdir=KN
+        input_rel=KN/INPUT
+        transcript_rel=-
+        input_kind=archived_deck
+        transcript_relation=unpaired_gwdac_capture
+        ;;
+    pdsd|pdesd)
+        run_subdir=said
+        input_rel=-
+        transcript_rel=-
+        input_kind=synthetic_quit_probe
+        transcript_relation=unpaired_gwdac_capture
+        ;;
+    *)
+        printf 'unsupported runtime-refresh engine: %s\n' "${engine}" >&2
+        exit 2
+        ;;
+esac
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly state_root="${ORACLE_STATE_ROOT:-/oracle-work/runtime-refresh/${engine}}"
+readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}/runtime-refresh/${engine}/historical"
+readonly binary="${source_root}/said/${engine}"
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-120}"
+readonly stdout_file="${report_root}/stdout.txt"
+readonly stderr_file="${report_root}/stderr.txt"
+readonly trace_file="${report_root}/file-trace.tsv"
+readonly opened_file="${report_root}/opened-files.txt"
+readonly manifest="${report_root}/manifest.txt"
+readonly preflight_manifest="${phase1_root}/reports/runtime-refresh-preflight/manifests/${engine}.txt"
+readonly source_commit="$(
+    awk -F= '$1 == "source_commit" { print $2 }' "${preflight_manifest}"
+)"
+
+mkdir -p "${state_root}/runs" "${report_root}"
+test -x "${binary}"
+test "${source_commit}" = f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+run_root="$(mktemp -d "${state_root}/runs/historical.XXXXXX")"
+cp -a "${source_root}/${run_subdir}" "${run_root}/work"
+rm -f \
+    "${run_root}/work/SAID.TMP" \
+    "${run_root}/work/SAID.PCT" \
+    "${run_root}/work/SAID.LOG" \
+    "${run_root}/work/SAID.PS" \
+    "${run_root}/work/fort.3" \
+    "${run_root}/work/fort.7"
+
+readonly input_file="${report_root}/input.txt"
+if [[ "${input_kind}" == archived_deck ]]; then
+    cp "${source_root}/${input_rel}" "${input_file}"
+else
+    printf 'qt\n' >"${input_file}"
+fi
+: >"${trace_file}"
+
+set +e
+(
+    cd "${run_root}/work"
+    timeout "${timeout_seconds}" \
+        env \
+        LD_PRELOAD=/opt/oracle/file-trace.so \
+        ORACLE_FILE_TRACE="${trace_file}" \
+        "${binary}" \
+        <"${input_file}" \
+        >"${stdout_file}" \
+        2>"${stderr_file}"
+)
+status=$?
+set -e
+
+cut -f2- "${trace_file}" | sort -u >"${opened_file}"
+normal_exit=no
+if grep -Fq 'Thanks for using SAID' "${stdout_file}"; then
+    normal_exit=yes
+fi
+
+transcript_exact=not_applicable
+if [[ "${transcript_rel}" != - ]]; then
+    transcript_exact=no
+    if cmp -s "${stdout_file}" "${source_root}/${transcript_rel}"; then
+        transcript_exact=yes
+    fi
+fi
+
+artifact_inputs=()
+for name in SAID.TMP SAID.PCT SAID.LOG SAID.PS fort.3 fort.7; do
+    if [[ -f "${run_root}/work/${name}" ]]; then
+        install -m 644 "${run_root}/work/${name}" "${report_root}/${name}"
+        artifact_inputs+=("${report_root}/${name}")
+    fi
+done
+
+{
+    printf 'evidence_label=captured\n'
+    printf 'role=historical_executable_witness\n'
+    printf 'engine=%s\n' "${engine}"
+    printf 'source_commit=%s\n' "${source_commit}"
+    printf 'binary_sha256=%s\n' "$(sha256sum "${binary}" | awk '{print $1}')"
+    printf 'input_kind=%s\n' "${input_kind}"
+    printf 'input_sha256=%s\n' "$(sha256sum "${input_file}" | awk '{print $1}')"
+    printf 'transcript_relation=%s\n' "${transcript_relation}"
+    printf 'transcript_exact=%s\n' "${transcript_exact}"
+    printf 'exit_status=%s\n' "${status}"
+    printf 'timed_out=%s\n' "$([[ "${status}" -eq 124 ]] && printf yes || printf no)"
+    printf 'normal_exit=%s\n' "${normal_exit}"
+    printf 'stdout_bytes=%s\n' "$(wc -c <"${stdout_file}")"
+    printf 'stderr_bytes=%s\n' "$(wc -c <"${stderr_file}")"
+    printf 'opened_file_paths=%s\n' "$(wc -l <"${opened_file}")"
+    printf 'operating_system=%s\n' "$(
+        . /etc/os-release
+        printf '%s %s' "${NAME}" "${VERSION_ID}"
+    )"
+    ldd "${binary}" | sed 's/^/ldd=/'
+    sha256sum \
+        "${binary}" \
+        "${input_file}" \
+        "${stdout_file}" \
+        "${stderr_file}" \
+        "${trace_file}" \
+        "${opened_file}" \
+        "${artifact_inputs[@]}"
+} >"${manifest}"
+
+printf 'Historical runtime smoke: engine=%s exit=%s normal_exit=%s\n' \
+    "${engine}" "${status}" "${normal_exit}"

@@ -1,0 +1,241 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "$#" -ne 1 ]]; then
+    printf 'usage: %s <eprsd|nnsd|knsd|pdsd|pdesd>\n' "$0" >&2
+    exit 2
+fi
+
+readonly engine="$1"
+case "${engine}" in
+    eprsd)
+        run_subdir=pr/epr
+        input_rel=pr/epr/EPRF.INP
+        transcript_rel=pr/epr/EPRF.OUT
+        input_kind=archived_deck
+        transcript_relation=plausible_pair
+        ;;
+    nnsd)
+        run_subdir=nn
+        input_rel=nn/NNF.INP
+        transcript_rel=nn/NNF.OUT
+        input_kind=archived_deck
+        transcript_relation=plausible_pair
+        ;;
+    knsd)
+        run_subdir=KN
+        input_rel=KN/INPUT
+        transcript_rel=-
+        input_kind=archived_deck
+        transcript_relation=unpaired_gwdac_capture
+        ;;
+    pdsd|pdesd)
+        run_subdir=said
+        input_rel=-
+        transcript_rel=-
+        input_kind=synthetic_quit_probe
+        transcript_relation=unpaired_gwdac_capture
+        ;;
+    *)
+        printf 'unsupported runtime-refresh engine: %s\n' "${engine}" >&2
+        exit 2
+        ;;
+esac
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly source_commit="$(git -C "${source_root}" rev-parse HEAD)"
+readonly short_commit="${source_commit:0:12}"
+readonly state_root="${PHASE1_STATE_ROOT:-/workspace/phase1/runtime-refresh/${engine}}"
+readonly report_base="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}/runtime-refresh/${engine}"
+readonly report_root="${report_base}/modern"
+readonly historical_root="${report_base}/historical"
+readonly build_manifest="${report_base}/build/manifest.txt"
+readonly binary="${state_root}/artifacts/${short_commit}/${engine}"
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-120}"
+readonly stdout_file="${report_root}/stdout.txt"
+readonly stderr_file="${report_root}/stderr.txt"
+readonly trace_file="${report_root}/file-trace.txt"
+readonly opened_file="${report_root}/opened-files.txt"
+readonly trace_source="${phase1_root}/scripts/runtime-file-trace.c"
+readonly trace_library="${state_root}/file-trace.so"
+readonly manifest="${report_root}/manifest.txt"
+readonly summary="${report_base}/smoke-summary.tsv"
+readonly comparison="${report_base}/comparison.tsv"
+readonly first_diff="${report_base}/historical-vs-modern.first.diff"
+
+mkdir -p "${state_root}/runs" "${report_root}"
+test -f "${build_manifest}"
+build_status="$(awk -F= '$1 == "build_status" { print $2 }' "${build_manifest}")"
+historical_exit="$(awk -F= '$1 == "exit_status" { print $2 }' "${historical_root}/manifest.txt")"
+historical_normal_exit="$(awk -F= '$1 == "normal_exit" { print $2 }' "${historical_root}/manifest.txt")"
+
+if [[ "${build_status}" != linked || ! -x "${binary}" ]]; then
+    {
+        printf '%s\n' $'engine\tbuild_status\thistorical_exit\thistorical_normal_exit\tmodern_exit\tmodern_normal_exit\tstdout_exact\tresult'
+        printf '%s\t%s\t%s\t%s\tnot_run\tnot_run\tnot_run\tbuild_blocked\n' \
+            "${engine}" "${build_status}" "${historical_exit}" \
+            "${historical_normal_exit}"
+    } >"${summary}"
+    (
+        cd "${phase1_root}"
+        find "reports/runtime-refresh/${engine}" -type f \
+            ! -name evidence-manifest.sha256 \
+            ! -name README.md \
+            -print0 \
+            | sort -z \
+            | xargs -0 sha256sum
+    ) >"${report_base}/evidence-manifest.sha256"
+    printf 'Modern runtime smoke skipped: engine=%s build_status=%s\n' \
+        "${engine}" "${build_status}"
+    exit 0
+fi
+
+gcc -O2 -Wall -Wextra -Werror -fPIC -shared \
+    "${trace_source}" -ldl -o "${trace_library}"
+
+run_root="$(mktemp -d "${state_root}/runs/modern.XXXXXX")"
+cp -a "${source_root}/${run_subdir}" "${run_root}/work"
+rm -f \
+    "${run_root}/work/SAID.TMP" \
+    "${run_root}/work/SAID.PCT" \
+    "${run_root}/work/SAID.LOG" \
+    "${run_root}/work/SAID.PS" \
+    "${run_root}/work/fort.3" \
+    "${run_root}/work/fort.7"
+
+readonly input_file="${report_root}/input.txt"
+if [[ "${input_kind}" == archived_deck ]]; then
+    cp "${source_root}/${input_rel}" "${input_file}"
+else
+    printf 'qt\n' >"${input_file}"
+fi
+
+set +e
+: >"${trace_file}"
+(
+    cd "${run_root}/work"
+    timeout "${timeout_seconds}" \
+        env SAID_DATA_ROOT="${source_root}/sdat" \
+        LD_PRELOAD="${trace_library}" \
+        ORACLE_FILE_TRACE="${trace_file}" \
+        "${binary}" \
+        <"${input_file}" \
+        >"${stdout_file}" \
+        2>"${stderr_file}"
+)
+status=$?
+set -e
+
+cut -f2- "${trace_file}" \
+    | sort -u >"${opened_file}"
+normal_exit=no
+if grep -Fq 'Thanks for using SAID' "${stdout_file}"; then
+    normal_exit=yes
+fi
+
+stdout_exact=no
+if cmp -s "${historical_root}/stdout.txt" "${stdout_file}"; then
+    stdout_exact=yes
+fi
+{
+    diff -u \
+        --label historical \
+        --label modern \
+        "${historical_root}/stdout.txt" \
+        "${stdout_file}" || true
+} | sed -n '1,120p' >"${first_diff}"
+
+transcript_exact=not_applicable
+if [[ "${transcript_rel}" != - ]]; then
+    transcript_exact=no
+    if cmp -s "${stdout_file}" "${source_root}/${transcript_rel}"; then
+        transcript_exact=yes
+    fi
+fi
+
+artifact_inputs=()
+for name in SAID.TMP SAID.PCT SAID.LOG SAID.PS fort.3 fort.7; do
+    if [[ -f "${run_root}/work/${name}" ]]; then
+        install -m 644 "${run_root}/work/${name}" "${report_root}/${name}"
+        artifact_inputs+=("${report_root}/${name}")
+    fi
+done
+
+{
+    printf 'evidence_label=reference\n'
+    printf 'role=modern_runtime_smoke\n'
+    printf 'engine=%s\n' "${engine}"
+    printf 'source_commit=%s\n' "${source_commit}"
+    printf 'binary_sha256=%s\n' "$(sha256sum "${binary}" | awk '{print $1}')"
+    printf 'trace_source_sha256=%s\n' "$(sha256sum "${trace_source}" | awk '{print $1}')"
+    printf 'trace_library_sha256=%s\n' "$(sha256sum "${trace_library}" | awk '{print $1}')"
+    printf 'input_kind=%s\n' "${input_kind}"
+    printf 'input_sha256=%s\n' "$(sha256sum "${input_file}" | awk '{print $1}')"
+    printf 'transcript_relation=%s\n' "${transcript_relation}"
+    printf 'transcript_exact=%s\n' "${transcript_exact}"
+    printf 'exit_status=%s\n' "${status}"
+    printf 'timed_out=%s\n' "$([[ "${status}" -eq 124 ]] && printf yes || printf no)"
+    printf 'normal_exit=%s\n' "${normal_exit}"
+    printf 'stdout_bytes=%s\n' "$(wc -c <"${stdout_file}")"
+    printf 'stderr_bytes=%s\n' "$(wc -c <"${stderr_file}")"
+    printf 'opened_file_paths=%s\n' "$(wc -l <"${opened_file}")"
+    printf 'historical_stdout_exact=%s\n' "${stdout_exact}"
+    objdump -p "${binary}" | sed -n 's/^[[:space:]]*NEEDED[[:space:]]*/needed=/p'
+    sha256sum \
+        "${binary}" \
+        "${input_file}" \
+        "${stdout_file}" \
+        "${stderr_file}" \
+        "${trace_file}" \
+        "${opened_file}" \
+        "${artifact_inputs[@]}"
+} >"${manifest}"
+
+printf '%s\n' $'metric\thistorical\tmodern\trelation' >"${comparison}"
+printf 'exit_status\t%s\t%s\t%s\n' \
+    "${historical_exit}" "${status}" \
+    "$([[ "${historical_exit}" == "${status}" ]] && printf exact || printf different)" \
+    >>"${comparison}"
+printf 'normal_exit\t%s\t%s\t%s\n' \
+    "${historical_normal_exit}" "${normal_exit}" \
+    "$([[ "${historical_normal_exit}" == "${normal_exit}" ]] && printf exact || printf different)" \
+    >>"${comparison}"
+printf 'stdout_sha256\t%s\t%s\t%s\n' \
+    "$(sha256sum "${historical_root}/stdout.txt" | awk '{print $1}')" \
+    "$(sha256sum "${stdout_file}" | awk '{print $1}')" \
+    "${stdout_exact}" \
+    >>"${comparison}"
+
+result=diverged
+if [[ "${status}" -eq 0 && "${normal_exit}" == yes && \
+    "${stdout_exact}" == yes ]]; then
+    result=exact_smoke_pass
+elif [[ "${status}" -eq 0 && "${normal_exit}" == yes ]]; then
+    result=completed_output_differs
+elif [[ "${status}" -eq 124 ]]; then
+    result=timed_out
+else
+    result=runtime_failed
+fi
+
+{
+    printf '%s\n' $'engine\tbuild_status\thistorical_exit\thistorical_normal_exit\tmodern_exit\tmodern_normal_exit\tstdout_exact\tresult'
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+        "${engine}" "${build_status}" "${historical_exit}" \
+        "${historical_normal_exit}" "${status}" "${normal_exit}" \
+        "${stdout_exact}" "${result}"
+} >"${summary}"
+
+(
+    cd "${phase1_root}"
+    find "reports/runtime-refresh/${engine}" -type f \
+        ! -name evidence-manifest.sha256 \
+        ! -name README.md \
+        -print0 \
+        | sort -z \
+        | xargs -0 sha256sum
+) >"${report_base}/evidence-manifest.sha256"
+
+printf 'Modern runtime smoke: engine=%s result=%s exit=%s normal_exit=%s\n' \
+    "${engine}" "${result}" "${status}" "${normal_exit}"

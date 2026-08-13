@@ -1,0 +1,1948 @@
+ RETURN for non-graphics
+ "TDL" to set PLOT time delay
+ or enter TERMINAL type (XW, TK41, or ?) ->
+ Welcome to SAID64, the 64-bit version of SAID.
+ Several new features have been added. The mail back
+ option, "go9" has been improved, for example.
+
+ Note! 
+ SAID data file assignments can be changed at any time
+ by entering "GO250"
+
+ The electro-production DATA file is
+ EPPI0P108 8/08/07 RAA WORLD+CLAS+BONN    5/ 8/ 8    add 17375/14
+ "GO56" to do "CLAS"(PRL88, 12(2002)) analysis 
+ "GO60" to do RESIDULE/Contour/3-d PLOTS 
+ "GO51" to define a 2nd (alternate) solution
+ "GO17" to PLOT Q2 dependence of Multipoles at fixed Wcm
+ "GO27" to PLOT multipoles at fixed Wcm
+ "GO31" to PLOT Q2 dependence of RESONANCE fits
+ "GO28" Decay amps at Q2=0; get Q2 dependence 
+ "GO29" Fit RESONANCES, display Q2=0 decay amplitudes
+ "GO37" Test Watsons theorem for multipoles
+ "GO57" switch to Rosenbluth "data" file for Pi0P/PI+N
+ "GO47" Comparative PLOT of Multipoles 
+ "GO48" PLOT multipole phases vs PiN S-mtx phase 
+ RETURN to continue -> g2, w1, w2, r1, r2= 13.75 22.50  0.00  0.00  0.00   
+  Solution:
+  SM08K 2000 WN08(53013/25253)+162774/107078(188) JO07(0) SM05   8/13/26  
+  "GO22" to PUNCH params
+ "Q2" to modify WI07 for fixed Q2 fits
+ "G2" to change coupling constants
+ "RES" to set RESONANT multipoles
+ RETURN to continue -> SM08K 2000 WN08(53013/25253)+162774/107078(188) JO07(0) SM05   8/13/26  
+
+ An ALTERNATE solution can be obtained via "GO51"
+ It can be used for comparative plotting
+ of in the CONTOUR/3-D plotter ("GO60" or "CONP")
+
+  Enter ? for instructions, Return to continue -> Reaction no-  1(PI0P) 2(PI+N) 3(PI-P) 4(PI0N)
+ Enter reaction no -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Ind Var? A(Acm),C(CosA), or W(Wcm) -> (Min Inc Max) for Acm  ? GO9 to quit -> Value of Wcm  ? -> Q**2=   0.000 GeV**2  Eps=   0.000 Phi=    0.00 deg
+ Enter choices; Q**2, Eps, Phi ->  You are set to calculate PI0P production at Wcm  =  120.000
+  Acm  goes from  110.000 to  110.000 in increments of  225.000
+ Q**2=  -7.260 GeV**2 Eps=   0.000 Phi=    0.00 deg
+  Enter N to change, -GO9 to quit -> Enter Y(or M) for Multipoles at Wcm=  120.00 Mev ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions ->
+ "DEFI"(define observables), "GROU"(group print/plot), "MULT"(multiple print)
+ Enter observable (Return for Choices)->
+
+  Choices are
+  (DSG )  (DT  )  (DL  )  (DTT )  (DTL )  (DTLP)  (DSTL)
+  (SGT )  (SGTT)  (SGTL)  (T   )  (P   )  (S   )  (E   )
+  (F   )  (G   )  (H   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (T00 )  (T0Y )  (TY0 )
+  (TXX )  (TXZ )  (TZX )  (TZZ )  (L00 )  (L0Y )  (LXX )
+  (LZX )  (TL00)  (TL0X)  (TL0Y)  (TL0Z)  (TLX0)  (TLZ0)
+  (TLXX)  (TLZX)  (TT00)  (TT0X)  (TT0Z)  (TTX0)  (TTZ0)
+  (LP00)  (LP0X)  (LP0Y)  (LP0Z)  (LPX0)  (LPZ0)  (LPXX)
+  (LPZX)  (TP0X)  (TP0Z)  (TPX0)  (TPZ0)  (A0Y )  (PY  )
+  (PX  )  (PZ  )  (EMRI)  (ST1 )  (ST3 )  (ST13)  (A0YP)
+  (AXYZ)  (KD1A)  (KD1B)  (KD1C)  (KD1D)  (KD1E)  (KD1F)
+  (KD1G)  (KD1H)  (KD1I)  (KD1J)  (KD1K)  (KD1L)  (KD1M)
+  (KD1N)  (KD1O)  (KD1P)  (KD1Q)  (KD1R)  (KD1S)  (KD1T)
+  (RLTP)  (RLT )  (AE  )  (AT  )  (AET )  (SF1 )  (SF2 )
+ Enter "Defi" for definition of Response Functions -> Messages can be sent to: 
+ mparis@gwu.edu or rworkman@gwu.edu
+ Thanks for using SAID
+ The SAID files can be retrieved through MAIL
+ by entering "M". Enter "M" or RETURN(to skip)->

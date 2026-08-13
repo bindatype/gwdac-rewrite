@@ -1,0 +1,4 @@
+metric	historical	modern	relation
+exit_status	0	0	exact
+normal_exit	yes	yes	exact
+stdout_sha256	afede70b7e54b58a95d4d59d00dbf2e446ecb3b9bd160761a49fe8e1b2d4e352	afede70b7e54b58a95d4d59d00dbf2e446ecb3b9bd160761a49fe8e1b2d4e352	yes
