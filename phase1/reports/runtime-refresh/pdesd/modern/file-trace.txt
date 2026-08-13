@@ -1,0 +1,12 @@
+open	fort.7
+open	PDESOL.USR
+open	/workspace/arndt64/sdat/ppamp.dat
+open	/workspace/arndt64/sdat/pdemsg.dat
+open	/workspace/arndt64/sdat/pdedat.dat
+open	/workspace/arndt64/sdat/pdesol.dat
+open	/workspace/arndt64/sdat/pdeses.dat
+open	SAID.TMP
+open	SAID.PCT
+open	SAID.DS
+open	NEWDAT.DAT
+open	/workspace/arndt64/sdat/secpr.dat

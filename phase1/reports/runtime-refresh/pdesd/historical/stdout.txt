@@ -1,0 +1,19 @@
+ RETURN for non-graphics
+ "TDL" to set PLOT time delay
+ or enter TERMINAL type (XW, TK41, or ?) ->
+ Welcome to SAID64, the 64-bit version of SAID.
+ Several new features have been added. The mail back
+ option, "go9" has been improved, for example.
+
+ Note! 
+ SAID data file assignments can be changed at any time
+ by entering "GO250"
+
+ New contour plot! Enter CONP or "GO60" to see.
+ The experimental data file is
+ PDE011 Pid -> Pid        10/01    Arndt/Strakovsky  10/22/01    
+
+Note!! Do NOT use any solution outside its range of
+ validity. Extrapolation properties are generally BAD!
+
+ RETURN to continue ->

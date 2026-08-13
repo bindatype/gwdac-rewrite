@@ -1,0 +1,12 @@
+/home/arndt64/sdat/pdedat.dat
+/home/arndt64/sdat/pdemsg.dat
+/home/arndt64/sdat/pdeses.dat
+/home/arndt64/sdat/pdesol.dat
+/home/arndt64/sdat/ppamp.dat
+/home/arndt64/sdat/secpr.dat
+NEWDAT.DAT
+PDESOL.USR
+SAID.DS
+SAID.PCT
+SAID.TMP
+fort.7

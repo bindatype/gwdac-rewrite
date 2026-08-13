@@ -1,0 +1,12 @@
+/workspace/arndt64/sdat/pdedat.dat
+/workspace/arndt64/sdat/pdemsg.dat
+/workspace/arndt64/sdat/pdeses.dat
+/workspace/arndt64/sdat/pdesol.dat
+/workspace/arndt64/sdat/ppamp.dat
+/workspace/arndt64/sdat/secpr.dat
+NEWDAT.DAT
+PDESOL.USR
+SAID.DS
+SAID.PCT
+SAID.TMP
+fort.7
