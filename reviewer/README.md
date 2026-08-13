@@ -46,4 +46,6 @@ runtime-refresh manifest packages. It also independently compares all committed
 DSG and amplitude fixture tables across the modern build and both checked-in
 historical executables. The experimental PRBAS candidate is still run during
 reproduction, but its known mismatches are diagnostic evidence and do not enter
-the accepted three-executable oracle gate.
+the accepted three-executable oracle gate. Reviewer reproduction permits only
+the candidate request probe's documented exit 6; every other nonzero build or
+generator exit remains a reproduction failure.

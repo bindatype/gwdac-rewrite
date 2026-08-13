@@ -17,6 +17,7 @@ readonly command_table="${host_report_root}/commands.tsv"
 readonly summary="${host_report_root}/summary.txt"
 readonly keep_environment="${GWDAC_GATE_KEEP_ENVIRONMENT:-0}"
 readonly require_candidate="${GWDAC_GATE_REQUIRE_CANDIDATE:-1}"
+readonly allow_request_probe_mismatch="${GWDAC_GATE_ALLOW_REQUEST_PROBE_MISMATCH:-0}"
 readonly -a compose=(
     docker compose
     -p "${project}"
@@ -26,6 +27,11 @@ readonly -a compose=(
 mkdir -p "${host_report_root}"
 if [[ "${require_candidate}" != 0 && "${require_candidate}" != 1 ]]; then
     printf 'GWDAC_GATE_REQUIRE_CANDIDATE must be 0 or 1\n' >&2
+    exit 2
+fi
+if [[ "${allow_request_probe_mismatch}" != 0 && \
+    "${allow_request_probe_mismatch}" != 1 ]]; then
+    printf 'GWDAC_GATE_ALLOW_REQUEST_PROBE_MISMATCH must be 0 or 1\n' >&2
     exit 2
 fi
 printf '%s\n' $'step\tstatus' >"${command_table}"
@@ -62,6 +68,7 @@ run_step build-modern \
 run_step build-candidate \
     "${compose[@]}" exec -T \
     -e "PHASE2_REPORT_ROOT=${container_report_root}" \
+    -e "CM12_ALLOW_REQUEST_PROBE_MISMATCH=${allow_request_probe_mismatch}" \
     dev bash /phase2/scripts/build-cm12-seam
 
 for engine in modern seam; do
@@ -193,6 +200,8 @@ done <"${phase2_root}/fixtures/amplitudes/corpus.tsv"
     printf 'oracle_failures=%s\n' "${oracle_failures}"
     printf 'candidate_failures=%s\n' "${candidate_failures}"
     printf 'candidate_required=%s\n' "${require_candidate}"
+    printf 'request_probe_mismatch_allowed=%s\n' \
+        "${allow_request_probe_mismatch}"
     printf 'gate_table_sha256=%s\n' "$(
         shasum -a 256 "${gate_table}" | awk '{print $1}'
     )"
