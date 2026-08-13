@@ -16,6 +16,7 @@ readonly gate_table="${host_report_root}/fixture-gate.tsv"
 readonly command_table="${host_report_root}/commands.tsv"
 readonly summary="${host_report_root}/summary.txt"
 readonly keep_environment="${GWDAC_GATE_KEEP_ENVIRONMENT:-0}"
+readonly require_candidate="${GWDAC_GATE_REQUIRE_CANDIDATE:-1}"
 readonly -a compose=(
     docker compose
     -p "${project}"
@@ -23,6 +24,10 @@ readonly -a compose=(
 )
 
 mkdir -p "${host_report_root}"
+if [[ "${require_candidate}" != 0 && "${require_candidate}" != 1 ]]; then
+    printf 'GWDAC_GATE_REQUIRE_CANDIDATE must be 0 or 1\n' >&2
+    exit 2
+fi
 printf '%s\n' $'step\tstatus' >"${command_table}"
 
 cleanup() {
@@ -99,6 +104,8 @@ hash_or_missing() {
 }
 
 fixture_failures=0
+oracle_failures=0
+candidate_failures=0
 fixture_count=0
 row_count=0
 compare_fixture() {
@@ -130,7 +137,14 @@ compare_fixture() {
         [[ "${modern_sha}" == "${candidate_sha}" ]]; then
         candidate_exact=yes
     fi
-    if [[ "${oracle_exact}" != "yes" || "${candidate_exact}" != "yes" ]]; then
+    if [[ "${oracle_exact}" != "yes" ]]; then
+        oracle_failures=$((oracle_failures + 1))
+    fi
+    if [[ "${candidate_exact}" != "yes" ]]; then
+        candidate_failures=$((candidate_failures + 1))
+    fi
+    if [[ "${oracle_exact}" != "yes" || \
+        ("${require_candidate}" == 1 && "${candidate_exact}" != "yes") ]]; then
         fixture_failures=$((fixture_failures + 1))
     fi
     fixture_count=$((fixture_count + 1))
@@ -176,6 +190,9 @@ done <"${phase2_root}/fixtures/amplitudes/corpus.tsv"
     printf 'typed_records=%s\n' "${row_count}"
     printf 'command_failures=%s\n' "${command_failures}"
     printf 'fixture_failures=%s\n' "${fixture_failures}"
+    printf 'oracle_failures=%s\n' "${oracle_failures}"
+    printf 'candidate_failures=%s\n' "${candidate_failures}"
+    printf 'candidate_required=%s\n' "${require_candidate}"
     printf 'gate_table_sha256=%s\n' "$(
         shasum -a 256 "${gate_table}" | awk '{print $1}'
     )"

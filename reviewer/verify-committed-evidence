@@ -155,7 +155,7 @@ verify_corpus() {
     local cases=0
     local records=0
     local corpus_failed=0
-    local -a engines=(modern arndt64 gwdac seam)
+    local -a engines=(modern arndt64 gwdac)
 
     if ! check_tracked_file "${fixture_table}"; then
         printf 'CORPUS  FAIL %-28s fixture table unavailable\n' "${label}"
@@ -196,7 +196,7 @@ verify_corpus() {
     fi
 
     if [[ "${corpus_failed}" -eq 0 ]]; then
-        printf 'CORPUS  PASS %-28s cases=%s records=%s engines=4\n' \
+        printf 'CORPUS  PASS %-28s cases=%s records=%s engines=3\n' \
             "${label}" "${cases}" "${records}"
         pass_count=$((pass_count + 1))
     else

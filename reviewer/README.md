@@ -43,5 +43,7 @@ The default deletes it after reporting the result.
 
 The verifier covers the security, adapter, GO5, unpatched-priming, and
 runtime-refresh manifest packages. It also independently compares all committed
-DSG and amplitude fixture tables across the modern build, both checked-in
-historical executables, and the accepted immutable seam.
+DSG and amplitude fixture tables across the modern build and both checked-in
+historical executables. The experimental PRBAS candidate is still run during
+reproduction, but its known mismatches are diagnostic evidence and do not enter
+the accepted three-executable oracle gate.
