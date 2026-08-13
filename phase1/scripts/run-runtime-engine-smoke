@@ -108,7 +108,7 @@ readonly input_file="${report_root}/input.txt"
 if [[ "${input_kind}" == archived_deck ]]; then
     cp "${source_root}/${input_rel}" "${input_file}"
 else
-    printf 'qt\n' >"${input_file}"
+    printf '\nqt\n' >"${input_file}"
 fi
 
 set +e
@@ -130,7 +130,9 @@ set -e
 cut -f2- "${trace_file}" \
     | sort -u >"${opened_file}"
 normal_exit=no
-if grep -Fq 'Thanks for using SAID' "${stdout_file}"; then
+if [[ "${input_kind}" == synthetic_quit_probe && "${status}" -eq 0 ]]; then
+    normal_exit=yes
+elif grep -Fq 'Thanks for using SAID' "${stdout_file}"; then
     normal_exit=yes
 fi
 

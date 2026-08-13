@@ -1,0 +1,54 @@
+evidence_label=captured
+role=historical_executable_witness
+engine=pdsd
+source_commit=f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+binary_sha256=494f732b1c92ce5e5dd0ba1af8235a9557087456106ed81e00981b1c02f75f72
+input_kind=synthetic_quit_probe
+input_sha256=632f7ea9bbad671064ed57bb567d5711dc9fc620f730545b3b54cfaba943aab1
+transcript_relation=unpaired_gwdac_capture
+transcript_exact=not_applicable
+exit_status=0
+timed_out=no
+normal_exit=yes
+stdout_bytes=659
+stderr_bytes=0
+opened_file_paths=12
+operating_system=Ubuntu 24.04
+ldd=	libpng12.so.0 => /opt/oracle/root/lib/x86_64-linux-gnu/libpng12.so.0 (0x00007fffff400000)
+ldd=	libgd.so.2 => /opt/oracle/root/usr/lib/x86_64-linux-gnu/libgd.so.2 (0x00007fffff000000)
+ldd=	libgfortran.so.3 => /opt/oracle/root/usr/lib/x86_64-linux-gnu/libgfortran.so.3 (0x00007fffff69b000)
+ldd=	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fffff317000)
+ldd=	libXt.so.6 => /lib/x86_64-linux-gnu/libXt.so.6 (0x00007fffff62e000)
+ldd=	libX11.so.6 => /lib/x86_64-linux-gnu/libX11.so.6 (0x00007ffffeec3000)
+ldd=	libg2c.so.0 => /opt/oracle/root/usr/lib/libg2c.so.0 (0x00007ffffec00000)
+ldd=	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fffff2e9000)
+ldd=	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007ffffe9ee000)
+ldd=	libz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007fffff2cd000)
+ldd=	libXpm.so.4 => /lib/x86_64-linux-gnu/libXpm.so.4 (0x00007fffff2b9000)
+ldd=	libjpeg.so.8 => /lib/x86_64-linux-gnu/libjpeg.so.8 (0x00007ffffee40000)
+ldd=	libfontconfig.so.1 => /lib/x86_64-linux-gnu/libfontconfig.so.1 (0x00007fffff268000)
+ldd=	libfreetype.so.6 => /lib/x86_64-linux-gnu/libfreetype.so.6 (0x00007ffffe922000)
+ldd=	libquadmath.so.0 => /lib/x86_64-linux-gnu/libquadmath.so.0 (0x00007ffffe8d9000)
+ldd=	/lib64/ld-linux-x86-64.so.2 (0x00007ffffffc6000)
+ldd=	libSM.so.6 => /lib/x86_64-linux-gnu/libSM.so.6 (0x00007fffff25e000)
+ldd=	libICE.so.6 => /lib/x86_64-linux-gnu/libICE.so.6 (0x00007ffffe8bd000)
+ldd=	libxcb.so.1 => /lib/x86_64-linux-gnu/libxcb.so.1 (0x00007ffffe894000)
+ldd=	libexpat.so.1 => /lib/x86_64-linux-gnu/libexpat.so.1 (0x00007ffffe868000)
+ldd=	libbz2.so.1.0 => /lib/x86_64-linux-gnu/libbz2.so.1.0 (0x00007fffff24a000)
+ldd=	libpng16.so.16 => /lib/x86_64-linux-gnu/libpng16.so.16 (0x00007ffffe830000)
+ldd=	libbrotlidec.so.1 => /lib/x86_64-linux-gnu/libbrotlidec.so.1 (0x00007ffffee32000)
+ldd=	libuuid.so.1 => /lib/x86_64-linux-gnu/libuuid.so.1 (0x00007ffffe826000)
+ldd=	libbsd.so.0 => /lib/x86_64-linux-gnu/libbsd.so.0 (0x00007ffffe810000)
+ldd=	libXau.so.6 => /lib/x86_64-linux-gnu/libXau.so.6 (0x00007ffffe80a000)
+ldd=	libXdmcp.so.6 => /lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007ffffe802000)
+ldd=	libbrotlicommon.so.1 => /lib/x86_64-linux-gnu/libbrotlicommon.so.1 (0x00007ffffe7df000)
+ldd=	libmd.so.0 => /lib/x86_64-linux-gnu/libmd.so.0 (0x00007ffffe7d0000)
+494f732b1c92ce5e5dd0ba1af8235a9557087456106ed81e00981b1c02f75f72  /workspace/arndt64/said/pdsd
+632f7ea9bbad671064ed57bb567d5711dc9fc620f730545b3b54cfaba943aab1  /phase1/reports/runtime-refresh/pdsd/historical/input.txt
+47efa50c88765b40a0542d566677fbac42098527b1a294f78d27fe655e3611dc  /phase1/reports/runtime-refresh/pdsd/historical/stdout.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /phase1/reports/runtime-refresh/pdsd/historical/stderr.txt
+319489a771031979c9b829dbb28599103bb8a1979f7fb00786e587e261d46bce  /phase1/reports/runtime-refresh/pdsd/historical/file-trace.tsv
+d92a8d5c6272f2b655672364ccfbc6f4b05e720e5d78047c7a15adf61a1d1f4f  /phase1/reports/runtime-refresh/pdsd/historical/opened-files.txt
+be1f987c0e1033e8c141056c287a004eeac826290e4ef21ab03a41e449f13e2e  /phase1/reports/runtime-refresh/pdsd/historical/SAID.TMP
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /phase1/reports/runtime-refresh/pdsd/historical/SAID.PCT
+cb95a6bb17364a3b217afe9035238e31e87f726dbd7ad0dbd8ea2b8aed3c3e5d  /phase1/reports/runtime-refresh/pdsd/historical/fort.7
