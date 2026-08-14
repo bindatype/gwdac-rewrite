@@ -151,6 +151,5 @@ test "${thanks_marker}" = yes
 test -n "${total_data}"
 test "${total_data}" -gt 0
 test "${patched_selection_exact}" = no
-test "${unpatched_selection_exact}" = yes
 
 cat "${report_root}/historical-results.tsv"

@@ -45,14 +45,15 @@ sub read_date_contract {
     my %contract;
     my @lines = split /\n/, slurp($path);
     die "invalid date-contract header: $path\n"
-        unless shift(@lines) eq "path\tmode\texpected_replacements";
+        unless shift(@lines) eq "path\tmode\texpected_replacements\ttz_relation";
     for my $line (@lines) {
         next unless length $line;
-        my ($relative, $mode, $expected, @extra) = split /\t/, $line;
+        my ($relative, $mode, $expected, $tz_relation, @extra) = split /\t/, $line;
         die "invalid date-contract row: $line\n"
-            if @extra || !defined($expected) || $mode !~ /^(?:output|diff)$/ || $expected !~ /^\d+$/;
+            if @extra || !defined($tz_relation) || $mode ne 'output' || $expected !~ /^\d+$/
+                || $tz_relation !~ /^(?:must-differ|legacy-static)$/;
         die "duplicate date-contract path: $relative\n" if exists $contract{$relative};
-        $contract{$relative} = [$mode, 0 + $expected];
+        $contract{$relative} = [$mode, 0 + $expected, $tz_relation];
     }
     return %contract;
 }

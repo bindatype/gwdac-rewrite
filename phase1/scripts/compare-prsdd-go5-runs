@@ -35,8 +35,8 @@ sub read_date_contract {
     shift @lines;
     for my $line (@lines) {
         next unless length $line;
-        my ($relative, undef, $count) = split /\t/, $line;
-        $expected{$relative} = 0 + $count;
+        my ($relative, undef, $count, $tz_relation) = split /\t/, $line;
+        $expected{$relative} = [0 + $count, $tz_relation];
     }
     return %expected;
 }
@@ -61,7 +61,11 @@ my ($root_a, $root_b, $report) = @ARGV;
 my $script_root = dirname(File::Spec->rel2abs($0));
 my $date_contract_path = $ENV{GO5_DATE_FIELDS}
     // File::Spec->catfile($script_root, '..', 'config', 'prsdd-go5-date-fields.tsv');
+my $derived_path = $ENV{GO5_DERIVED_FILES}
+    // File::Spec->catfile($script_root, '..', 'config', 'prsdd-go5-derived-files.txt');
 my %expected_dates = read_date_contract($date_contract_path);
+my %derived = map { $_ => 1 }
+    grep { length } map { chomp; $_ } split /\n/, slurp($derived_path);
 my %raw_a = read_manifest(File::Spec->catfile($root_a, 'raw-manifest.sha256'));
 my %raw_b = read_manifest(File::Spec->catfile($root_b, 'raw-manifest.sha256'));
 my %canonical_a = read_manifest(File::Spec->catfile($root_a, 'canonical-manifest.sha256'));
@@ -86,13 +90,22 @@ for my $relative (sort keys %raw_a) {
     my $tokens_a = join(',', @{$ledger_a{$relative} // []});
     my $tokens_b = join(',', @{$ledger_b{$relative} // []});
     if (exists $expected_dates{$relative}) {
+        my ($expected_count, $tz_relation) = @{$expected_dates{$relative}};
         die "$relative: wrong ledger count in candidate A\n"
-            if scalar(@{$ledger_a{$relative} // []}) != $expected_dates{$relative};
+            if scalar(@{$ledger_a{$relative} // []}) != $expected_count;
         die "$relative: wrong ledger count in candidate B\n"
-            if scalar(@{$ledger_b{$relative} // []}) != $expected_dates{$relative};
-        die "$relative: raw dates did not differ\n"
-            if $raw_relation ne 'different' || $tokens_a eq $tokens_b;
-        $date_differences++;
+            if scalar(@{$ledger_b{$relative} // []}) != $expected_count;
+        if ($tz_relation eq 'must-differ') {
+            die "$relative: raw dates did not differ\n"
+                if $raw_relation ne 'different' || $tokens_a eq $tokens_b;
+            $date_differences++;
+        } else {
+            die "$relative: legacy date unexpectedly followed TZ\n"
+                if $raw_relation ne 'exact' || $tokens_a ne $tokens_b;
+        }
+    } elsif ($derived{$relative}) {
+        die "$relative: raw derived artifact did not expose the date-context change\n"
+            if $raw_relation ne 'different';
     } else {
         die "$relative: non-date raw artifact differed\n" if $raw_relation ne 'exact';
         $nondate_exact++;
@@ -103,5 +116,9 @@ for my $relative (sort keys %raw_a) {
 open my $fh, '>:raw', $report or die "cannot write $report: $!\n";
 print {$fh} join("\n", @rows), "\n";
 close $fh or die "cannot close $report: $!\n";
-printf "two-run comparison: date_files_different=%d nondate_files_exact=%d canonical_files_exact=%d\n",
-    $date_differences, $nondate_exact, scalar(keys %canonical_a);
+printf "two-run comparison: modern_date_files_different=%d legacy_date_files_static=%d derived_raw_files_different=%d nondate_files_exact=%d canonical_files_exact=%d\n",
+    $date_differences,
+    scalar(grep { $expected_dates{$_}[1] eq 'legacy-static' } keys %expected_dates),
+    scalar(keys %derived),
+    $nondate_exact,
+    scalar(keys %canonical_a);

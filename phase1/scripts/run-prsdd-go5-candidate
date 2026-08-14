@@ -102,6 +102,8 @@ compose exec -T oracle \
     "${raw_root}" "${candidate_root}/raw-manifest.sha256"
 "${script_root}/canonicalize-prsdd-go5-evidence" \
     "${raw_root}" "${canonical_root}" "${candidate_root}/canonicalization.tsv"
+"${script_root}/derive-prsdd-go5-canonical-artifacts" \
+    "${canonical_root}" "${candidate_root}/canonical-derivation.tsv"
 "${script_root}/write-prsdd-go5-manifest" \
     "${canonical_root}" "${candidate_root}/canonical-manifest.sha256"
 "${script_root}/compare-prsdd-go5-candidate" \

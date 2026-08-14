@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    printf 'usage: %s CANONICAL_PACKAGE REPORT\n' "$0" >&2
+    exit 64
+}
+
+[[ "$#" -eq 2 ]] || usage
+readonly canonical_root="$1"
+readonly report="$2"
+readonly result="${canonical_root}/historical-results.tsv"
+readonly temporary="${report}.tmp.$$"
+trap 'rm -f "${temporary}"' EXIT
+
+test -d "${canonical_root}"
+test -f "${result}"
+
+patched_selection_exact=no
+unpatched_selection_exact=no
+if cmp -s \
+    "${canonical_root}/historical-arndt64-database.selection-projection" \
+    "${canonical_root}/accepted-database.selection-projection"; then
+    patched_selection_exact=yes
+fi
+if cmp -s \
+    "${canonical_root}/historical-arndt64-database.selection-projection" \
+    "${canonical_root}/unpatched-database-1.selection-projection"; then
+    unpatched_selection_exact=yes
+fi
+
+diff -u \
+    --label historical-arndt64-database \
+    --label accepted-database \
+    "${canonical_root}/historical-arndt64-database.stdout" \
+    "${canonical_root}/accepted-database.stdout" \
+    >"${canonical_root}/historical-vs-patched.diff" || true
+diff -u \
+    --label historical-arndt64-database \
+    --label unpatched-database-1 \
+    "${canonical_root}/historical-arndt64-database.stdout" \
+    "${canonical_root}/unpatched-database-1.stdout" \
+    >"${canonical_root}/historical-vs-unpatched.diff" || true
+
+awk -F '\t' -v OFS='\t' \
+    -v patched="${patched_selection_exact}" \
+    -v unpatched="${unpatched_selection_exact}" '
+        NR == 1 { print; next }
+        { $9=patched; $10=unpatched; print }
+    ' "${result}" >"${temporary}"
+mv "${temporary}" "${result}"
+
+{
+    printf 'path\tderivation\tresult\n'
+    printf 'historical-results.tsv\tcanonical-selection-comparison\tpatched=%s,unpatched=%s\n' \
+        "${patched_selection_exact}" "${unpatched_selection_exact}"
+    printf 'historical-vs-patched.diff\tdiff-of-canonical-stdout\tgenerated\n'
+    printf 'historical-vs-unpatched.diff\tdiff-of-canonical-stdout\tgenerated\n'
+} >"${report}"
+
+test "${patched_selection_exact}" = no
+test "${unpatched_selection_exact}" = yes
+printf 'derived GO5 canonical artifacts: files=3\n'

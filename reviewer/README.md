@@ -43,9 +43,11 @@ GO5_KEEP_WORKSPACE=1 make reviewer-reproduce-go5
 ```
 
 It runs the modern and historical GO5 diagnostic twice, under
-`Pacific/Kiritimati` and `Etc/GMT+12`. Raw captures must differ only in the 13
-explicitly declared date-bearing files; all 69 canonical package files must be
-byte-identical. Each raw package is compared with the committed GO5 manifest by
+`Pacific/Kiritimati` and `Etc/GMT+12`. Raw differences must stay inside the
+explicit date and derived-artifact contract. The modern runtime follows `TZ`; the
+checked-in historical executable does not, so three date-sensitive comparison
+artifacts are re-derived from canonical inputs. All 69 canonical package files
+must be byte-identical. Each raw package is compared with the committed GO5 manifest by
 a separate command. The generators do not write that manifest or modify the
 accepted report tree. Evidence files are written only below the caller's
 candidate root; case-sensitive execution scratch remains in disposable Docker
