@@ -1,0 +1,70 @@
+path	raw_relation	canonical_relation	date_tokens_a	date_tokens_b
+accepted-database.exit	exact	exact		
+accepted-database.selection-projection	different	exact	 8/14/26, 8/14/26, 8/14/26	 8/13/26, 8/13/26, 8/13/26
+accepted-database.stderr	exact	exact		
+accepted-database.stdout	different	exact	 8/14/26, 8/14/26, 8/14/26	 8/13/26, 8/13/26, 8/13/26
+accepted-priming.exit	exact	exact		
+accepted-priming.stderr	exact	exact		
+accepted-priming.stdout	different	exact	 8/14/26, 8/14/26, 8/14/26, 8/14/26, 8/14/26	 8/13/26, 8/13/26, 8/13/26, 8/13/26, 8/13/26
+build-patched-traced/build-manifest.txt	exact	exact		
+build-patched-traced/fsplit.log	exact	exact		
+build-patched-traced/gplot-build.log	exact	exact		
+build-patched-traced/local-libraries-build.log	exact	exact		
+build-patched-traced/prsdd-core-build.log	exact	exact		
+build-patched-traced/prsdd-headless-build.log	exact	exact		
+build-patched-traced/prsdd-link.log	exact	exact		
+build-patched/build-manifest.txt	exact	exact		
+build-patched/fsplit.log	exact	exact		
+build-patched/gplot-build.log	exact	exact		
+build-patched/local-libraries-build.log	exact	exact		
+build-patched/prsdd-core-build.log	exact	exact		
+build-patched/prsdd-headless-build.log	exact	exact		
+build-patched/prsdd-link.log	exact	exact		
+build-unpatched-traced/build-manifest.txt	exact	exact		
+build-unpatched-traced/fsplit.log	exact	exact		
+build-unpatched-traced/gplot-build.log	exact	exact		
+build-unpatched-traced/local-libraries-build.log	exact	exact		
+build-unpatched-traced/prsdd-core-build.log	exact	exact		
+build-unpatched-traced/prsdd-headless-build.log	exact	exact		
+build-unpatched-traced/prsdd-link.log	exact	exact		
+build-unpatched/build-manifest.txt	exact	exact		
+build-unpatched/fsplit.log	exact	exact		
+build-unpatched/gplot-build.log	exact	exact		
+build-unpatched/local-libraries-build.log	exact	exact		
+build-unpatched/prsdd-core-build.log	exact	exact		
+build-unpatched/prsdd-headless-build.log	exact	exact		
+build-unpatched/prsdd-link.log	exact	exact		
+deck-comparison.diff	exact	exact		
+environment.txt	exact	exact		
+first-unpatched-cstr-bytes.txt	exact	exact		
+fresh-patched-database.exit	exact	exact		
+fresh-patched-database.stderr	exact	exact		
+fresh-patched-database.stdout	different	exact	 8/14/26, 8/14/26, 8/14/26	 8/13/26, 8/13/26, 8/13/26
+historical-arndt64-database.exit	exact	exact		
+historical-arndt64-database.selection-projection	exact	exact	 8/14/26, 8/14/26, 8/14/26	 8/14/26, 8/14/26, 8/14/26
+historical-arndt64-database.stderr	exact	exact		
+historical-arndt64-database.stdout	exact	exact	 8/14/26, 8/14/26, 8/14/26	 8/14/26, 8/14/26, 8/14/26
+historical-environment.txt	exact	exact		
+historical-results.tsv	different	exact		
+historical-vs-patched.diff	different	exact		
+historical-vs-unpatched.diff	different	exact		
+patched-read-status.txt	exact	exact		
+patched-read-values.txt	exact	exact		
+patched-traced-database.exit	exact	exact		
+patched-traced-database.stderr	exact	exact		
+patched-traced-database.stdout	different	exact	 8/14/26, 8/14/26, 8/14/26	 8/13/26, 8/13/26, 8/13/26
+read-value-summary.tsv	exact	exact		
+read-values.diff	exact	exact		
+results.tsv	exact	exact		
+unpatched-database-1.exit	exact	exact		
+unpatched-database-1.selection-projection	different	exact	 8/14/26, 8/14/26, 8/14/26	 8/13/26, 8/13/26, 8/13/26
+unpatched-database-1.stderr	exact	exact		
+unpatched-database-1.stdout	different	exact	 8/14/26, 8/14/26, 8/14/26	 8/13/26, 8/13/26, 8/13/26
+unpatched-database-2.exit	exact	exact		
+unpatched-database-2.stderr	exact	exact		
+unpatched-database-2.stdout	different	exact	 8/14/26, 8/14/26, 8/14/26	 8/13/26, 8/13/26, 8/13/26
+unpatched-read-status.txt	exact	exact		
+unpatched-read-values.txt	exact	exact		
+unpatched-traced-database.exit	exact	exact		
+unpatched-traced-database.stderr	exact	exact		
+unpatched-traced-database.stdout	different	exact	 8/14/26, 8/14/26, 8/14/26	 8/13/26, 8/13/26, 8/13/26

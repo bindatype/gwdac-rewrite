@@ -3,6 +3,7 @@ security-scan	.	security/reports/credential-scan-20260812/manifest.sha256
 go3pr2-adapter	.	phase1/reports/go3pr2-adapter-diagnostic/manifest.sha256
 prsdd-go5	phase1/reports/prsdd-go5-diagnostic	phase1/reports/prsdd-go5-diagnostic/manifest.sha256
 prsdd-go5-reconciliation	phase1/reports/prsdd-go5-evidence-reconciliation-20260813	phase1/reports/prsdd-go5-evidence-reconciliation-20260813/manifest.sha256
+prsdd-go5-determinism	phase1/reports/prsdd-go5-evidence-determinism-20260813	phase1/reports/prsdd-go5-evidence-determinism-20260813/manifest.sha256
 unpatched-priming	phase1/reports/unpatched-priming-measurement	phase1/reports/unpatched-priming-measurement/manifest.sha256
 runtime-refresh-aggregate	.	phase1/reports/runtime-refresh/aggregate-manifest.sha256
 runtime-refresh-eprsd	phase1	phase1/reports/runtime-refresh/eprsd/evidence-manifest.sha256
