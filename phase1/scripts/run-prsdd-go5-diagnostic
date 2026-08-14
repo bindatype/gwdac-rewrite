@@ -3,7 +3,15 @@ set -euo pipefail
 
 readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
 readonly phase1_root="${PHASE1_ROOT:-/phase1}"
-readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}/prsdd-go5-diagnostic"
+if [[ -z "${PHASE1_REPORT_ROOT:-}" ]]; then
+    printf 'PHASE1_REPORT_ROOT must name a disposable candidate root\n' >&2
+    exit 64
+fi
+if [[ -z "${EVIDENCE_TZ:-}" ]]; then
+    printf 'EVIDENCE_TZ must identify the raw-capture time zone\n' >&2
+    exit 64
+fi
+readonly report_root="${PHASE1_REPORT_ROOT}/prsdd-go5-diagnostic"
 readonly fixture_root="${phase1_root}/fixtures/prsdd-go5-diagnostic"
 readonly accepted_state_root="${PHASE1_STATE_ROOT:-/workspace/phase1/reproducible}"
 readonly diagnostic_state_root="${PRSD_GO5_STATE_ROOT:-/workspace/phase1/prsdd-go5-diagnostic}"
@@ -39,7 +47,10 @@ mkdir -p "${report_root}" "${diagnostic_state_root}/runs"
 
 cmp "${priming_fixture}" \
     "${phase1_root}/fixtures/go3pr2-production-adapter/live.in"
-diff -u "${priming_fixture}" "${database_fixture}" \
+diff -u \
+    --label go3pr2-priming.in \
+    --label go5pr-database-list.in \
+    "${priming_fixture}" "${database_fixture}" \
     >"${report_root}/deck-comparison.diff" || true
 
 build_variant() {
@@ -98,7 +109,7 @@ run_case() {
     (
         cd "${run_root}/pr"
         timeout "${timeout_seconds}" \
-            env SAID_DATA_ROOT="${data_root}" \
+            env SAID_DATA_ROOT="${data_root}" TZ="${EVIDENCE_TZ}" \
             "${binary}" \
             <"${fixture}" \
             >"${prefix}.stdout" \
@@ -246,13 +257,5 @@ test "$(awk -F '\t' '$1 == "first_field" { print $2 }' "${report_root}/read-valu
     printf 'pru_sha256=%s\n' "$(sha256sum "${source_root}/said/pru.f" | awk '{ print $1 }')"
     printf 'pnu_sha256=%s\n' "$(sha256sum "${source_root}/said/pnu.f" | awk '{ print $1 }')"
 } >"${report_root}/environment.txt"
-
-(
-    cd "${report_root}"
-    find . -type f ! -name manifest.sha256 -print0 \
-        | sort -z \
-        | xargs -0 sha256sum \
-        | sed 's#  \./#  #'
-) >"${report_root}/manifest.sha256"
 
 cat "${results}"

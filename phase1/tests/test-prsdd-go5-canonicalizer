@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly phase1_root="$(cd "${script_root}/.." && pwd)"
+readonly workspace="$(mktemp -d "${TMPDIR:-/tmp}/go5-canonicalizer-test.XXXXXX")"
+trap 'rm -rf "${workspace}"' EXIT
+
+mkdir -p "${workspace}/raw"
+printf 'fixture.stdout\n' >"${workspace}/inventory.txt"
+printf 'path\tmode\texpected_replacements\nfixture.stdout\toutput\t3\n' \
+    >"${workspace}/dates.tsv"
+{
+    printf ' PR094  Photo-prod          07/09 Arndt  08/18/14\n'
+    printf '%-64s%s  \n' '  CM12 CHI/DP=51634/25553 0.2098E+01' ' 8/14/26'
+    printf '%22s%s  \n' '' ' 8/14/26'
+    printf '%-40s%s  \n' '     PI+N  DSG  AT Elab =  1000.00' ' 8/14/26'
+    printf '  SAMPLE Chi,M= 34/25  1.25E-03\n'
+} >"${workspace}/raw/fixture.stdout"
+
+GO5_INVENTORY="${workspace}/inventory.txt" \
+GO5_DATE_FIELDS="${workspace}/dates.tsv" \
+    "${phase1_root}/scripts/canonicalize-prsdd-go5-evidence" \
+    "${workspace}/raw" "${workspace}/canonical" "${workspace}/ledger.tsv"
+
+test "$(grep -Fo '<RUNDATE>' "${workspace}/canonical/fixture.stdout" | wc -l | tr -d ' ')" -eq 3
+grep -Fq '08/18/14' "${workspace}/canonical/fixture.stdout"
+grep -Fq '07/09' "${workspace}/canonical/fixture.stdout"
+grep -Fq 'CHI/DP=51634/25553' "${workspace}/canonical/fixture.stdout"
+grep -Fq 'Chi,M= 34/25' "${workspace}/canonical/fixture.stdout"
+grep -Fq '0.2098E+01' "${workspace}/canonical/fixture.stdout"
+grep -Fq '1.25E-03' "${workspace}/canonical/fixture.stdout"
+test "$(($(wc -l <"${workspace}/ledger.tsv") - 1))" -eq 3
+
+printf 'path\tmode\texpected_replacements\nfixture.stdout\toutput\t4\n' \
+    >"${workspace}/bad-count.tsv"
+if GO5_INVENTORY="${workspace}/inventory.txt" \
+    GO5_DATE_FIELDS="${workspace}/bad-count.tsv" \
+    "${phase1_root}/scripts/canonicalize-prsdd-go5-evidence" \
+    "${workspace}/raw" "${workspace}/bad-canonical" "${workspace}/bad-ledger.tsv" \
+    >/dev/null 2>&1; then
+    printf 'canonicalizer accepted an incorrect replacement count\n' >&2
+    exit 1
+fi
+
+printf 'prsdd GO5 canonicalizer tests: PASS\n'

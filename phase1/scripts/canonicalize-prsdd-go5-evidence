@@ -1,0 +1,170 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use File::Basename qw(dirname);
+use File::Find qw(find);
+use File::Path qw(make_path);
+use File::Spec;
+
+sub usage {
+    die "usage: $0 RAW_PACKAGE CANONICAL_PACKAGE LEDGER\n";
+}
+
+sub slurp {
+    my ($path) = @_;
+    open my $fh, '<:raw', $path or die "cannot read $path: $!\n";
+    local $/;
+    return <$fh>;
+}
+
+sub write_file {
+    my ($path, $contents) = @_;
+    make_path(dirname($path));
+    open my $fh, '>:raw', $path or die "cannot write $path: $!\n";
+    print {$fh} $contents;
+    close $fh or die "cannot close $path: $!\n";
+}
+
+sub read_inventory {
+    my ($path) = @_;
+    my @paths = grep { length } map { chomp; $_ } split /\n/, slurp($path);
+    my %seen;
+    for my $relative (@paths) {
+        die "invalid inventory path: $relative\n"
+            if File::Spec->file_name_is_absolute($relative) || $relative =~ m{(?:^|/)\.\.(?:/|$)};
+        die "duplicate inventory path: $relative\n" if $seen{$relative}++;
+    }
+    my @sorted = sort @paths;
+    die "inventory is not sorted: $path\n" if join("\n", @paths) ne join("\n", @sorted);
+    return @paths;
+}
+
+sub read_date_contract {
+    my ($path) = @_;
+    my %contract;
+    my @lines = split /\n/, slurp($path);
+    die "invalid date-contract header: $path\n"
+        unless shift(@lines) eq "path\tmode\texpected_replacements";
+    for my $line (@lines) {
+        next unless length $line;
+        my ($relative, $mode, $expected, @extra) = split /\t/, $line;
+        die "invalid date-contract row: $line\n"
+            if @extra || !defined($expected) || $mode !~ /^(?:output|diff)$/ || $expected !~ /^\d+$/;
+        die "duplicate date-contract path: $relative\n" if exists $contract{$relative};
+        $contract{$relative} = [$mode, 0 + $expected];
+    }
+    return %contract;
+}
+
+sub count_literal {
+    my ($contents, $literal) = @_;
+    return scalar(() = $contents =~ /\Q$literal\E/g);
+}
+
+sub scientific_tokens {
+    my ($contents) = @_;
+    return join "\n", ($contents =~ /[+-]?(?:\d+(?:\.\d*)?|\.\d+)[Ee][+-]?\d+/g);
+}
+
+sub canonicalize_line {
+    my ($relative, $mode, $line, $line_number, $ledger_rows) = @_;
+    my @offsets = $mode eq 'output' ? (64, 40, 22) : (23);
+    my $replacements = 0;
+
+    for my $offset (@offsets) {
+        next if length($line) < $offset + 8;
+        my $field = substr($line, $offset, 8);
+        next unless $field =~ /^(?: [1-9]|1[0-2])\/(?: [1-9]|[12][0-9]|3[01])\/\d{2}$/;
+
+        my $prefix = substr($line, 0, $offset);
+        my $suffix = substr($line, $offset + 8);
+        if ($mode eq 'output' && $offset == 64) {
+            next unless $prefix =~ /CHI\/DP=/ && $suffix =~ /^\s*$/;
+        } elsif ($mode eq 'output' && $offset == 40) {
+            next unless $prefix =~ /PI\+N\s+DSG\s+AT Elab\s*=/ && $suffix =~ /^\s*$/;
+        } elsif ($mode eq 'output' && $offset == 22) {
+            next unless $prefix =~ /^\s*$/ && $suffix =~ /^\s*$/;
+        } else {
+            next unless $prefix =~ /^[ +\-]\s*$/ && $suffix =~ /^\s*$/;
+        }
+
+        substr($line, $offset, 8, '<RUNDATE>');
+        push @{$ledger_rows}, join("\t", $relative, $line_number, $offset + 1, $field, '<RUNDATE>');
+        $replacements++;
+    }
+    return ($line, $replacements);
+}
+
+@ARGV == 3 or usage();
+my ($raw_root, $canonical_root, $ledger) = @ARGV;
+my $script_root = dirname(File::Spec->rel2abs($0));
+my $inventory_path = $ENV{GO5_INVENTORY}
+    // File::Spec->catfile($script_root, '..', 'config', 'prsdd-go5-generated-files.txt');
+my $date_contract_path = $ENV{GO5_DATE_FIELDS}
+    // File::Spec->catfile($script_root, '..', 'config', 'prsdd-go5-date-fields.tsv');
+
+-d $raw_root or die "raw package is not a directory: $raw_root\n";
+die "canonical package already exists: $canonical_root\n" if -e $canonical_root;
+
+my @inventory = read_inventory($inventory_path);
+my %inventory = map { $_ => 1 } @inventory;
+my %date_contract = read_date_contract($date_contract_path);
+for my $relative (keys %date_contract) {
+    die "date-contract path is outside inventory: $relative\n" unless $inventory{$relative};
+}
+
+my @actual;
+find(
+    {
+        no_chdir => 1,
+        wanted => sub {
+            return unless -f $_;
+            my $relative = File::Spec->abs2rel($File::Find::name, $raw_root);
+            push @actual, $relative;
+        },
+    },
+    $raw_root,
+);
+@actual = sort @actual;
+die "raw package inventory mismatch\nexpected:\n" . join("\n", @inventory)
+    . "\nactual:\n" . join("\n", @actual) . "\n"
+    if join("\n", @inventory) ne join("\n", @actual);
+
+my @ledger_rows;
+for my $relative (@inventory) {
+    my $source = File::Spec->catfile($raw_root, split m{/}, $relative);
+    my $target = File::Spec->catfile($canonical_root, split m{/}, $relative);
+    my $raw = slurp($source);
+    my $canonical = $raw;
+
+    if (my $contract = $date_contract{$relative}) {
+        my ($mode, $expected) = @{$contract};
+        my @lines = split /(?<=\n)/, $raw, -1;
+        my $count = 0;
+        for my $index (0 .. $#lines) {
+            my ($updated, $line_count) = canonicalize_line(
+                $relative, $mode, $lines[$index], $index + 1, \@ledger_rows,
+            );
+            $lines[$index] = $updated;
+            $count += $line_count;
+        }
+        die "$relative: replacements=$count expected=$expected\n" if $count != $expected;
+        $canonical = join '', @lines;
+
+        for my $marker ('08/18/14', '07/09', 'CHI/DP=', 'Chi,M=') {
+            die "$relative: canonicalization changed protected marker $marker\n"
+                if count_literal($raw, $marker) != count_literal($canonical, $marker);
+        }
+        die "$relative: canonicalization changed E-notation tokens\n"
+            if scientific_tokens($raw) ne scientific_tokens($canonical);
+    }
+
+    write_file($target, $canonical);
+}
+
+my $ledger_text = "path\tline\tcolumn\traw_token\tcanonical_token\n";
+$ledger_text .= join("\n", @ledger_rows) . "\n" if @ledger_rows;
+write_file($ledger, $ledger_text);
+print "canonicalized files=" . scalar(@inventory)
+    . " replacements=" . scalar(@ledger_rows) . "\n";

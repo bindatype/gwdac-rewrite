@@ -36,6 +36,20 @@ reviewer/reproduce-evidence --scope runtime-refresh
 Set `REVIEWER_KEEP_WORKSPACE=1` to retain the disposable clone for inspection.
 The default deletes it after reporting the result.
 
+The GO5 evidence-determinism candidate has its own bounded reproducer:
+
+```sh
+GO5_KEEP_WORKSPACE=1 make reviewer-reproduce-go5
+```
+
+It runs the modern and historical GO5 diagnostic twice, under
+`Pacific/Kiritimati` and `Etc/GMT+12`. Raw captures must differ only in the 13
+explicitly declared date-bearing files; all 69 canonical package files must be
+byte-identical. Each raw package is compared with the committed GO5 manifest by
+a separate command. The generators do not write that manifest or modify the
+accepted report tree. A pass identifies a review candidate, not adopted
+evidence or physics approval.
+
 ## Exit contract
 
 | Exit | Meaning |
@@ -47,8 +61,8 @@ The default deletes it after reporting the result.
 | `40` | missing or failed infrastructure prerequisite |
 | `64` | command-line usage error |
 
-The verifier covers the security, adapter, GO5, unpatched-priming, and
-runtime-refresh manifest packages. It also independently compares all committed
+The verifier covers the security, adapter, GO5, GO5 reconciliation,
+unpatched-priming, and runtime-refresh manifest packages. It also independently compares all committed
 DSG and amplitude fixture tables across the modern build and both checked-in
 historical executables. The experimental PRBAS candidate is still run during
 reproduction, but its known mismatches are diagnostic evidence and do not enter

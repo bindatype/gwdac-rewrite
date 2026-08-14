@@ -3,8 +3,16 @@ set -euo pipefail
 
 readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
 readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+if [[ -z "${PHASE1_REPORT_ROOT:-}" ]]; then
+    printf 'PHASE1_REPORT_ROOT must name a disposable candidate root\n' >&2
+    exit 64
+fi
+if [[ -z "${EVIDENCE_TZ:-}" ]]; then
+    printf 'EVIDENCE_TZ must identify the raw-capture time zone\n' >&2
+    exit 64
+fi
 readonly state_root="${ORACLE_STATE_ROOT:-/oracle-work/prsdd-go5-diagnostic}"
-readonly report_root="${PHASE1_REPORT_ROOT:-${phase1_root}/reports}/prsdd-go5-diagnostic"
+readonly report_root="${PHASE1_REPORT_ROOT}/prsdd-go5-diagnostic"
 readonly fixture="${phase1_root}/fixtures/prsdd-go5-diagnostic/go5pr-database-list.in"
 readonly binary="${source_root}/said/prsdd"
 readonly data_root="${source_root}/sdat"
@@ -54,7 +62,7 @@ set +e
 (
     cd "${run_root}/pr"
     timeout "${timeout_seconds}" \
-        env LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}" \
+        env LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}" TZ="${EVIDENCE_TZ}" \
         "${binary}" \
         <"${fixture}" \
         >"${prefix}.stdout" \
@@ -144,13 +152,5 @@ test -n "${total_data}"
 test "${total_data}" -gt 0
 test "${patched_selection_exact}" = no
 test "${unpatched_selection_exact}" = yes
-
-(
-    cd "${report_root}"
-    find . -type f ! -name manifest.sha256 -print0 \
-        | sort -z \
-        | xargs -0 sha256sum \
-        | sed 's#  \./#  #'
-) >"${report_root}/manifest.sha256"
 
 cat "${report_root}/historical-results.tsv"

@@ -2,28 +2,27 @@
 set -euo pipefail
 
 readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly outputs_root="$(cd "${script_root}/../.." && pwd)"
-readonly compose_root="${outputs_root}/container-environment"
-readonly report_root="${outputs_root}/phase1/reports/prsdd-go5-diagnostic"
+readonly workspace="${GO5_CANDIDATE_WORKSPACE:-$(mktemp -d "${TMPDIR:-/tmp}/gwdac-go5-determinism.XXXXXX")}"
+readonly candidate_a="${workspace}/kiritimati"
+readonly candidate_b="${workspace}/gmt-minus-12"
+readonly keep_workspace="${GO5_KEEP_WORKSPACE:-0}"
 
-docker compose -f "${compose_root}/compose.yaml" up -d dev oracle
-docker compose -f "${compose_root}/compose.yaml" exec -T dev bootstrap-repos
+cleanup() {
+    if [[ "${keep_workspace}" == 1 ]]; then
+        printf 'GO5 candidate workspace retained: %s\n' "${workspace}"
+    else
+        rm -rf "${workspace}"
+    fi
+}
+trap cleanup EXIT
 
-if ! docker compose -f "${compose_root}/compose.yaml" exec -T dev \
-    test -x /workspace/phase1/reproducible/artifacts/f6c81d01a1fe/prsdd-headless; then
-    docker compose -f "${compose_root}/compose.yaml" exec -T dev \
-        /phase1/scripts/build-prsdd
-fi
+mkdir -p "${workspace}"
+"${script_root}/run-prsdd-go5-candidate" \
+    "${candidate_a}" Pacific/Kiritimati
+"${script_root}/run-prsdd-go5-candidate" \
+    "${candidate_b}" Etc/GMT+12
+"${script_root}/compare-prsdd-go5-runs" \
+    "${candidate_a}" "${candidate_b}" "${workspace}/two-run-comparison.tsv"
 
-docker compose -f "${compose_root}/compose.yaml" exec -T dev \
-    env REUSE_DIAGNOSTIC_BUILDS=yes \
-    /phase1/scripts/run-prsdd-go5-diagnostic
-docker compose -f "${compose_root}/compose.yaml" exec -T oracle \
-    /phase1/scripts/run-historical-prsdd-go5-diagnostic
-
-(
-    cd "${report_root}"
-    sha256sum -c manifest.sha256
-)
-
-printf 'prsdd GO5 diagnostic: PASS\n'
+printf 'prsdd GO5 evidence-determinism seam: CANDIDATE PASS workspace=%s\n' \
+    "${workspace}"

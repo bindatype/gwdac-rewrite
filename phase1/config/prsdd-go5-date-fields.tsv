@@ -1,0 +1,14 @@
+path	mode	expected_replacements
+accepted-database.selection-projection	output	3
+accepted-database.stdout	output	3
+accepted-priming.stdout	output	5
+fresh-patched-database.stdout	output	3
+historical-arndt64-database.selection-projection	output	3
+historical-arndt64-database.stdout	output	3
+historical-vs-patched.diff	diff	1
+historical-vs-unpatched.diff	diff	1
+patched-traced-database.stdout	output	3
+unpatched-database-1.selection-projection	output	3
+unpatched-database-1.stdout	output	3
+unpatched-database-2.stdout	output	3
+unpatched-traced-database.stdout	output	3

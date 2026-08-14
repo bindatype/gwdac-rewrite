@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    printf 'usage: %s ABSOLUTE_CANDIDATE_ROOT TIME_ZONE\n' "$0" >&2
+    exit 64
+}
+
+[[ "$#" -eq 2 ]] || usage
+readonly candidate_root="$1"
+readonly evidence_tz="$2"
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly outputs_root="$(cd "${script_root}/../.." && pwd)"
+readonly compose_file="${outputs_root}/container-environment/compose.yaml"
+readonly reference_root="${outputs_root}/phase1/reports/prsdd-go5-diagnostic"
+readonly raw_root="${candidate_root}/raw/prsdd-go5-diagnostic"
+readonly canonical_root="${candidate_root}/canonical/prsdd-go5-diagnostic"
+readonly project="gwdac-go5-candidate-$$"
+readonly before_fingerprint="$(mktemp)"
+readonly after_fingerprint="$(mktemp)"
+runtime_started=0
+completed=0
+
+case "${candidate_root}" in
+    /*) ;;
+    *) usage ;;
+esac
+case "${candidate_root}/" in
+    "${outputs_root}/"*)
+        printf 'candidate root must be outside the authoritative worktree\n' >&2
+        exit 64
+        ;;
+esac
+if [[ -e "${candidate_root}" ]]; then
+    printf 'candidate root already exists: %s\n' "${candidate_root}" >&2
+    exit 64
+fi
+
+fingerprint_worktree() {
+    local output="$1"
+    find "${outputs_root}" \
+        -path "${outputs_root}/.git" -prune -o \
+        -type f -exec shasum -a 256 {} \; \
+        | LC_ALL=C sort >"${output}"
+}
+
+compose() {
+    PHASE1_REPORTS_HOST="${candidate_root}" \
+        docker compose -p "${project}" -f "${compose_file}" "$@"
+}
+
+cleanup() {
+    if [[ "${runtime_started}" -eq 1 ]]; then
+        compose down --volumes >/dev/null 2>&1 || true
+    fi
+    rm -f "${before_fingerprint}" "${after_fingerprint}"
+    if [[ "${completed}" -eq 0 ]]; then
+        printf 'GO5 candidate failed; partial capture retained at %s\n' \
+            "${candidate_root}" >&2
+    fi
+}
+trap cleanup EXIT
+
+fingerprint_worktree "${before_fingerprint}"
+mkdir -p "${candidate_root}/raw" "${candidate_root}/scratch"
+cat >"${candidate_root}/run-context.txt" <<EOF
+evidence_label=captured
+outputs_commit=$(git -C "${outputs_root}" rev-parse HEAD)
+time_zone=${evidence_tz}
+candidate_root=${candidate_root}
+accepted_evidence_modified=no
+physics_review=pending
+EOF
+
+compose up -d --build dev oracle
+runtime_started=1
+compose exec -T dev bootstrap-repos
+
+compose exec -T dev \
+    env \
+    PHASE1_REPORT_ROOT=/phase1/reports/scratch/build-accepted \
+    PHASE1_STATE_ROOT=/phase1/reports/scratch/state/accepted \
+    /phase1/scripts/build-prsdd
+
+compose exec -T dev \
+    env \
+    EVIDENCE_TZ="${evidence_tz}" \
+    PHASE1_REPORT_ROOT=/phase1/reports/raw \
+    PHASE1_STATE_ROOT=/phase1/reports/scratch/state/accepted \
+    PRSD_GO5_STATE_ROOT=/phase1/reports/scratch/state/diagnostic \
+    /phase1/scripts/run-prsdd-go5-diagnostic
+
+compose exec -T oracle \
+    env \
+    EVIDENCE_TZ="${evidence_tz}" \
+    ORACLE_STATE_ROOT=/phase1/reports/scratch/state/oracle \
+    PHASE1_REPORT_ROOT=/phase1/reports/raw \
+    /phase1/scripts/run-historical-prsdd-go5-diagnostic
+
+"${script_root}/write-prsdd-go5-manifest" \
+    "${raw_root}" "${candidate_root}/raw-manifest.sha256"
+"${script_root}/canonicalize-prsdd-go5-evidence" \
+    "${raw_root}" "${canonical_root}" "${candidate_root}/canonicalization.tsv"
+"${script_root}/write-prsdd-go5-manifest" \
+    "${canonical_root}" "${candidate_root}/canonical-manifest.sha256"
+"${script_root}/compare-prsdd-go5-candidate" \
+    "${raw_root}" \
+    "${candidate_root}/raw-manifest.sha256" \
+    "${reference_root}" \
+    "${candidate_root}/candidate-vs-committed.tsv"
+
+rm -rf "${candidate_root}/scratch"
+fingerprint_worktree "${after_fingerprint}"
+if ! cmp -s "${before_fingerprint}" "${after_fingerprint}"; then
+    printf 'GO5 candidate generation changed a path outside candidate root\n' >&2
+    diff -u --label before-worktree --label after-worktree \
+        "${before_fingerprint}" "${after_fingerprint}" >&2 || true
+    exit 30
+fi
+
+completed=1
+printf 'GO5 candidate captured: root=%s timezone=%s files=69\n' \
+    "${candidate_root}" "${evidence_tz}"

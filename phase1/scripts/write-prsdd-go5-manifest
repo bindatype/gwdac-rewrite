@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    printf 'usage: %s PACKAGE_ROOT OUTPUT_MANIFEST\n' "$0" >&2
+    exit 64
+}
+
+[[ "$#" -eq 2 ]] || usage
+readonly package_root="$1"
+readonly output_manifest="$2"
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly inventory="${GO5_INVENTORY:-${script_root}/../config/prsdd-go5-generated-files.txt}"
+
+test -d "${package_root}"
+test -f "${inventory}"
+case "${output_manifest}" in
+    "${package_root}"/*)
+        printf 'manifest must be outside the package it describes\n' >&2
+        exit 64
+        ;;
+esac
+
+if command -v sha256sum >/dev/null 2>&1; then
+    hash_file() { sha256sum "$1" | awk '{print $1}'; }
+elif command -v shasum >/dev/null 2>&1; then
+    hash_file() { shasum -a 256 "$1" | awk '{print $1}'; }
+else
+    printf 'missing SHA-256 tool\n' >&2
+    exit 40
+fi
+
+readonly expected="$(mktemp)"
+readonly actual="$(mktemp)"
+readonly temporary="${output_manifest}.tmp.$$"
+cleanup() {
+    rm -f "${expected}" "${actual}" "${temporary}"
+}
+trap cleanup EXIT
+
+LC_ALL=C sort "${inventory}" >"${expected}"
+(
+    cd "${package_root}"
+    find . -type f -print | sed 's#^\./##' | LC_ALL=C sort
+) >"${actual}"
+if ! cmp -s "${expected}" "${actual}"; then
+    printf 'GO5 package inventory mismatch\n' >&2
+    diff -u --label expected-inventory --label actual-inventory \
+        "${expected}" "${actual}" >&2 || true
+    exit 30
+fi
+
+mkdir -p "$(dirname "${output_manifest}")"
+: >"${temporary}"
+while IFS= read -r relative; do
+    printf '%s  %s\n' "$(hash_file "${package_root}/${relative}")" "${relative}" \
+        >>"${temporary}"
+done <"${expected}"
+mv "${temporary}" "${output_manifest}"
+printf 'GO5 explicit manifest: files=%s path=%s\n' \
+    "$(wc -l <"${output_manifest}" | tr -d ' ')" "${output_manifest}"

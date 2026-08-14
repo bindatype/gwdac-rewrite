@@ -1,0 +1,107 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use File::Basename qw(dirname);
+use File::Spec;
+
+sub usage {
+    die "usage: $0 CANDIDATE_A CANDIDATE_B REPORT\n";
+}
+
+sub slurp {
+    my ($path) = @_;
+    open my $fh, '<:raw', $path or die "cannot read $path: $!\n";
+    local $/;
+    return <$fh>;
+}
+
+sub read_manifest {
+    my ($path) = @_;
+    my %entries;
+    for my $line (split /\n/, slurp($path)) {
+        next unless length $line;
+        my ($hash, $relative) = $line =~ /^([0-9a-f]{64})  (.+)$/
+            or die "invalid manifest row in $path: $line\n";
+        $entries{$relative} = $hash;
+    }
+    return %entries;
+}
+
+sub read_date_contract {
+    my ($path) = @_;
+    my %expected;
+    my @lines = split /\n/, slurp($path);
+    shift @lines;
+    for my $line (@lines) {
+        next unless length $line;
+        my ($relative, undef, $count) = split /\t/, $line;
+        $expected{$relative} = 0 + $count;
+    }
+    return %expected;
+}
+
+sub read_ledger {
+    my ($path) = @_;
+    my %tokens;
+    my @lines = split /\n/, slurp($path);
+    die "invalid ledger header: $path\n"
+        unless shift(@lines) eq "path\tline\tcolumn\traw_token\tcanonical_token";
+    for my $line (@lines) {
+        next unless length $line;
+        my ($relative, undef, undef, $raw, $canonical) = split /\t/, $line;
+        die "invalid canonical token in $path\n" unless $canonical eq '<RUNDATE>';
+        push @{$tokens{$relative}}, $raw;
+    }
+    return %tokens;
+}
+
+@ARGV == 3 or usage();
+my ($root_a, $root_b, $report) = @ARGV;
+my $script_root = dirname(File::Spec->rel2abs($0));
+my $date_contract_path = $ENV{GO5_DATE_FIELDS}
+    // File::Spec->catfile($script_root, '..', 'config', 'prsdd-go5-date-fields.tsv');
+my %expected_dates = read_date_contract($date_contract_path);
+my %raw_a = read_manifest(File::Spec->catfile($root_a, 'raw-manifest.sha256'));
+my %raw_b = read_manifest(File::Spec->catfile($root_b, 'raw-manifest.sha256'));
+my %canonical_a = read_manifest(File::Spec->catfile($root_a, 'canonical-manifest.sha256'));
+my %canonical_b = read_manifest(File::Spec->catfile($root_b, 'canonical-manifest.sha256'));
+my %ledger_a = read_ledger(File::Spec->catfile($root_a, 'canonicalization.tsv'));
+my %ledger_b = read_ledger(File::Spec->catfile($root_b, 'canonicalization.tsv'));
+
+die "candidate manifests have different inventories\n"
+    if join("\n", sort keys %raw_a) ne join("\n", sort keys %raw_b);
+die "canonical candidate manifests differ\n"
+    if join("\n", map { "$canonical_a{$_}  $_" } sort keys %canonical_a)
+        ne join("\n", map { "$canonical_b{$_}  $_" } sort keys %canonical_b);
+
+my @rows = ("path\traw_relation\tcanonical_relation\tdate_tokens_a\tdate_tokens_b");
+my ($date_differences, $nondate_exact) = (0, 0);
+for my $relative (sort keys %raw_a) {
+    my $raw_relation = $raw_a{$relative} eq $raw_b{$relative} ? 'exact' : 'different';
+    my $canonical_relation = $canonical_a{$relative} eq $canonical_b{$relative}
+        ? 'exact' : 'different';
+    die "canonical mismatch: $relative\n" if $canonical_relation ne 'exact';
+
+    my $tokens_a = join(',', @{$ledger_a{$relative} // []});
+    my $tokens_b = join(',', @{$ledger_b{$relative} // []});
+    if (exists $expected_dates{$relative}) {
+        die "$relative: wrong ledger count in candidate A\n"
+            if scalar(@{$ledger_a{$relative} // []}) != $expected_dates{$relative};
+        die "$relative: wrong ledger count in candidate B\n"
+            if scalar(@{$ledger_b{$relative} // []}) != $expected_dates{$relative};
+        die "$relative: raw dates did not differ\n"
+            if $raw_relation ne 'different' || $tokens_a eq $tokens_b;
+        $date_differences++;
+    } else {
+        die "$relative: non-date raw artifact differed\n" if $raw_relation ne 'exact';
+        $nondate_exact++;
+    }
+    push @rows, join("\t", $relative, $raw_relation, $canonical_relation, $tokens_a, $tokens_b);
+}
+
+open my $fh, '>:raw', $report or die "cannot write $report: $!\n";
+print {$fh} join("\n", @rows), "\n";
+close $fh or die "cannot close $report: $!\n";
+printf "two-run comparison: date_files_different=%d nondate_files_exact=%d canonical_files_exact=%d\n",
+    $date_differences, $nondate_exact, scalar(keys %canonical_a);

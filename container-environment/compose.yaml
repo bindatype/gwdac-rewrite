@@ -14,12 +14,12 @@ services:
       - ../phase1/fixtures:/phase1/fixtures:ro
       - ../phase1/patches:/phase1/patches:ro
       - ../phase1/scripts:/phase1/scripts:ro
-      - ../phase1/reports:/phase1/reports
+      - ${PHASE1_REPORTS_HOST:-../phase1/reports}:/phase1/reports
       - ../phase2/contracts:/phase2/contracts:ro
       - ../phase2/fixtures:/phase2/fixtures:ro
       - ../phase2/kernel:/phase2/kernel:ro
       - ../phase2/scripts:/phase2/scripts:ro
-      - ../phase2/reports:/phase2/reports
+      - ${PHASE2_REPORTS_HOST:-../phase2/reports}:/phase2/reports
     init: true
     stdin_open: true
     tty: true
@@ -40,12 +40,12 @@ services:
       - oracle-work:/oracle-work
       - ../phase1/fixtures:/phase1/fixtures:ro
       - ../phase1/scripts:/phase1/scripts:ro
-      - ../phase1/reports:/phase1/reports
+      - ${PHASE1_REPORTS_HOST:-../phase1/reports}:/phase1/reports
       - ../phase2/contracts:/phase2/contracts:ro
       - ../phase2/fixtures:/phase2/fixtures:ro
       - ../phase2/kernel:/phase2/kernel:ro
       - ../phase2/scripts:/phase2/scripts:ro
-      - ../phase2/reports:/phase2/reports
+      - ${PHASE2_REPORTS_HOST:-../phase2/reports}:/phase2/reports
     tmpfs:
       - /tmp
     init: true
