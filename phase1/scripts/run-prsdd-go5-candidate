@@ -69,6 +69,7 @@ outputs_commit=$(git -C "${outputs_root}" rev-parse HEAD)
 time_zone=${evidence_tz}
 candidate_root=${candidate_root}
 accepted_evidence_modified=no
+execution_state=disposable_docker_volumes
 physics_review=pending
 EOF
 
@@ -79,21 +80,21 @@ compose exec -T dev bootstrap-repos
 compose exec -T dev \
     env \
     PHASE1_REPORT_ROOT=/phase1/reports/scratch/build-accepted \
-    PHASE1_STATE_ROOT=/phase1/reports/scratch/state/accepted \
+    PHASE1_STATE_ROOT=/workspace/phase1/reproducible \
     /phase1/scripts/build-prsdd
 
 compose exec -T dev \
     env \
     EVIDENCE_TZ="${evidence_tz}" \
     PHASE1_REPORT_ROOT=/phase1/reports/raw \
-    PHASE1_STATE_ROOT=/phase1/reports/scratch/state/accepted \
-    PRSD_GO5_STATE_ROOT=/phase1/reports/scratch/state/diagnostic \
+    PHASE1_STATE_ROOT=/workspace/phase1/reproducible \
+    PRSD_GO5_STATE_ROOT=/workspace/phase1/prsdd-go5-candidate \
     /phase1/scripts/run-prsdd-go5-diagnostic
 
 compose exec -T oracle \
     env \
     EVIDENCE_TZ="${evidence_tz}" \
-    ORACLE_STATE_ROOT=/phase1/reports/scratch/state/oracle \
+    ORACLE_STATE_ROOT=/oracle-work/prsdd-go5-candidate \
     PHASE1_REPORT_ROOT=/phase1/reports/raw \
     /phase1/scripts/run-historical-prsdd-go5-diagnostic
 

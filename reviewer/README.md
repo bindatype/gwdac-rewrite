@@ -47,8 +47,10 @@ It runs the modern and historical GO5 diagnostic twice, under
 explicitly declared date-bearing files; all 69 canonical package files must be
 byte-identical. Each raw package is compared with the committed GO5 manifest by
 a separate command. The generators do not write that manifest or modify the
-accepted report tree. A pass identifies a review candidate, not adopted
-evidence or physics approval.
+accepted report tree. Evidence files are written only below the caller's
+candidate root; case-sensitive execution scratch remains in disposable Docker
+volumes and is deleted at teardown. A pass identifies a review candidate, not
+adopted evidence or physics approval.
 
 ## Exit contract
 
