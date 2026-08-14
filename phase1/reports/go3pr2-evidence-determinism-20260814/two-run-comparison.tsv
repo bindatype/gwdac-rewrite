@@ -1,0 +1,35 @@
+path	raw_relation	canonical_relation	date_tokens_a	date_tokens_b
+comparison.tsv	exact	exact		
+historical/arndt64-archived.exit	exact	exact		
+historical/arndt64-archived.formatted	exact	exact	 8/14/26, 8/14/26	 8/14/26, 8/14/26
+historical/arndt64-archived.section	exact	exact	 8/14/26, 8/14/26	 8/14/26, 8/14/26
+historical/arndt64-archived.stderr	exact	exact		
+historical/arndt64-archived.stdout	exact	exact	 8/14/26, 8/14/26, 8/14/26, 8/14/26	 8/14/26, 8/14/26, 8/14/26, 8/14/26
+historical/arndt64-live.exit	exact	exact		
+historical/arndt64-live.formatted	exact	exact	 8/14/26, 8/14/26	 8/14/26, 8/14/26
+historical/arndt64-live.section	exact	exact	 8/14/26, 8/14/26	 8/14/26, 8/14/26
+historical/arndt64-live.stderr	exact	exact		
+historical/arndt64-live.stdout	exact	exact	 8/14/26, 8/14/26, 8/14/26, 8/14/26, 8/14/26	 8/14/26, 8/14/26, 8/14/26, 8/14/26, 8/14/26
+historical/gwdac-archived.exit	exact	exact		
+historical/gwdac-archived.formatted	exact	exact	 8/14/26, 8/14/26	 8/14/26, 8/14/26
+historical/gwdac-archived.section	exact	exact	 8/14/26, 8/14/26	 8/14/26, 8/14/26
+historical/gwdac-archived.stderr	exact	exact		
+historical/gwdac-archived.stdout	exact	exact	 8/14/26, 8/14/26, 8/14/26, 8/14/26	 8/14/26, 8/14/26, 8/14/26, 8/14/26
+historical/gwdac-live.exit	exact	exact		
+historical/gwdac-live.formatted	exact	exact	 8/14/26, 8/14/26	 8/14/26, 8/14/26
+historical/gwdac-live.section	exact	exact	 8/14/26, 8/14/26	 8/14/26, 8/14/26
+historical/gwdac-live.stderr	exact	exact		
+historical/gwdac-live.stdout	exact	exact	 8/14/26, 8/14/26, 8/14/26, 8/14/26, 8/14/26	 8/14/26, 8/14/26, 8/14/26, 8/14/26, 8/14/26
+historical/results.tsv	exact	exact		
+modern/modern-headless-archived.exit	exact	exact		
+modern/modern-headless-archived.formatted	different	exact	 8/15/26, 8/15/26	 8/14/26, 8/14/26
+modern/modern-headless-archived.section	different	exact	 8/15/26, 8/15/26	 8/14/26, 8/14/26
+modern/modern-headless-archived.stderr	exact	exact		
+modern/modern-headless-archived.stdout	different	exact	 8/15/26, 8/15/26, 8/15/26, 8/15/26	 8/14/26, 8/14/26, 8/14/26, 8/14/26
+modern/modern-headless-live.exit	exact	exact		
+modern/modern-headless-live.formatted	different	exact	 8/15/26, 8/15/26	 8/14/26, 8/14/26
+modern/modern-headless-live.section	different	exact	 8/15/26, 8/15/26	 8/14/26, 8/14/26
+modern/modern-headless-live.stderr	exact	exact		
+modern/modern-headless-live.stdout	different	exact	 8/15/26, 8/15/26, 8/15/26, 8/15/26, 8/15/26	 8/14/26, 8/14/26, 8/14/26, 8/14/26, 8/14/26
+modern/results.tsv	exact	exact		
+results.tsv	exact	exact		
