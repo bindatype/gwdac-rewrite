@@ -1,0 +1,15 @@
+path	raw_relation	canonical_relation	date_tokens_kiritimati	date_tokens_gmt_minus_12
+accepted-database.selection-projection	different	exact	 8/15/26, 8/15/26, 8/15/26	 8/14/26, 8/14/26, 8/14/26
+accepted-database.stdout	different	exact	 8/15/26, 8/15/26, 8/15/26	 8/14/26, 8/14/26, 8/14/26
+accepted-priming.stdout	different	exact	 8/15/26, 8/15/26, 8/15/26, 8/15/26, 8/15/26	 8/14/26, 8/14/26, 8/14/26, 8/14/26, 8/14/26
+fresh-patched-database.stdout	different	exact	 8/15/26, 8/15/26, 8/15/26	 8/14/26, 8/14/26, 8/14/26
+historical-arndt64-database.selection-projection	exact	exact	 8/14/26, 8/14/26, 8/14/26	 8/14/26, 8/14/26, 8/14/26
+historical-arndt64-database.stdout	exact	exact	 8/14/26, 8/14/26, 8/14/26	 8/14/26, 8/14/26, 8/14/26
+historical-results.tsv	different	exact		
+historical-vs-patched.diff	different	exact		
+historical-vs-unpatched.diff	different	exact		
+patched-traced-database.stdout	different	exact	 8/15/26, 8/15/26, 8/15/26	 8/14/26, 8/14/26, 8/14/26
+unpatched-database-1.selection-projection	different	exact	 8/15/26, 8/15/26, 8/15/26	 8/14/26, 8/14/26, 8/14/26
+unpatched-database-1.stdout	different	exact	 8/15/26, 8/15/26, 8/15/26	 8/14/26, 8/14/26, 8/14/26
+unpatched-database-2.stdout	different	exact	 8/15/26, 8/15/26, 8/15/26	 8/14/26, 8/14/26, 8/14/26
+unpatched-traced-database.stdout	different	exact	 8/15/26, 8/15/26, 8/15/26	 8/14/26, 8/14/26, 8/14/26
