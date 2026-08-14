@@ -10,6 +10,12 @@ The reviewer harness separates two operations that must not be conflated:
 
 Neither command changes physics source, fixtures, tolerances, or oracle output.
 
+`verify-committed-evidence` passes when the reviewed commit is checked out
+cleanly. It also compares each tracked evidence file with its committed object,
+so a checkout with a locally modified evidence file returns exit 10 by design;
+that result identifies working-tree drift rather than a defect in the published
+commit.
+
 ## Commands
 
 From the repository root:
@@ -49,3 +55,9 @@ reproduction, but its known mismatches are diagnostic evidence and do not enter
 the accepted three-executable oracle gate. Reviewer reproduction permits only
 the candidate request probe's documented exit 6; every other nonzero build or
 generator exit remains a reproduction failure.
+
+Coverage differs from integrity verification. The GO5/`PRRDX` diagnostic and
+the unpatched-priming measurement are checked against their committed manifests,
+but `reproduce-evidence` does not re-run either diagnostic. It reproduces only
+the CM12 gate, including the diagnostic PRBAS candidate, and the five runtime-
+refresh engine outcomes described above.
