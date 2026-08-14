@@ -1,0 +1,7 @@
+path	mode	expected_replacements	tz_relation
+historical/arndt64-archived.stdout	output	4	legacy-static
+historical/arndt64-live.stdout	output	5	legacy-static
+historical/gwdac-archived.stdout	output	4	legacy-static
+historical/gwdac-live.stdout	output	5	legacy-static
+modern/modern-headless-archived.stdout	output	4	must-differ
+modern/modern-headless-live.stdout	output	5	must-differ

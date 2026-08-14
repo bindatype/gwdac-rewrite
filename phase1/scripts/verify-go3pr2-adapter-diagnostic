@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly outputs_root="$(cd "${script_root}/../.." && pwd)"
+readonly workspace="${GO3PR2_CANDIDATE_WORKSPACE:-${TMPDIR:-/tmp}/gwdac-go3pr2-determinism-$(git -C "${outputs_root}" rev-parse --short=12 HEAD)}"
+readonly kiritimati="${workspace}/kiritimati"
+readonly gmt_minus_12="${workspace}/gmt-minus-12"
+readonly date_fields="${outputs_root}/phase1/config/go3pr2-date-fields.tsv"
+completed=0
+
+if [[ -e "${workspace}" ]]; then
+    printf 'GO3PR2 candidate workspace already exists: %s\n' "${workspace}" >&2
+    exit 64
+fi
+
+cleanup() {
+    if [[ "${completed}" -eq 1 && "${GO3PR2_KEEP_WORKSPACE:-0}" != 1 ]]; then
+        rm -rf "${workspace}"
+    elif [[ -d "${workspace}" ]]; then
+        printf 'GO3PR2 candidate workspace retained: %s\n' "${workspace}"
+    fi
+}
+trap cleanup EXIT
+
+"${script_root}/run-go3pr2-candidate" "${kiritimati}" Pacific/Kiritimati
+"${script_root}/run-go3pr2-candidate" "${gmt_minus_12}" Etc/GMT+12
+EVIDENCE_DATE_FIELDS="${date_fields}" EVIDENCE_DERIVED_FILES=/dev/null \
+    "${script_root}/compare-prsdd-go5-runs" \
+    "${kiritimati}" "${gmt_minus_12}" "${workspace}/two-run-comparison.tsv"
+
+completed=1
+printf 'GO3PR2 evidence-determinism seam: CANDIDATE PASS workspace=%s\n' \
+    "${workspace}"

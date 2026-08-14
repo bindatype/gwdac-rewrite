@@ -59,14 +59,6 @@ combine_results() {
             >>"${comparison}"
     done
 
-    sha256sum \
-        "${fixture_root}/archived.in" \
-        "${fixture_root}/live.in" \
-        "${fixture_root}/wtrim3" \
-        "${combined}" \
-        "${comparison}" \
-        >"${report_root}/manifest.sha256"
-
     cat "${comparison}"
 }
 
@@ -114,6 +106,7 @@ run_case() {
     local prefix="${mode_report_root}/${label}-${deck}"
     local run_root
     local runtime_library_path="${LD_LIBRARY_PATH:-}"
+    local -a runtime_environment
     local status
     local web_sections
     local formatter_exact
@@ -131,6 +124,13 @@ run_case() {
     fi
     if [[ "${label}" == "gwdac" ]]; then
         runtime_library_path="/opt/oracle/gfortran-4.4/usr/lib:${runtime_library_path}"
+    fi
+    runtime_environment=(
+        "SAID_DATA_ROOT=${data_root}"
+        "LD_LIBRARY_PATH=${runtime_library_path}"
+    )
+    if [[ -n "${EVIDENCE_TZ:-}" ]]; then
+        runtime_environment+=("TZ=${EVIDENCE_TZ}")
     fi
 
     test -x "${binary}"
@@ -152,9 +152,7 @@ run_case() {
     (
         cd "${run_root}/pr"
         timeout "${timeout_seconds}" \
-            env \
-            SAID_DATA_ROOT="${data_root}" \
-            LD_LIBRARY_PATH="${runtime_library_path}" \
+            env "${runtime_environment[@]}" \
             "${binary}" \
             <"${fixture}" \
             >"${prefix}.stdout" \

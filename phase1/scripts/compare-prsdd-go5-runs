@@ -59,9 +59,9 @@ sub read_ledger {
 @ARGV == 3 or usage();
 my ($root_a, $root_b, $report) = @ARGV;
 my $script_root = dirname(File::Spec->rel2abs($0));
-my $date_contract_path = $ENV{GO5_DATE_FIELDS}
+my $date_contract_path = $ENV{EVIDENCE_DATE_FIELDS} // $ENV{GO5_DATE_FIELDS}
     // File::Spec->catfile($script_root, '..', 'config', 'prsdd-go5-date-fields.tsv');
-my $derived_path = $ENV{GO5_DERIVED_FILES}
+my $derived_path = $ENV{EVIDENCE_DERIVED_FILES} // $ENV{GO5_DERIVED_FILES}
     // File::Spec->catfile($script_root, '..', 'config', 'prsdd-go5-derived-files.txt');
 my %expected_dates = read_date_contract($date_contract_path);
 my %derived = map { $_ => 1 }

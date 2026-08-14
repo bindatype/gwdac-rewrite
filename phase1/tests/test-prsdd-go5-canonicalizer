@@ -18,8 +18,8 @@ printf 'path\tmode\texpected_replacements\ttz_relation\nfixture.stdout\toutput\t
     printf '  SAMPLE Chi,M= 34/25  1.25E-03\n'
 } >"${workspace}/raw/fixture.stdout"
 
-GO5_INVENTORY="${workspace}/inventory.txt" \
-GO5_DATE_FIELDS="${workspace}/dates.tsv" \
+EVIDENCE_INVENTORY="${workspace}/inventory.txt" \
+EVIDENCE_DATE_FIELDS="${workspace}/dates.tsv" \
     "${phase1_root}/scripts/canonicalize-prsdd-go5-evidence" \
     "${workspace}/raw" "${workspace}/canonical" "${workspace}/ledger.tsv"
 
@@ -37,8 +37,8 @@ cmp \
 
 printf 'path\tmode\texpected_replacements\ttz_relation\nfixture.stdout\toutput\t4\tmust-differ\n' \
     >"${workspace}/bad-count.tsv"
-if GO5_INVENTORY="${workspace}/inventory.txt" \
-    GO5_DATE_FIELDS="${workspace}/bad-count.tsv" \
+if EVIDENCE_INVENTORY="${workspace}/inventory.txt" \
+    EVIDENCE_DATE_FIELDS="${workspace}/bad-count.tsv" \
     "${phase1_root}/scripts/canonicalize-prsdd-go5-evidence" \
     "${workspace}/raw" "${workspace}/bad-canonical" "${workspace}/bad-ledger.tsv" \
     >/dev/null 2>&1; then

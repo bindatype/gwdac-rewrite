@@ -1,0 +1,97 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Digest::SHA qw(sha256_hex);
+use File::Basename qw(dirname);
+use File::Spec;
+
+sub usage {
+    die "usage: $0 CANDIDATE_PACKAGE CANDIDATE_MANIFEST REFERENCE_PACKAGE REPORT\n";
+}
+
+sub slurp {
+    my ($path) = @_;
+    open my $fh, '<:raw', $path or die "cannot read $path: $!\n";
+    local $/;
+    return <$fh>;
+}
+
+sub hash_file {
+    my ($path) = @_;
+    return sha256_hex(slurp($path));
+}
+
+sub read_manifest {
+    my ($path) = @_;
+    my %entries;
+    for my $line (split /\n/, slurp($path)) {
+        next unless length $line;
+        my ($hash, $entry) = $line =~ /^([0-9a-f]{64})  (.+)$/
+            or die "invalid manifest row in $path: $line\n";
+        die "duplicate manifest path in $path: $entry\n" if exists $entries{$entry};
+        $entries{$entry} = $hash;
+    }
+    return %entries;
+}
+
+@ARGV == 4 or usage();
+my ($candidate_root, $candidate_manifest, $reference_root, $report) = @ARGV;
+my $script_root = dirname(File::Spec->rel2abs($0));
+my $phase1_root = File::Spec->catdir($script_root, '..');
+my $inventory_path = $ENV{EVIDENCE_INVENTORY}
+    // File::Spec->catfile($phase1_root, 'config', 'go3pr2-generated-files.txt');
+my @inventory = grep { length } map { chomp; $_ } split /\n/, slurp($inventory_path);
+my %inventory = map { $_ => 1 } @inventory;
+my %candidate = read_manifest($candidate_manifest);
+my %reference = read_manifest(File::Spec->catfile($reference_root, 'manifest.sha256'));
+
+die "candidate manifest does not match explicit inventory\n"
+    if join("\n", sort keys %candidate) ne join("\n", sort @inventory);
+
+my %reference_for_candidate;
+for my $entry (sort keys %reference) {
+    my $actual_path;
+    if ($entry =~ m{^/phase1/reports/go3pr2-adapter-diagnostic/(comparison\.tsv|results\.tsv)$}) {
+        $reference_for_candidate{$1} = $reference{$entry};
+        $actual_path = File::Spec->catfile($reference_root, $1);
+    } elsif ($entry =~ m{^/phase1/(fixtures/.+)$}) {
+        $actual_path = File::Spec->catfile($phase1_root, split m{/}, $1);
+    } else {
+        die "unexpected committed reference path: $entry\n";
+    }
+    die "reference file missing: $entry\n" unless -f $actual_path;
+    die "committed reference manifest mismatch: $entry\n"
+        if hash_file($actual_path) ne $reference{$entry};
+}
+
+my %counts;
+my @rows = ("path\trelation\tcandidate_sha256\treference_sha256");
+for my $relative (@inventory) {
+    my $candidate_path = File::Spec->catfile($candidate_root, split m{/}, $relative);
+    my $actual = hash_file($candidate_path);
+    die "candidate manifest mismatch: $relative\n" if $actual ne $candidate{$relative};
+    my $reference_hash = $reference_for_candidate{$relative};
+    my $relation;
+    if (defined $reference_hash) {
+        $relation = $actual eq $reference_hash ? 'raw-exact' : 'raw-different';
+    } else {
+        $relation = 'candidate-only-explicit';
+        $reference_hash = '-';
+    }
+    $counts{$relation}++;
+    push @rows, join("\t", $relative, $relation, $actual, $reference_hash);
+}
+
+for my $entry (sort keys %reference) {
+    next if $entry =~ m{/go3pr2-adapter-diagnostic/(?:comparison|results)\.tsv$};
+    $counts{'reference-only'}++;
+    push @rows, join("\t", $entry, 'reference-only', '-', $reference{$entry});
+}
+
+open my $fh, '>:raw', $report or die "cannot write $report: $!\n";
+print {$fh} join("\n", @rows), "\n";
+close $fh or die "cannot close $report: $!\n";
+printf "candidate comparison: raw_exact=%d raw_different=%d candidate_only=%d reference_only=%d\n",
+    map { $counts{$_} // 0 }
+    qw(raw-exact raw-different candidate-only-explicit reference-only);

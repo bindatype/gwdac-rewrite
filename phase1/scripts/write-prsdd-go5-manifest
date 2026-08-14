@@ -10,7 +10,8 @@ usage() {
 readonly package_root="$1"
 readonly output_manifest="$2"
 readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly inventory="${GO5_INVENTORY:-${script_root}/../config/prsdd-go5-generated-files.txt}"
+readonly inventory="${EVIDENCE_INVENTORY:-${GO5_INVENTORY:-${script_root}/../config/prsdd-go5-generated-files.txt}}"
+readonly package_label="${EVIDENCE_PACKAGE_LABEL:-GO5}"
 
 test -d "${package_root}"
 test -f "${inventory}"
@@ -44,7 +45,7 @@ LC_ALL=C sort "${inventory}" >"${expected}"
     find . -type f -print | sed 's#^\./##' | LC_ALL=C sort
 ) >"${actual}"
 if ! cmp -s "${expected}" "${actual}"; then
-    printf 'GO5 package inventory mismatch\n' >&2
+    printf '%s package inventory mismatch\n' "${package_label}" >&2
     diff -u --label expected-inventory --label actual-inventory \
         "${expected}" "${actual}" >&2 || true
     exit 30
@@ -57,5 +58,5 @@ while IFS= read -r relative; do
         >>"${temporary}"
 done <"${expected}"
 mv "${temporary}" "${output_manifest}"
-printf 'GO5 explicit manifest: files=%s path=%s\n' \
-    "$(wc -l <"${output_manifest}" | tr -d ' ')" "${output_manifest}"
+printf '%s explicit manifest: files=%s path=%s\n' \
+    "${package_label}" "$(wc -l <"${output_manifest}" | tr -d ' ')" "${output_manifest}"

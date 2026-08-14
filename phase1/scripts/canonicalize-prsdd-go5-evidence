@@ -100,9 +100,9 @@ sub canonicalize_line {
 @ARGV == 3 or usage();
 my ($raw_root, $canonical_root, $ledger) = @ARGV;
 my $script_root = dirname(File::Spec->rel2abs($0));
-my $inventory_path = $ENV{GO5_INVENTORY}
+my $inventory_path = $ENV{EVIDENCE_INVENTORY} // $ENV{GO5_INVENTORY}
     // File::Spec->catfile($script_root, '..', 'config', 'prsdd-go5-generated-files.txt');
-my $date_contract_path = $ENV{GO5_DATE_FIELDS}
+my $date_contract_path = $ENV{EVIDENCE_DATE_FIELDS} // $ENV{GO5_DATE_FIELDS}
     // File::Spec->catfile($script_root, '..', 'config', 'prsdd-go5-date-fields.tsv');
 
 -d $raw_root or die "raw package is not a directory: $raw_root\n";

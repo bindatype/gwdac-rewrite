@@ -1,4 +1,4 @@
-.PHONY: reviewer-verify reviewer-reproduce reviewer-reproduce-cm12 reviewer-reproduce-runtime-refresh reviewer-reproduce-go5
+.PHONY: reviewer-verify reviewer-reproduce reviewer-reproduce-cm12 reviewer-reproduce-runtime-refresh reviewer-reproduce-go5 reviewer-reproduce-go3pr2
 
 reviewer-verify:
 	./reviewer/verify-committed-evidence
@@ -14,3 +14,6 @@ reviewer-reproduce-runtime-refresh:
 
 reviewer-reproduce-go5:
 	./phase1/scripts/verify-prsdd-go5-diagnostic
+
+reviewer-reproduce-go3pr2:
+	./phase1/scripts/verify-go3pr2-adapter-diagnostic
