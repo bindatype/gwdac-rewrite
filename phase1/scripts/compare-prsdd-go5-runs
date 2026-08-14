@@ -50,7 +50,7 @@ sub read_ledger {
     for my $line (@lines) {
         next unless length $line;
         my ($relative, undef, undef, $raw, $canonical) = split /\t/, $line;
-        die "invalid canonical token in $path\n" unless $canonical eq '<RUNDATE>';
+        die "invalid canonical token in $path\n" unless $canonical eq '<RUN_DT>';
         push @{$tokens{$relative}}, $raw;
     }
     return %tokens;

@@ -90,8 +90,8 @@ sub canonicalize_line {
             next unless $prefix =~ /^[ +\-]\s*$/ && $suffix =~ /^\s*$/;
         }
 
-        substr($line, $offset, 8, '<RUNDATE>');
-        push @{$ledger_rows}, join("\t", $relative, $line_number, $offset + 1, $field, '<RUNDATE>');
+        substr($line, $offset, 8, '<RUN_DT>');
+        push @{$ledger_rows}, join("\t", $relative, $line_number, $offset + 1, $field, '<RUN_DT>');
         $replacements++;
     }
     return ($line, $replacements);
@@ -159,6 +159,17 @@ for my $relative (@inventory) {
         }
         die "$relative: canonicalization changed E-notation tokens\n"
             if scientific_tokens($raw) ne scientific_tokens($canonical);
+    }
+
+    die "$relative: canonicalization changed file length\n"
+        if length($raw) != length($canonical);
+    my @raw_lines = split /(?<=\n)/, $raw, -1;
+    my @canonical_lines = split /(?<=\n)/, $canonical, -1;
+    die "$relative: canonicalization changed line count\n"
+        if scalar(@raw_lines) != scalar(@canonical_lines);
+    for my $index (0 .. $#raw_lines) {
+        die "$relative: canonicalization changed line length at line " . ($index + 1) . "\n"
+            if length($raw_lines[$index]) != length($canonical_lines[$index]);
     }
 
     write_file($target, $canonical);

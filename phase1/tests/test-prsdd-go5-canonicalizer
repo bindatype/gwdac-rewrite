@@ -23,7 +23,7 @@ GO5_DATE_FIELDS="${workspace}/dates.tsv" \
     "${phase1_root}/scripts/canonicalize-prsdd-go5-evidence" \
     "${workspace}/raw" "${workspace}/canonical" "${workspace}/ledger.tsv"
 
-test "$(grep -Fo '<RUNDATE>' "${workspace}/canonical/fixture.stdout" | wc -l | tr -d ' ')" -eq 3
+test "$(grep -Fo '<RUN_DT>' "${workspace}/canonical/fixture.stdout" | wc -l | tr -d ' ')" -eq 3
 grep -Fq '08/18/14' "${workspace}/canonical/fixture.stdout"
 grep -Fq '07/09' "${workspace}/canonical/fixture.stdout"
 grep -Fq 'CHI/DP=51634/25553' "${workspace}/canonical/fixture.stdout"
@@ -31,6 +31,9 @@ grep -Fq 'Chi,M= 34/25' "${workspace}/canonical/fixture.stdout"
 grep -Fq '0.2098E+01' "${workspace}/canonical/fixture.stdout"
 grep -Fq '1.25E-03' "${workspace}/canonical/fixture.stdout"
 test "$(($(wc -l <"${workspace}/ledger.tsv") - 1))" -eq 3
+cmp \
+    <(awk '{ print length($0) }' "${workspace}/raw/fixture.stdout") \
+    <(awk '{ print length($0) }' "${workspace}/canonical/fixture.stdout")
 
 printf 'path\tmode\texpected_replacements\ttz_relation\nfixture.stdout\toutput\t4\tmust-differ\n' \
     >"${workspace}/bad-count.tsv"
