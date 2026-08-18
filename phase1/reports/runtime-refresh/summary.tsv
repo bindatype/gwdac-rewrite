@@ -1,6 +1,6 @@
 engine	build_status	warnings	input_evidence	historical_exit	modern_exit	stdout_exact	classification	checkpoint
 eprsd	linked	463	archived_deck	0	0	yes	exact_deck_smoke_pass	917b6ba
 nnsd	linked	136	archived_deck	0	0	yes	exact_deck_smoke_pass	0015cb0
-knsd	linked	233	archived_deck	2	2	no	hard_coded_path_blocker	e441665
+knsd	linked	633	archived_deck	0	0	no	completed_output_differs	34c2640
 pdsd	linked	109	synthetic_startup_quit	0	0	yes	exact_startup_smoke_pass	cfdf133
 pdesd	linked	114	synthetic_startup_quit	0	0	yes	exact_startup_smoke_pass	d27c49c

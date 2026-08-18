@@ -1,6 +1,6 @@
 engine	build_status	historical_exit	historical_normal_exit	modern_exit	modern_normal_exit	stdout_exact	result
 eprsd	linked	0	yes	0	yes	yes	exact_smoke_pass
 nnsd	linked	0	yes	0	yes	yes	exact_smoke_pass
-knsd	linked	2	no	2	no	no	runtime_failed
+knsd	linked	0	yes	0	yes	no	completed_output_differs
 pdsd	linked	0	yes	0	yes	yes	exact_smoke_pass
 pdesd	linked	0	yes	0	yes	yes	exact_smoke_pass

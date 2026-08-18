@@ -18,3 +18,6 @@ open	NEWDAT.DAT
 open	/home/arndt64/sdat/secpr.dat
 open	/home/arndt64/sdat/secpr.dat
 open	/home/arndt64/KN/KNSOL.USR
+open	/home/arndt64/KN/KNSOL.USR
+open	SAID.LOG
+open	SAID.PS

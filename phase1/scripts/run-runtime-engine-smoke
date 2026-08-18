@@ -157,7 +157,22 @@ if [[ "${transcript_rel}" != - ]]; then
 fi
 
 artifact_inputs=()
-for name in SAID.TMP SAID.PCT SAID.LOG SAID.PS fort.3 fort.7; do
+# SAID.PS is a rendering artifact and rendering is outside scope
+# (GWDAC Rewrite Plan.md:48, 149-156). The accepted headless boundary
+# creates the file but writes no content, so its existence is a
+# completion witness that the deck reached the PostScript step while its
+# content carries no evidence. Assert and record the witness, then
+# exclude it from the evidence package and let it be cleaned with the
+# run directory rather than left as an unclassified artifact.
+said_ps_witness=absent
+said_ps_bytes=0
+if [[ -f "${run_root}/work/SAID.PS" ]]; then
+    said_ps_witness=created
+    said_ps_bytes="$(wc -c <"${run_root}/work/SAID.PS")"
+    rm -f "${run_root}/work/SAID.PS"
+fi
+
+for name in SAID.TMP SAID.PCT SAID.LOG fort.3 fort.7; do
     if [[ -f "${run_root}/work/${name}" ]]; then
         install -m 644 "${run_root}/work/${name}" "${report_root}/${name}"
         artifact_inputs+=("${report_root}/${name}")
@@ -176,6 +191,8 @@ done
     printf 'input_sha256=%s\n' "$(sha256sum "${input_file}" | awk '{print $1}')"
     printf 'transcript_relation=%s\n' "${transcript_relation}"
     printf 'transcript_exact=%s\n' "${transcript_exact}"
+    printf 'said_ps_witness=%s\n' "${said_ps_witness}"
+    printf 'said_ps_bytes=%s\n' "${said_ps_bytes}"
     printf 'exit_status=%s\n' "${status}"
     printf 'timed_out=%s\n' "$([[ "${status}" -eq 124 ]] && printf yes || printf no)"
     printf 'normal_exit=%s\n' "${normal_exit}"

@@ -1,4 +1,4 @@
 metric	historical	modern	relation
-exit_status	2	2	exact
-normal_exit	no	no	exact
-stdout_sha256	02d853d6ec424b0e7695b86c3b3f4c2e472b8fabf267bb0ceaf514b18fbf6192	7889fe52a96087f1445c507d97a60733210153d971d5a7b3c53c62305976a20f	no
+exit_status	0	0	exact
+normal_exit	yes	yes	exact
+stdout_sha256	065f786e7fc26ea39975257c6030f9bf3242e9fa1f8f37ae48fb47f0e06dab6f	6adbb5252c42e3ed475a0f25884d494d7cea2bf34580bf80b78d3d5ab800398b	no
