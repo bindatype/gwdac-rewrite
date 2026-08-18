@@ -15,5 +15,8 @@ reviewer-reproduce-runtime-refresh:
 reviewer-reproduce-go5:
 	./phase1/scripts/verify-prsdd-go5-diagnostic
 
+reviewer-verify-comma-a-editing:
+	./phase1/scripts/verify-gfortran-comma-a-editing
+
 reviewer-reproduce-go3pr2:
 	./phase1/scripts/verify-go3pr2-adapter-diagnostic

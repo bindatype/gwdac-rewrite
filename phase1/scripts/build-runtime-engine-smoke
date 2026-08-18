@@ -48,6 +48,13 @@ readonly -a fixed_flags=(
     -fno-automatic
 )
 
+# Engines whose main program unit is compiled -std=gnu to restore g77
+# comma handling in formatted input. Deliberately narrow: -std=gnu also
+# reports legacy extensions that -std=legacy accepts silently, which
+# changes recorded build-diagnostic evidence for engines that have no
+# manifested comma defect. Only engines with a measured defect belong here.
+readonly -a comma_semantics_engines=(knsd)
+
 readonly -a gplot_flags=(
     -O1
     -cpp
@@ -136,10 +143,26 @@ for source in "${sources[@]}"; do
     set +e
     (
         cd "${core_root}"
-        gfortran \
-            "${fixed_flags[@]}" \
-            -c "${source}.f" \
-            -o "${source}.o"
+        # -std=legacy makes gfortran treat a comma as a field terminator in
+        # formatted input. g77 did not apply that to A editing, so records
+        # such as the KNSOL.USR title "PRMS=(62,27)" lose the comma. The
+        # behavior is process-global and established by the main program
+        # unit through _gfortran_set_options, so only that unit needs
+        # -std=gnu; the remaining units keep -std=legacy for the argument-
+        # extent tolerance they require to compile. See
+        # phase1/scripts/verify-gfortran-comma-a-editing.
+        if [[ "${source}" == "${engine}" ]] \
+           && [[ " ${comma_semantics_engines[*]} " == *" ${engine} "* ]]; then
+            gfortran \
+                "${fixed_flags[@]/-std=legacy/-std=gnu}" \
+                -c "${source}.f" \
+                -o "${source}.o"
+        else
+            gfortran \
+                "${fixed_flags[@]}" \
+                -c "${source}.f" \
+                -o "${source}.o"
+        fi
     ) >>"${core_log}" 2>&1
     source_status=$?
     set -e
