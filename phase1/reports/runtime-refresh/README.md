@@ -14,15 +14,29 @@ warning-driven fix was made.
 | --- | --- | --- | --- |
 | `eprsd` | Archived deck | Exact pass | Same-input historical and modern stdout |
 | `nnsd` | Archived deck | Exact pass | Same-input historical and modern stdout |
-| `knsd` | Archived deck | Blocked | Both runs exit 2 at a hard-coded absolute path; stdout also differs |
+| `knsd` | Archived deck | Completes; output differs | Both runs exit 0; stdout differs only in the intended `SAID_DATA_ROOT` display lines |
 | `pdsd` | Synthetic startup/quit | Exact pass | Startup and clean quit only |
 | `pdesd` | Synthetic startup/quit | Exact pass | Startup and clean quit only |
 
-The `knsd` dataset file survives at `/workspace/arndt64/KN/KNSOL.USR`, but
-both executables request `/home/arndt64/KN/KNSOL.USR`. No path-layout or source
-fix was attempted. Its first stdout differences also include legacy
-`PRMS=(62,27)` versus modern `PRMS=(62 27)` rendering. This remains the one
-unresolved engine blocker from this sweep.
+`knsd` was previously the one unresolved blocker from this sweep, with both
+executables exiting 2 while requesting `/home/arndt64/KN/KNSOL.USR`. That
+blocker was environmental rather than a source defect: the archived `KN/INPUT`
+deck supplies the absolute path as interactive input after `SAID_DATA_ROOT` has
+already been applied, so the portable-data-root patch could not intercept it.
+Both containers now provide `/home/arndt64/KN` as a compatibility alias,
+resolving to the 10,088-byte `KNSOL.USR` rather than any of the five zero-byte
+copies in the archive.
+
+Both executables now exit 0 and render `PRMS=(62,27)`. The earlier modern
+rendering of `PRMS=(62 27)` was a compiler-semantics defect: `-std=legacy`
+makes gfortran treat a comma as a field terminator in formatted input, which
+g77 did not do for A editing. The `knsd` main program unit is compiled
+`-std=gnu` to restore g77 field handling. `stdout_exact` remains `no` because
+the raw data-root display strings differ; a strict contract permits only those
+lines to differ and requires every other byte to match.
+
+No source, fixture, tolerance, formula, or archived deck was changed. This
+remains runtime-compatibility evidence; physics approval is still pending.
 
 The exact `pdsd` and `pdesd` results are intentionally weaker than the two
 deck-driven passes because no retained request deck or paired transcript
