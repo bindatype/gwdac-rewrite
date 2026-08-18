@@ -140,6 +140,41 @@ stdout_exact=no
 if cmp -s "${historical_root}/stdout.txt" "${stdout_file}"; then
     stdout_exact=yes
 fi
+
+# Sanctioned-difference contract. stdout_exact=no plus a coarse result class
+# would accept any normally completing run with arbitrarily changed output, so
+# engines with a known non-exact relation must declare exactly which lines may
+# differ. The only sanctioned difference is the SAID_DATA_ROOT display root and
+# the fixed-width column padding that compensates for its length. Every other
+# byte must match. This is a strict comparison, not a tolerance: no numeric
+# rounding and no general text normalization is applied.
+stdout_relation=exact
+if [[ "${stdout_exact}" == no ]]; then
+    case "${engine}" in
+        knsd)
+            sanctioned_normalize() {
+                sed -E 's#/(home|workspace)/arndt64/sdat/#<SDAT>/#g; s/[[:space:]]+$//' "$1"
+            }
+            unsanctioned="$(diff "${historical_root}/stdout.txt" "${stdout_file}" \
+                | grep -E '^[<>]' | grep -vF '/sdat/' || true)"
+            if [[ -n "${unsanctioned}" ]]; then
+                printf 'FAIL engine=%s stdout differs outside the sanctioned SAID_DATA_ROOT lines:\n%s\n' \
+                    "${engine}" "${unsanctioned}" >&2
+                exit 1
+            fi
+            if ! diff -q <(sanctioned_normalize "${historical_root}/stdout.txt") \
+                         <(sanctioned_normalize "${stdout_file}") >/dev/null; then
+                printf 'FAIL engine=%s stdout not byte-identical after removing the sanctioned data-root display difference\n' \
+                    "${engine}" >&2
+                exit 1
+            fi
+            stdout_relation=data_root_display_only
+            ;;
+        *)
+            stdout_relation=unclassified
+            ;;
+    esac
+fi
 {
     diff -u \
         --label historical \
@@ -169,8 +204,29 @@ said_ps_bytes=0
 if [[ -f "${run_root}/work/SAID.PS" ]]; then
     said_ps_witness=created
     said_ps_bytes="$(wc -c <"${run_root}/work/SAID.PS")"
-    rm -f "${run_root}/work/SAID.PS"
 fi
+
+# Engines whose accepted deck reaches the PostScript step must assert the
+# witness rather than merely record it. Absence, or any nonzero content, is a
+# failure and must stop the run before cleanup: nonzero content would mean the
+# headless boundary emitted rendering output, which is outside scope and must
+# not be silently discarded.
+case "${engine}" in
+    knsd)
+        if [[ "${said_ps_witness}" != created ]]; then
+            printf 'FAIL engine=%s expected SAID.PS completion witness, found none\n' \
+                "${engine}" >&2
+            exit 1
+        fi
+        if [[ "${said_ps_bytes}" -ne 0 ]]; then
+            printf 'FAIL engine=%s SAID.PS carries %s bytes; rendering output is out of scope and must not be discarded silently\n' \
+                "${engine}" "${said_ps_bytes}" >&2
+            exit 1
+        fi
+        ;;
+esac
+
+rm -f "${run_root}/work/SAID.PS"
 
 for name in SAID.TMP SAID.PCT SAID.LOG fort.3 fort.7; do
     if [[ -f "${run_root}/work/${name}" ]]; then
@@ -200,6 +256,7 @@ done
     printf 'stderr_bytes=%s\n' "$(wc -c <"${stderr_file}")"
     printf 'opened_file_paths=%s\n' "$(wc -l <"${opened_file}")"
     printf 'historical_stdout_exact=%s\n' "${stdout_exact}"
+    printf 'stdout_relation=%s\n' "${stdout_relation}"
     objdump -p "${binary}" | sed -n 's/^[[:space:]]*NEEDED[[:space:]]*/needed=/p'
     sha256sum \
         "${binary}" \

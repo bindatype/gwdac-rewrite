@@ -18,6 +18,7 @@ stdout_bytes=7115
 stderr_bytes=0
 opened_file_paths=16
 historical_stdout_exact=no
+stdout_relation=data_root_display_only
 needed=libgfortran.so.5
 needed=libm.so.6
 needed=libX11.so.6

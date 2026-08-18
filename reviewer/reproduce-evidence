@@ -162,6 +162,18 @@ reproduce_runtime_refresh() {
         exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
     fi
 
+    # The compiler-semantics fixture must run inside the pinned dev container,
+    # because the behavior it asserts is a property of that exact gfortran. A
+    # checked-in reproducer that no gate executes would assert nothing.
+    printf 'RUN gfortran-comma-a-editing\n'
+    if ! "${compose[@]}" exec -T dev \
+        /phase1/scripts/verify-gfortran-comma-a-editing; then
+        printf 'COMPATIBILITY FAIL gfortran comma A-editing fixture\n' >&2
+        compatibility_failures=$((compatibility_failures + 1))
+    else
+        printf 'PASS gfortran-comma-a-editing\n'
+    fi
+
     while IFS=$'\t' read -r engine _ <&3; do
         if [[ "${engine}" == engine ]]; then
             continue

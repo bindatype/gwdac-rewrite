@@ -123,8 +123,29 @@ said_ps_bytes=0
 if [[ -f "${run_root}/work/SAID.PS" ]]; then
     said_ps_witness=created
     said_ps_bytes="$(wc -c <"${run_root}/work/SAID.PS")"
-    rm -f "${run_root}/work/SAID.PS"
 fi
+
+# Engines whose accepted deck reaches the PostScript step must assert the
+# witness rather than merely record it. Absence, or any nonzero content, is a
+# failure and must stop the run before cleanup: nonzero content would mean the
+# headless boundary emitted rendering output, which is outside scope and must
+# not be silently discarded.
+case "${engine}" in
+    knsd)
+        if [[ "${said_ps_witness}" != created ]]; then
+            printf 'FAIL engine=%s expected SAID.PS completion witness, found none\n' \
+                "${engine}" >&2
+            exit 1
+        fi
+        if [[ "${said_ps_bytes}" -ne 0 ]]; then
+            printf 'FAIL engine=%s SAID.PS carries %s bytes; rendering output is out of scope and must not be discarded silently\n' \
+                "${engine}" "${said_ps_bytes}" >&2
+            exit 1
+        fi
+        ;;
+esac
+
+rm -f "${run_root}/work/SAID.PS"
 
 for name in SAID.TMP SAID.PCT SAID.LOG fort.3 fort.7; do
     if [[ -f "${run_root}/work/${name}" ]]; then
