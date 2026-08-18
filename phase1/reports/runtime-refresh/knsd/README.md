@@ -23,6 +23,17 @@ eight `KNSOL.USR` copies in the archive are zero bytes; a fix that let the
 relative name resolve instead would load an empty solution file, exit 0, and
 produce silently incorrect results.
 
+## Relationship to the superseded package
+
+This package **replaces** the blocked `knsd` evidence recorded at checkpoint
+`e441665`, in which both executables exited 2 at `saidopen.f:268` and the
+modern build rendered `PRMS=(62 27)`. That result was correct for its
+configuration and is not repudiated: it remains retrievable in repository
+history and its classification, `hard_coded_path_blocker`, is preserved in the
+`summary.tsv` history. The failure is superseded by a container-layout and
+compiler-semantics change, not erased, and no evidence from that package was
+discarded to obtain this one.
+
 This is runtime-compatibility evidence, not physics approval.
 
 ## Evidence
