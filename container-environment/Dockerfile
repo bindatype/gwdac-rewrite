@@ -25,6 +25,14 @@ RUN apt-get update \
         zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Compatibility alias for the archived KN/INPUT deck, which repoints unit
+# 11 to /home/arndt64/KN/KNSOL.USR as interactive input. SAIDOPEN applies
+# SAID_DATA_ROOT to its FIL() table during initialization, before the deck
+# override is read, so the portable-data-root patch cannot intercept this
+# path. The archived deck is reference evidence and is not modified.
+RUN mkdir -p /home/arndt64 \
+    && ln -s /workspace/arndt64/KN /home/arndt64/KN
+
 COPY bin/bootstrap-repos /usr/local/bin/bootstrap-repos
 COPY bin/verify-environment /usr/local/bin/verify-environment
 
