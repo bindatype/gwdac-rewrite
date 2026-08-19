@@ -51,7 +51,7 @@
  WEB
 
     SP06 766276 57255/31876 P+=27190/13344 P-=22702/11967 CX= 6084/ 
-     PI+P  DSG  at TLAB =   500.00     8/ 2/26
+     PI+P  DSG  at TLAB =   500.00     8/19/26
      ACM     Obs,Err
    A(cm)     DSG(cm)       Err     A(lab)    DSG(lab)
      0.000  0.4980E+01  0.0000E+00    0.00  0.1188E+02

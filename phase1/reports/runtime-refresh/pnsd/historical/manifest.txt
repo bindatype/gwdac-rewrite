@@ -8,6 +8,7 @@ fixture_sha256=090979c16fbb263c9c887996f17bc69b22387197b49cc6c53e1bcdfa5075a80d
 exit_status=0
 stderr_bytes=0
 result_rows=7
+no_render_artifact_absent=yes
 opened_file_paths=29
 operating_system=Ubuntu 24.04
 ldd=	libpng12.so.0 => /opt/oracle/root/lib/x86_64-linux-gnu/libpng12.so.0 (0x00007fffff400000)
@@ -41,12 +42,13 @@ ldd=	libbrotlicommon.so.1 => /lib/x86_64-linux-gnu/libbrotlicommon.so.1 (0x00007
 ldd=	libmd.so.0 => /lib/x86_64-linux-gnu/libmd.so.0 (0x00007ffffe7d0000)
 184232e664a6883751b2a4e68f73fc82f53c8e165572a46caf8b5a1a30f571de  /workspace/arndt64/said/pnsd
 090979c16fbb263c9c887996f17bc69b22387197b49cc6c53e1bcdfa5075a80d  /phase1/fixtures/pnsd-sp06-no-render.in
-2067e4a06540ee52c4c0a00a64dac737f26216a73d9ac7f8842878a059f8bda6  /phase1/reports/runtime-refresh/pnsd/historical/stdout.txt
+50a7acf9ce3c966dda48d86d2eeb751febc327323e839dcc8911ef3d8f63b4ab  /phase1/reports/runtime-refresh/pnsd/historical/stdout.txt
 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /phase1/reports/runtime-refresh/pnsd/historical/stderr.txt
 05048dfba0f072aaac8cd36cfb28f32ea20cf627cfa61d12ba11cea143f16328  /phase1/reports/runtime-refresh/pnsd/historical/results.tsv
 2ec2d237105931b833f1d1f9192e08a7ef303086385fd4d3ec3609cd6ca3a9dd  /phase1/reports/runtime-refresh/pnsd/historical/file-trace.tsv
 c7411f72e184b04ab2dada1ee462694080e8e70e3b46117474bca62c0f433206  /phase1/reports/runtime-refresh/pnsd/historical/opened-files.txt
-78916db578d35434b28809993462807f6a5cd42f6fc128e8816830dbeea63e54  /phase1/reports/runtime-refresh/pnsd/historical/SAID.TMP
+c61e321514c18554faed17347d14dad6e33dc1b2cf78f9736422f4af19087560  /phase1/reports/runtime-refresh/pnsd/historical/SAID.TMP
 eb86b55fcbbabec5c1d45df2e8fe612e932ef7dc086613bfed366040ac228a56  /phase1/reports/runtime-refresh/pnsd/historical/SAID.PCT
-cfe3d8ffe8a82c5675e529835907b6c8ada7cd419c209ead43e1535ff1c31fac  /phase1/reports/runtime-refresh/pnsd/historical/SAID.LOG
+2ec0de528faaebd36bb713a2828d5704c31bf988c43803cd4c1b52a8a9de67ff  /phase1/reports/runtime-refresh/pnsd/historical/SAID.LOG
 cb95a6bb17364a3b217afe9035238e31e87f726dbd7ad0dbd8ea2b8aed3c3e5d  /phase1/reports/runtime-refresh/pnsd/historical/fort.7
+65a4806179fafbc1482baff48ec07d9b669069da5388af0f0046423d174f52af  /phase1/scripts/run-historical-pnsd

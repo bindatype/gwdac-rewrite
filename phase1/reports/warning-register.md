@@ -68,20 +68,21 @@ The new category counts sum to every warning line in:
 
 ## `pnsd` extension
 
-The clean `pnsd` build emits 233 warnings: 8 while rebuilding the local
-libraries, 166 in `pnsd.f`, `pn1.f`, `pn2.f`, and `pnu.f`, 59 in the same
+The clean `pnsd` build emits 633 warnings: 8 while rebuilding the local
+libraries, 566 in `pnsd.f`, `pn1.f`, `pn2.f`, and `pnu.f`, 59 in the same
 `gplot` closure, and none while linking.
 
 | Build area | Compatibility debt | Suspected defect | Confirmed defect | Total |
 | --- | ---: | ---: | ---: | ---: |
 | Local libraries | 6 | 2 | 0 | 8 |
-| `pnsd` core | 103 | 36 | 27 | 166 |
+| `pnsd` core | 503 | 36 | 27 | 566 |
 | `gplot` | 55 | 4 | 0 | 59 |
-| Total | 164 | 42 | 27 | 233 |
+| Total | 564 | 42 | 27 | 633 |
 
-The SP06 runtime fixture also exposes an unwarned internal formatted-read
-failure at `pnu.f:4569` under modern libgfortran. It is recorded in
-`runtime-refresh/pnsd/warnings.md`; no source fix was attempted.
+The 400 additional compatibility-debt diagnostics are exposed by compiling the
+`pnsd` main unit with `-std=gnu` to restore g77 A-editing behavior. The SP06
+runtime fixture gates that setting and the exact historical artifact relation;
+no source or warning-driven fix was attempted.
 
 ## Runtime-check finding
 

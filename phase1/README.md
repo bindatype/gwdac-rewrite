@@ -92,14 +92,15 @@ claim of scientific or hidden floating-point equivalence.
 
 The Legacy Runtime Refresh inventory ranks the remaining six archived engines
 by surviving source, local dependencies, datasets, executable, input deck, and
-captured transcript. `pnsd` builds reproducibly with modern gfortran and
-produces a byte-identical seven-row SP06 DSG table before stopping at an
-internal formatted read in `pnu.f:4569`, where the checked-in executable
-continues normally. The subsequent five-engine sweep records exact deck-driven
-smoke passes for `eprsd` and `nnsd`, exact startup/quit smoke passes for `pdsd`
-and `pdesd`, and a shared hard-coded-path failure for `knsd`. No source fix was
-made. `reports/runtime-refresh/README.md` and `summary.tsv` define the evidence
-and its limits.
+captured transcript. `pnsd` builds reproducibly with modern gfortran and, with
+only its main program unit using the g77-compatible formatted-input semantics,
+exactly matches the checked-in executable across seven SP06 DSG rows and every
+surviving runtime artifact. The subsequent five-engine sweep records exact
+deck-driven smoke passes for `eprsd` and `nnsd`, exact startup/quit smoke passes
+for `pdsd` and `pdesd`, and normally completing `knsd` runs whose only stdout
+difference is the configured data-root display path. No archived Fortran or
+deck was changed. The runtime-refresh package READMEs and manifests define the
+evidence and its limits; none of these results is physics approval.
 
 Phase 1 is complete for the retained scope. `build-prsdd` keeps the original
 reference build as its default and also accepts the Phase 2

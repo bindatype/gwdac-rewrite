@@ -25,8 +25,9 @@ make reviewer-verify
 make reviewer-reproduce
 ```
 
-The full reproducer runs the 24-fixture, 288-record CM12 gate and all five
-runtime-refresh engines. Run one group when diagnosing infrastructure:
+The full reproducer runs the 24-fixture, 288-record CM12 gate, the exact `pnsd`
+oracle contract, and the five-engine runtime-refresh smoke sweep. Run one group
+when diagnosing infrastructure:
 
 ```sh
 reviewer/reproduce-evidence --scope cm12
@@ -82,9 +83,10 @@ failure.
 | `64` | command-line usage error |
 
 The verifier covers the security, adapter, GO5, GO5 reconciliation,
-unpatched-priming, and runtime-refresh manifest packages. It also independently compares all committed
-DSG and amplitude fixture tables across the modern build and both checked-in
-historical executables. The experimental PRBAS candidate is still run during
+unpatched-priming, `pnsd`, and runtime-refresh manifest packages. It also
+independently compares all committed DSG and amplitude fixture tables across
+the modern build and both checked-in historical executables. The experimental
+PRBAS candidate is still run during
 reproduction, but its known mismatches are diagnostic evidence and do not enter
 the accepted three-executable oracle gate. Reviewer reproduction permits only
 the candidate request probe's documented exit 6; every other nonzero build or
@@ -93,5 +95,6 @@ generator exit remains a reproduction failure.
 Coverage differs from integrity verification. The GO5/`PRRDX` diagnostic and
 the unpatched-priming measurement are checked against their committed manifests,
 but `reproduce-evidence` does not re-run either diagnostic. It reproduces only
-the CM12 gate, including the diagnostic PRBAS candidate, and the five runtime-
-refresh engine outcomes described above.
+the CM12 gate, including the diagnostic PRBAS candidate, the `pnsd` two-build
+and exact-artifact contract, and the five runtime-refresh engine outcomes
+described above.
