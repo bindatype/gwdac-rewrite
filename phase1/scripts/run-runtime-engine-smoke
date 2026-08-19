@@ -81,7 +81,6 @@ if [[ "${build_status}" != linked || ! -x "${binary}" ]]; then
         cd "${phase1_root}"
         find "reports/runtime-refresh/${engine}" -type f \
             ! -name evidence-manifest.sha256 \
-            ! -name README.md \
             -print0 \
             | sort -z \
             | xargs -0 sha256sum
@@ -307,7 +306,6 @@ fi
     cd "${phase1_root}"
     find "reports/runtime-refresh/${engine}" -type f \
         ! -name evidence-manifest.sha256 \
-        ! -name README.md \
         -print0 \
         | sort -z \
         | xargs -0 sha256sum

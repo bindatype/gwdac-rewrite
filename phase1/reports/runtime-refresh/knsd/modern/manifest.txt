@@ -27,11 +27,11 @@ needed=libgcc_s.so.1
 needed=libc.so.6
 8c043625345110760f73ba774c5a04389bd2bf52a3e0baca4af632b4ec173ab7  /workspace/phase1/runtime-refresh/knsd/artifacts/f6c81d01a1fe/knsd
 3a00f7eee4037226762e53be35920319d6292a6914936223574deed8a042c445  /phase1/reports/runtime-refresh/knsd/modern/input.txt
-6adbb5252c42e3ed475a0f25884d494d7cea2bf34580bf80b78d3d5ab800398b  /phase1/reports/runtime-refresh/knsd/modern/stdout.txt
+d6a438395014290b4046aaf2928953767406f48aacd3e97a4d20d36fd7eaf1c9  /phase1/reports/runtime-refresh/knsd/modern/stdout.txt
 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /phase1/reports/runtime-refresh/knsd/modern/stderr.txt
 27a1d5949cf63b038b6e713fa86d5e3faf87480fb3740317f56c5c3c95cb3059  /phase1/reports/runtime-refresh/knsd/modern/file-trace.txt
 659eb27d82a0e782a0f4709d25c03e52aae9c66b4b1578cc04ce7cd504817cab  /phase1/reports/runtime-refresh/knsd/modern/opened-files.txt
 63ad8e85349fe11819885976ef96cbe3f6f65c288b290713acadbdf9a9280388  /phase1/reports/runtime-refresh/knsd/modern/SAID.TMP
 eb86b55fcbbabec5c1d45df2e8fe612e932ef7dc086613bfed366040ac228a56  /phase1/reports/runtime-refresh/knsd/modern/SAID.PCT
-0cfebfb0cbb7479da48004a1e2c8ce7ee4362055c691d692770e5fd17fd5cdd0  /phase1/reports/runtime-refresh/knsd/modern/SAID.LOG
+2ec0de528faaebd36bb713a2828d5704c31bf988c43803cd4c1b52a8a9de67ff  /phase1/reports/runtime-refresh/knsd/modern/SAID.LOG
 cb95a6bb17364a3b217afe9035238e31e87f726dbd7ad0dbd8ea2b8aed3c3e5d  /phase1/reports/runtime-refresh/knsd/modern/fort.7

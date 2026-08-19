@@ -105,7 +105,7 @@
  WEB
 
     KS13 AMPLITUDES FOR K-N 8/20/13                                 
-     K+P   SGT  at ACM  =     0.00     8/18/26
+     K+P   SGT  at ACM  =     0.00     8/19/26
      WCM     Obs,Err
   1480.000  0.0000E+00  0.0000E+00
   1500.000  0.0000E+00  0.0000E+00
