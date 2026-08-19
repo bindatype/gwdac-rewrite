@@ -20,6 +20,12 @@ readonly source_commit="$(
 )"
 
 mkdir -p "${state_root}/runs" "${report_root}"
+rm -f \
+    "${report_root}/SAID.LOG" \
+    "${report_root}/SAID.PCT" \
+    "${report_root}/SAID.PS" \
+    "${report_root}/SAID.TMP" \
+    "${report_root}/fort.7"
 test -x "${binary}"
 test -f "${fixture}"
 test -f "${preflight_manifest}"
@@ -77,6 +83,7 @@ test "${status}" -eq 0
 test ! -s "${stderr_file}"
 test "${result_rows}" -eq 7
 grep -Fq 'Thanks for using SAID' "${stdout_file}"
+test ! -e "${run_root}/pn/SAID.PS"
 
 artifact_inputs=()
 for name in SAID.TMP SAID.PCT SAID.LOG SAID.PS fort.3 fort.7; do
@@ -97,6 +104,7 @@ done
     printf 'exit_status=%s\n' "${status}"
     printf 'stderr_bytes=%s\n' "$(wc -c <"${stderr_file}")"
     printf 'result_rows=%s\n' "${result_rows}"
+    printf 'no_render_artifact_absent=yes\n'
     printf 'opened_file_paths=%s\n' "$(wc -l <"${opened_file}")"
     printf 'operating_system=%s\n' "$(
         . /etc/os-release
@@ -111,7 +119,8 @@ done
         "${result_file}" \
         "${trace_file}" \
         "${opened_file}" \
-        "${artifact_inputs[@]}"
+        "${artifact_inputs[@]}" \
+        "${phase1_root}/scripts/run-historical-pnsd"
 } >"${manifest}"
 
 printf 'Historical pnsd oracle passed: %s\n' "${result_file}"

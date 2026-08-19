@@ -1,4 +1,4 @@
-.PHONY: reviewer-verify reviewer-reproduce reviewer-reproduce-cm12 reviewer-reproduce-runtime-refresh reviewer-reproduce-go5 reviewer-reproduce-go3pr2 reviewer-reproduce-unpatched-priming reviewer-verify-comma-a-editing
+.PHONY: reviewer-verify reviewer-reproduce reviewer-reproduce-cm12 reviewer-reproduce-runtime-refresh reviewer-reproduce-go5 reviewer-reproduce-go3pr2 reviewer-reproduce-unpatched-priming reviewer-verify-comma-a-editing reviewer-write-pnsd-manifest
 
 reviewer-verify:
 	./reviewer/verify-committed-evidence
@@ -17,6 +17,9 @@ reviewer-reproduce-go5:
 
 reviewer-verify-comma-a-editing:
 	./phase1/scripts/verify-gfortran-comma-a-editing
+
+reviewer-write-pnsd-manifest:
+	./phase1/scripts/write-pnsd-evidence-manifest
 
 reviewer-reproduce-go3pr2:
 	./phase1/scripts/verify-go3pr2-adapter-diagnostic

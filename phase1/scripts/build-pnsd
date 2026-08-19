@@ -30,6 +30,12 @@ readonly -a fixed_flags=(
     -fno-automatic
 )
 
+# The main program establishes libgfortran's process-wide formatted-input
+# semantics through _gfortran_set_options. g77 preserved commas in A editing;
+# gfortran -std=legacy does not. Keep every non-main unit on the accepted legacy
+# flags and change only the unit whose runtime options control the process.
+readonly -a main_flags=("${fixed_flags[@]/-std=legacy/-std=gnu}")
+
 readonly -a gplot_flags=(
     -O1
     -cpp
@@ -118,10 +124,17 @@ cp \
 for source in pnsd pn1 pn2 pnu; do
     (
         cd "${core_root}"
-        gfortran \
-            "${fixed_flags[@]}" \
-            -c "${source}.f" \
-            -o "${source}.o"
+        if [[ "${source}" == pnsd ]]; then
+            gfortran \
+                "${main_flags[@]}" \
+                -c "${source}.f" \
+                -o "${source}.o"
+        else
+            gfortran \
+                "${fixed_flags[@]}" \
+                -c "${source}.f" \
+                -o "${source}.o"
+        fi
     ) >>"${core_log}" 2>&1
 done
 
@@ -181,6 +194,8 @@ warning_count="$({
     printf 'gfortran=%s\n' "$(gfortran --version | sed -n '1p')"
     printf 'gcc=%s\n' "$(gcc --version | sed -n '1p')"
     printf 'source_files=pnsd.f,pn1.f,pn2.f,pnu.f\n'
+    printf 'main_unit_standard=gnu\n'
+    printf 'other_unit_standard=legacy\n'
     printf 'saidopen_members=%s\n' "$(ar t "${build_root}/saidopen.a" | wc -l)"
     printf 'libxz_members=%s\n' "$(ar t "${build_root}/libxz.a" | wc -l)"
     printf 'gplot_members=%s\n' "$(ar t "${build_root}/gplot.a" | wc -l)"

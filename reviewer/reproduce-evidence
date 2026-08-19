@@ -145,6 +145,9 @@ reproduce_runtime_refresh() {
     local expected
     local actual
     local step_status
+    local first_pnsd_binary
+    local second_pnsd_binary
+    local pnsd_warnings
     local -a compose=(
         docker compose
         -p "${runtime_project}"
@@ -172,6 +175,37 @@ reproduce_runtime_refresh() {
         compatibility_failures=$((compatibility_failures + 1))
     else
         printf 'PASS gfortran-comma-a-editing\n'
+    fi
+
+    printf 'RUN runtime-refresh engine=pnsd\n'
+    step_status=0
+    "${compose[@]}" exec -T oracle \
+        /phase1/scripts/run-historical-pnsd || step_status=1
+    "${compose[@]}" exec -T dev \
+        /phase1/scripts/build-pnsd || step_status=1
+    first_pnsd_binary="$(awk '$2 ~ /\/pnsd$/ {value=$1} END {print value}' \
+        "${disposable}/phase1/reports/runtime-refresh/pnsd/build/manifest.txt")"
+    "${compose[@]}" exec -T dev \
+        /phase1/scripts/build-pnsd || step_status=1
+    second_pnsd_binary="$(awk '$2 ~ /\/pnsd$/ {value=$1} END {print value}' \
+        "${disposable}/phase1/reports/runtime-refresh/pnsd/build/manifest.txt")"
+    pnsd_warnings="$(awk -F= '$1 == "warning_instances" {print $2}' \
+        "${disposable}/phase1/reports/runtime-refresh/pnsd/build/manifest.txt")"
+    "${compose[@]}" exec -T dev \
+        /phase1/scripts/run-pnsd || step_status=1
+    if [[ "${step_status}" -ne 0 ]]; then
+        printf 'REPRODUCTION FAIL engine=pnsd command failed\n' >&2
+        reproduction_failures=$((reproduction_failures + 1))
+    elif [[ -z "${first_pnsd_binary}" || \
+            "${first_pnsd_binary}" != "${second_pnsd_binary}" ]]; then
+        printf 'COMPATIBILITY FAIL engine=pnsd build reproducibility mismatch\n' >&2
+        compatibility_failures=$((compatibility_failures + 1))
+    elif [[ "${pnsd_warnings}" != 633 ]]; then
+        printf 'COMPATIBILITY FAIL engine=pnsd warnings=%s expected=633\n' \
+            "${pnsd_warnings:-missing}" >&2
+        compatibility_failures=$((compatibility_failures + 1))
+    else
+        printf 'PASS runtime-refresh engine=pnsd warnings=633 build_reproducible=yes artifacts=7\n'
     fi
 
     while IFS=$'\t' read -r engine _ <&3; do

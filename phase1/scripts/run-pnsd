@@ -22,6 +22,12 @@ readonly comparison="${report_base}/comparison.tsv"
 readonly manifest="${report_root}/manifest.txt"
 
 mkdir -p "${state_root}/runs" "${report_root}"
+rm -f \
+    "${report_root}/SAID.LOG" \
+    "${report_root}/SAID.PCT" \
+    "${report_root}/SAID.PS" \
+    "${report_root}/SAID.TMP" \
+    "${report_root}/fort.7"
 test -x "${binary}"
 test -f "${fixture}"
 test -f "${oracle_root}/results.tsv"
@@ -78,9 +84,13 @@ oracle_result_exact=no
 if cmp -s "${result_file}" "${oracle_root}/results.tsv"; then
     oracle_result_exact=yes
 fi
+no_render_artifact_absent=yes
+if [[ -e "${run_root}/pn/SAID.PS" ]]; then
+    no_render_artifact_absent=no
+fi
 
 artifact_inputs=()
-for name in SAID.TMP SAID.PCT SAID.LOG SAID.PS fort.3 fort.7; do
+for name in SAID.TMP SAID.PCT SAID.LOG fort.3 fort.7; do
     if [[ -f "${run_root}/pn/${name}" ]]; then
         install -m 644 "${run_root}/pn/${name}" "${report_root}/${name}"
         artifact_inputs+=("${report_root}/${name}")
@@ -89,10 +99,16 @@ done
 
 printf '%s\n' $'artifact\thistorical_sha256\tmodern_sha256\texact' \
     >"${comparison}"
-for name in stdout.txt results.tsv SAID.TMP SAID.PCT SAID.LOG SAID.PS fort.3 fort.7; do
+oracle_artifacts_exact=yes
+for name in stdout.txt stderr.txt results.tsv SAID.TMP SAID.PCT SAID.LOG fort.7; do
     historical="${oracle_root}/${name}"
     modern="${report_root}/${name}"
     if [[ ! -f "${historical}" || ! -f "${modern}" ]]; then
+        printf '%s\t%s\t%s\tmissing\n' "${name}" \
+            "$([[ -f "${historical}" ]] && sha256sum "${historical}" | awk '{print $1}' || printf absent)" \
+            "$([[ -f "${modern}" ]] && sha256sum "${modern}" | awk '{print $1}' || printf absent)" \
+            >>"${comparison}"
+        oracle_artifacts_exact=no
         continue
     fi
     historical_sha="$(sha256sum "${historical}" | awk '{print $1}')"
@@ -100,6 +116,8 @@ for name in stdout.txt results.tsv SAID.TMP SAID.PCT SAID.LOG SAID.PS fort.3 for
     exact=no
     if [[ "${historical_sha}" == "${modern_sha}" ]]; then
         exact=yes
+    else
+        oracle_artifacts_exact=no
     fi
     printf '%s\t%s\t%s\t%s\n' \
         "${name}" "${historical_sha}" "${modern_sha}" "${exact}" \
@@ -120,6 +138,8 @@ done
     printf 'result_rows=%s\n' "${result_rows}"
     printf 'normal_exit=%s\n' "${normal_exit}"
     printf 'oracle_result_exact=%s\n' "${oracle_result_exact}"
+    printf 'oracle_artifacts_exact=%s\n' "${oracle_artifacts_exact}"
+    printf 'no_render_artifact_absent=%s\n' "${no_render_artifact_absent}"
     objdump -p "${binary}" | sed -n 's/^[[:space:]]*NEEDED[[:space:]]*/needed=/p'
     sha256sum \
         "${binary}" \
@@ -128,12 +148,15 @@ done
         "${stderr_file}" \
         "${result_file}" \
         "${comparison}" \
-        "${artifact_inputs[@]}"
+        "${artifact_inputs[@]}" \
+        "${phase1_root}/scripts/run-pnsd"
 } >"${manifest}"
 
 if [[ "${status}" -ne 0 || "${stderr_bytes}" -ne 0 || \
     "${result_rows}" -ne 7 || "${normal_exit}" != yes || \
-    "${oracle_result_exact}" != yes ]]; then
+    "${oracle_result_exact}" != yes || \
+    "${oracle_artifacts_exact}" != yes || \
+    "${no_render_artifact_absent}" != yes ]]; then
     printf 'Modern pnsd oracle comparison blocked: %s\n' "${manifest}" >&2
     exit 1
 fi
