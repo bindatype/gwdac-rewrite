@@ -5,11 +5,6 @@ readonly phase1_root="${PHASE1_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." &&
 readonly package_root="${phase1_root}/reports/runtime-refresh/pnsd"
 readonly manifest="${package_root}/evidence-manifest.sha256"
 
-mapfile -t report_files < <(
-    find "${package_root}" -type f ! -name evidence-manifest.sha256 -print \
-        | sort
-)
-
 files=(
     "${phase1_root}/README.md"
     "${phase1_root}/fixtures/pnsd-sp06-no-render.in"
@@ -18,7 +13,13 @@ files=(
     "${phase1_root}/scripts/run-historical-pnsd"
     "${phase1_root}/scripts/run-pnsd"
     "${phase1_root}/scripts/write-pnsd-evidence-manifest"
-    "${report_files[@]}"
+)
+
+while IFS= read -r file; do
+    files+=("${file}")
+done < <(
+    find "${package_root}" -type f ! -name evidence-manifest.sha256 -print \
+        | sort
 )
 
 (
