@@ -31,7 +31,6 @@ EVIDENCE_DATE_FIELDS="${date_fields}" EVIDENCE_DERIVED_FILES=/dev/null \
     "${script_root}/compare-prsdd-go5-runs" \
     "${kiritimati}" "${gmt_minus_12}" "${workspace}/two-run-comparison.tsv"
 
-cmp "${kiritimati}/raw-manifest.sha256" "${gmt_minus_12}/raw-manifest.sha256"
 completed=1
 printf 'unpatched-priming evidence-determinism seam: CANDIDATE PASS workspace=%s\n' \
     "${workspace}"

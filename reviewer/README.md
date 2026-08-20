@@ -61,12 +61,14 @@ UNPATCHED_PRIMING_KEEP_WORKSPACE=1 make reviewer-reproduce-unpatched-priming
 ```
 
 It builds and runs the unpatched binary twice under `Pacific/Kiritimati` and
-`Etc/GMT+12`. Both runs must reproduce all 10 generated artifacts byte-for-byte
-against each other and the committed package. The committed README is the
-eleventh evidence file and remains a checked reference document rather than a
-generated artifact. The expected engine exit `2`, `PRRDX` EOF, exact witness
-row, and failed compatibility status are preserved; a candidate pass does not
-reclassify that retained behavioral failure.
+`Etc/GMT+12`. Nine non-date artifacts must remain raw-exact. The five declared
+run-date fields in `unpatched-priming.stdout` must expose the timezone change,
+and all 10 canonical artifacts must match each other and the committed package.
+The committed README is the eleventh evidence file and remains a checked
+reference document rather than a generated artifact. The expected engine exit
+`2`, `PRRDX` EOF, exact witness row, and failed compatibility status are
+preserved; a candidate pass does not reclassify that retained behavioral
+failure.
 
 ## Exit contract
 

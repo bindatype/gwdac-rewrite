@@ -16,6 +16,8 @@ readonly reference_root="${outputs_root}/phase1/reports/unpatched-priming-measur
 readonly accepted_stdout_reference="${outputs_root}/phase1/reports/prsdd-go5-diagnostic/accepted-priming.stdout"
 readonly raw_root="${candidate_root}/raw/unpatched-priming-measurement"
 readonly canonical_root="${candidate_root}/canonical/unpatched-priming-measurement"
+readonly reference_generated_root="${candidate_root}/scratch/reference-package"
+readonly reference_canonical_root="${candidate_root}/scratch/reference-canonical"
 readonly inventory="${outputs_root}/phase1/config/unpatched-priming-generated-files.txt"
 readonly date_fields="${outputs_root}/phase1/config/unpatched-priming-date-fields.tsv"
 readonly project="gwdac-unpatched-priming-candidate-$$"
@@ -69,6 +71,10 @@ fingerprint_worktree "${before_fingerprint}"
 mkdir -p "${candidate_root}/raw" "${candidate_root}/scratch/reference"
 cp "${accepted_stdout_reference}" \
     "${candidate_root}/scratch/reference/accepted-priming.stdout"
+mkdir -p "${reference_generated_root}"
+while IFS= read -r relative; do
+    cp "${reference_root}/${relative}" "${reference_generated_root}/${relative}"
+done <"${inventory}"
 cat >"${candidate_root}/run-context.txt" <<EOF
 evidence_label=captured
 outputs_commit=$(git -C "${outputs_root}" rev-parse HEAD)
@@ -105,6 +111,14 @@ EVIDENCE_INVENTORY="${inventory}" EVIDENCE_DATE_FIELDS="${date_fields}" \
 EVIDENCE_INVENTORY="${inventory}" EVIDENCE_PACKAGE_LABEL='unpatched priming' \
     "${script_root}/write-evidence-manifest" \
     "${canonical_root}" "${candidate_root}/canonical-manifest.sha256"
+EVIDENCE_INVENTORY="${inventory}" EVIDENCE_DATE_FIELDS="${date_fields}" \
+    "${script_root}/canonicalize-prsdd-go5-evidence" \
+    "${reference_generated_root}" "${reference_canonical_root}" \
+    "${candidate_root}/committed-canonicalization.tsv"
+EVIDENCE_INVENTORY="${inventory}" EVIDENCE_PACKAGE_LABEL='committed unpatched priming' \
+    "${script_root}/write-evidence-manifest" \
+    "${reference_canonical_root}" \
+    "${candidate_root}/committed-canonical-manifest.sha256"
 EVIDENCE_INVENTORY="${inventory}" \
     "${script_root}/compare-prsdd-go5-candidate" \
     "${raw_root}" \
@@ -113,11 +127,15 @@ EVIDENCE_INVENTORY="${inventory}" \
     "${candidate_root}/candidate-vs-committed.tsv"
 
 test "$(awk -F '\t' 'NR > 1 && $2 == "raw-exact" { count++ } END { print count + 0 }' \
-    "${candidate_root}/candidate-vs-committed.tsv")" -eq 10
+    "${candidate_root}/candidate-vs-committed.tsv")" -eq 9
 test "$(awk -F '\t' 'NR > 1 && $2 == "raw-different" { count++ } END { print count + 0 }' \
-    "${candidate_root}/candidate-vs-committed.tsv")" -eq 0
+    "${candidate_root}/candidate-vs-committed.tsv")" -eq 1
+test "$(awk -F '\t' 'NR > 1 && $1 == "unpatched-priming.stdout" && $2 == "raw-different" { count++ } END { print count + 0 }' \
+    "${candidate_root}/candidate-vs-committed.tsv")" -eq 1
 test "$(awk -F '\t' 'NR > 1 && $1 == "README.md" && $2 == "reference-document-only" { count++ } END { print count + 0 }' \
     "${candidate_root}/candidate-vs-committed.tsv")" -eq 1
+cmp "${candidate_root}/canonical-manifest.sha256" \
+    "${candidate_root}/committed-canonical-manifest.sha256"
 
 rm -rf "${candidate_root}/scratch"
 fingerprint_worktree "${after_fingerprint}"
@@ -129,5 +147,5 @@ if ! cmp -s "${before_fingerprint}" "${after_fingerprint}"; then
 fi
 
 completed=1
-printf 'unpatched-priming candidate captured: root=%s timezone=%s generated_files=10 reference_files=1\n' \
+printf 'unpatched-priming candidate captured: root=%s timezone=%s generated_files=10 date_fields=5 reference_files=1\n' \
     "${candidate_root}" "${evidence_tz}"

@@ -1,1 +1,2 @@
 path	mode	expected_replacements	tz_relation
+unpatched-priming.stdout	output	5	must-differ
