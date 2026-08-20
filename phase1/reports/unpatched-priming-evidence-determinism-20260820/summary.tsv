@@ -10,7 +10,7 @@ date_substitutions_per_context	5
 nondate_raw_exact	9
 canonical_exact	10
 candidate_only_files	0
-canonical_manifest_sha256	dc6e477ccd3b38eb0f2965f2091c3004513d3d1a2f40b725f34865e26f2c4c
+canonical_manifest_sha256	dc6e477ccd3b38eb0f2965f2091c3004513d3d3d1a2f40b725f34865e26f2c4c
 witness_row_survives	yes
 engine_exit_status	2
 prrdx_eof	yes

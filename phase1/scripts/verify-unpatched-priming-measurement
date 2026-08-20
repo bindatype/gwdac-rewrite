@@ -7,7 +7,33 @@ readonly workspace="${UNPATCHED_PRIMING_CANDIDATE_WORKSPACE:-${TMPDIR:-/tmp}/gwd
 readonly kiritimati="${workspace}/kiritimati"
 readonly gmt_minus_12="${workspace}/gmt-minus-12"
 readonly date_fields="${outputs_root}/phase1/config/unpatched-priming-date-fields.tsv"
+readonly committed_summary="${outputs_root}/phase1/reports/unpatched-priming-evidence-determinism-20260820/summary.tsv"
 completed=0
+
+if command -v sha256sum >/dev/null 2>&1; then
+    hash_file() { sha256sum "$1" | awk '{ print $1 }'; }
+elif command -v shasum >/dev/null 2>&1; then
+    hash_file() { shasum -a 256 "$1" | awk '{ print $1 }'; }
+else
+    printf 'unpatched-priming summary contract: missing SHA-256 tool\n' >&2
+    exit 40
+fi
+
+if [[ ! -f "${committed_summary}" ]]; then
+    printf 'unpatched-priming summary contract: committed summary missing\n' >&2
+    exit 30
+fi
+summary_count="$(awk -F '\t' \
+    '$1 == "canonical_manifest_sha256" { count++ } END { print count + 0 }' \
+    "${committed_summary}")"
+summary_value="$(awk -F '\t' \
+    '$1 == "canonical_manifest_sha256" { print $2; exit }' \
+    "${committed_summary}")"
+if [[ "${summary_count}" -ne 1 || "${#summary_value}" -ne 64 || \
+    "${summary_value}" == *[!0123456789abcdef]* ]]; then
+    printf 'unpatched-priming summary contract: malformed committed summary\n' >&2
+    exit 30
+fi
 
 if [[ -e "${workspace}" ]]; then
     printf 'unpatched-priming candidate workspace already exists: %s\n' "${workspace}" >&2
@@ -30,6 +56,24 @@ trap cleanup EXIT
 EVIDENCE_DATE_FIELDS="${date_fields}" EVIDENCE_DERIVED_FILES=/dev/null \
     "${script_root}/compare-prsdd-go5-runs" \
     "${kiritimati}" "${gmt_minus_12}" "${workspace}/two-run-comparison.tsv"
+
+for context_root in "${kiritimati}" "${gmt_minus_12}"; do
+    for manifest in canonical-manifest.sha256 committed-canonical-manifest.sha256; do
+        manifest_path="${context_root}/${manifest}"
+        if [[ ! -f "${manifest_path}" ]]; then
+            printf 'unpatched-priming summary contract: missing %s/%s\n' \
+                "$(basename "${context_root}")" "${manifest}" >&2
+            exit 30
+        fi
+        actual_value="$(hash_file "${manifest_path}")"
+        if [[ "${actual_value}" != "${summary_value}" ]]; then
+            printf 'unpatched-priming summary contract: mismatch %s/%s\n' \
+                "$(basename "${context_root}")" "${manifest}" >&2
+            exit 30
+        fi
+    done
+done
+printf 'unpatched-priming summary contract: PASS artifacts=4\n'
 
 completed=1
 printf 'unpatched-priming evidence-determinism seam: CANDIDATE PASS workspace=%s\n' \

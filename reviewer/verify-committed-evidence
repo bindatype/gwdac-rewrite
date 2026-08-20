@@ -140,6 +140,91 @@ verify_manifest() {
     fi
 }
 
+verify_unpatched_priming_summary() {
+    local summary='phase1/reports/unpatched-priming-evidence-determinism-20260820/summary.tsv'
+    local artifacts='phase1/reports/unpatched-priming-evidence-determinism-20260820/artifact-hashes.tsv'
+    local summary_count
+    local summary_value
+    local artifact_count
+    local context
+    local artifact
+    local row_count
+    local row_value
+    local contract_failed=0
+
+    if ! check_tracked_file "${summary}"; then
+        contract_failed=1
+    fi
+    if ! check_tracked_file "${artifacts}"; then
+        contract_failed=1
+    fi
+    if [[ "${contract_failed}" -ne 0 ]]; then
+        printf 'CONTRACT FAIL unpatched-priming-summary files unavailable\n'
+        return
+    fi
+
+    summary_count="$(awk -F '\t' \
+        '$1 == "canonical_manifest_sha256" { count++ } END { print count + 0 }' \
+        "${outputs_root}/${summary}")"
+    summary_value="$(awk -F '\t' \
+        '$1 == "canonical_manifest_sha256" { print $2; exit }' \
+        "${outputs_root}/${summary}")"
+    if [[ "${summary_count}" -ne 1 ]]; then
+        integrity_failure \
+            "unpatched-priming-summary: canonical_manifest_sha256 rows=${summary_count} expected=1"
+        contract_failed=1
+    fi
+    if [[ "${#summary_value}" -ne 64 || \
+        "${summary_value}" == *[!0123456789abcdef]* ]]; then
+        integrity_failure \
+            'unpatched-priming-summary: canonical_manifest_sha256 is not lowercase 64-hex'
+        contract_failed=1
+    fi
+
+    artifact_count="$(awk -F '\t' \
+        '$2 == "canonical-manifest.sha256" || \
+         $2 == "committed-canonical-manifest.sha256" { count++ } \
+         END { print count + 0 }' \
+        "${outputs_root}/${artifacts}")"
+    if [[ "${artifact_count}" -ne 4 ]]; then
+        integrity_failure \
+            "unpatched-priming-summary: canonical artifact rows=${artifact_count} expected=4"
+        contract_failed=1
+    fi
+
+    for context in kiritimati gmt-minus-12; do
+        for artifact in canonical-manifest.sha256 committed-canonical-manifest.sha256; do
+            row_count="$(awk -F '\t' -v context="${context}" -v artifact="${artifact}" \
+                '$1 == context && $2 == artifact { count++ } END { print count + 0 }' \
+                "${outputs_root}/${artifacts}")"
+            row_value="$(awk -F '\t' -v context="${context}" -v artifact="${artifact}" \
+                '$1 == context && $2 == artifact { print $3; exit }' \
+                "${outputs_root}/${artifacts}")"
+            if [[ "${row_count}" -ne 1 ]]; then
+                integrity_failure \
+                    "unpatched-priming-summary: ${context}/${artifact} rows=${row_count} expected=1"
+                contract_failed=1
+            fi
+            if [[ "${#row_value}" -ne 64 || \
+                "${row_value}" == *[!0123456789abcdef]* ]]; then
+                integrity_failure \
+                    "unpatched-priming-summary: ${context}/${artifact} is not lowercase 64-hex"
+                contract_failed=1
+            elif [[ "${row_value}" != "${summary_value}" ]]; then
+                integrity_failure \
+                    "unpatched-priming-summary: ${context}/${artifact} differs from summary"
+                contract_failed=1
+            fi
+        done
+    done
+
+    if [[ "${contract_failed}" -eq 0 ]]; then
+        printf 'CONTRACT PASS unpatched-priming-summary artifacts=4\n'
+    else
+        printf 'CONTRACT FAIL unpatched-priming-summary\n'
+    fi
+}
+
 verify_corpus() {
     local label="$1"
     local fixture_table="$2"
@@ -214,6 +299,8 @@ if check_tracked_file "${manifest_config}"; then
         verify_manifest "${label}" "${base}" "${manifest}"
     done <"${outputs_root}/${manifest_config}"
 fi
+
+verify_unpatched_priming_summary
 
 verify_corpus \
     cm12-dsg \
