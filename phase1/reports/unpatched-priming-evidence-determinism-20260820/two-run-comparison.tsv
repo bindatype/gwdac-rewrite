@@ -1,0 +1,11 @@
+path	raw_relation	canonical_relation	date_tokens_a	date_tokens_b
+environment.txt	exact	exact		
+patched-row.txt	exact	exact		
+patched-total-chi2.txt	exact	exact		
+result.tsv	exact	exact		
+unpatched-priming.exit	exact	exact		
+unpatched-priming.stderr	exact	exact		
+unpatched-priming.stdout	different	exact	 8/21/26, 8/21/26, 8/21/26, 8/21/26, 8/21/26	 8/19/26, 8/19/26, 8/19/26, 8/19/26, 8/19/26
+unpatched-row.txt	exact	exact		
+unpatched-total-chi2.txt	exact	exact		
+witness-row-survives.txt	exact	exact		
