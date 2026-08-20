@@ -54,6 +54,20 @@ candidate root; case-sensitive execution scratch remains in disposable Docker
 volumes and is deleted at teardown. A pass identifies a review candidate, not
 adopted evidence or physics approval.
 
+The unpatched-priming package has a separate bounded reproducer:
+
+```sh
+UNPATCHED_PRIMING_KEEP_WORKSPACE=1 make reviewer-reproduce-unpatched-priming
+```
+
+It builds and runs the unpatched binary twice under `Pacific/Kiritimati` and
+`Etc/GMT+12`. Both runs must reproduce all 10 generated artifacts byte-for-byte
+against each other and the committed package. The committed README is the
+eleventh evidence file and remains a checked reference document rather than a
+generated artifact. The expected engine exit `2`, `PRRDX` EOF, exact witness
+row, and failed compatibility status are preserved; a candidate pass does not
+reclassify that retained behavioral failure.
+
 ## Exit contract
 
 | Exit | Meaning |

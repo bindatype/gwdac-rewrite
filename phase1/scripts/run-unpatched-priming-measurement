@@ -42,8 +42,12 @@ else
     set +e
     (
         cd "${run_root}/pr"
+        runtime_environment=("SAID_DATA_ROOT=${data_root}")
+        if [[ -n "${EVIDENCE_TZ:-}" ]]; then
+            runtime_environment+=("TZ=${EVIDENCE_TZ}")
+        fi
         timeout "${timeout_seconds}" \
-            env SAID_DATA_ROOT="${data_root}" \
+            env "${runtime_environment[@]}" \
             "${binary}" \
             <"${fixture}" \
             >"${report_root}/unpatched-priming.stdout" \
@@ -110,14 +114,6 @@ test "${verdict}" = yes
     printf 'compiler=%s\n' "$(gfortran --version | sed -n '1p')"
     printf 'operating_system=%s\n' "$(. /etc/os-release; printf '%s %s' "${NAME}" "${VERSION_ID}")"
 } >"${report_root}/environment.txt"
-
-(
-    cd "${report_root}"
-    find . -type f ! -name manifest.sha256 -print0 \
-        | sort -z \
-        | xargs -0 sha256sum \
-        | sed 's#  \./#  #'
-) >"${report_root}/manifest.sha256"
 
 printf 'patched row:   %s\n' "$(cat "${report_root}/patched-row.txt")"
 printf 'unpatched row: %s\n' "$(cat "${report_root}/unpatched-row.txt")"

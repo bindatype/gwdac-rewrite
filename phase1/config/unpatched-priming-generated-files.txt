@@ -1,0 +1,10 @@
+environment.txt
+patched-row.txt
+patched-total-chi2.txt
+result.tsv
+unpatched-priming.exit
+unpatched-priming.stderr
+unpatched-priming.stdout
+unpatched-row.txt
+unpatched-total-chi2.txt
+witness-row-survives.txt

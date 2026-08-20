@@ -38,7 +38,7 @@ sub read_manifest {
 @ARGV == 4 or usage();
 my ($candidate_root, $candidate_manifest, $reference_root, $report) = @ARGV;
 my $script_root = dirname(File::Spec->rel2abs($0));
-my $inventory_path = $ENV{GO5_INVENTORY}
+my $inventory_path = $ENV{EVIDENCE_INVENTORY} // $ENV{GO5_INVENTORY}
     // File::Spec->catfile($script_root, '..', 'config', 'prsdd-go5-generated-files.txt');
 my @inventory = grep { length } map { chomp; $_ } split /\n/, slurp($inventory_path);
 my %inventory = map { $_ => 1 } @inventory;
