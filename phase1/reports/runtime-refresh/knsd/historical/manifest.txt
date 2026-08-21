@@ -7,12 +7,14 @@ input_kind=archived_deck
 input_sha256=3a00f7eee4037226762e53be35920319d6292a6914936223574deed8a042c445
 transcript_relation=unpaired_gwdac_capture
 transcript_exact=not_applicable
-exit_status=2
+said_ps_witness=created
+said_ps_bytes=0
+exit_status=0
 timed_out=no
-normal_exit=no
-stdout_bytes=2291
-stderr_bytes=139
-opened_file_paths=14
+normal_exit=yes
+stdout_bytes=7115
+stderr_bytes=0
+opened_file_paths=16
 operating_system=Ubuntu 24.04
 ldd=	libpng12.so.0 => /opt/oracle/root/lib/x86_64-linux-gnu/libpng12.so.0 (0x00007fffff400000)
 ldd=	libgd.so.2 => /opt/oracle/root/usr/lib/x86_64-linux-gnu/libgd.so.2 (0x00007fffff000000)
@@ -45,10 +47,11 @@ ldd=	libbrotlicommon.so.1 => /lib/x86_64-linux-gnu/libbrotlicommon.so.1 (0x00007
 ldd=	libmd.so.0 => /lib/x86_64-linux-gnu/libmd.so.0 (0x00007ffffe7d0000)
 064a7fe51e3c2d4c2a8c12be0254c68491d01c3b12db8eeac93657c6d8d79e20  /workspace/arndt64/said/knsd
 3a00f7eee4037226762e53be35920319d6292a6914936223574deed8a042c445  /phase1/reports/runtime-refresh/knsd/historical/input.txt
-02d853d6ec424b0e7695b86c3b3f4c2e472b8fabf267bb0ceaf514b18fbf6192  /phase1/reports/runtime-refresh/knsd/historical/stdout.txt
-732fcb01f1df14d3cd5471578a7d7d103897317f1c59aa8b5c4dd3d2ba0771d2  /phase1/reports/runtime-refresh/knsd/historical/stderr.txt
-aedc1e5c7f032dc98825f3709e77fce5b9f55f03e61b1c21d8f12302b3ac00f1  /phase1/reports/runtime-refresh/knsd/historical/file-trace.tsv
-3a7629c28c07a8b325ab6bef690d18d8480111c1ce5f60ffa3f116ada1d6d063  /phase1/reports/runtime-refresh/knsd/historical/opened-files.txt
-22c1e4603d7a2f29cf1f90dca3cfb99f219af078d1d00d77eb0a80194012d35b  /phase1/reports/runtime-refresh/knsd/historical/SAID.TMP
-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /phase1/reports/runtime-refresh/knsd/historical/SAID.PCT
+67154638340ba10f3a40966782ad74ffcd3a9c18cc4b38692a4dceb4ae257f4e  /phase1/reports/runtime-refresh/knsd/historical/stdout.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /phase1/reports/runtime-refresh/knsd/historical/stderr.txt
+0a75b89254b90305118105d08c1a1100dc2c764f0320ef72f49ba1bd56e49894  /phase1/reports/runtime-refresh/knsd/historical/file-trace.tsv
+ae4d4b034f08aed440a34cd4ea46940d94535b6cf14568714899e76f4da0008e  /phase1/reports/runtime-refresh/knsd/historical/opened-files.txt
+63ad8e85349fe11819885976ef96cbe3f6f65c288b290713acadbdf9a9280388  /phase1/reports/runtime-refresh/knsd/historical/SAID.TMP
+eb86b55fcbbabec5c1d45df2e8fe612e932ef7dc086613bfed366040ac228a56  /phase1/reports/runtime-refresh/knsd/historical/SAID.PCT
+2ec0de528faaebd36bb713a2828d5704c31bf988c43803cd4c1b52a8a9de67ff  /phase1/reports/runtime-refresh/knsd/historical/SAID.LOG
 cb95a6bb17364a3b217afe9035238e31e87f726dbd7ad0dbd8ea2b8aed3c3e5d  /phase1/reports/runtime-refresh/knsd/historical/fort.7

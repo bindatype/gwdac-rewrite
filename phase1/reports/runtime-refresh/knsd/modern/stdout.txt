@@ -21,7 +21,7 @@
  Add a "smeared" resonance with "GO34"
  "GO37" to PLOT coupled-channel amplitudes (eg PiN->etaN)
  RETURN to continue ->  Your solution is
-  SP92 0-2650(1100)  K+P = 4871/ 3663 I0= 3172/ 1746 PRMS=(62 27) 08
+  SP92 0-2650(1100)  K+P = 4871/ 3663 I0= 3172/ 1746 PRMS=(62,27) 08
  For PiN only enter "R" to replace a wave with RESONANCE
  For PiN only enter "F" to "flip" etaN couplings
  RETURN (or "GON") to continue ->
@@ -44,4 +44,112 @@
   9  10 - SAID.PCT                                                    
  10  77 - SAID.DS                                                     
  11   4 - NEWDAT.DAT                                                  
- Enter a FILE number (1 thru 11) -> Enter the FILENAME for unit  11 ->
+ Enter a FILE number (1 thru 11) -> Enter the FILENAME for unit  11 -> Enter a FILE number (1 thru 11) ->
+  Enter first four letters of desired solution
+ Entry of "V   " will change to alternate solution file.
+ Entry of "SES " will setup from Single-Energy file.
+ Enter  OWN to enter solution.   -Return for choices ->
+ An ALTERNATE solution can be defined with a "GO51"
+ It can be used for comparison when plotting or with the
+ CONTOUR/3-D plot option ("CONP" or "GO60")
+
+  Enter first four letters of desired solution
+ Entry of "V   " will change to alternate solution file.
+ Entry of "SES " will setup from Single-Energy file.
+ Enter  OWN to enter solution.   -Return for choices ->
+  Enter first four letters of desired solution
+ Entry of "V   " will change to alternate solution file.
+ Entry of "SES " will setup from Single-Energy file.
+ Enter  OWN to enter solution.   -Return for choices ->  Your solution is
+  KS13 AMPLITUDES FOR K-N 8/20/13                                   
+ For PiN only enter "R" to replace a wave with RESONANCE
+ For PiN only enter "F" to "flip" etaN couplings
+ RETURN (or "GON") to continue ->
+ An ALTERNATE solution can be defined with a "GO51"
+ It can be used for comparison when plotting or with the
+ CONTOUR/3-D plot option ("CONP" or "GO60")
+ Reaction?  -  1(K+P ) 2(K+N ) 3(K+NX) 4(K0PX) 5(KI=0) 6(K+DC) 7(K+DB)
+ Enter reaction no ->
+ Note: TOTAL X-sections MUST be done at 0 deg
+ Vs? A(Acm),L(Alab),T(Tlab),P(Plab),W(Wcm),-t, or C(cos Acm) -> (Min Inc Max) for WCM  ? GO9 to quit ->  WCM =  1480.000  Tlab=   74.563 Mev
+  WCM =  1500.000  Tlab=  106.323 Mev
+  WCM =  1520.000  Tlab=  138.510 Mev
+  WCM =  1540.000  Tlab=  171.123 Mev
+  WCM =  1560.000  Tlab=  204.162 Mev
+  WCM =  1580.000  Tlab=  237.628 Mev
+  WCM =  1600.000  Tlab=  271.520 Mev
+  WCM =  1620.000  Tlab=  305.838 Mev
+  WCM =  1640.000  Tlab=  340.582 Mev
+  WCM =  1660.000  Tlab=  375.753 Mev
+  WCM =  1680.000  Tlab=  411.350 Mev
+  WCM =  1700.000  Tlab=  447.373 Mev
+  WCM =  1720.000  Tlab=  483.823 Mev
+  WCM =  1740.000  Tlab=  520.699 Mev
+  WCM =  1760.000  Tlab=  558.001 Mev
+  WCM =  1780.000  Tlab=  595.730 Mev
+  WCM =  1800.000  Tlab=  633.885 Mev
+  WCM =  1820.000  Tlab=  672.466 Mev
+  WCM =  1840.000  Tlab=  711.474 Mev
+  WCM =  1860.000  Tlab=  750.908 Mev
+  WCM =  1880.000  Tlab=  790.768 Mev
+  WCM =  1900.000  Tlab=  831.055 Mev
+  WCM =  1920.000  Tlab=  871.767 Mev
+  WCM =  1940.000  Tlab=  912.907 Mev
+  WCM =  1960.000  Tlab=  954.472 Mev
+  WCM =  1980.000  Tlab=  996.464 Mev
+  WCM =  2000.000  Tlab= 1038.882 Mev
+  Fixed variable? A(Acm) or L(Alab) -> Value of ACM  ? ->  You are set to calculate K+P  scattering at ACM  =    0.000
+  WCM  goes from 1480.000 to 2000.000 in increments of   20.000
+  Enter N to change, -GO9 to quit -> Enter Y(A) to see Phases(Amplitudes) at WCM = 2000.00 Mev ->
+  Enter observable (or MULT), -Return for choices ->
+ WEB
+
+    KS13 AMPLITUDES FOR K-N 8/20/13                                 
+     K+P   SGT  at ACM  =     0.00     8/19/26
+     WCM     Obs,Err
+  1480.000  0.0000E+00  0.0000E+00
+  1500.000  0.0000E+00  0.0000E+00
+  1520.000  0.0000E+00  0.0000E+00
+  1540.000  0.0000E+00  0.0000E+00
+  1560.000  0.0000E+00  0.0000E+00
+  1580.000  0.0000E+00  0.0000E+00
+  1600.000  0.0000E+00  0.0000E+00
+  1620.000  0.0000E+00  0.0000E+00
+  1640.000  0.0000E+00  0.0000E+00
+  1660.000  0.0000E+00  0.0000E+00
+  1680.000  0.0000E+00  0.0000E+00
+  1700.000  0.0000E+00  0.0000E+00
+  1720.000  0.0000E+00  0.0000E+00
+  1740.000  0.0000E+00  0.0000E+00
+  1760.000  0.0000E+00  0.0000E+00
+  1780.000  0.0000E+00  0.0000E+00
+  1800.000  0.0000E+00  0.0000E+00
+  1820.000  0.0000E+00  0.0000E+00
+  1840.000  0.0000E+00  0.0000E+00
+  1860.000  0.0000E+00  0.0000E+00
+  1880.000  0.0000E+00  0.0000E+00
+  1900.000  0.0000E+00  0.0000E+00
+  1920.000  0.0000E+00  0.0000E+00
+  1940.000  0.0000E+00  0.0000E+00
+  1960.000  0.0000E+00  0.0000E+00
+  1980.000  0.0000E+00  0.0000E+00
+  2000.000  0.0000E+00  0.0000E+00
+  To see exp data enter a range(min max) for ACM  -> Enter "Y" to normalize, "R" to enter references-> Enter "short reference" (eg NE(80) ), or Return -> Enter "short reference" (eg NE(80) ), or Return -> Enter "Y" to normalize, "R" to enter references->
+ WEB
+
+  No data in range emin,emax,amin,amax=  74.561038.88   0.00   0.00
+ "PLOT", "MEAS", "SWAP", "CHAN" or: 
+
+  Enter observable (or MULT), -Return for choices ->
+  Enter observable (or MULT), -Return for choices ->
+
+  Choices are: (DSGL does LAB cross sections )
+  (DSG )  (P   )  (R   )  (A   )  (B   )  (S   )  (BETA)
+  (REF )  (IMF )  (REG )  (IMG )  (ALFA)  (SGT )  (SGTR)
+  (SGTE)  (D,ET)  (TR,I)  (SLTH)  (B   )  (IDSX)  (AMPL)
+
+  Enter observable (or MULT), -Return for choices -> Messages can be sent to: 
+ mparis@gwu.edu or rworkman@gwu.edu
+ Thanks for using SAID
+ The SAID files can be retrieved through MAIL
+ by entering "M". Enter "M" or RETURN(to skip)->

@@ -66,6 +66,7 @@ RUN mkdir -p /home/arndt \
     && ln -s /workspace/arndt64/pr /home/arndt64/pr \
     && ln -s /workspace/arndt64/sdat /home/arndt64/sdat \
     && ln -s /workspace/arndt64/said /home/arndt64/said \
+    && ln -s /workspace/arndt64/KN /home/arndt64/KN \
     && ln -s /workspace/arndt64/said/KCM.100330 \
         /home/mparis/SAID/said-current/said/pr/KCM \
     && ln -s /opt/oracle/root/usr/lib/x86_64-linux-gnu/libgd.so.2.0.0 \

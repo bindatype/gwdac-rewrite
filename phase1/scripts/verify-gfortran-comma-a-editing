@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# Asserts the gfortran formatted-input behavior that motivates compiling
+# runtime-refresh main program units with -std=gnu.
+#
+# Under -std=legacy, gfortran treats a comma as a field terminator in
+# formatted input. g77 did not apply that to A editing, so a data record
+# such as the KNSOL.USR title "PRMS=(62,27)" loses its comma: the A4 field
+# terminates at zero length, is blanked, and the remainder shifts left.
+#
+# The behavior is process-global and established by the main program unit
+# via _gfortran_set_options, so the -std= of the unit containing the READ
+# is not what governs. This fixture asserts both facts.
+set -euo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly fixture_root="${GFORTRAN_COMMA_FIXTURE:-${script_root}/../fixtures/gfortran-comma-a-editing}"
+readonly work="$(mktemp -d "${TMPDIR:-/tmp}/gfortran-comma.XXXXXX")"
+trap 'rm -rf "${work}"' EXIT
+
+readonly -a base_flags=(-w -ffixed-line-length-none)
+
+printf 'compiler: %s\n' "$(gfortran --version | sed -n '1p')"
+printf 'flags   : %s\n' "${base_flags[*]}"
+printf '\n%-14s %-14s %-10s %s\n' main sub expect actual
+
+failures=0
+
+check() {
+    local main_std="$1" sub_std="$2" expect="$3"
+    local actual
+    gfortran "${base_flags[@]}" "-std=${sub_std}" -c \
+        "${fixture_root}/roundtrip.f" -o "${work}/roundtrip.o"
+    gfortran "${base_flags[@]}" "-std=${main_std}" -c \
+        "${fixture_root}/driver.f" -o "${work}/driver.o"
+    gfortran -o "${work}/t" "${work}/driver.o" "${work}/roundtrip.o"
+    if "${work}/t" >"${work}/out" 2>&1; then
+        actual=preserved
+    else
+        actual=corrupt
+    fi
+    printf '%-14s %-14s %-10s %s\n' "${main_std}" "${sub_std}" "${expect}" "${actual}"
+    if [[ "${actual}" != "${expect}" ]]; then
+        printf 'FAIL expected %s got %s (main=%s sub=%s)\n' \
+            "${expect}" "${actual}" "${main_std}" "${sub_std}" >&2
+        sed -n '1p' "${work}/out" >&2
+        failures=$((failures + 1))
+    fi
+}
+
+# The main program unit governs; the subprogram's -std= does not.
+check legacy legacy corrupt
+check gnu    gnu    preserved
+check legacy gnu    corrupt
+check gnu    legacy preserved
+
+printf '\n'
+if [[ "${failures}" -ne 0 ]]; then
+    printf 'gfortran comma A-editing fixture: FAIL failures=%d\n' "${failures}" >&2
+    exit 1
+fi
+printf 'gfortran comma A-editing fixture: PASS\n'
