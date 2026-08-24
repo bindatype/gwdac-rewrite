@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${script_root}/lib/exit-codes.sh"
+
+for tool in cmp mktemp sed sort; do
+	if ! command -v "${tool}" >/dev/null 2>&1; then
+		printf 'INFRASTRUCTURE FAIL missing tool: %s\n' "${tool}" >&2
+		exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+	fi
+done
+
+readonly workspace="$(mktemp -d "${TMPDIR:-/tmp}/evidence-sort-policy.XXXXXX")"
+readonly unpinned="${workspace}/unpinned"
+readonly pinned="${workspace}/pinned"
+readonly upper="${workspace}/Z-entry"
+readonly lower="${workspace}/a-entry"
+
+cleanup() {
+	rm -rf "${workspace}"
+}
+trap cleanup EXIT
+
+printf 'upper\n' >"${upper}"
+printf 'lower\n' >"${lower}"
+cat >"${unpinned}" <<'SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+if command -v sha256sum >/dev/null 2>&1; then
+	hash_file() { sha256sum "$1" | awk '{print $1}'; }
+elif command -v shasum >/dev/null 2>&1; then
+	hash_file() { shasum -a 256 "$1" | awk '{print $1}'; }
+else
+	printf 'missing SHA-256 tool\n' >&2
+	exit 40
+fi
+printf '%s\n' "$@" | sort | while IFS= read -r path; do
+	printf '%s  %s\n' "$(hash_file "${path}")" "$(basename "${path}")"
+done
+SCRIPT
+sed 's/| sort |/| LC_ALL=C sort |/' "${unpinned}" >"${pinned}"
+chmod +x "${unpinned}" "${pinned}"
+
+LC_ALL=C "${unpinned}" "${upper}" "${lower}" >"${workspace}/unpinned-c"
+LC_ALL=en_US.UTF-8 "${unpinned}" "${upper}" "${lower}" \
+	>"${workspace}/unpinned-hostile"
+if cmp -s "${workspace}/unpinned-c" "${workspace}/unpinned-hostile"; then
+	printf 'FIXTURE FAIL unpinned output did not expose collation change\n' >&2
+	exit "${REVIEWER_EXIT_REPRODUCTION}"
+fi
+LC_ALL=C sort "${workspace}/unpinned-c" >"${workspace}/unpinned-c.normalized"
+LC_ALL=C sort "${workspace}/unpinned-hostile" \
+	>"${workspace}/unpinned-hostile.normalized"
+if ! cmp -s "${workspace}/unpinned-c.normalized" \
+	"${workspace}/unpinned-hostile.normalized"; then
+	printf 'FIXTURE FAIL path/hash pairs changed instead of order only\n' >&2
+	exit "${REVIEWER_EXIT_REPRODUCTION}"
+fi
+
+"${script_root}/verify-evidence-sort-policy" --script "${unpinned}" \
+	>"${workspace}/unpinned-policy.log" 2>&1
+unpinned_status=$?
+if [[ "${unpinned_status}" -ne "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}" ]]; then
+	printf 'FIXTURE FAIL unpinned policy exit=%s expected=%s\n' \
+		"${unpinned_status}" "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}" >&2
+	exit "${REVIEWER_EXIT_REPRODUCTION}"
+fi
+
+LC_ALL=C "${pinned}" "${upper}" "${lower}" >"${workspace}/pinned-c"
+LC_ALL=en_US.UTF-8 "${pinned}" "${upper}" "${lower}" \
+	>"${workspace}/pinned-hostile"
+if ! cmp -s "${workspace}/pinned-c" "${workspace}/pinned-hostile"; then
+	printf 'FIXTURE FAIL point-of-use pin is not locale-independent\n' >&2
+	exit "${REVIEWER_EXIT_REPRODUCTION}"
+fi
+if ! "${script_root}/verify-evidence-sort-policy" --script "${pinned}" \
+	>"${workspace}/pinned-policy.log" 2>&1; then
+	printf 'FIXTURE FAIL pinned pipeline rejected by policy\n' >&2
+	exit "${REVIEWER_EXIT_REPRODUCTION}"
+fi
+
+printf 'PASS evidence-sort-policy unpinned_exit=%s order_only=yes pinned_exact=yes\n' \
+	"${unpinned_status}"

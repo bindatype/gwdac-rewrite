@@ -172,3 +172,5 @@ identities fail closed. `make reviewer-reproduce` performs the CM12 and
 five-engine runtime-refresh regeneration only in a disposable clone.
 `make reviewer-verify-runtime-refresh-contract` checks deterministic aggregate
 generation and proves a stale but hash-consistent package checkpoint fails.
+`make reviewer-verify-evidence-sort-policy` proves evidence-producing shell
+sorts are pinned at point of use and rejects the unpinned collation defect.

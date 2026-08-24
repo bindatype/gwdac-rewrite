@@ -28,6 +28,7 @@ From the repository root:
 make reviewer-verify
 make reviewer-verify-gate-identity
 make reviewer-verify-runtime-refresh-contract
+make reviewer-verify-evidence-sort-policy
 make reviewer-reproduce
 ```
 
@@ -48,6 +49,13 @@ aggregate only through:
 ```sh
 make reviewer-write-runtime-refresh-aggregate
 ```
+
+Evidence-producing shell pipelines pin collation directly as
+`LC_ALL=C sort`. `reviewer/verify-evidence-sort-policy` checks every tracked
+Bash script under `phase1/scripts`; its fixture proves that an unpinned pipeline
+can reorder unchanged path/hash pairs under a hostile locale and is rejected.
+The policy is intentionally local to the evidence-producing command. It does
+not impose a process-wide locale on compiler or runtime output.
 
 The full reproducer runs the 24-fixture, 288-record CM12 gate, the exact `pnsd`
 oracle contract, and the five-engine runtime-refresh smoke sweep. Run one group

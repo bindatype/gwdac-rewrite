@@ -99,6 +99,8 @@ check_tracked_file() {
 
 for gate_contract_file in \
 	reviewer/verify-committed-evidence \
+	reviewer/verify-evidence-sort-policy \
+	reviewer/verify-evidence-sort-policy-fixtures \
 	reviewer/verify-runtime-refresh-contract-fixtures \
 	reviewer/write-runtime-refresh-aggregate \
 	reviewer/lib/exit-codes.sh \
@@ -474,7 +476,11 @@ if check_tracked_file "${runtime_refresh_config}"; then
 		verify_runtime_refresh_package \
 			"${label}" "${engine}" "${base}" "${manifest}" "${checkpoint}"
 	done <"${outputs_root}/${runtime_refresh_config}"
-	verify_runtime_refresh_aggregate_contract "${runtime_refresh_config}"
+verify_runtime_refresh_aggregate_contract "${runtime_refresh_config}"
+fi
+
+if ! "${script_root}/verify-evidence-sort-policy"; then
+	integrity_failure 'evidence-sort-policy rejected the committed scripts'
 fi
 
 verify_unpatched_priming_summary

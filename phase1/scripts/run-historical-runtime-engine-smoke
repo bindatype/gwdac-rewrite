@@ -94,7 +94,7 @@ set +e
 status=$?
 set -e
 
-cut -f2- "${trace_file}" | sort -u >"${opened_file}"
+cut -f2- "${trace_file}" | LC_ALL=C sort -u >"${opened_file}"
 normal_exit=no
 if [[ "${input_kind}" == synthetic_quit_probe && "${status}" -eq 0 ]]; then
     normal_exit=yes

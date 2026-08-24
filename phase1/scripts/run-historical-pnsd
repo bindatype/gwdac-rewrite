@@ -57,7 +57,7 @@ set +e
 status=$?
 set -e
 
-cut -f2- "${trace_file}" | sort -u >"${opened_file}"
+cut -f2- "${trace_file}" | LC_ALL=C sort -u >"${opened_file}"
 
 awk '
     BEGIN {

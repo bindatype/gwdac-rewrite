@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly outputs_root="$(cd "${script_root}/.." && pwd)"
+source "${script_root}/lib/exit-codes.sh"
+
+usage() {
+	printf 'usage: %s [--script FILE ...]\n' "$0"
+	printf 'Check evidence-producing Bash sort commands for point-of-use LC_ALL=C.\n'
+}
+
+declare -a scripts=()
+check_committed=1
+if [[ "$#" -gt 0 ]]; then
+	check_committed=0
+	while [[ "$#" -gt 0 ]]; do
+		if [[ "$#" -lt 2 || "$1" != --script ]]; then
+			usage >&2
+			exit 64
+		fi
+		scripts+=("$2")
+		shift 2
+	done
+else
+	while IFS= read -r relative; do
+		if IFS= read -r first_line <"${outputs_root}/${relative}" &&
+			[[ "${first_line}" == *bash* ]]; then
+			scripts+=("${outputs_root}/${relative}")
+		fi
+	done < <(git -C "${outputs_root}" ls-files phase1/scripts)
+fi
+
+failures=0
+sort_sites=0
+for script in "${scripts[@]}"; do
+	if [[ ! -f "${script}" ]]; then
+		printf 'POLICY FAIL missing script: %s\n' "${script}" >&2
+		failures=$((failures + 1))
+		continue
+	fi
+	if [[ "${check_committed}" -eq 1 ]]; then
+		relative="${script#${outputs_root}/}"
+		if ! git -C "${outputs_root}" diff --quiet HEAD -- "${relative}"; then
+			printf 'POLICY FAIL script differs from HEAD: %s\n' "${relative}" >&2
+			failures=$((failures + 1))
+		fi
+	fi
+	while IFS=: read -r line_number line; do
+		if [[ -z "${line_number}" ]]; then
+			continue
+		fi
+		sort_sites=$((sort_sites + 1))
+		if [[ ! "${line}" =~ LC_ALL=C[[:space:]]+sort([[:space:]]|$) ]]; then
+			printf 'POLICY FAIL unpinned sort: %s:%s\n' \
+				"${script#${outputs_root}/}" "${line_number}" >&2
+			failures=$((failures + 1))
+		fi
+	done < <(
+		awk '/(^|[[:space:]|;&(])sort([[:space:]]|$)/ {print FNR ":" $0}' \
+			"${script}"
+	)
+done
+
+if [[ "${failures}" -ne 0 ]]; then
+	printf 'RESULT evidence_sort_policy_fail failures=%s sites=%s exit=%s\n' \
+		"${failures}" "${sort_sites}" "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}"
+	exit "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}"
+fi
+
+printf 'CONTRACT PASS evidence-sort-policy scripts=%s sites=%s\n' \
+	"${#scripts[@]}" "${sort_sites}"

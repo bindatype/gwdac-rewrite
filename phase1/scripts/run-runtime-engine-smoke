@@ -82,7 +82,7 @@ if [[ "${build_status}" != linked || ! -x "${binary}" ]]; then
         find "reports/runtime-refresh/${engine}" -type f \
             ! -name evidence-manifest.sha256 \
             -print0 \
-            | sort -z \
+            | LC_ALL=C sort -z \
             | xargs -0 sha256sum
     ) >"${report_base}/evidence-manifest.sha256"
     printf 'Modern runtime smoke skipped: engine=%s build_status=%s\n' \
@@ -127,7 +127,7 @@ status=$?
 set -e
 
 cut -f2- "${trace_file}" \
-    | sort -u >"${opened_file}"
+    | LC_ALL=C sort -u >"${opened_file}"
 normal_exit=no
 if [[ "${input_kind}" == synthetic_quit_probe && "${status}" -eq 0 ]]; then
     normal_exit=yes
@@ -307,7 +307,7 @@ fi
     find "reports/runtime-refresh/${engine}" -type f \
         ! -name evidence-manifest.sha256 \
         -print0 \
-        | sort -z \
+        | LC_ALL=C sort -z \
         | xargs -0 sha256sum
 ) >"${report_base}/evidence-manifest.sha256"
 

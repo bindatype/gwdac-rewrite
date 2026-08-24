@@ -1,4 +1,4 @@
-.PHONY: reviewer-verify reviewer-verify-gate-identity reviewer-verify-runtime-refresh-contract reviewer-reproduce reviewer-reproduce-cm12 reviewer-reproduce-runtime-refresh reviewer-reproduce-go5 reviewer-reproduce-go3pr2 reviewer-reproduce-unpatched-priming reviewer-verify-comma-a-editing reviewer-write-pnsd-manifest reviewer-write-runtime-refresh-aggregate
+.PHONY: reviewer-verify reviewer-verify-gate-identity reviewer-verify-runtime-refresh-contract reviewer-verify-evidence-sort-policy reviewer-reproduce reviewer-reproduce-cm12 reviewer-reproduce-runtime-refresh reviewer-reproduce-go5 reviewer-reproduce-go3pr2 reviewer-reproduce-unpatched-priming reviewer-verify-comma-a-editing reviewer-write-pnsd-manifest reviewer-write-runtime-refresh-aggregate
 
 reviewer-verify:
 	./reviewer/verify-committed-evidence --expected-commit "$$(git rev-parse HEAD)"
@@ -8,6 +8,9 @@ reviewer-verify-gate-identity:
 
 reviewer-verify-runtime-refresh-contract:
 	./reviewer/verify-runtime-refresh-contract-fixtures
+
+reviewer-verify-evidence-sort-policy:
+	./reviewer/verify-evidence-sort-policy-fixtures
 
 reviewer-reproduce:
 	./reviewer/reproduce-evidence

@@ -105,7 +105,7 @@ run_oracle() {
     printf '%s\n' "${status}" >"${exit_report}"
 
     cut -f2- "${trace_report}" \
-        | sort -u \
+        | LC_ALL=C sort -u \
         >"${opened_report}"
 
     for name in SAID.TMP SAID.PCT SAID.LOG fort.3 fort.7; do
