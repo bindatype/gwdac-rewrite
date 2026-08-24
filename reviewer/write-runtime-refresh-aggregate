@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly outputs_root="$(cd "${script_root}/.." && pwd)"
+readonly registry="${outputs_root}/reviewer/config/runtime-refresh-packages.tsv"
+
+usage() {
+	printf 'usage: %s [--output FILE]\n' "$0"
+}
+
+output="${outputs_root}/phase1/reports/runtime-refresh/aggregate-manifest.sha256"
+if [[ "$#" -gt 0 ]]; then
+	if [[ "$#" -ne 2 || "$1" != --output ]]; then
+		usage >&2
+		exit 64
+	fi
+	output="$2"
+fi
+
+for tool in awk mktemp mv; do
+	if ! command -v "${tool}" >/dev/null 2>&1; then
+		printf 'INFRASTRUCTURE FAIL missing tool: %s\n' "${tool}" >&2
+		exit 40
+	fi
+done
+
+if command -v sha256sum >/dev/null 2>&1; then
+	hash_file() { sha256sum "$1" | awk '{print $1}'; }
+elif command -v shasum >/dev/null 2>&1; then
+	hash_file() { shasum -a 256 "$1" | awk '{print $1}'; }
+else
+	printf 'INFRASTRUCTURE FAIL missing SHA-256 tool\n' >&2
+	exit 40
+fi
+
+readonly temporary="$(mktemp "${TMPDIR:-/tmp}/runtime-refresh-aggregate.XXXXXX")"
+cleanup() {
+	rm -f "${temporary}"
+}
+trap cleanup EXIT
+
+write_entry() {
+	local relative="$1"
+	local absolute="${outputs_root}/${relative}"
+
+	if [[ ! -f "${absolute}" ]]; then
+		printf 'INTEGRITY FAIL aggregate input missing: %s\n' "${relative}" >&2
+		exit 10
+	fi
+	printf '%s  %s\n' "$(hash_file "${absolute}")" "${relative}" \
+		>>"${temporary}"
+}
+
+write_entry phase1/reports/runtime-refresh/README.md
+write_entry phase1/reports/runtime-refresh/summary.tsv
+write_entry reviewer/config/runtime-refresh-packages.tsv
+
+while IFS=$'\t' read -r label engine base manifest checkpoint; do
+	if [[ "${label}" == label ]]; then
+		continue
+	fi
+	write_entry "${manifest}"
+done <"${registry}"
+
+mv "${temporary}" "${output}"
+trap - EXIT
+printf 'Wrote runtime-refresh aggregate: %s files=9\n' "${output}"

@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly outputs_root="$(cd "${script_root}/.." && pwd)"
+source "${script_root}/lib/exit-codes.sh"
+
+for tool in awk cmp git grep mktemp mv; do
+	if ! command -v "${tool}" >/dev/null 2>&1; then
+		printf 'INFRASTRUCTURE FAIL missing tool: %s\n' "${tool}" >&2
+		exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+	fi
+done
+
+readonly workspace="$(mktemp -d "${TMPDIR:-/tmp}/runtime-refresh-contract.XXXXXX")"
+readonly aggregate_c="${workspace}/aggregate-c.sha256"
+readonly aggregate_utf8="${workspace}/aggregate-utf8.sha256"
+readonly disposable="${workspace}/outputs"
+readonly gate_output="${workspace}/stale-checkpoint.log"
+
+cleanup() {
+	rm -rf "${workspace}"
+}
+trap cleanup EXIT
+
+LC_ALL=C "${script_root}/write-runtime-refresh-aggregate" \
+	--output "${aggregate_c}" >/dev/null
+LC_ALL=en_US.UTF-8 "${script_root}/write-runtime-refresh-aggregate" \
+	--output "${aggregate_utf8}" >/dev/null
+if ! cmp -s "${aggregate_c}" "${aggregate_utf8}"; then
+	printf 'FIXTURE FAIL aggregate differs by locale\n' >&2
+	exit "${REVIEWER_EXIT_REPRODUCTION}"
+fi
+if ! cmp -s "${aggregate_c}" \
+	"${outputs_root}/phase1/reports/runtime-refresh/aggregate-manifest.sha256"; then
+	printf 'FIXTURE FAIL aggregate writer does not reproduce committed artifact\n' >&2
+	exit "${REVIEWER_EXIT_REPRODUCTION}"
+fi
+
+if ! git clone --quiet --no-hardlinks "${outputs_root}" "${disposable}"; then
+	printf 'INFRASTRUCTURE FAIL could not create stale-checkpoint clone\n' >&2
+	exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+fi
+
+registry="${disposable}/reviewer/config/runtime-refresh-packages.tsv"
+summary="${disposable}/phase1/reports/runtime-refresh/summary.tsv"
+current_checkpoint="$(awk -F '\t' '$2 == "pnsd" {print $5; exit}' "${registry}")"
+stale_checkpoint="$(git -C "${disposable}" rev-parse "${current_checkpoint}^")"
+
+awk -F '\t' -v OFS='\t' -v stale="${stale_checkpoint}" \
+	'$2 == "pnsd" {$5 = stale} {print}' "${registry}" >"${registry}.tmp"
+mv "${registry}.tmp" "${registry}"
+awk -F '\t' -v OFS='\t' -v stale="${stale_checkpoint}" \
+	'$1 == "pnsd" {$9 = substr(stale, 1, 7)} {print}' \
+	"${summary}" >"${summary}.tmp"
+mv "${summary}.tmp" "${summary}"
+"${disposable}/reviewer/write-runtime-refresh-aggregate" >/dev/null
+
+git -C "${disposable}" add \
+	reviewer/config/runtime-refresh-packages.tsv \
+	phase1/reports/runtime-refresh/summary.tsv \
+	phase1/reports/runtime-refresh/aggregate-manifest.sha256
+if ! git -C "${disposable}" \
+	-c user.name='Reviewer Fixture' \
+	-c user.email='reviewer-fixture@invalid' \
+	commit --quiet -m 'fixture: make pnsd checkpoint stale but hash-consistent'; then
+	printf 'INFRASTRUCTURE FAIL could not commit stale-checkpoint fixture\n' >&2
+	exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+fi
+
+fixture_commit="$(git -C "${disposable}" rev-parse HEAD)"
+"${disposable}/reviewer/verify-committed-evidence" \
+	--expected-commit "${fixture_commit}" >"${gate_output}" 2>&1
+gate_status=$?
+if [[ "${gate_status}" -ne "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}" ]]; then
+	printf 'FIXTURE FAIL stale checkpoint exit=%s expected=%s\n' \
+		"${gate_status}" "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}" >&2
+	exit "${REVIEWER_EXIT_REPRODUCTION}"
+fi
+if ! grep -Fq 'PACKAGE PASS runtime-refresh-aggregate    files=9' \
+	"${gate_output}"; then
+	printf 'FIXTURE FAIL stale checkpoint package was not hash-consistent\n' >&2
+	exit "${REVIEWER_EXIT_REPRODUCTION}"
+fi
+if ! grep -Fq \
+	"INTEGRITY FAIL runtime-refresh-pnsd: checkpoint ${stale_checkpoint} does not reproduce HEAD" \
+	"${gate_output}"; then
+	printf 'FIXTURE FAIL semantic checkpoint rejection missing\n' >&2
+	exit "${REVIEWER_EXIT_REPRODUCTION}"
+fi
+
+printf 'PASS runtime-refresh-contract locale_exact=yes stale_checkpoint_exit=%s stale=%s\n' \
+	"${gate_status}" "${stale_checkpoint}"

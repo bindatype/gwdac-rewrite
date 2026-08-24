@@ -170,3 +170,5 @@ any generator. Its opening and final records are bound to the expected full
 commit ID; `make reviewer-verify-gate-identity` proves missing and mismatched
 identities fail closed. `make reviewer-reproduce` performs the CM12 and
 five-engine runtime-refresh regeneration only in a disposable clone.
+`make reviewer-verify-runtime-refresh-contract` checks deterministic aggregate
+generation and proves a stale but hash-consistent package checkpoint fails.

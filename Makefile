@@ -1,10 +1,13 @@
-.PHONY: reviewer-verify reviewer-verify-gate-identity reviewer-reproduce reviewer-reproduce-cm12 reviewer-reproduce-runtime-refresh reviewer-reproduce-go5 reviewer-reproduce-go3pr2 reviewer-reproduce-unpatched-priming reviewer-verify-comma-a-editing reviewer-write-pnsd-manifest
+.PHONY: reviewer-verify reviewer-verify-gate-identity reviewer-verify-runtime-refresh-contract reviewer-reproduce reviewer-reproduce-cm12 reviewer-reproduce-runtime-refresh reviewer-reproduce-go5 reviewer-reproduce-go3pr2 reviewer-reproduce-unpatched-priming reviewer-verify-comma-a-editing reviewer-write-pnsd-manifest reviewer-write-runtime-refresh-aggregate
 
 reviewer-verify:
 	./reviewer/verify-committed-evidence --expected-commit "$$(git rev-parse HEAD)"
 
 reviewer-verify-gate-identity:
 	./reviewer/verify-gate-identity-fixtures
+
+reviewer-verify-runtime-refresh-contract:
+	./reviewer/verify-runtime-refresh-contract-fixtures
 
 reviewer-reproduce:
 	./reviewer/reproduce-evidence
@@ -23,6 +26,9 @@ reviewer-verify-comma-a-editing:
 
 reviewer-write-pnsd-manifest:
 	./phase1/scripts/write-pnsd-evidence-manifest
+
+reviewer-write-runtime-refresh-aggregate:
+	./reviewer/write-runtime-refresh-aggregate
 
 reviewer-reproduce-go3pr2:
 	./phase1/scripts/verify-go3pr2-adapter-diagnostic

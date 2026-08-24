@@ -27,11 +27,27 @@ From the repository root:
 ```sh
 make reviewer-verify
 make reviewer-verify-gate-identity
+make reviewer-verify-runtime-refresh-contract
 make reviewer-reproduce
 ```
 
 The gate-identity fixture proves that missing and mismatched expected commits
 are rejected and that the rejection record is itself bound to actual `HEAD`.
+The runtime-refresh contract fixture proves the aggregate writer is
+locale-independent and byte-identical to the committed artifact. It then creates
+a disposable commit whose `pnsd` checkpoint is stale while its summary and every
+dependent hash are internally consistent; Gate 1 must reject that commit by
+comparing the registered package state with the checkpoint tree.
+
+`reviewer/config/runtime-refresh-packages.tsv` is the single machine-readable
+source for engine manifests and full package checkpoint IDs. The aggregate
+writer reads that registry, and Gate 1 independently validates its order,
+checkpoint semantics, summary short IDs, and all package hashes. Regenerate the
+aggregate only through:
+
+```sh
+make reviewer-write-runtime-refresh-aggregate
+```
 
 The full reproducer runs the 24-fixture, 288-record CM12 gate, the exact `pnsd`
 oracle contract, and the five-engine runtime-refresh smoke sweep. Run one group

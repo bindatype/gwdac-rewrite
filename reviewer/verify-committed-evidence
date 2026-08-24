@@ -99,8 +99,11 @@ check_tracked_file() {
 
 for gate_contract_file in \
 	reviewer/verify-committed-evidence \
+	reviewer/verify-runtime-refresh-contract-fixtures \
+	reviewer/write-runtime-refresh-aggregate \
 	reviewer/lib/exit-codes.sh \
-	reviewer/config/evidence-manifests.tsv; do
+	reviewer/config/evidence-manifests.tsv \
+	reviewer/config/runtime-refresh-packages.tsv; do
 	check_tracked_file "${gate_contract_file}" || true
 done
 
@@ -168,6 +171,137 @@ verify_manifest() {
     else
         printf 'PACKAGE FAIL %-28s files_checked=%s\n' "${label}" "${checked}"
     fi
+}
+
+verify_runtime_refresh_package() {
+	local label="$1"
+	local engine="$2"
+	local base="$3"
+	local manifest="$4"
+	local checkpoint="$5"
+	local summary='phase1/reports/runtime-refresh/summary.tsv'
+	local target
+	local relative
+	local changed_path=''
+	local summary_count
+	local summary_checkpoint
+	local contract_failed=0
+
+	if [[ "${#checkpoint}" -ne 40 || \
+		"${checkpoint}" == *[!0123456789abcdef]* ]]; then
+		integrity_failure "${label}: checkpoint is not lowercase 40-hex: ${checkpoint}"
+		contract_failed=1
+	elif ! git -C "${outputs_root}" cat-file -e "${checkpoint}^{commit}" 2>/dev/null; then
+		integrity_failure "${label}: checkpoint commit unavailable: ${checkpoint}"
+		contract_failed=1
+	elif ! git -C "${outputs_root}" merge-base --is-ancestor \
+		"${checkpoint}" HEAD; then
+		integrity_failure "${label}: checkpoint is not an ancestor of HEAD: ${checkpoint}"
+		contract_failed=1
+	fi
+
+	if [[ "${contract_failed}" -eq 0 ]] && check_tracked_file "${manifest}"; then
+		if ! git -C "${outputs_root}" diff --quiet \
+			"${checkpoint}" HEAD -- "${manifest}"; then
+			changed_path="${manifest}"
+		fi
+		while [[ -z "${changed_path}" ]] && read -r _ target; do
+			if [[ -z "${target:-}" ]]; then
+				continue
+			fi
+			if ! relative="$(manifest_target "${base}" "${target}")"; then
+				changed_path="unsupported:${target}"
+				break
+			fi
+			if ! git -C "${outputs_root}" diff --quiet \
+				"${checkpoint}" HEAD -- "${relative}"; then
+				changed_path="${relative}"
+			fi
+		done <"${outputs_root}/${manifest}"
+		if [[ -n "${changed_path}" ]]; then
+			integrity_failure \
+				"${label}: checkpoint ${checkpoint} does not reproduce HEAD path=${changed_path}"
+			contract_failed=1
+		fi
+	else
+		contract_failed=1
+	fi
+
+	if ! check_tracked_file "${summary}"; then
+		contract_failed=1
+	else
+		summary_count="$(awk -F '\t' -v engine="${engine}" \
+			'$1 == engine {count++} END {print count + 0}' \
+			"${outputs_root}/${summary}")"
+		summary_checkpoint="$(awk -F '\t' -v engine="${engine}" \
+			'$1 == engine {print $9; exit}' "${outputs_root}/${summary}")"
+		if [[ "${summary_count}" -ne 1 ]]; then
+			integrity_failure \
+				"${label}: summary rows=${summary_count} expected=1"
+			contract_failed=1
+		elif [[ "${summary_checkpoint}" != "${checkpoint:0:7}" ]]; then
+			integrity_failure \
+				"${label}: summary checkpoint=${summary_checkpoint} expected=${checkpoint:0:7}"
+			contract_failed=1
+		fi
+	fi
+
+	if [[ "${contract_failed}" -eq 0 ]]; then
+		printf 'CONTRACT PASS %-28s checkpoint=%s\n' \
+			"${label}" "${checkpoint:0:7}"
+	else
+		printf 'CONTRACT FAIL %-28s checkpoint=%s\n' \
+			"${label}" "${checkpoint:0:7}"
+	fi
+}
+
+verify_runtime_refresh_aggregate_contract() {
+	local registry="$1"
+	local aggregate='phase1/reports/runtime-refresh/aggregate-manifest.sha256'
+	local row=0
+	local expected_rows
+	local actual_path
+	local expected_path
+	local contract_failed=0
+
+	if ! check_tracked_file "${aggregate}"; then
+		printf 'CONTRACT FAIL runtime-refresh-aggregate-derived unavailable\n'
+		return
+	fi
+
+	expected_rows="$((3 + $(awk -F '\t' 'NR > 1 {count++} END {print count + 0}' \
+		"${outputs_root}/${registry}")))"
+	while read -r _ actual_path; do
+		row=$((row + 1))
+		case "${row}" in
+			1) expected_path='phase1/reports/runtime-refresh/README.md' ;;
+			2) expected_path='phase1/reports/runtime-refresh/summary.tsv' ;;
+			3) expected_path='reviewer/config/runtime-refresh-packages.tsv' ;;
+			*)
+				expected_path="$(awk -F '\t' -v wanted="$((row - 3))" \
+					'NR > 1 {count++} count == wanted {print $4; exit}' \
+					"${outputs_root}/${registry}")"
+				;;
+		esac
+		if [[ "${actual_path}" != "${expected_path}" ]]; then
+			integrity_failure \
+				"runtime-refresh-aggregate-derived: row=${row} path=${actual_path} expected=${expected_path}"
+			contract_failed=1
+		fi
+	done <"${outputs_root}/${aggregate}"
+
+	if [[ "${row}" -ne "${expected_rows}" ]]; then
+		integrity_failure \
+			"runtime-refresh-aggregate-derived: rows=${row} expected=${expected_rows}"
+		contract_failed=1
+	fi
+	if [[ "${contract_failed}" -eq 0 ]]; then
+		printf 'CONTRACT PASS runtime-refresh-aggregate-derived files=%s\n' \
+			"${row}"
+	else
+		printf 'CONTRACT FAIL runtime-refresh-aggregate-derived files=%s\n' \
+			"${row}"
+	fi
 }
 
 verify_unpatched_priming_summary() {
@@ -327,7 +461,20 @@ if check_tracked_file "${manifest_config}"; then
             continue
         fi
         verify_manifest "${label}" "${base}" "${manifest}"
-    done <"${outputs_root}/${manifest_config}"
+	done <"${outputs_root}/${manifest_config}"
+fi
+
+readonly runtime_refresh_config='reviewer/config/runtime-refresh-packages.tsv'
+if check_tracked_file "${runtime_refresh_config}"; then
+	while IFS=$'\t' read -r label engine base manifest checkpoint; do
+		if [[ "${label}" == label ]]; then
+			continue
+		fi
+		verify_manifest "${label}" "${base}" "${manifest}"
+		verify_runtime_refresh_package \
+			"${label}" "${engine}" "${base}" "${manifest}" "${checkpoint}"
+	done <"${outputs_root}/${runtime_refresh_config}"
+	verify_runtime_refresh_aggregate_contract "${runtime_refresh_config}"
 fi
 
 verify_unpatched_priming_summary
