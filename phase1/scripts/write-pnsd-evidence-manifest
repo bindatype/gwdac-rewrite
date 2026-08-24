@@ -18,7 +18,7 @@ while IFS= read -r file; do
     files+=("${file}")
 done < <(
     find "${package_root}" -type f ! -name evidence-manifest.sha256 -print \
-        | sort
+        | LC_ALL=C sort
 )
 
 (
