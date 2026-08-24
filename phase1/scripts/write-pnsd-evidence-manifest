@@ -6,7 +6,6 @@ readonly package_root="${phase1_root}/reports/runtime-refresh/pnsd"
 readonly manifest="${package_root}/evidence-manifest.sha256"
 
 files=(
-    "${phase1_root}/README.md"
     "${phase1_root}/fixtures/pnsd-sp06-no-render.in"
     "${phase1_root}/reports/warning-register.md"
     "${phase1_root}/scripts/build-pnsd"

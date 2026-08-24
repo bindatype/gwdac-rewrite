@@ -56,9 +56,12 @@ modern executable produced the seven correct rows and then exited 2 at
 remains valid evidence for the old compiler configuration and remains
 retrievable in repository history; it is superseded, not repudiated.
 
-The first divergence was process-global formatted-input behavior at
-`READ(CSTR,159)` in `PNRDX`. The main-unit compiler setting fully accounts for
-the difference. This is runtime-compatibility evidence, not physics approval.
+The prior package's first recorded failure is EOF at `pnu.f:4569`. In a bounded
+experiment, changing only the `pnsd.f` main-unit compiler mode while reusing the
+unchanged `pnu.o` was sufficient to make the retained SP06 run byte-identical
+to the historical oracle. The field-level trigger remains unattributed because
+the `CSTR`, `INP`, `MMO`, and `MMY` trace was not run. This is
+runtime-compatibility evidence, not physics approval.
 
 ## Reproduction
 
