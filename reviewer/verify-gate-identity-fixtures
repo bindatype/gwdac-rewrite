@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly outputs_root="$(cd "${script_root}/.." && pwd)"
+source "${script_root}/lib/exit-codes.sh"
+
+for tool in git grep mktemp; do
+	if ! command -v "${tool}" >/dev/null 2>&1; then
+		printf 'INFRASTRUCTURE FAIL missing tool: %s\n' "${tool}" >&2
+		exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+	fi
+done
+
+readonly verifier="${script_root}/verify-committed-evidence"
+readonly commit="$(git -C "${outputs_root}" rev-parse --verify 'HEAD^{commit}')"
+readonly mismatch='0000000000000000000000000000000000000000'
+readonly missing_output="$(mktemp)"
+readonly mismatch_output="$(mktemp)"
+
+cleanup() {
+	rm -f "${missing_output}" "${mismatch_output}"
+}
+trap cleanup EXIT
+
+"${verifier}" >"${missing_output}" 2>&1
+missing_status=$?
+if [[ "${missing_status}" -ne "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}" ]]; then
+	printf 'FIXTURE FAIL missing identity exit=%s expected=%s\n' \
+		"${missing_status}" "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}" >&2
+	exit "${REVIEWER_EXIT_REPRODUCTION}"
+fi
+if ! grep -Fq 'INTEGRITY FAIL gate identity missing expected commit' \
+	"${missing_output}"; then
+	printf 'FIXTURE FAIL missing identity was not attributed\n' >&2
+	exit "${REVIEWER_EXIT_REPRODUCTION}"
+fi
+if ! grep -Fq \
+	"RESULT evidence_integrity_fail failures=1 exit=${REVIEWER_EXIT_EVIDENCE_INTEGRITY} commit=${commit}" \
+	"${missing_output}"; then
+	printf 'FIXTURE FAIL missing identity result lacks commit binding\n' >&2
+	exit "${REVIEWER_EXIT_REPRODUCTION}"
+fi
+
+"${verifier}" --expected-commit "${mismatch}" >"${mismatch_output}" 2>&1
+mismatch_status=$?
+if [[ "${mismatch_status}" -ne "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}" ]]; then
+	printf 'FIXTURE FAIL mismatched identity exit=%s expected=%s\n' \
+		"${mismatch_status}" "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}" >&2
+	exit "${REVIEWER_EXIT_REPRODUCTION}"
+fi
+if ! grep -Fq \
+	"INTEGRITY FAIL gate identity mismatch expected=${mismatch} actual=${commit}" \
+	"${mismatch_output}"; then
+	printf 'FIXTURE FAIL mismatched identity was not attributed\n' >&2
+	exit "${REVIEWER_EXIT_REPRODUCTION}"
+fi
+
+printf 'PASS gate-identity missing_exit=%s mismatch_exit=%s commit=%s\n' \
+	"${missing_status}" "${mismatch_status}" "${commit}"

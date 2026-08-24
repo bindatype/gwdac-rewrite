@@ -1,7 +1,10 @@
-.PHONY: reviewer-verify reviewer-reproduce reviewer-reproduce-cm12 reviewer-reproduce-runtime-refresh reviewer-reproduce-go5 reviewer-reproduce-go3pr2 reviewer-reproduce-unpatched-priming reviewer-verify-comma-a-editing reviewer-write-pnsd-manifest
+.PHONY: reviewer-verify reviewer-verify-gate-identity reviewer-reproduce reviewer-reproduce-cm12 reviewer-reproduce-runtime-refresh reviewer-reproduce-go5 reviewer-reproduce-go3pr2 reviewer-reproduce-unpatched-priming reviewer-verify-comma-a-editing reviewer-write-pnsd-manifest
 
 reviewer-verify:
-	./reviewer/verify-committed-evidence
+	./reviewer/verify-committed-evidence --expected-commit "$$(git rev-parse HEAD)"
+
+reviewer-verify-gate-identity:
+	./reviewer/verify-gate-identity-fixtures
 
 reviewer-reproduce:
 	./reviewer/reproduce-evidence

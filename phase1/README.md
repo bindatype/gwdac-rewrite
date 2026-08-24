@@ -166,5 +166,7 @@ drift remains separate from source-to-binary pairing and behavioral approval.
 
 From the repository root, `make reviewer-verify` checks the committed runtime,
 GO5, adapter, security, DSG, and amplitude evidence without invoking Docker or
-any generator. `make reviewer-reproduce` performs the CM12 and five-engine
-runtime-refresh regeneration only in a disposable clone.
+any generator. Its opening and final records are bound to the expected full
+commit ID; `make reviewer-verify-gate-identity` proves missing and mismatched
+identities fail closed. `make reviewer-reproduce` performs the CM12 and
+five-engine runtime-refresh regeneration only in a disposable clone.

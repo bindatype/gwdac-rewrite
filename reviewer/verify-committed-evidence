@@ -6,13 +6,16 @@ readonly outputs_root="$(cd "${script_root}/.." && pwd)"
 source "${script_root}/lib/exit-codes.sh"
 
 usage() {
-    printf 'usage: %s\n' "$0"
-    printf 'Verify committed evidence without invoking generators or Docker.\n'
+	printf 'usage: %s --expected-commit COMMIT\n' "$0"
+	printf 'Verify committed evidence without invoking generators or Docker.\n'
 }
 
-if [[ "$#" -ne 0 ]]; then
-    usage >&2
-    exit 64
+expected_commit=''
+if [[ "$#" -eq 2 && "$1" == --expected-commit ]]; then
+	expected_commit="$2"
+elif [[ "$#" -ne 0 ]]; then
+	usage >&2
+	exit 64
 fi
 
 for tool in git awk cmp wc mktemp; do
@@ -32,8 +35,28 @@ else
 fi
 
 if ! git -C "${outputs_root}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    printf 'INFRASTRUCTURE FAIL not a Git worktree: %s\n' "${outputs_root}" >&2
-    exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+	printf 'INFRASTRUCTURE FAIL not a Git worktree: %s\n' "${outputs_root}" >&2
+	exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+fi
+
+readonly commit="$(git -C "${outputs_root}" rev-parse --verify 'HEAD^{commit}')"
+printf 'VERIFY commit=%s expected=%s\n' \
+	"${commit}" "${expected_commit:-missing}"
+
+identity_failure=''
+if [[ -z "${expected_commit}" ]]; then
+	identity_failure='gate identity missing expected commit'
+elif [[ "${#expected_commit}" -ne 40 || \
+	"${expected_commit}" == *[!0123456789abcdef]* ]]; then
+	identity_failure="gate identity expected commit is not lowercase 40-hex: ${expected_commit}"
+elif [[ "${expected_commit}" != "${commit}" ]]; then
+	identity_failure="gate identity mismatch expected=${expected_commit} actual=${commit}"
+fi
+if [[ -n "${identity_failure}" ]]; then
+	printf 'INTEGRITY FAIL %s\n' "${identity_failure}" >&2
+	printf 'RESULT evidence_integrity_fail failures=1 exit=%s commit=%s\n' \
+		"${REVIEWER_EXIT_EVIDENCE_INTEGRITY}" "${commit}"
+	exit "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}"
 fi
 
 readonly before_status="$(mktemp)"
@@ -71,8 +94,15 @@ check_tracked_file() {
         integrity_failure "working copy differs from HEAD: ${relative}"
         return 1
     fi
-    return 0
+	return 0
 }
+
+for gate_contract_file in \
+	reviewer/verify-committed-evidence \
+	reviewer/lib/exit-codes.sh \
+	reviewer/config/evidence-manifests.tsv; do
+	check_tracked_file "${gate_contract_file}" || true
+done
 
 manifest_target() {
     local base="$1"
@@ -322,10 +352,11 @@ if ! cmp -s "${before_status}" "${after_status}"; then
 fi
 
 if [[ "${integrity_failures}" -ne 0 ]]; then
-    printf 'RESULT evidence_integrity_fail failures=%s exit=%s\n' \
-        "${integrity_failures}" "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}"
-    exit "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}"
+	printf 'RESULT evidence_integrity_fail failures=%s exit=%s commit=%s\n' \
+		"${integrity_failures}" "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}" \
+		"${commit}"
+	exit "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}"
 fi
 
-printf 'RESULT pass packages=%s exit=%s\n' \
-    "${pass_count}" "${REVIEWER_EXIT_SUCCESS}"
+printf 'RESULT pass packages=%s exit=%s commit=%s\n' \
+	"${pass_count}" "${REVIEWER_EXIT_SUCCESS}" "${commit}"

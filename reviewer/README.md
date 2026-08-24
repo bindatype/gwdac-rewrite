@@ -3,7 +3,7 @@
 The reviewer harness separates two operations that must not be conflated:
 
 1. `verify-committed-evidence` reads and hashes committed evidence without
-   invoking Docker, compilers, legacy executables, or generators.
+	invoking Docker, compilers, legacy executables, or generators.
 2. `reproduce-evidence` clones the exact reviewed commit into a temporary
    workspace and runs generators only there. The authoritative checkout is
    fingerprinted before and after the run.
@@ -14,7 +14,11 @@ Neither command changes physics source, fixtures, tolerances, or oracle output.
 cleanly. It also compares each tracked evidence file with its committed object,
 so a checkout with a locally modified evidence file returns exit 10 by design;
 that result identifies working-tree drift rather than a defect in the published
-commit.
+commit. Every invocation must provide the expected full commit ID. The verifier
+compares it with `HEAD` and includes the commit in both its opening identity and
+final result; missing and mismatched identities return exit 10 before evidence
+verification. Before reporting a pass, the verifier also proves that its own
+script, exit contract, and manifest configuration match that same commit.
 
 ## Commands
 
@@ -22,8 +26,12 @@ From the repository root:
 
 ```sh
 make reviewer-verify
+make reviewer-verify-gate-identity
 make reviewer-reproduce
 ```
+
+The gate-identity fixture proves that missing and mismatched expected commits
+are rejected and that the rejection record is itself bound to actual `HEAD`.
 
 The full reproducer runs the 24-fixture, 288-record CM12 gate, the exact `pnsd`
 oracle contract, and the five-engine runtime-refresh smoke sweep. Run one group

@@ -76,7 +76,8 @@ fi
 
 printf 'REPRODUCE commit=%s scope=%s workspace=%s\n' \
     "${commit}" "${scope}" "${workspace}"
-"${disposable}/reviewer/verify-committed-evidence"
+"${disposable}/reviewer/verify-committed-evidence" \
+	--expected-commit "${commit}"
 verify_status=$?
 if [[ "${verify_status}" -ne 0 ]]; then
     exit "${verify_status}"
