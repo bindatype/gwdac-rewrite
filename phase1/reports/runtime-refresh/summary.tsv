@@ -4,3 +4,4 @@ nnsd	linked	136	archived_deck	0	0	yes	exact_deck_smoke_pass	0015cb0
 knsd	linked	633	archived_deck	0	0	no	completed_output_differs	7f3af2e
 pdsd	linked	109	synthetic_startup_quit	0	0	yes	exact_startup_smoke_pass	cfdf133
 pdesd	linked	114	synthetic_startup_quit	0	0	yes	exact_startup_smoke_pass	d27c49c
+pnsd	linked	633	archived_deck	0	0	yes	exact_deck_smoke_pass	a2e16b8
