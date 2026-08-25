@@ -1,6 +1,6 @@
 # GWDAC rewrite artifacts
 
-Documentation reviewed: 2026-08-13
+Documentation reviewed: 2026-08-25
 
 This private repository is the authoritative build, contract, diagnostic, and
 evidence checkout for the GWDAC/SAID modernization effort. Historical source
@@ -38,10 +38,11 @@ is diagnostic evidence only.
 The runtime-refresh track has now attempted all six additional engines on
 Ubuntu 24.04 with GNU Fortran 13.3.0. `eprsd` and `nnsd` exactly match retained
 historical decks; `pdsd` and `pdesd` exactly match startup/quit smoke tests.
-`pnsd` matches seven displayed DSG rows before its post-table `PNRDX`
-end-of-file failure, and `knsd` remains blocked at a hard-coded absolute data
-path. These runtime results establish compatibility evidence, not physics
-approval.
+`pnsd` exactly reproduces the retained SP06 no-render deck, including seven DSG
+rows and its seven-artifact runtime contract. `knsd` now completes its archived
+deck under both the checked-in and modern executables; its raw stdout differs
+only in the sanctioned five-line configured data-root display relation. These
+runtime results establish compatibility evidence, not physics approval.
 
 ## Compatibility boundaries
 
@@ -75,5 +76,15 @@ physics review remains pending.
 The reviewer harness is now available through `make reviewer-verify` and
 `make reviewer-reproduce`. The first command only verifies committed evidence;
 the second clones the exact commit into a disposable workspace before running
-the 24-fixture CM12 gate and five-engine runtime-refresh sweep. The authoritative
-six modified and 59 untracked report entries remain outside these commits.
+the 24-fixture CM12 gate, exact `pnsd` oracle contract, and separate five-engine
+runtime-refresh sweep. Measured with `git status --porcelain=v1 -uall`, the
+authoritative dirty inventory is six modified plus 561 untracked files: 567
+entries with status-list SHA-256 `9301c33f06487ac65c131d2e090dc23b33e86a9a0e1066ed18ab7dc5bcb35632`.
+Those files remain outside these commits.
+
+Gate 1 is bound to the full expected commit and fails closed on identity drift.
+It validates the machine-readable runtime package registry, package
+checkpoints, deterministic aggregate generation, pinned collation, and
+registered README manifest coverage. These controls establish mechanical
+provenance; they do not validate narrative prose or provide physics approval,
+which remain human-review responsibilities.
