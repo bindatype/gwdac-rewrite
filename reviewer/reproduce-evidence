@@ -134,7 +134,7 @@ reproduce_cm12() {
         reproduction_failures=$((reproduction_failures + 1))
     fi
     if [[ "${gate_status}" -eq 0 ]]; then
-        printf 'PASS cm12 fixtures=24 records=288 candidate_diagnostic_failures=%s\n' \
+        printf 'PASS cm12 fixtures=24 records=288 non_gating_prbas_candidate_fixture_mismatches=%s\n' \
             "${candidate_failures}"
     fi
 }

@@ -2,6 +2,8 @@
 
 Date: 2026-08-02
 
+Status correction: 2026-08-25
+
 Evidence labels:
 
 - **oracle**: displayed typed records shared exactly by the modern headless
@@ -22,7 +24,8 @@ scientifically endorse the retained behavior.
 | First experimental 34-form typed PRBAS candidate, commit `e2b4d5c` | Clean-checkout 24-fixture gate | **FAIL: 3/24 pass, 21/24 fail**; DSG 2/11 pass, amplitudes 1/13 pass | Build and commands run, but the candidate is not behaviorally compatible. |
 | Frozen 40-applicable-form replay diagnostic, commit `2f8caec` | One pion-plus fixture at `Elab=1000 MeV`, `Acm=90 degrees` | **PASS: 40/40 per-form deltas, final amplitudes, and DSG exact** | Forensic accounting proof, not a PRBAS implementation. It establishes the frozen target value and accumulation order. |
 | Experimental 40-applicable-form/direct-`PNSM05` WIP candidate, commit `9cb0009` | Targeted pion-plus fixture only | **FAIL:** DSG `2.69659853` versus frozen replay `2.03560233`; non-`1xx` multipoles 0/18 exact; full gate not run | Intentionally failing diagnostic candidate. It must not be described as a valid SM05 result or accepted replacement. |
-| Instrumented frozen hadronic pipeline, commits `f366d73` and `516c375` | Same targeted pion-plus fixture | **PASS for diagnostic integrity:** displayed choice-1 amplitudes remain byte-identical to the retained target; candidate `TER`/`TEI` match 0/18 | Identifies legacy `PNTEST`/SP00 dispatch and saved-state boundaries without changing the oracle. No full corpus was authorized. |
+| Instrumented frozen hadronic pipeline, commits `f366d73` and `516c375` | Same targeted pion-plus fixture | **PASS for diagnostic integrity:** displayed choice-1 amplitudes remain byte-identical to the retained target; candidate `TER`/`TEI` match 0/18 | Identifies legacy `PNTEST`/SP00 dispatch and saved-state boundaries without changing the oracle. This is the focused result; the later `627f06d` survey below resolves prevalence across retained pion-plus amplitude requests. |
+| Instrumented frozen CM12 pion-plus dispatch prevalence survey, commit `627f06d` | 10 retained choice-1 amplitude fixtures / 18 energy groups / 468 traced form evaluations, including 324 candidate-relevant forms; unchanged 24-fixture oracle corpus rerun | **PASS for diagnostic integrity:** 10 no-dispatch rows, 458 `PNTEST` rows, zero `PNSM05` rows; all 10 displayed survey tables exact; oracle 24/24 fixtures and 288/288 records exact | Resolves prevalence of the retained pion-plus dispatch path. Further diagnostics of that same path would be redundant. This is not a full corpus run of the experimental direct-`PNSM05` candidate or a PRBAS replacement. |
 | Current public SAID website | One public DSG request with the same solution, reaction, energy, and angle | **Captured only:** displayed DSG `2.098` | Neither a frozen oracle nor a candidate acceptance test. Production internals and lineage are unknown. |
 
 ## Frozen oracle reference
@@ -87,6 +90,8 @@ compatibility check.
   `phase2/reports/cm12-form-diagnostic/CANDIDATE-HANDOFF.md`
 - Hadronic dispatch diagnostic:
   `phase2/reports/hadronic-pipeline-diagnostic/README.md`
+- Pion-plus dispatch prevalence survey:
+  `phase2/reports/cm12-dispatch-survey/README.md`
 - Live website check:
   `phase2/reports/live-said-website-investigation/README.md`
 
