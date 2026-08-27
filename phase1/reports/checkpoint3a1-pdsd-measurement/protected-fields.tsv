@@ -1,0 +1,13 @@
+class	artifact_or_source	evidence	result
+request_input	/workspace/arndt64/said/PIDSOL.USR	pre/post SHA-256	exact
+request_input	/workspace/arndt64/said/SAID.DS	pre/post SHA-256	exact
+request_input	/workspace/arndt64/said/NEWDAT.DAT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/ppamp.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/pidmsg.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/pidcd.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/pidsol.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/pidses.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/secpr.dat	pre/post SHA-256	exact
+request_input	raw/runtime/*/{historical,modern}/input.txt	four-package direct hash comparison	exact
+retained_output	raw/runtime/*/{historical,modern}/*	historical and modern cross-context package comparisons	exact
+retained_artifact	raw/build-{a,b}/artifact/pdsd	Build A/B direct SHA-256	exact

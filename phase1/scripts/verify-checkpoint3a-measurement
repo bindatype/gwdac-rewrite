@@ -1,0 +1,237 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly outputs_root="$(cd "${script_root}/../.." && pwd)"
+readonly registry="${outputs_root}/phase1/config/checkpoint3a-engines.tsv"
+readonly harness_commit=0ed942172a2b828f3368cf0687cb27bc8c5985c5
+readonly base_commit=eac47653b140ca3781f713aa8b279706373481a5
+readonly expected_binary_sha256=84b91c07a1f3d2966561b8541d2d5ea8902a9a792123de178c1ed9f643200416
+readonly expected_input_sha256=632f7ea9bbad671064ed57bb567d5711dc9fc620f730545b3b54cfaba943aab1
+readonly expected_stdout_sha256=47efa50c88765b40a0542d566677fbac42098527b1a294f78d27fe655e3611dc
+
+if [[ "$#" -ne 1 ]]; then
+    printf 'usage: %s <engine>\n' "$0" >&2
+    exit 64
+fi
+readonly requested_engine="$1"
+
+config_row="$(awk -F '\t' -v engine="${requested_engine}" \
+    'NR > 1 && $1 == engine {print; count++} END {if (count != 1) exit 1}' \
+    "${registry}")" || {
+    printf 'checkpoint 3A verifier: engine is not registered exactly once: %s\n' \
+        "${requested_engine}" >&2
+    exit 64
+}
+IFS=$'\t' read -r \
+    engine checkpoint report_name protected_config_rel run_subdir input_kind \
+    input_rel transcript_rel expected_stdout_relation <<<"${config_row}"
+readonly engine checkpoint report_name protected_config_rel run_subdir input_kind
+readonly input_rel transcript_rel expected_stdout_relation
+readonly report_rel="phase1/reports/${report_name}"
+readonly report_root="${outputs_root}/${report_rel}"
+readonly raw_root="${report_root}/raw"
+
+for tool in git awk cmp find grep sed shasum tr wc; do
+    if ! command -v "${tool}" >/dev/null 2>&1; then
+        printf 'checkpoint 3A verifier: missing tool: %s\n' "${tool}" >&2
+        exit 40
+    fi
+done
+
+hash_file() {
+    shasum -a 256 "$1" | awk '{print $1}'
+}
+
+context_value() {
+    local key="$1"
+    awk -F= -v key="${key}" '$1 == key {print $2; exit}' \
+        "${report_root}/run-context.txt"
+}
+
+manifest_value() {
+    local key="$1"
+    local manifest="$2"
+    awk -F= -v key="${key}" '$1 == key {print $2; exit}' "${manifest}"
+}
+
+verify_manifest_inventory() {
+    local tree="$1"
+    local manifest="$2"
+    local exclude="$3"
+    local expected
+    local actual
+
+    expected="$(mktemp "${TMPDIR:-/tmp}/checkpoint3a-expected.XXXXXX")"
+    actual="$(mktemp "${TMPDIR:-/tmp}/checkpoint3a-actual.XXXXXX")"
+    awk '{print $2}' "${manifest}" | LC_ALL=C sort >"${expected}"
+    (
+        cd "${tree}"
+        find . -type f -print | sed 's#^\./##' \
+            | awk -v exclude="${exclude}" '$0 != exclude' \
+            | LC_ALL=C sort
+    ) >"${actual}"
+    if ! cmp -s "${expected}" "${actual}"; then
+        printf 'checkpoint 3A verifier: manifest inventory mismatch: %s\n' \
+            "${manifest}" >&2
+        rm -f "${expected}" "${actual}"
+        exit 30
+    fi
+    rm -f "${expected}" "${actual}"
+}
+
+verify_hash_manifest() {
+    local tree="$1"
+    local manifest="$2"
+
+    (cd "${tree}" && shasum -a 256 -c "${manifest}") >/dev/null
+}
+
+test -d "${raw_root}"
+test ! -e "${report_root}/canonical"
+test ! -e "${report_root}/working-reports"
+test -f "${report_root}/README.md"
+test -f "${report_root}/manifest.sha256"
+test -f "${report_root}/raw-manifest.sha256"
+test "$(find "${report_root}" -type f | wc -l | tr -d ' ')" -eq 91
+
+for path in \
+    phase1/config/checkpoint3a-engines.tsv \
+    "${protected_config_rel}" \
+    phase1/scripts/capture-checkpoint3a-runtime \
+    phase1/scripts/run-checkpoint3a-measurement \
+    phase1/scripts/verify-checkpoint3a-measurement; do
+    git -C "${outputs_root}" ls-files --error-unmatch -- "${path}" >/dev/null
+    git -C "${outputs_root}" diff --quiet HEAD -- "${path}"
+done
+if ! git -C "${outputs_root}" diff --quiet \
+    "${harness_commit}" HEAD -- \
+    phase1/config/checkpoint3a-engines.tsv \
+    "${protected_config_rel}" \
+    phase1/scripts/capture-checkpoint3a-runtime \
+    phase1/scripts/run-checkpoint3a-measurement; then
+    printf 'checkpoint 3A verifier: capture primitive changed after execution\n' >&2
+    exit 30
+fi
+if [[ -n "$(git -C "${outputs_root}" ls-files --others --exclude-standard -- "${report_rel}")" ]] || \
+   ! git -C "${outputs_root}" diff --quiet HEAD -- "${report_rel}"; then
+    printf 'checkpoint 3A verifier: report is untracked or differs from HEAD\n' >&2
+    exit 30
+fi
+
+verify_manifest_inventory "${raw_root}" "${report_root}/raw-manifest.sha256" -
+verify_hash_manifest "${raw_root}" ../raw-manifest.sha256
+verify_manifest_inventory "${report_root}" "${report_root}/manifest.sha256" manifest.sha256
+verify_hash_manifest "${report_root}" manifest.sha256
+test "$(wc -l <"${report_root}/raw-manifest.sha256" | tr -d ' ')" -eq 78
+test "$(wc -l <"${report_root}/manifest.sha256" | tr -d ' ')" -eq 90
+
+test "$(context_value checkpoint)" = "${checkpoint}"
+test "$(context_value engine)" = "${engine}"
+test "$(context_value authorized_base_commit)" = "${base_commit}"
+test "$(context_value outputs_commit)" = "${harness_commit}"
+test "$(context_value builds)" = 2
+test "$(context_value runtime_executions)" = 4
+test "$(context_value timezones)" = UTC-14,UTC+12
+test "$(context_value context_assertions)" = expected_offsets_and_distinct_civil_dates
+test "$(context_value capture_order)" = raw_before_compatibility
+test "$(context_value canonicalization)" = none
+test "$(context_value physics_review)" = pending
+git -C "${outputs_root}" cat-file -e "${harness_commit}^{commit}"
+git -C "${outputs_root}" merge-base --is-ancestor "${base_commit}" "${harness_commit}"
+
+readonly preflight="${report_root}/context-preflight.tsv"
+test "$(awk 'END {print NR + 0}' "${preflight}")" -eq 5
+if ! awk -F '\t' '
+    NR == 1 {
+        if ($1 != "context" || $2 != "service" || $3 != "requested_tz" ||
+            $4 != "expected_offset" || $5 != "observed_timestamp" ||
+            $6 != "observed_date" || $7 != "observed_offset" ||
+            $8 != "container_id" || $9 != "image_id") exit 1
+        next
+    }
+    {
+        key = $1 SUBSEP $2
+        if (seen[key]++) exit 1
+        if ($1 == "utc-plus-14" && ($3 != "UTC-14" || $4 != "+1400" || $7 != "+1400")) exit 1
+        if ($1 == "utc-minus-12" && ($3 != "UTC+12" || $4 != "-1200" || $7 != "-1200")) exit 1
+        if ($2 != "oracle" && $2 != "dev") exit 1
+        if (substr($5, 1, 10) != $6 || substr($5, length($5) - 4) != $7) exit 1
+        if (length($8) != 64 || $9 !~ /^sha256:/) exit 1
+        date[$1 SUBSEP $2] = $6
+        container[$1 SUBSEP $2] = $8
+        image[$1 SUBSEP $2] = $9
+    }
+    END {
+        for (i = 1; i <= 2; i++) {
+            service = i == 1 ? "oracle" : "dev"
+            if (date["utc-plus-14" SUBSEP service] == date["utc-minus-12" SUBSEP service]) exit 1
+            if (container["utc-plus-14" SUBSEP service] != container["utc-minus-12" SUBSEP service]) exit 1
+            if (image["utc-plus-14" SUBSEP service] != image["utc-minus-12" SUBSEP service]) exit 1
+        }
+    }
+' "${preflight}"; then
+    printf 'checkpoint 3A verifier: context preflight contract failed\n' >&2
+    exit 30
+fi
+
+cmp "${report_root}/protected-inputs.before.sha256" \
+    "${report_root}/protected-inputs.after.sha256"
+test "$(wc -l <"${report_root}/protected-inputs.before.sha256" | tr -d ' ')" -eq 9
+test "$(awk -F '\t' 'NR > 1 && $4 != "exact" {bad++} END {print bad + 0}' \
+    "${report_root}/protected-fields.tsv")" -eq 0
+test "$(awk 'END {print NR - 1}' "${report_root}/protected-fields.tsv")" -eq 12
+
+readonly build_comparison="${report_root}/build-package-comparison.tsv"
+test "$(awk 'END {print NR - 1}' "${build_comparison}")" -eq 10
+test "$(awk -F '\t' 'NR > 1 && $4 == "different" {count++} END {print count + 0}' \
+    "${build_comparison}")" -eq 1
+test "$(awk -F '\t' '$1 == "build/manifest.txt" && $4 == "different" {count++} END {print count + 0}' \
+    "${build_comparison}")" -eq 1
+test "$(awk -F '\t' -v engine="${engine}" -v hash="${expected_binary_sha256}" \
+    '$1 == "artifact/" engine && $2 == hash && $3 == hash && $4 == "exact" {count++} END {print count + 0}' \
+    "${build_comparison}")" -eq 1
+test "$(awk 'END {print NR - 1}' "${report_root}/volatile-fields.tsv")" -eq 1
+test "$(awk -F '\t' 'NR == 2 && $3 == "execution_metadata" && $4 == 1 && $6 == "measured_volatile" {print 1}' \
+    "${report_root}/volatile-fields.tsv")" = 1
+
+for lineage in historical modern; do
+    comparison="${report_root}/runtime-${lineage}-timezone-comparison.tsv"
+    test "$(awk 'END {print NR - 1}' "${comparison}")" -eq 9
+    test "$(awk -F '\t' 'NR > 1 && $4 != "exact" {count++} END {print count + 0}' \
+        "${comparison}")" -eq 0
+done
+
+for context in utc-plus-14 utc-minus-12; do
+    context_root="${raw_root}/runtime/${context}"
+    verify_manifest_inventory "${context_root}" \
+        "${context_root}/evidence-manifest.sha256" evidence-manifest.sha256
+    verify_hash_manifest "${context_root}" evidence-manifest.sha256
+    test "$(wc -l <"${context_root}/evidence-manifest.sha256" | tr -d ' ')" -eq 28
+    test ! -s "${context_root}/historical-vs-modern.first.diff"
+    test "$(awk -F '\t' 'NR == 2 && $1 == "pdsd" && $6 == "exact" && $7 == "exact_smoke_pass" {print 1}' \
+        "${context_root}/smoke-summary.tsv")" = 1
+    expected_context="$(mktemp "${TMPDIR:-/tmp}/checkpoint3a-context.XXXXXX")"
+    {
+        head -n 1 "${preflight}"
+        awk -F '\t' -v context="${context}" '$1 == context' "${preflight}"
+    } >"${expected_context}"
+    cmp "${expected_context}" "${context_root}/operator/context.tsv"
+    rm -f "${expected_context}"
+    for lineage in historical modern; do
+        run_root="${context_root}/${lineage}"
+        test "$(hash_file "${run_root}/input.txt")" = "${expected_input_sha256}"
+        test "$(hash_file "${run_root}/stdout.txt")" = "${expected_stdout_sha256}"
+        test "$(manifest_value exit_status "${run_root}/manifest.txt")" = 0
+        test "$(manifest_value normal_exit "${run_root}/manifest.txt")" = yes
+    done
+done
+
+if find "${report_root}" -type f \
+    \( -name '*canonical*' -o -name '*normalized*' \) -print | grep -q .; then
+    printf 'checkpoint 3A verifier: canonical or normalized artifact present\n' >&2
+    exit 30
+fi
+
+printf 'checkpoint 3A measurement: PASS engine=%s files=91 builds=2 executions=4 contexts=4 volatile_fields=1 protected_inputs=9\n' \
+    "${engine}"

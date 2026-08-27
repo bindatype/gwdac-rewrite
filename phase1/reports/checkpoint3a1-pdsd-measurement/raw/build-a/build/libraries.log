@@ -1,0 +1,67 @@
+patching file saidopen.for
+Hunk #2 succeeded at 165 (offset 6 lines).
+Hunk #3 succeeded at 202 (offset 2 lines).
+axis.f:61:30:
+
+   57 |       CALL SYMBOL (XA,YA,0.14,BCD,THETA,NAC)
+      |                              2
+......
+   61 |       CALL SYMBOL (XA,YA,0.14,8H (X10** ,THETA,8)
+      |                              1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+axis.f:67:28:
+
+   57 |       CALL SYMBOL (XA,YA,0.14,BCD,THETA,NAC)
+      |                              2
+......
+   67 |       CALL SYMBOL(XA,YA,.14,1H),THETA,1)
+      |                            1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+kcvrt.f:92:17:
+
+   33 |       CALL DATA1(IE,1,MTRN)
+      |                 2
+......
+   92 |       CALL DATA1(T,1,MTRN)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+number.f:38:32:
+
+   29 |    10 CALL SYMBOL (XT,YT,HGHT,1H-,THETA,1)
+      |                              2  
+......
+   38 |         CALL SYMBOL (XT,YT,HGHT,BB(4)  ,THETA,1)
+      |                                1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(1)/HOLLERITH).
+picz.f:60:17:
+
+   46 |       CALL DATA1(NFIL,1,M)
+      |                 2
+......
+   60 |       CALL DATA1(PIC,-14,M)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+picz.f:76:17:
+
+   46 |       CALL DATA1(NFIL,1,M)
+      |                 2
+......
+   76 |       CALL DATA1(NPC,NPIX,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+picz.f:125:16:
+
+  105 |       CALL DRAW(PIC,X0,Y0,THTA,SCL,NPC,NPIX)
+      |                2
+......
+  125 |       CALL DRAW('OLDX',X,Y,0.,1.,NPC,NPIX)
+      |                1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(4)/REAL(4)).
+picz.f:362:17:
+
+   46 |       CALL DATA1(NFIL,1,M)
+      |                 2
+......
+  362 |       CALL DATA1(LTL,-124,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)

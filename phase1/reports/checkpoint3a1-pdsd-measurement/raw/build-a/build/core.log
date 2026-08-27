@@ -1,0 +1,321 @@
+pidsaid.f:2468:17:
+
+ 2434 |       CALL DATA2(EMIN,1,EMAX,1,MTRN)
+      |                 2
+......
+ 2468 |       CALL DATA2(NYI,1,NYF,1,MTRN)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pidsaid.f:2468:23:
+
+ 2434 |       CALL DATA2(EMIN,1,EMAX,1,MTRN)
+      |                        2
+......
+ 2468 |       CALL DATA2(NYI,1,NYF,1,MTRN)
+      |                       1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pidsaid.f:2476:17:
+
+ 2455 |       CALL DATA1(X,-14,MTRN)
+      |                 2
+......
+ 2476 |       CALL DATA1(IREF,-24,MTRN)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pidsaid.f:2000:17:
+
+ 2000 |       CALL DATA1(TITLE,-184,M)
+      |                 1
+......
+ 2455 |       CALL DATA1(X,-14,MTRN)
+      |                 2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pidsaid.f:2055:17:
+
+ 2055 |       CALL DATA1(ERMTX,3300,MTRN)
+      |                 1
+......
+ 2455 |       CALL DATA1(X,-14,MTRN)
+      |                 2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pidsaid.f:2139:22:
+
+ 2139 |       CALL DATA2(NL,1,YZ,4,M)
+      |                      1
+......
+ 2434 |       CALL DATA2(EMIN,1,EMAX,1,MTRN)
+      |                        2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pidsaid.f:2873:16:
+
+ 2536 |       CALL XCHG(ISR1,VAR(9))
+      |                2
+......
+ 2873 |       CALL XCHG(HREF,4HNONE)
+      |                1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+pidsaid.f:2905:20:
+
+ 2536 |       CALL XCHG(ISR1,VAR(9))
+      |                     2
+......
+ 2905 |       CALL XCHG(HPP,MTTL(IR))
+      |                    1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pidsaid.f:2910:29:
+
+ 2035 |       CALL DATA3(ZJ,1,ZNF,1,ERMTX,50,MTRN)
+      |                            2 
+......
+ 2910 |       CALL DATA3(TMIN,1,DT,1,TMAX,1,MTRN)
+      |                             1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pidsaid.f:3382:38:
+
+ 3256 |       CALL SYMBOL(2.6,1.6,0.1,DTTL,0.0,30)
+      |                              2        
+......
+ 3382 |       CALL SYMBOL(XL+2.1,YB-0.25,0.15,' E@d#q#@@(MeV)',0.0,14)
+      |                                      1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(14)/REAL(4)).
+pidsaid.f:3742:17:
+
+ 2434 |       CALL DATA2(EMIN,1,EMAX,1,MTRN)
+      |                 2
+......
+ 3742 |       CALL DATA2(DUM,3,E,40,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pidsaid.f:3742:23:
+
+ 2434 |       CALL DATA2(EMIN,1,EMAX,1,MTRN)
+      |                        2
+......
+ 3742 |       CALL DATA2(DUM,3,E,40,M)
+      |                       1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pidsaid.f:3751:17:
+
+ 2455 |       CALL DATA1(X,-14,MTRN)
+      |                 2
+......
+ 3751 |       CALL DATA1(DUM,50,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pidsaid.f:4606:23:
+
+ 2434 |       CALL DATA2(EMIN,1,EMAX,1,MTRN)
+      |                        2
+......
+ 4606 |       CALL DATA2(XXK,1,XHA,3,MTRN)
+      |                       1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pidsaid.f:2234:30:
+
+ 2022 |       IF(TITLE(2).EQ.HPPD) CALL PPDAMP(-27.0,1,1,1,DUM,DUM)
+      |                                                   2
+......
+ 2234 |       CALL PPDAMP(TLB,4,NN,LL,TR,TI)
+      |                              1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pidsaid.f:2234:33:
+
+ 2022 |       IF(TITLE(2).EQ.HPPD) CALL PPDAMP(-27.0,1,1,1,DUM,DUM)
+      |                                                       2
+......
+ 2234 |       CALL PPDAMP(TLB,4,NN,LL,TR,TI)
+      |                                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pidsaid.f:4277:17:
+
+ 2035 |       CALL DATA3(ZJ,1,ZNF,1,ERMTX,50,MTRN)
+      |                 2
+......
+ 4277 |       CALL DATA3(NY1,1,NYI,1,NYF,1,M)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pidsaid.f:4277:23:
+
+ 2035 |       CALL DATA3(ZJ,1,ZNF,1,ERMTX,50,MTRN)
+      |                      2 
+......
+ 4277 |       CALL DATA3(NY1,1,NYI,1,NYF,1,M)
+      |                       1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pidsaid.f:4277:29:
+
+ 2035 |       CALL DATA3(ZJ,1,ZNF,1,ERMTX,50,MTRN)
+      |                            2 
+......
+ 4277 |       CALL DATA3(NY1,1,NYI,1,NYF,1,M)
+      |                             1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pidsaid.f:4038:17:
+
+ 3311 |       CALL ASYMB(FASE(NN,LL),XPW,YPW,0.2,0.0)
+      |                 2
+......
+ 4038 |       CALL ASYMB('TLAB',2.2,-0.35,0.2,0.0)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(4)/REAL(4)).
+pidsaid.f:5005:31:
+
+ 2035 |       CALL DATA3(ZJ,1,ZNF,1,ERMTX,50,MTRN)
+      |                            2   
+......
+ 5005 |       CALL DATA3(XMIN,1,XINC,1,XMAX,1,MTRN)
+      |                               1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pidsaid.f:5048:33:
+
+ 2035 |       CALL DATA3(ZJ,1,ZNF,1,ERMTX,50,MTRN)
+      |                            2     
+......
+ 5048 |       CALL DATA3(XFMIN,1,XFINC,1,XFMAX,1,MTRN)
+      |                                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pidsaid.f:5098:17:
+
+ 2455 |       CALL DATA1(X,-14,MTRN)
+      |                 2
+......
+ 5098 |       CALL DATA1(XCSTR,-24,MTRN)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pidsaid.f:5203:29:
+
+ 3256 |       CALL SYMBOL(2.6,1.6,0.1,DTTL,0.0,30)
+      |                              2
+......
+ 5203 |       CALL SYMBOL(-.6,-.2,.1,TTL,0.,9)
+      |                             1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pidsaid.f:5205:29:
+
+ 3256 |       CALL SYMBOL(2.6,1.6,0.1,DTTL,0.0,30)
+      |                              2
+......
+ 5205 |       CALL SYMBOL(5.2,-.2,.1,TTL,0.,9)
+      |                             1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pidsaid.f:5208:28:
+
+ 3256 |       CALL SYMBOL(2.6,1.6,0.1,DTTL,0.0,30)
+      |                              2
+......
+ 5208 |       CALL SYMBOL(2.,-.3,.1,TTL,0.,21)
+      |                            1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pidsaid.f:5214:28:
+
+ 3256 |       CALL SYMBOL(2.6,1.6,0.1,DTTL,0.0,30)
+      |                              2
+......
+ 5214 |       CALL SYMBOL(.5,4.1,.1,TTL,0.,11)
+      |                            1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pidsaid.f:5216:31:
+
+ 3256 |       CALL SYMBOL(2.6,1.6,0.1,DTTL,0.0,30)
+      |                              2 
+......
+ 5216 |       CALL SYMBOL(-1.05,.05,.1,TTL,0.,9)
+      |                               1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pidsaid.f:5218:32:
+
+ 3256 |       CALL SYMBOL(2.6,1.6,0.1,DTTL,0.0,30)
+      |                              2  
+......
+ 5218 |       CALL SYMBOL(-1.05,3.95,.1,TTL,0.,9)
+      |                                1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pidsaid.f:5248:29:
+
+ 3256 |       CALL SYMBOL(2.6,1.6,0.1,DTTL,0.0,30)
+      |                              2
+......
+ 5248 |       CALL SYMBOL(3.5,4.1,.1,TTL,0.,11)
+      |                             1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pidsaid.f:5253:29:
+
+ 3256 |       CALL SYMBOL(2.6,1.6,0.1,DTTL,0.0,30)
+      |                              2
+......
+ 5253 |       CALL SYMBOL(1.9,4.1,.1,TTL,0.,13)
+      |                             1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pidsaid.f:5300:27:
+
+ 3256 |       CALL SYMBOL(2.6,1.6,0.1,DTTL,0.0,30)
+      |                              2
+......
+ 5300 |       CALL SYMBOL(-1.,Y,.1,TTL,0.,8)
+      |                           1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pidsaid.f:5623:29:
+
+ 2035 |       CALL DATA3(ZJ,1,ZNF,1,ERMTX,50,MTRN)
+      |                            2 
+......
+ 5623 |       CALL DATA3(ZMIN,1,DZ,1,ZMAX,1,MTRN)
+      |                             1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pidsaid.f:173:31:
+
+  173 |       CALL DATA3(XMIN,1,XINC,1,XMAX,1,MTRN)
+      |                               1
+......
+ 2035 |       CALL DATA3(ZJ,1,ZNF,1,ERMTX,50,MTRN)
+      |                            2   
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pidsaid.f:758:44:
+
+  758 |       IF(IDV.EQ.5) CALL SYMBOL(2.0,-0.3,0.2,HIND,0.0,4)
+      |                                            1
+......
+ 3256 |       CALL SYMBOL(2.6,1.6,0.1,DTTL,0.0,30)
+      |                              2              
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pidu.f:124:33-44:
+
+  124 |       READ(NINX,100,END=99) (VAR(J),J=13,30)
+      |                                 1          2
+Warning: Array reference at (1) out of bounds (30 > 20) in loop beginning at (2)
+pidu.f:179:22:
+
+  179 |       CALL DATA3(NJ,1,NFX,1,DUM,50,M)
+      |                      1
+......
+  786 |       CALL DATA3(NE,1,E1,1,DE,1,M)
+      |                      2
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pidu.f:179:28:
+
+  179 |       CALL DATA3(NJ,1,NFX,1,DUM,50,M)
+      |                            1
+......
+  786 |       CALL DATA3(NE,1,E1,1,DE,1,M)
+      |                           2 
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pidu.f:188:35:
+
+  188 |       CALL PDEAMP(0.0,TRE,TIE,TTLE)
+      |                                   1
+Warning: Type mismatch in argument 'ntl' at (1); passed REAL(4) to INTEGER(4)
+pidu.f:189:35:
+
+  189 |       CALL PIDAMP(0.0,TRP,TIP,TTLP)
+      |                                   1
+Warning: Type mismatch in argument 'ntl' at (1); passed REAL(4) to INTEGER(4)
+pidu.f:210:35:
+
+  210 |       CALL PDEAMP(TLB,TRE,TIE,TTLE)
+      |                                   1
+Warning: Type mismatch in argument 'ntl' at (1); passed REAL(4) to INTEGER(4)
+pidu.f:220:35:
+
+  220 |    36 CALL PIDAMP(TLB,TRP,TIP,TTLP)
+      |                                   1
+Warning: Type mismatch in argument 'ntl' at (1); passed REAL(4) to INTEGER(4)
