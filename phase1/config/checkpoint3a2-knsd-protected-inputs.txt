@@ -1,0 +1,11 @@
+KN/INPUT
+KN/PNAMP.DAT
+KN/KNSOL.USR
+KN/SAID.DS
+KN/NEWDAT.DAT
+sdat/kndat.dat
+sdat/knsol.dat
+sdat/knses.dat
+sdat/knmsg.dat
+sdat/pnintp.dat
+sdat/secpr.dat
