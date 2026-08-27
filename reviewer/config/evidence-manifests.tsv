@@ -8,4 +8,5 @@ prsdd-go5-determinism	phase1/reports/prsdd-go5-evidence-determinism-20260813	pha
 prsdd-go5-width-correction	phase1/reports/prsdd-go5-width-correction-20260814	phase1/reports/prsdd-go5-width-correction-20260814/manifest.sha256
 unpatched-priming	phase1/reports/unpatched-priming-measurement	phase1/reports/unpatched-priming-measurement/manifest.sha256
 unpatched-priming-determinism	phase1/reports/unpatched-priming-evidence-determinism-20260820	phase1/reports/unpatched-priming-evidence-determinism-20260820/manifest.sha256
+checkpoint3a-pdsd	phase1/reports/checkpoint3a1-pdsd-measurement	phase1/reports/checkpoint3a1-pdsd-measurement/manifest.sha256
 runtime-refresh-aggregate	.	phase1/reports/runtime-refresh/aggregate-manifest.sha256
