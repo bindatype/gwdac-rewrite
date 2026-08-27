@@ -1,0 +1,146 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions);
+
+my ($mode, $left_path, $right_path, $inventory_path);
+my ($left_root, $right_root);
+
+GetOptions(
+    'mode=s'       => \$mode,
+    'left=s'       => \$left_path,
+    'right=s'      => \$right_path,
+    'inventory=s'  => \$inventory_path,
+    'left-root=s'  => \$left_root,
+    'right-root=s' => \$right_root,
+) or usage();
+
+usage() unless defined $mode && defined $left_path && defined $right_path
+    && defined $inventory_path;
+usage() unless $mode eq 'exact' || $mode eq 'data_root_display_only'
+    || $mode eq 'date_fields_only';
+
+my @left = read_lines($left_path);
+my @right = read_lines($right_path);
+fail("line count differs") unless @left == @right;
+
+open my $inventory, '>', $inventory_path
+    or fail("cannot write inventory: $inventory_path: $!");
+print {$inventory} "line\tfield\tleft\tright\tclass\trelation\n";
+
+if ($mode eq 'exact') {
+    for my $index (0 .. $#left) {
+        fail("line " . ($index + 1) . " differs")
+            unless $left[$index] eq $right[$index];
+    }
+    close $inventory or fail("cannot close inventory: $inventory_path: $!");
+    print "exact fields=0\n";
+    exit 0;
+}
+
+if ($mode eq 'data_root_display_only') {
+    usage() unless defined $left_root && defined $right_root
+        && length($left_root) && length($right_root)
+        && $left_root ne $right_root;
+
+    my $changed = 0;
+    for my $index (0 .. $#left) {
+        next if $left[$index] eq $right[$index];
+
+        my $left_count = occurrences($left[$index], $left_root);
+        my $right_count = occurrences($right[$index], $right_root);
+        fail("line " . ($index + 1) . " does not contain one configured root")
+            unless $left_count == 1 && $right_count == 1;
+
+        my $left_normalized = $left[$index];
+        my $right_normalized = $right[$index];
+        $left_normalized =~ s/\Q$left_root\E/<DATA-ROOT>/;
+        $right_normalized =~ s/\Q$right_root\E/<DATA-ROOT>/;
+        $left_normalized =~ s/[ \t]+(\r?\n)\z/$1/;
+        $right_normalized =~ s/[ \t]+(\r?\n)\z/$1/;
+        $left_normalized =~ s/[ \t]+\z//;
+        $right_normalized =~ s/[ \t]+\z//;
+        fail("line " . ($index + 1) . " differs outside configured root")
+            unless $left_normalized eq $right_normalized;
+
+        $changed++;
+        print {$inventory} join("\t",
+            $index + 1, 'data_root', $left_root, $right_root,
+            'environment_display', 'data_root_display_only'), "\n";
+    }
+    fail('configured roots produced no changed lines') unless $changed;
+    close $inventory or fail("cannot close inventory: $inventory_path: $!");
+    print "data_root_display_only fields=$changed\n";
+    exit 0;
+}
+
+my $date_re = qr/(?<![0-9])([0-9]{1,2}\/[0-9]{1,2}\/[0-9]{2,4})(?![0-9])/;
+my $volatile = 0;
+my $protected = 0;
+
+for my $index (0 .. $#left) {
+    my @left_dates = dates_in($left[$index], $date_re);
+    my @right_dates = dates_in($right[$index], $date_re);
+    fail("line " . ($index + 1) . " has different date-field counts")
+        unless @left_dates == @right_dates;
+
+    if ($left[$index] ne $right[$index]) {
+        fail("line " . ($index + 1) . " differs without a date field")
+            unless @left_dates;
+        my $left_normalized = $left[$index];
+        my $right_normalized = $right[$index];
+        $left_normalized =~ s/$date_re/<DATE>/g;
+        $right_normalized =~ s/$date_re/<DATE>/g;
+        fail("line " . ($index + 1) . " differs outside date fields")
+            unless $left_normalized eq $right_normalized;
+    }
+
+    for my $field (0 .. $#left_dates) {
+        my $changed = $left_dates[$field] ne $right_dates[$field];
+        my $class = $changed ? 'execution_metadata' : 'protected_date';
+        my $relation = $changed ? 'measured_volatile' : 'exact';
+        $changed ? $volatile++ : $protected++;
+        print {$inventory} join("\t",
+            $index + 1, 'date_' . ($field + 1),
+            $left_dates[$field], $right_dates[$field], $class, $relation), "\n";
+    }
+}
+
+fail('date relation produced no changed fields') unless $volatile;
+close $inventory or fail("cannot close inventory: $inventory_path: $!");
+print "date_fields_only volatile=$volatile protected=$protected\n";
+exit 0;
+
+sub read_lines {
+    my ($path) = @_;
+    open my $handle, '<', $path or fail("cannot read $path: $!");
+    my @lines = <$handle>;
+    close $handle or fail("cannot close $path: $!");
+    return @lines;
+}
+
+sub occurrences {
+    my ($value, $needle) = @_;
+    my $count = 0;
+    $count++ while $value =~ /\Q$needle\E/g;
+    return $count;
+}
+
+sub dates_in {
+    my ($value, $pattern) = @_;
+    my @dates;
+    push @dates, $1 while $value =~ /$pattern/g;
+    return @dates;
+}
+
+sub usage {
+    print STDERR "usage: classify-checkpoint3a-relation --mode MODE --left FILE --right FILE --inventory FILE [--left-root ROOT --right-root ROOT]\n";
+    exit 64;
+}
+
+sub fail {
+    my ($message) = @_;
+    print STDERR "checkpoint 3A relation: $message\n";
+    exit 1;
+}

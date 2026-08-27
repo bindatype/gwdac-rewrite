@@ -5,7 +5,7 @@ readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly outputs_root="$(cd "${script_root}/../.." && pwd)"
 readonly compose_file="${outputs_root}/container-environment/compose.yaml"
 readonly registry="${outputs_root}/phase1/config/checkpoint3a-engines.tsv"
-readonly base_commit=eac47653b140ca3781f713aa8b279706373481a5
+readonly relation_classifier="${outputs_root}/phase1/scripts/classify-checkpoint3a-relation"
 readonly stable_main=3b56542884efc5c24d302335b263f6c50eed5dd0
 readonly expected_dirty_entries=567
 readonly expected_dirty_sha256=9301c33f06487ac65c131d2e090dc23b33e86a9a0e1066ed18ab7dc5bcb35632
@@ -18,6 +18,13 @@ if [[ "$#" -ne 1 ]]; then
 fi
 readonly requested_engine="$1"
 
+readonly expected_registry_header=$'engine\tcheckpoint\treport_name\tprotected_inputs\trun_subdir\tinput_kind\tinput_rel\ttranscript_rel\tcapture_commit\tauthorized_base_commit\texpected_stdout_relation\texpected_smoke_result\texpected_cross_context_relation\texpected_cross_context_difference_files\texpected_report_files\texpected_raw_files\texpected_manifest_entries\texpected_raw_manifest_entries\texpected_build_comparison_rows\texpected_build_difference_count\texpected_build_difference_path\texpected_context_manifest_entries\texpected_runtime_comparison_rows\texpected_protected_input_count\texpected_protected_field_count\texpected_volatile_field_count\texpected_binary_sha256\texpected_input_sha256\texpected_historical_stdout_sha256\texpected_modern_stdout_sha256\thistorical_data_root\tmodern_data_root'
+IFS= read -r actual_registry_header <"${registry}"
+if [[ "${actual_registry_header}" != "${expected_registry_header}" ]]; then
+    printf 'checkpoint 3A: registry schema mismatch\n' >&2
+    exit 64
+fi
+
 config_row="$(awk -F '\t' -v engine="${requested_engine}" \
     'NR > 1 && $1 == engine {print; count++} END {if (count != 1) exit 1}' \
     "${registry}")" || {
@@ -27,9 +34,29 @@ config_row="$(awk -F '\t' -v engine="${requested_engine}" \
 }
 IFS=$'\t' read -r \
     engine checkpoint report_name protected_config_rel run_subdir input_kind \
-    input_rel transcript_rel expected_stdout_relation <<<"${config_row}"
+    input_rel transcript_rel capture_commit authorized_base_commit \
+    expected_stdout_relation expected_smoke_result \
+    expected_cross_context_relation expected_cross_context_difference_files \
+    expected_report_files expected_raw_files expected_manifest_entries \
+    expected_raw_manifest_entries expected_build_comparison_rows \
+    expected_build_difference_count expected_build_difference_path \
+    expected_context_manifest_entries expected_runtime_comparison_rows \
+    expected_protected_input_count expected_protected_field_count \
+    expected_volatile_field_count expected_binary_sha256 expected_input_sha256 \
+    expected_historical_stdout_sha256 expected_modern_stdout_sha256 \
+    historical_data_root modern_data_root <<<"${config_row}"
 readonly engine checkpoint report_name protected_config_rel run_subdir input_kind
-readonly input_rel transcript_rel expected_stdout_relation
+readonly input_rel transcript_rel capture_commit authorized_base_commit
+readonly expected_stdout_relation expected_smoke_result
+readonly expected_cross_context_relation expected_cross_context_difference_files
+readonly expected_report_files expected_raw_files expected_manifest_entries
+readonly expected_raw_manifest_entries expected_build_comparison_rows
+readonly expected_build_difference_count expected_build_difference_path
+readonly expected_context_manifest_entries expected_runtime_comparison_rows
+readonly expected_protected_input_count expected_protected_field_count
+readonly expected_volatile_field_count expected_binary_sha256 expected_input_sha256
+readonly expected_historical_stdout_sha256 expected_modern_stdout_sha256
+readonly historical_data_root modern_data_root
 readonly protected_config="${outputs_root}/${protected_config_rel}"
 readonly report_root="${outputs_root}/phase1/reports/${report_name}"
 readonly work_reports="${report_root}/working-reports"
@@ -47,7 +74,7 @@ runtime_started=0
 completed=0
 authoritative_status=''
 
-for tool in git docker awk cmp diff find grep sed shasum tr wc; do
+for tool in git docker awk cmp diff find grep perl sed shasum tr wc; do
     if ! command -v "${tool}" >/dev/null 2>&1; then
         printf 'checkpoint 3A: missing tool: %s\n' "${tool}" >&2
         exit 40
@@ -60,6 +87,112 @@ fi
 if [[ ! -f "${protected_config}" ]]; then
     printf 'checkpoint 3A: missing protected-input config: %s\n' \
         "${protected_config_rel}" >&2
+    exit 64
+fi
+if [[ ! -x "${relation_classifier}" ]]; then
+    printf 'checkpoint 3A: missing relation classifier: %s\n' \
+        "${relation_classifier}" >&2
+    exit 64
+fi
+if [[ "${capture_commit}" != HEAD && \
+      ! "${capture_commit}" =~ ^[0-9a-f]{40}$ ]] || \
+   [[ ! "${authorized_base_commit}" =~ ^[0-9a-f]{40}$ ]]; then
+    printf 'checkpoint 3A: registry commit boundary is not lowercase 40-hex\n' >&2
+    exit 64
+fi
+readonly resolved_capture_commit="$(git -C "${outputs_root}" rev-parse HEAD)"
+if [[ "${capture_commit}" != HEAD && \
+      "${capture_commit}" != "${resolved_capture_commit}" ]]; then
+    printf 'checkpoint 3A: capture row is historical; use a new HEAD row for recapture\n' >&2
+    exit 64
+fi
+case "${expected_stdout_relation}" in
+    exact)
+        if [[ "${historical_data_root}" != - || "${modern_data_root}" != - ]]; then
+            printf 'checkpoint 3A: exact stdout relation must not declare data roots\n' >&2
+            exit 64
+        fi
+        ;;
+    data_root_display_only)
+        if [[ "${historical_data_root}" == - || "${modern_data_root}" == - || \
+              "${historical_data_root}" == "${modern_data_root}" ]]; then
+            printf 'checkpoint 3A: data-root relation requires distinct roots\n' >&2
+            exit 64
+        fi
+        ;;
+    *)
+        printf 'checkpoint 3A: unsupported stdout relation: %s\n' \
+            "${expected_stdout_relation}" >&2
+        exit 64
+        ;;
+esac
+case "${expected_cross_context_relation}" in
+    exact|date_fields_only) ;;
+    *)
+        printf 'checkpoint 3A: unsupported cross-context relation: %s\n' \
+            "${expected_cross_context_relation}" >&2
+        exit 64
+        ;;
+esac
+for expected_count in \
+    "${expected_cross_context_difference_files}" \
+    "${expected_report_files}" "${expected_raw_files}" \
+    "${expected_manifest_entries}" "${expected_raw_manifest_entries}" \
+    "${expected_build_comparison_rows}" "${expected_build_difference_count}" \
+    "${expected_context_manifest_entries}" "${expected_runtime_comparison_rows}" \
+    "${expected_protected_input_count}" "${expected_protected_field_count}" \
+    "${expected_volatile_field_count}"; do
+    if [[ ! "${expected_count}" =~ ^[0-9]+$ ]]; then
+        printf 'checkpoint 3A: registry count is not numeric: %s\n' \
+            "${expected_count}" >&2
+        exit 64
+    fi
+done
+for expected_hash in \
+    "${expected_binary_sha256}" "${expected_input_sha256}" \
+    "${expected_historical_stdout_sha256}" \
+    "${expected_modern_stdout_sha256}"; do
+    if [[ ! "${expected_hash}" =~ ^[0-9a-f]{64}$ ]]; then
+        printf 'checkpoint 3A: registry hash is not lowercase 64-hex\n' >&2
+        exit 64
+    fi
+done
+for required_value in \
+    "${engine}" "${checkpoint}" "${report_name}" "${protected_config_rel}" \
+    "${run_subdir}" "${input_kind}" "${expected_smoke_result}" \
+    "${expected_build_difference_path}"; do
+    if [[ -z "${required_value}" ]]; then
+        printf 'checkpoint 3A: registry contains an empty required field\n' >&2
+        exit 64
+    fi
+done
+if [[ ! "${engine}" =~ ^[a-z0-9]+$ || \
+      ! "${report_name}" =~ ^[A-Za-z0-9._-]+$ || \
+      ! "${expected_smoke_result}" =~ ^[a-z0-9_]+$ ]]; then
+    printf 'checkpoint 3A: registry contains an unsafe identifier\n' >&2
+    exit 64
+fi
+if [[ "${expected_build_difference_count}" -ne 1 || \
+      "${expected_build_difference_path}" != build/manifest.txt ]]; then
+    printf 'checkpoint 3A: unsupported build-difference contract count=%s path=%s\n' \
+        "${expected_build_difference_count}" \
+        "${expected_build_difference_path}" >&2
+    exit 64
+fi
+if [[ "${expected_cross_context_relation}" == exact && \
+      "${expected_cross_context_difference_files}" -ne 0 ]] || \
+   [[ "${expected_cross_context_relation}" == date_fields_only && \
+      "${expected_cross_context_difference_files}" -eq 0 ]]; then
+    printf 'checkpoint 3A: cross-context relation/count contract is inconsistent\n' >&2
+    exit 64
+fi
+if [[ "${expected_stdout_relation}" == exact && \
+      "${expected_historical_stdout_sha256}" != \
+      "${expected_modern_stdout_sha256}" ]] || \
+   [[ "${expected_stdout_relation}" == data_root_display_only && \
+      "${expected_historical_stdout_sha256}" == \
+      "${expected_modern_stdout_sha256}" ]]; then
+    printf 'checkpoint 3A: stdout relation/hash contract is inconsistent\n' >&2
     exit 64
 fi
 if [[ -e "${report_root}" ]]; then
@@ -82,13 +215,14 @@ if [[ "${authoritative_root}" != /* ]] || \
         "${authoritative_root}" >&2
     exit 64
 fi
-if ! git -C "${outputs_root}" merge-base --is-ancestor "${base_commit}" HEAD; then
+if ! git -C "${outputs_root}" merge-base --is-ancestor \
+    "${authorized_base_commit}" HEAD; then
     printf 'checkpoint 3A: candidate does not descend from base %s\n' \
-        "${base_commit}" >&2
+        "${authorized_base_commit}" >&2
     exit 64
 fi
-if [[ "$(git -C "${authoritative_root}" rev-parse dev)" != "${base_commit}" || \
-      "$(git -C "${authoritative_root}" rev-parse origin/dev)" != "${base_commit}" || \
+if [[ "$(git -C "${authoritative_root}" rev-parse dev)" != "${authorized_base_commit}" || \
+      "$(git -C "${authoritative_root}" rev-parse origin/dev)" != "${authorized_base_commit}" || \
       "$(git -C "${authoritative_root}" rev-parse main)" != "${stable_main}" ]]; then
     printf 'checkpoint 3A: authoritative refs moved from the authorized boundary\n' >&2
     exit 64
@@ -318,11 +452,13 @@ compare_builds() {
 
     diff -u --label build-a/manifest.txt --label build-b/manifest.txt \
         "${manifest_a}" "${manifest_b}" >"${report_root}/build-manifest.diff" || true
-    if [[ "${differences}" -ne 1 ]] || \
-       ! awk -F '\t' '$1 == "build/manifest.txt" && $4 == "different" {found++} END {exit found != 1}' \
+    if [[ "${differences}" -ne "${expected_build_difference_count}" ]] || \
+       ! awk -F '\t' -v path="${expected_build_difference_path}" \
+            '$1 == path && $4 == "different" {found++} END {exit found != 1}' \
             "${comparison}"; then
-        printf 'checkpoint 3A: expected only build/manifest.txt to differ; found=%s\n' \
-            "${differences}" >&2
+        printf 'checkpoint 3A: build differences=%s expected=%s path=%s\n' \
+            "${differences}" "${expected_build_difference_count}" \
+            "${expected_build_difference_path}" >&2
         exit 1
     fi
 
@@ -390,13 +526,27 @@ compare_runtime_pair() {
     local modern_normal
     local stdout_relation=different
     local context_manifest_tmp
+    local relation_inventory="${root}/cross-lineage-stdout-fields.tsv"
+    local -a classifier_args
 
     historical_exit="$(awk -F= '$1 == "exit_status" {print $2}' "${historical}/manifest.txt")"
     modern_exit="$(awk -F= '$1 == "exit_status" {print $2}' "${modern}/manifest.txt")"
     historical_normal="$(awk -F= '$1 == "normal_exit" {print $2}' "${historical}/manifest.txt")"
     modern_normal="$(awk -F= '$1 == "normal_exit" {print $2}' "${modern}/manifest.txt")"
-    if cmp -s "${historical}/stdout.txt" "${modern}/stdout.txt"; then
-        stdout_relation=exact
+    classifier_args=(
+        --mode "${expected_stdout_relation}"
+        --left "${historical}/stdout.txt"
+        --right "${modern}/stdout.txt"
+        --inventory "${relation_inventory}"
+    )
+    if [[ "${expected_stdout_relation}" == data_root_display_only ]]; then
+        classifier_args+=(
+            --left-root "${historical_data_root}"
+            --right-root "${modern_data_root}"
+        )
+    fi
+    if "${relation_classifier}" "${classifier_args[@]}" >/dev/null; then
+        stdout_relation="${expected_stdout_relation}"
     fi
 
     diff -u --label historical --label modern \
@@ -421,9 +571,10 @@ compare_runtime_pair() {
     if [[ "${historical_exit}" == 0 && "${modern_exit}" == 0 && \
           "${historical_normal}" == yes && "${modern_normal}" == yes && \
           "${stdout_relation}" == "${expected_stdout_relation}" ]]; then
-        printf '%s\t%s\t%s\t%s\t%s\t%s\texact_smoke_pass\n' \
+        printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
             "${engine}" "${historical_exit}" "${historical_normal}" \
             "${modern_exit}" "${modern_normal}" "${stdout_relation}" \
+            "${expected_smoke_result}" \
             >>"${root}/smoke-summary.tsv"
     else
         printf '%s\t%s\t%s\t%s\t%s\t%s\tunclassified\n' \
@@ -466,6 +617,9 @@ compare_runtime_lineage() {
     local relative
     local hash_left
     local hash_right
+    local relation
+    local relation_inventory
+    local changed_files=0
 
     (cd "${left}" && find . -type f -print | sed 's#^\./##' | LC_ALL=C sort) \
         >"${list_left}"
@@ -482,17 +636,38 @@ compare_runtime_lineage() {
     while IFS= read -r relative; do
         hash_left="$(hash_file "${left}/${relative}")"
         hash_right="$(hash_file "${right}/${relative}")"
+        relation=exact
         if [[ "${hash_left}" != "${hash_right}" ]]; then
-            printf '%s\t%s\t%s\tdifferent\n' \
-                "${relative}" "${hash_left}" "${hash_right}" >>"${output}"
-            printf 'checkpoint 3A: unclassified %s context difference: %s\n' \
-                "${lineage}" "${relative}" >&2
-            exit 1
+            if [[ "${expected_cross_context_relation}" != date_fields_only ]]; then
+                printf 'checkpoint 3A: unclassified %s context difference: %s\n' \
+                    "${lineage}" "${relative}" >&2
+                exit 1
+            fi
+            relation_inventory="${report_root}/runtime-${lineage}-${relative//\//_}-date-fields.tsv"
+            if ! "${relation_classifier}" \
+                --mode date_fields_only \
+                --left "${left}/${relative}" \
+                --right "${right}/${relative}" \
+                --inventory "${relation_inventory}" >/dev/null; then
+                printf 'checkpoint 3A: unclassified %s context difference: %s\n' \
+                    "${lineage}" "${relative}" >&2
+                exit 1
+            fi
+            relation=date_fields_only
+            changed_files=$((changed_files + 1))
         fi
-        printf '%s\t%s\t%s\texact\n' \
-            "${relative}" "${hash_left}" "${hash_right}" >>"${output}"
+        printf '%s\t%s\t%s\t%s\n' \
+            "${relative}" "${hash_left}" "${hash_right}" "${relation}" \
+            >>"${output}"
     done <"${list_left}"
     rm -f "${list_left}" "${list_right}"
+    if [[ "${changed_files}" -ne \
+          "${expected_cross_context_difference_files}" ]]; then
+        printf 'checkpoint 3A: %s context changed files=%s expected=%s\n' \
+            "${lineage}" "${changed_files}" \
+            "${expected_cross_context_difference_files}" >&2
+        exit 1
+    fi
 }
 
 mkdir -p "${report_root}" "${work_reports}" "${raw_root}"
@@ -500,10 +675,10 @@ cat >"${report_root}/run-context.txt" <<EOF
 evidence_label=captured
 checkpoint=${checkpoint}
 engine=${engine}
-authorized_base_commit=${base_commit}
-outputs_commit=$(git -C "${outputs_root}" rev-parse HEAD)
-authoritative_dev=${base_commit}
-authoritative_origin_dev=${base_commit}
+authorized_base_commit=${authorized_base_commit}
+outputs_commit=${resolved_capture_commit}
+authoritative_dev=${authorized_base_commit}
+authoritative_origin_dev=${authorized_base_commit}
 authoritative_main=${stable_main}
 authoritative_dirty_entries=${authoritative_dirty_entries}
 authoritative_dirty_sha256=${authoritative_dirty_sha256}
@@ -552,6 +727,27 @@ printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
     "binary SHA-256 record path: state/build-${source_short}.<suffix>/${engine}" \
     execution_metadata 1 'Build A/B direct diff' measured_volatile \
     >>"${report_root}/volatile-fields.tsv"
+if [[ "${expected_cross_context_relation}" == date_fields_only ]]; then
+    while IFS= read -r date_inventory; do
+        volatile_count="$(awk -F '\t' \
+            'NR > 1 && $5 == "execution_metadata" && \
+                $6 == "measured_volatile" {count++} END {print count + 0}' \
+            "${date_inventory}")"
+        if [[ "${volatile_count}" -gt 0 ]]; then
+            printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+                "${date_inventory#${report_root}/}" 'changed date fields' \
+                execution_metadata "${volatile_count}" \
+                'strict cross-context field inventory' measured_volatile \
+                >>"${report_root}/volatile-fields.tsv"
+        fi
+    done < <(find "${report_root}" -maxdepth 1 -type f \
+        -name 'runtime-*-date-fields.tsv' -print | LC_ALL=C sort)
+fi
+if [[ "$(awk 'END {print NR - 1}' "${report_root}/volatile-fields.tsv")" -ne \
+      "${expected_volatile_field_count}" ]]; then
+    printf 'checkpoint 3A: volatile summary count differs from registry\n' >&2
+    exit 1
+fi
 
 printf '%s\n' $'class\tartifact_or_source\tevidence\tresult' \
     >"${report_root}/protected-fields.tsv"
@@ -564,14 +760,55 @@ printf '%s\t%s\t%s\t%s\n' \
     request_input 'raw/runtime/*/{historical,modern}/input.txt' \
     'four-package direct hash comparison' exact \
     >>"${report_root}/protected-fields.tsv"
-printf '%s\t%s\t%s\t%s\n' \
-    retained_output 'raw/runtime/*/{historical,modern}/*' \
-    'historical and modern cross-context package comparisons' exact \
-    >>"${report_root}/protected-fields.tsv"
+if [[ "${expected_stdout_relation}" == exact && \
+      "${expected_cross_context_relation}" == exact ]]; then
+    printf '%s\t%s\t%s\t%s\n' \
+        retained_output 'raw/runtime/*/{historical,modern}/*' \
+        'historical and modern cross-context package comparisons' exact \
+        >>"${report_root}/protected-fields.tsv"
+else
+    printf '%s\t%s\t%s\t%s\n' \
+        sanctioned_environment_relation \
+        'raw/runtime/*/{historical,modern}/stdout.txt' \
+        'strict historical/modern field inventory' \
+        "${expected_stdout_relation}" >>"${report_root}/protected-fields.tsv"
+    printf '%s\t%s\t%s\t%s\n' \
+        retained_output 'raw/runtime/*/{historical,modern}/*' \
+        'strict cross-context field inventories' \
+        "${expected_cross_context_relation}" >>"${report_root}/protected-fields.tsv"
+    while IFS= read -r date_inventory; do
+        protected_count="$(awk -F '\t' \
+            'NR > 1 && $5 == "protected_date" && $6 == "exact" \
+                {count++} END {print count + 0}' "${date_inventory}")"
+        if [[ "${protected_count}" -gt 0 ]]; then
+            printf '%s\t%s\t%s\t%s\n' \
+                scientific_identity "${date_inventory#${report_root}/}" \
+                "${protected_count} unchanged date-shaped fields" exact \
+                >>"${report_root}/protected-fields.tsv"
+        fi
+    done < <(find "${report_root}" -maxdepth 1 -type f \
+        -name 'runtime-*-date-fields.tsv' -print | LC_ALL=C sort)
+fi
 printf '%s\t%s\t%s\t%s\n' \
     retained_artifact "raw/build-{a,b}/artifact/${engine}" \
     'Build A/B direct SHA-256' exact \
     >>"${report_root}/protected-fields.tsv"
+if [[ "$(awk 'END {print NR - 1}' "${report_root}/protected-fields.tsv")" -ne \
+      "${expected_protected_field_count}" ]]; then
+    printf 'checkpoint 3A: protected summary count differs from registry\n' >&2
+    exit 1
+fi
+
+if [[ "${expected_stdout_relation}" == exact ]]; then
+    stdout_summary='Each historical/modern stdout pair was exact.'
+else
+    stdout_summary='Each historical/modern stdout pair differed only in configured data-root display fields; no other bytes differed.'
+fi
+if [[ "${expected_cross_context_relation}" == exact ]]; then
+    context_summary='Each lineage was exact across the two effective timezone contexts.'
+else
+    context_summary='Cross-context differences were confined to measured execution-date fields; unchanged date-shaped fields remain protected scientific identity.'
+fi
 
 cat >"${report_root}/README.md" <<EOF
 # Shared Checkpoint ${checkpoint} ${engine} measurement
@@ -581,7 +818,7 @@ field classifications derived from their direct diffs. Physics review remains
 pending.
 
 This package uses the shared engine-parameterized Checkpoint 3A primitive at
-outputs commit $(git -C "${outputs_root}" rev-parse HEAD). It measures only the
+outputs commit ${resolved_capture_commit}. It measures only the
 ${engine} startup/quit control. The unchanged dev and oracle images were each
 verified to honor POSIX UTC-14 (+1400) and UTC+12 (-1200), with distinct civil
 dates, before any engine build or execution. Requested and observed contexts,
@@ -594,17 +831,13 @@ comparison. The engine files under raw/build-* and
 raw/runtime/*/{historical,modern} are unmodified captures; derived relation
 tables sit beside them. No canonical copy or normalization exists.
 
-Direct diffs found one volatile build metadata field: the random build-root
-suffix in build/manifest.txt. The executable and all other build files were
-exact. Historical and modern runtime packages were each exact across the two
-effective timezone contexts, and each historical/modern pair retained the
-exact startup/quit relation. Protected inputs were byte-identical before and
-after execution.
+Direct diffs attributed the random build-root suffix in build/manifest.txt to
+execution metadata; the executable and all other build files were exact.
+${stdout_summary} ${context_summary} Protected inputs were byte-identical before
+and after execution.
 
-This corrected package supersedes local candidate f96abae without rewriting or
-deleting that audit commit. It is a 3A measurement result, not a canonicalizer,
-Checkpoint 3B acceptance, physics approval, or Gate 1 registration of this
-package.
+This is a 3A measurement result, not a canonicalizer, Checkpoint 3B acceptance,
+physics approval, or Gate 1 registration of this package.
 EOF
 
 rm -rf "${work_reports}"
@@ -612,6 +845,29 @@ write_tree_manifest "${raw_root}" "${report_root}/raw-manifest.sha256"
 final_manifest_tmp="$(mktemp "${TMPDIR:-/tmp}/checkpoint3a-manifest.XXXXXX")"
 write_tree_manifest "${report_root}" "${final_manifest_tmp}"
 mv "${final_manifest_tmp}" "${report_root}/manifest.sha256"
+
+test "$(find "${report_root}" -type f | wc -l | tr -d ' ')" -eq \
+    "${expected_report_files}"
+test "$(find "${raw_root}" -type f | wc -l | tr -d ' ')" -eq \
+    "${expected_raw_files}"
+test "$(wc -l <"${report_root}/manifest.sha256" | tr -d ' ')" -eq \
+    "${expected_manifest_entries}"
+test "$(wc -l <"${report_root}/raw-manifest.sha256" | tr -d ' ')" -eq \
+    "${expected_raw_manifest_entries}"
+test "$(hash_file "${raw_root}/build-a/artifact/${engine}")" = \
+    "${expected_binary_sha256}"
+test "$(hash_file "${raw_root}/build-b/artifact/${engine}")" = \
+    "${expected_binary_sha256}"
+for context in "${context_slugs[@]}"; do
+    test "$(hash_file "${raw_root}/runtime/${context}/historical/input.txt")" = \
+        "${expected_input_sha256}"
+    test "$(hash_file "${raw_root}/runtime/${context}/modern/input.txt")" = \
+        "${expected_input_sha256}"
+    test "$(hash_file "${raw_root}/runtime/${context}/historical/stdout.txt")" = \
+        "${expected_historical_stdout_sha256}"
+    test "$(hash_file "${raw_root}/runtime/${context}/modern/stdout.txt")" = \
+        "${expected_modern_stdout_sha256}"
+done
 
 completed=1
 printf 'checkpoint 3A: PASS engine=%s report=%s\n' "${engine}" "${report_root}"
