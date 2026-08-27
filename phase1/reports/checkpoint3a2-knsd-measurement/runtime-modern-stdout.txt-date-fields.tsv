@@ -1,0 +1,4 @@
+line	field	left	right	class	relation
+64	date_1	8/20/13	8/20/13	protected_date	exact
+107	date_1	8/20/13	8/20/13	protected_date	exact
+108	date_1	8/28/26	8/27/26	execution_metadata	measured_volatile

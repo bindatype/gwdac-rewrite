@@ -1,0 +1,2 @@
+engine	historical_exit	historical_normal_exit	modern_exit	modern_normal_exit	stdout_relation	result
+knsd	0	yes	0	yes	data_root_display_only	completed_output_differs

@@ -1,0 +1,1 @@
+Runtime-refresh build smoke: engine=knsd status=linked manifest=/phase1/reports/runtime-refresh/knsd/build/manifest.txt

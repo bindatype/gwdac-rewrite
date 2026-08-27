@@ -1,0 +1,18 @@
+class	artifact_or_source	evidence	result
+request_input	/workspace/arndt64/KN/INPUT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/KN/PNAMP.DAT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/KN/KNSOL.USR	pre/post SHA-256	exact
+request_input	/workspace/arndt64/KN/SAID.DS	pre/post SHA-256	exact
+request_input	/workspace/arndt64/KN/NEWDAT.DAT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/kndat.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/knsol.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/knses.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/knmsg.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/pnintp.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/secpr.dat	pre/post SHA-256	exact
+request_input	raw/runtime/*/{historical,modern}/input.txt	four-package direct hash comparison	exact
+sanctioned_environment_relation	raw/runtime/*/{historical,modern}/stdout.txt	strict historical/modern field inventory	data_root_display_only
+retained_output	raw/runtime/*/{historical,modern}/*	strict cross-context field inventories	date_fields_and_hashes_only
+scientific_identity	runtime-historical-stdout.txt-date-fields.tsv	2 unchanged date-shaped fields	exact
+scientific_identity	runtime-modern-stdout.txt-date-fields.tsv	2 unchanged date-shaped fields	exact
+retained_artifact	raw/build-{a,b}/artifact/knsd	Build A/B direct SHA-256	exact

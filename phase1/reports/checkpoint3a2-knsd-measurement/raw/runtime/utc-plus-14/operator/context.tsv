@@ -1,0 +1,3 @@
+context	service	requested_tz	expected_offset	observed_timestamp	observed_date	observed_offset	container_id	image_id
+utc-plus-14	oracle	UTC-14	+1400	2026-08-28T08:40:36+1400	2026-08-28	+1400	1d8113c518dff99b28ae5860f75ed3aa0dd5eb34d8b2a269a21f882a455b20f0	sha256:3b4fab2444ac8d62efb88953eff476f8f06049b319c52f342c96d04d821aa31b
+utc-plus-14	dev	UTC-14	+1400	2026-08-28T08:40:37+1400	2026-08-28	+1400	bacfcb7242544626ba32795f1d55b944d20414989135990de9570ec020d4abac	sha256:b7863460b1b91ad79a672e0c4dbd6bbb0c788fb1318d99131be9d6ebf36b9c27

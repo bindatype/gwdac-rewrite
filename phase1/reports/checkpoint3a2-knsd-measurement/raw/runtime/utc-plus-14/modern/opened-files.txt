@@ -1,0 +1,16 @@
+/home/arndt64/KN/KNSOL.USR
+/workspace/arndt64/sdat/kndat.dat
+/workspace/arndt64/sdat/knmsg.dat
+/workspace/arndt64/sdat/knses.dat
+/workspace/arndt64/sdat/knsol.dat
+/workspace/arndt64/sdat/pnintp.dat
+/workspace/arndt64/sdat/secpr.dat
+KNSOL.USR
+NEWDAT.DAT
+PNAMP.DAT
+SAID.DS
+SAID.LOG
+SAID.PCT
+SAID.PS
+SAID.TMP
+fort.7

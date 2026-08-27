@@ -1,0 +1,19 @@
+--- historical
++++ modern
+@@ -35,11 +35,11 @@
+  NO  FN         File 
+   1  15 - PNAMP.DAT                                                   
+   2  11 - KNSOL.USR                                                   
+-  3   8 - /home/arndt64/sdat/kndat.dat                                
+-  4   1 - /home/arndt64/sdat/knsol.dat                                
+-  5   3 - /home/arndt64/sdat/knses.dat                                
+-  6   2 - /home/arndt64/sdat/knmsg.dat                                
+-  7  12 - /home/arndt64/sdat/pnintp.dat                               
++  3   8 - /workspace/arndt64/sdat/kndat.dat                           
++  4   1 - /workspace/arndt64/sdat/knsol.dat                           
++  5   3 - /workspace/arndt64/sdat/knses.dat                           
++  6   2 - /workspace/arndt64/sdat/knmsg.dat                           
++  7  12 - /workspace/arndt64/sdat/pnintp.dat                          
+   8   7 - SAID.TMP                                                    
+   9  10 - SAID.PCT                                                    
+  10  77 - SAID.DS                                                     

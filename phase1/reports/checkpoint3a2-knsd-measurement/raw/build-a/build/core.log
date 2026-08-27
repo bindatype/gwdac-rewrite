@@ -1,0 +1,3198 @@
+knsd.f:20:52:
+
+   20 |       DATA HY,HN,HE,HA,HI,HR/1HY,1HN,1HE,1HA,1HI,1HR/
+      |                                                    1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:21:67:
+
+   21 |       DATA HSGT,CHAN,DSGL,HHH,HMULT/4HSGT ,4HCHAN,4HDSGL,4H    ,4HMULT/
+      |                                                                   1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:23:67:
+
+   23 |       DATA NBLANK,XBLANK,HV,XNUT,MQUIT/4H    ,1H ,4HV   ,4H*   ,4HQUIT/
+      |                                                                   1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:24:64:
+
+   24 |       DATA NSST,HPLOT,TDMAX,LOGO,AMPL/0,4HPLOT,10000.,4HLOGO,4HAMPL/
+      |                                                                1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:25:61:
+
+   25 |       DATA HIDV/4HACM ,4HTLAB,4HPLAB,4HWCM ,4H-T  ,4HALAB,4HCSTH/
+      |                                                             1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:26:42:
+
+   26 |       DATA HID/1HA,1HT,1HP,1HW,1H-,1HL,1HC/
+      |                                          1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:27:65:
+
+   27 |       DATA HGIN,HFILL,FILL,SWAP,HETA/4HMEAS,4HFILL,1.0,4HSWAP,4HETA /
+      |                                                                 1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:42:19:
+
+   42 |     3 DTTL(J)=XBLNK
+      |                   1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 3 at (1)
+knsd.f:54:28:
+
+   54 |       CALL XCHG(TYPE(20),4HIDSX)
+      |                            1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:205:17:
+
+  205 |   410 XNORM(K)=0.
+      |                 1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 410 at (1)
+knsd.f:294:14:
+
+  294 |    37 X=X+XINC
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 37 at (1)
+knsd.f:380:19:
+
+  380 |       DO 42 N=NNS,4
+      |                   1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 42 at (1)
+knsd.f:437:19:
+
+  437 |       DO 45 IA=1,NA
+      |                   1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 45 at (1)
+knsd.f:442:14:
+
+  442 |    45 Z=Z+XINC
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 45 at (1)
+knsd.f:447:48:
+
+  447 |       IF(MTP.EQ.3.AND.H.EQ.HSGT) CALL XCHG(H,4HSGTE)
+      |                                                1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:485:19:
+
+  485 |       DO 71 IA=1,NA
+      |                   1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 71 at (1)
+knsd.f:505:14:
+
+  505 |    71 Z=Z+XINC
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 71 at (1)
+knsd.f:709:14:
+
+  709 |    80 Z=Z+XINC
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 80 at (1)
+knsd.f:784:22:
+
+  784 |       CALL XCHG(ZZ,4H UN-)
+      |                      1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:785:36:
+
+  785 |       IF(IFNX.EQ.1) CALL XCHG(ZZ,4H    )
+      |                                    1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:816:23:
+
+  816 |    60 CALL PLOT(6.,Y,2)
+      |                       1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 60 at (1)
+knsd.f:832:10:
+
+  832 |    87 Y=YY
+      |          1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 87 at (1)
+knsd.f:859:10:
+
+  859 |    83 Y=YY
+      |          1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 83 at (1)
+knsd.f:874:10:
+
+  874 |    84 Y=YY
+      |          1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 84 at (1)
+knsd.f:921:13:
+
+  921 |    88 Y=Y-.15
+      |             1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 88 at (1)
+knsd.f:1047:22:
+
+ 1047 |     4 OBSM(I,N)=OBS(I)
+      |                      1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 4 at (1)
+knsd.f:1059:18:
+
+ 1059 |       DO 5 IA=1,NA
+      |                  1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 5 at (1)
+knsd.f:1064:14:
+
+ 1064 |     5 Z=Z+XINC
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 5 at (1)
+knsd.f:1143:58:
+
+ 1143 |       DATA TNAM,TKX80,TKH80,TKA84/4HINTP,4HKX80,4HKH80,4HKA84/
+      |                                                          1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:1144:33:
+
+ 1144 |       DATA TKA85,HMODF/4HKA85,4HMODF/
+      |                                 1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:1171:62:
+
+ 1171 |     2 PL1(I,L)=((2.*EL-1.)*Z*PL1(I,L-1)-EL*PL1(I,L-2))/(EL-1.)
+      |                                                              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 2 at (1)
+knsd.f:1177:37:
+
+ 1177 |     3 TTH(N)=.5*((W1(N)+WL)**2-S0)/WT
+      |                                     1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 3 at (1)
+knsd.f:1199:18:
+
+ 1199 |       DO 8 L=1,NNL
+      |                  1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 8 at (1)
+knsd.f:1201:24:
+
+ 1201 |     8 VI(I,L,N)=VV(10+L)
+      |                        1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 8 at (1)
+knsd.f:1217:18:
+
+ 1217 |       DO 5 L=1,NNL
+      |                  1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 5 at (1)
+knsd.f:1224:15:
+
+ 1224 |     5 ZZ=ZZ*QPQ
+      |               1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 5 at (1)
+knsd.f:1244:17:
+
+ 1244 |    16 SPH(I,L)=0.
+      |                 1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 16 at (1)
+knsd.f:1273:18:
+
+ 1273 |       DO 40 J=1,NA
+      |                  1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 40 at (1)
+knsd.f:1286:19:
+
+ 1286 |       DO 41 L=1,NNL
+      |                   1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 41 at (1)
+knsd.f:1288:24:
+
+ 1288 |    41 TI(I,N,L)=TIX(N,L)
+      |                        1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 41 at (1)
+knsd.f:1304:19:
+
+ 1304 |       DO 21 L=1,NNL
+      |                   1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 21 at (1)
+knsd.f:1337:17:
+
+ 1337 |       DO 33 N=1,4
+      |                 1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 33 at (1)
+knsd.f:1375:63:
+
+ 1375 |    12 PL1(J,L)=((2.*EL-1.)*ZC*PL1(J,L-1)-EL*PL1(J,L-2))/(EL-1.)
+      |                                                               1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 12 at (1)
+knsd.f:1396:19:
+
+ 1396 |       DO 23 N=NNS,4
+      |                   1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 23 at (1)
+knsd.f:1444:18:
+
+ 1444 |    31 DO 26 J=1,NA
+      |                  1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 26 at (1)
+knsd.f:1455:13:
+
+ 1455 |    26 II=II+1
+      |             1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 26 at (1)
+knsd.f:1460:18:
+
+ 1460 |       DO 27 J=1,NA
+      |                  1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 27 at (1)
+knsd.f:1465:13:
+
+ 1465 |    27 II=II+1
+      |             1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 27 at (1)
+knsd.f:1482:9:
+
+ 1482 |      C4Hspee/
+      |         1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:1484:21:
+
+ 1484 |     1 HPEQU(J)=HPE(J)
+      |                     1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 1 at (1)
+knsd.f:1574:23:
+
+ 1574 |       CALL XCHG(HDR,4H(D) )
+      |                       1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:1575:47:
+
+ 1575 |       IF(NBT(J)-100*NLX.NE.1) CALL XCHG(HDR,4H(R) )
+      |                                               1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:1587:18:
+
+ 1587 |       DATA NBL/4H    /
+      |                  1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:1588:52:
+
+ 1588 |       DATA MP/4HPI+P,4HPI-P,4HCXS ,4HPNI1,4HPNI3,4HETAN/
+      |                                                    1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:1591:59:
+
+ 1591 |       DATA MK/4HK+P ,4HK+N ,4HK+NX,4HK0PX,4HKI=0,4HK+DC,4HK+DB/
+      |                                                           1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:1632:30:
+
+ 1632 |       DATA HY,PPWCS,NLPROD/1HY,'P11 ','D13 ','F15 ','G17 ','S11 '
+      |                              1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:1652:24:
+
+ 1652 |     4 CALL DATA1(NL,1,M)
+      |                        1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 4 at (1)
+knsd.f:1702:14:
+
+ 1702 |     3 I0=I0+10
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 3 at (1)
+knsd.f:1721:20:
+
+ 1721 |       CALL ASYMB(4HWCM ,3.0,-0.25,0.15,0.0)
+      |                    1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:1766:11:
+
+ 1766 |     7 IPN=2
+      |           1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 7 at (1)
+knsd.f:1784:14:
+
+ 1784 |     9 I0=I0+10
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 9 at (1)
+knsd.f:1795:14:
+
+ 1795 |    10 I0=I0+10
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 10 at (1)
+knsd.f:1796:19:
+
+ 1796 |     8 NPOLY=NPOLY+1
+      |                   1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 8 at (1)
+knsd.f:1856:17:
+
+ 1856 |       DO 28 K=1,8
+      |                 1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 28 at (1)
+knsd.f:1857:18:
+
+ 1857 |    28 PW(I,N,K)=0.
+      |                  1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 28 at (1)
+knsd.f:1877:23:
+
+ 1877 |    33 PW(I,MM,K)=DUM(K)
+      |                       1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 33 at (1)
+knsd.f:1939:11:
+
+ 1939 |    42 IPN=2
+      |           1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 42 at (1)
+knsd.f:2081:21:
+
+ 2081 |     4 PKIN(I)=PK(I+1)
+      |                     1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 4 at (1)
+knsd.f:2144:15:
+
+ 2144 |    11 I01=I01+2
+      |               1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 11 at (1)
+knsd.f:2280:22:
+
+ 2280 |     1 PCM(I)=A(I)+B(I)
+      |                      1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 1 at (1)
+knsd.f:2290:32:
+
+ 2290 |     2 Q(I)=A(I)+PUN(I)*(QZ-DOT1)
+      |                                1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 2 at (1)
+knsd.f:2305:17:
+
+ 2305 |     3 B(I)=A(I)/X
+      |                 1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 3 at (1)
+knsd.f:2319:35:
+
+ 2319 |       DATA NBINM,NBINA,HP/50,40,1HP/
+      |                                   1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:2397:20:
+
+ 2397 |       DO 3 M=1,NBIN2
+      |                    1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 3 at (1)
+knsd.f:2463:12:
+
+ 2463 |     5 Z=Z+DZ
+      |            1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 5 at (1)
+knsd.f:2557:21:
+
+ 2557 |       DO 14 J=1,NBIN2
+      |                     1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 14 at (1)
+knsd.f:2608:12:
+
+ 2608 |     6 X=X+DX
+      |            1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 6 at (1)
+knsd.f:2635:35:
+
+ 2635 |      1D13+,4HS11 ,4HF15-,4HF15 ,4HF15+/
+      |                                   1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:2636:37:
+
+ 2636 |       DATA AL/1HS,1HP,1HD,1HF,1HG,1HH/
+      |                                     1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:2637:49:
+
+ 2637 |       DATA IL/1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9/
+      |                                                 1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:2710:52:
+
+ 2710 |       DATA HY,HN,HE,HA,HI,HR/1HY,1HN,1HE,1HA,1HI,1HR/
+      |                                                    1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:2711:20:
+
+ 2711 |       DATA NBLNK/4H    /
+      |                    1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:2712:64:
+
+ 2712 |       DATA NSST,HPLOT,TDMAX,LOGO,AMPL/0,4HPLOT,50000.,4HLOGO,4HAMPL/
+      |                                                                1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:2713:40:
+
+ 2713 |       DATA HIDV/4HTHTA,4HTLAB,4HPLAB,4HWCM /
+      |                                        1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:2777:14:
+
+ 2777 |    37 X=X+XINC
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 37 at (1)
+knsd.f:3007:23:
+
+ 3007 |    60 CALL PLOT(6.,Y,2)
+      |                       1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 60 at (1)
+knsd.f:3016:13:
+
+ 3016 |    72 Y=Y-.15
+      |             1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 72 at (1)
+knsd.f:3039:10:
+
+ 3039 |    87 YY=Y
+      |          1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 87 at (1)
+knsd.f:3075:21:
+
+ 3075 |     5 XFIX=XFIX+XFINC
+      |                     1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 5 at (1)
+knsd.f:3097:30:
+
+ 3097 |       DATA ALL,BLNK/4HALL ,4H    /
+      |                              1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:3170:13:
+
+ 3170 |    21 II=II+1
+      |             1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 21 at (1)
+knsd.f:3249:25:
+
+ 3249 |    32 XTL(J,NEXP)=DTTL(J)
+      |                         1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 32 at (1)
+knsd.f:3258:21:
+
+ 3258 |       CALL XCHG(Z,4H ZZ()
+      |                     1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:3294:26:
+
+ 3294 |       DATA INTP,NSTART/4HINTP,0/
+      |                          1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:3330:12:
+
+ 3330 |     2 Z=Z+DE
+      |            1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 2 at (1)
+knsd.f:3354:16:
+
+ 3354 |       DO 5 N=1,4
+      |                1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 5 at (1)
+knsd.f:3411:20:
+
+ 3411 |       DATA HRESX/4HFA02/
+      |                    1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:3414:60:
+
+ 3414 |       DATA NCURS,NF2,YES,HSIG,HCURS,HC/1,3,4HY   ,4HSIG ,4HCURS,0.20/
+      |                                                            1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:3415:67:
+
+ 3415 |       DATA DINC,FRACT,HSCAL,NSCAL,NTORD,HSUM/.25,1.,4HSCAL,-1,0,4HSUM /
+      |                                                                   1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:3418:41:
+
+ 3418 |       IF(WI.GT.200.0) CALL XCHG(HRESX,4HSP92)
+      |                                         1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:3442:17:
+
+ 3442 |       DO 23 L=1,8
+      |                 1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 23 at (1)
+knsd.f:3444:18:
+
+ 3444 |    23 DLPT(L,N)=0.
+      |                  1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 23 at (1)
+knsd.f:3550:16:
+
+ 3550 |    62 DL(I,N)=0.
+      |                1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 62 at (1)
+knsd.f:3552:17:
+
+ 3552 |       DO 61 L=1,8
+      |                 1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 61 at (1)
+knsd.f:3556:18:
+
+ 3556 |    61 DLPT(L,N)=0.
+      |                  1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 61 at (1)
+knsd.f:3647:35:
+
+ 3647 |       IF(NCURS.LT.0) CALL ASYMB(4HSGMB,-.6,3.2,.2,90.)
+      |                                   1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:3648:35:
+
+ 3648 |       IF(NCURS.LT.0) CALL ASYMB(4HTLAB,2.,-0.5,.2,0.)
+      |                                   1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:3690:10:
+
+ 3690 |    74 YM=Y
+      |          1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 74 at (1)
+knsd.f:3696:22:
+
+ 3696 |    75 CALL PLOT(X,Y,2)
+      |                      1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 75 at (1)
+knsd.f:3715:22:
+
+ 3715 |    78 CALL PLOT(X,Y,2)
+      |                      1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 78 at (1)
+knsd.f:3729:16:
+
+ 3729 |       DO 6 N=1,4
+      |                1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 6 at (1)
+knsd.f:3774:11:
+
+ 3774 |    55 K=K+5
+      |           1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 55 at (1)
+knsd.f:3815:35:
+
+ 3815 |       IF(NCURS.LT.0) CALL ASYMB(4HTLAB,2.,-.6,.2,0.)
+      |                                   1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:3873:14:
+
+ 3873 |    17 Z=Z+DINC
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 17 at (1)
+knsd.f:3890:10:
+
+ 3890 |    18 YY=Y
+      |          1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 18 at (1)
+knsd.f:3905:10:
+
+ 3905 |    19 YY=Y
+      |          1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 19 at (1)
+knsd.f:3971:13:
+
+ 3971 |    82 Y=Y+0.1
+      |             1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 82 at (1)
+knsd.f:3975:13:
+
+ 3975 |    81 N0=N0+6
+      |             1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 81 at (1)
+knsd.f:3992:11:
+
+ 3992 |    15 YB=YT
+      |           1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 15 at (1)
+knsd.f:4071:24:
+
+ 4071 |       CALL XCHG(PB02,4HPB02)
+      |                        1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:4091:14:
+
+ 4091 |    21 EE=EE+DE
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 21 at (1)
+knsd.f:4219:12:
+
+ 4219 |     6 II=-II
+      |            1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 6 at (1)
+knsd.f:4271:11:
+
+ 4271 |    11 K=K+5
+      |           1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 11 at (1)
+knsd.f:4312:14:
+
+ 4312 |    13 Y=Y+0.07
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 13 at (1)
+knsd.f:4316:13:
+
+ 4316 |    12 N0=N0+6
+      |             1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 12 at (1)
+knsd.f:4317:15:
+
+ 4317 |     3 YC=YC+YBL
+      |               1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 3 at (1)
+knsd.f:4319:15:
+
+ 4319 |     2 XC=XC+XBL
+      |               1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 2 at (1)
+knsd.f:4429:15:
+
+ 4429 |     2 ZL=ZL+2.0
+      |               1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 2 at (1)
+knsd.f:4448:59:
+
+ 4448 |       DATA WPI,WN,WMX,CLSL,HSL/139.65,938.256,400.0,1.0,4HSL  /
+      |                                                           1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:4449:52:
+
+ 4449 |       DATA T1,DT,TP,TM,HY/30.0,10.0,150.0,-150.0,1HY/
+      |                                                    1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:4505:15:
+
+ 4505 |     4 AZ(J)=0.0
+      |               1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 4 at (1)
+knsd.f:4530:23:
+
+ 4530 |       CALL XCHG(HHH,4HC-L )
+      |                       1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:4531:39:
+
+ 4531 |       IF(CLSL.LT.0.0) CALL XCHG(HHH,4HS-L )
+      |                                       1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:4560:17:
+
+ 4560 |    21 PP(J,K)=0.0
+      |                 1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 21 at (1)
+knsd.f:4650:16:
+
+ 4650 |     8 Y=Y+0.5625
+      |                1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 8 at (1)
+knsd.f:4716:32:
+
+ 4716 |       IF(K.EQ.3) CALL XCHG(H,4HBORN)
+      |                                1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:4717:32:
+
+ 4717 |       IF(K.EQ.4) CALL XCHG(H,4HKoch)
+      |                                1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:4777:16:
+
+ 4777 |       DO 1 N=1,4
+      |                1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 1 at (1)
+knsd.f:4796:20:
+
+ 4796 |       DATA HMODF/4HMODF/
+      |                    1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:4861:41:
+
+ 4861 |       DATA HHR,HD,H3D,YES/1HR,1HD,1H3,1HY/
+      |                                         1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:4952:14:
+
+ 4952 |    64 AA=AA+DA
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 64 at (1)
+knsd.f:4996:12:
+
+ 4996 |    66 Z=Z+DY
+      |            1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 66 at (1)
+knsd.f:5002:21:
+
+ 5002 |    70 TITLE(J)=TL4(J)
+      |                     1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 70 at (1)
+knsd.f:5197:13:
+
+ 5197 |    45 NH=NH+1
+      |             1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 45 at (1)
+knsd.f:5275:33:
+
+ 5275 |       DATA BLANK,H1,NV/4H    ,1H1,70/
+      |                                 1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:5290:12:
+
+ 5290 |    41 Z=Z+DE
+      |            1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 41 at (1)
+knsd.f:5303:14:
+
+ 5303 |    31 TH=TH+DA
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 31 at (1)
+knsd.f:5310:36:
+
+ 5310 |    32 IF(OBS(I).LT.YMIN) YMIN=OBS(I)
+      |                                    1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 32 at (1)
+knsd.f:5323:36:
+
+ 5323 |       IF(DFXD.GT.0.0) CALL ASYMB(4HTHCM,2.0,-0.4,0.2,0.0)
+      |                                    1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:5374:12:
+
+ 5374 |    33 X=X+DX
+      |            1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 33 at (1)
+knsd.f:5387:12:
+
+ 5387 |    34 X=X+DX
+      |            1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 34 at (1)
+knsd.f:5571:46:
+
+ 5571 |       DATA BLANK,H1,HREF,HQ/4H    ,1H1,1HS,4HQ   /
+      |                                              1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:5592:20:
+
+ 5592 |       CALL ASYMB(4HTHCM,2.0,-0.4,0.2,0.0)
+      |                    1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:5593:20:
+
+ 5593 |       CALL ASYMB(4HTLAB,-0.2,2.0,0.2,90.0)
+      |                    1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:5763:23:
+
+ 5763 |     7 C=C+(OBSZ/ERX)**2
+      |                       1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 7 at (1)
+knsd.f:5853:24:
+
+ 5853 |     2 TTX(J,KJ)=TITLE(J)
+      |                        1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 2 at (1)
+knsd.f:5855:16:
+
+ 5855 |       DO 3 L=1,8
+      |                1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 3 at (1)
+knsd.f:5858:27:
+
+ 5858 |     4 PX(I,N,L,KJ)=P(I,N,L)
+      |                           1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 4 at (1)
+knsd.f:5860:28:
+
+ 5860 |     3 NFX(N,L,KJ)=NFORM(N,L)
+      |                            1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 3 at (1)
+knsd.f:5867:23:
+
+ 5867 |     5 TTX(J,2)=TITLE(J)
+      |                       1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 5 at (1)
+knsd.f:5869:16:
+
+ 5869 |       DO 6 L=1,8
+      |                1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 6 at (1)
+knsd.f:5872:26:
+
+ 5872 |     7 PX(I,N,L,2)=P(I,N,L)
+      |                          1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 7 at (1)
+knsd.f:5874:27:
+
+ 5874 |     6 NFX(N,L,2)=NFORM(N,L)
+      |                           1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 6 at (1)
+knsd.f:5886:23:
+
+ 5886 |     8 TITLE(J)=TTX(J,K)
+      |                       1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 8 at (1)
+knsd.f:5888:16:
+
+ 5888 |       DO 9 L=1,8
+      |                1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 9 at (1)
+knsd.f:5891:26:
+
+ 5891 |    10 P(I,N,L)=PX(I,N,L,K)
+      |                          1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 10 at (1)
+knsd.f:5893:27:
+
+ 5893 |     9 NFORM(N,L)=NFX(N,L,K)
+      |                           1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 9 at (1)
+knsd.f:5907:50:
+
+ 5907 |       DATA NORG,BLNK,ZNUT,HYES/0,4H    ,4H*   ,4HY   /
+      |                                                  1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:6020:18:
+
+ 6020 |       DO 33 I=1,NX
+      |                  1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 33 at (1)
+knsd.f:6027:12:
+
+ 6027 |    33 X=X+DX
+      |            1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 33 at (1)
+knsd.f:6037:12:
+
+ 6037 |    34 Y=YMAX
+      |            1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 34 at (1)
+knsd.f:6038:12:
+
+ 6038 |    35 X=XMAX
+      |            1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 35 at (1)
+knsd.f:6047:18:
+
+ 6047 |       DO 31 I=1,NX
+      |                  1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 31 at (1)
+knsd.f:6058:12:
+
+ 6058 |    31 X=X+DX
+      |            1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 31 at (1)
+knsd.f:6065:18:
+
+ 6065 |       DO 38 J=1,NY
+      |                  1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 38 at (1)
+knsd.f:6076:12:
+
+ 6076 |    38 Y=Y+DY
+      |            1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 38 at (1)
+knsd.f:6281:14:
+
+ 6281 |     2 Z=Z+10.0
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 2 at (1)
+knsd.f:6296:14:
+
+ 6296 |     4 Z=Z+25.0
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 4 at (1)
+knsd.f:6312:45:
+
+ 6312 |       DATA CC/4HPI0P,4HPI+N,4HPI-P,4HPI0N,4HALL /
+      |                                             1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:6314:40:
+
+ 6314 |       DATA TTLS/4HFA03,4HSES-,4HKH80,4HCMB /
+      |                                        1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:6318:21:
+
+ 6318 |       CALL XCHG(H,4HPR  )
+      |                     1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:6319:35:
+
+ 6319 |       IF(WI.GT.0.0) CALL XCHG(H,4HPIN )
+      |                                   1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:6320:37:
+
+ 6320 |       IF(WI.GT.200.0) CALL XCHG(H,4HKN  )
+      |                                     1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:6358:25:
+
+ 6358 |     4 NDT(NFIT,K)=ZZ+0.01
+      |                         1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 4 at (1)
+knsd.f:6367:23:
+
+ 6367 |     6 CHI2(NFIT,J,K)=ZZ
+      |                       1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 6 at (1)
+knsd.f:6368:27:
+
+ 6368 |     5 CHI2(NFIT,NRCT+1,K)=Z
+      |                           1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 5 at (1)
+knsd.f:6378:28:
+
+ 6378 |       CALL XCHG(CC(NRCT),4HALL )
+      |                            1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:6383:21:
+
+ 6383 |    15 CALL XCHG(H,4HTlab)
+      |                     1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:6384:35:
+
+ 6384 |       IF(NETP.LT.0) CALL XCHG(H,4HWcm )
+      |                                   1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:6404:17:
+
+ 6404 |       DO 16 N=1,4
+      |                 1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 16 at (1)
+knsd.f:6405:18:
+
+ 6405 |    16 CHX(K,N)=0.0
+      |                  1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 16 at (1)
+knsd.f:6411:28:
+
+ 6411 |     8 NDX(K)=NDX(K)+NDT(I,K)
+      |                            1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 8 at (1)
+knsd.f:6417:19:
+
+ 6417 |       DO 7 K=1,NRCT
+      |                   1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 7 at (1)
+knsd.f:6418:35:
+
+ 6418 |     7 CHX(K,N)=CHX(K,N)+CHI2(I,K,N)
+      |                                   1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 7 at (1)
+knsd.f:6427:28:
+
+ 6427 |    19 CHX(K,N)=CHX(K,N)/Z
+      |                            1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 19 at (1)
+knsd.f:6482:13:
+
+ 6482 |    18 X=X+0.3
+      |             1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 18 at (1)
+knsd.f:6490:21:
+
+ 6490 |       CALL XCHG(H,4HTLAB)
+      |                     1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:6491:35:
+
+ 6491 |       IF(NETP.LT.1) CALL XCHG(H,4HWCM )
+      |                                   1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:6501:21:
+
+ 6501 |       CALL XCHG(H,4HReac)
+      |                     1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:6506:21:
+
+ 6506 |       CALL XCHG(H,4HData)
+      |                     1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:6533:16:
+
+ 6533 |    24 YOFF=-YOFF
+      |                1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 24 at (1)
+knsd.f:6583:19:
+
+ 6583 |       DATA SLEE/4H S-L/
+      |                   1
+Warning: Legacy Extension: Hollerith constant at (1)
+knsd.f:6592:16:
+
+ 6592 |       DO 2 N=1,4
+      |                1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 2 at (1)
+knsd.f:6680:27:
+
+ 6680 |     8 BL=BL*(1.+(ETA/Z)**2)
+      |                           1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 8 at (1)
+knsd.f:6683:21:
+
+ 6683 |       DO 9 NN=NNM,NNP
+      |                     1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 9 at (1)
+knsd.f:6742:13:
+
+ 6742 |    12 ZZ=ZZ*Z
+      |             1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 12 at (1)
+knsd.f:6795:19:
+
+ 6795 |     9 TI(NN,LL)=TIX
+      |                   1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 9 at (1)
+knsd.f:6810:17:
+
+ 6810 |       DO 97 N=1,4
+      |                 1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 97 at (1)
+knsd.f:6831:21:
+
+ 6831 |     1 P8(J)=PM(J,1,1)
+      |                     1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 1 at (1)
+knsd.f:6842:16:
+
+ 6842 |       DO 4 L=1,2
+      |                1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 4 at (1)
+knsd.f:27:39:
+
+   27 |       DATA HGIN,HFILL,FILL,SWAP,HETA/4HMEAS,4HFILL,1.0,4HSWAP,4HETA /
+      |                                       1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:27:46:
+
+   27 |       DATA HGIN,HFILL,FILL,SWAP,HETA/4HMEAS,4HFILL,1.0,4HSWAP,4HETA /
+      |                                              1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:27:57:
+
+   27 |       DATA HGIN,HFILL,FILL,SWAP,HETA/4HMEAS,4HFILL,1.0,4HSWAP,4HETA /
+      |                                                         1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:27:64:
+
+   27 |       DATA HGIN,HFILL,FILL,SWAP,HETA/4HMEAS,4HFILL,1.0,4HSWAP,4HETA /
+      |                                                                1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:26:17:
+
+   26 |       DATA HID/1HA,1HT,1HP,1HW,1H-,1HL,1HC/
+      |                 1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:26:21:
+
+   26 |       DATA HID/1HA,1HT,1HP,1HW,1H-,1HL,1HC/
+      |                     1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:26:25:
+
+   26 |       DATA HID/1HA,1HT,1HP,1HW,1H-,1HL,1HC/
+      |                         1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:26:29:
+
+   26 |       DATA HID/1HA,1HT,1HP,1HW,1H-,1HL,1HC/
+      |                             1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:26:33:
+
+   26 |       DATA HID/1HA,1HT,1HP,1HW,1H-,1HL,1HC/
+      |                                 1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:26:37:
+
+   26 |       DATA HID/1HA,1HT,1HP,1HW,1H-,1HL,1HC/
+      |                                     1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:26:41:
+
+   26 |       DATA HID/1HA,1HT,1HP,1HW,1H-,1HL,1HC/
+      |                                         1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:25:18:
+
+   25 |       DATA HIDV/4HACM ,4HTLAB,4HPLAB,4HWCM ,4H-T  ,4HALAB,4HCSTH/
+      |                  1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:25:25:
+
+   25 |       DATA HIDV/4HACM ,4HTLAB,4HPLAB,4HWCM ,4H-T  ,4HALAB,4HCSTH/
+      |                         1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:25:32:
+
+   25 |       DATA HIDV/4HACM ,4HTLAB,4HPLAB,4HWCM ,4H-T  ,4HALAB,4HCSTH/
+      |                                1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:25:39:
+
+   25 |       DATA HIDV/4HACM ,4HTLAB,4HPLAB,4HWCM ,4H-T  ,4HALAB,4HCSTH/
+      |                                       1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:25:46:
+
+   25 |       DATA HIDV/4HACM ,4HTLAB,4HPLAB,4HWCM ,4H-T  ,4HALAB,4HCSTH/
+      |                                              1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:25:53:
+
+   25 |       DATA HIDV/4HACM ,4HTLAB,4HPLAB,4HWCM ,4H-T  ,4HALAB,4HCSTH/
+      |                                                     1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:25:60:
+
+   25 |       DATA HIDV/4HACM ,4HTLAB,4HPLAB,4HWCM ,4H-T  ,4HALAB,4HCSTH/
+      |                                                            1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:24:42:
+
+   24 |       DATA NSST,HPLOT,TDMAX,LOGO,AMPL/0,4HPLOT,10000.,4HLOGO,4HAMPL/
+      |                                          1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:24:56:
+
+   24 |       DATA NSST,HPLOT,TDMAX,LOGO,AMPL/0,4HPLOT,10000.,4HLOGO,4HAMPL/
+      |                                                        1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:24:63:
+
+   24 |       DATA NSST,HPLOT,TDMAX,LOGO,AMPL/0,4HPLOT,10000.,4HLOGO,4HAMPL/
+      |                                                               1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:23:41:
+
+   23 |       DATA NBLANK,XBLANK,HV,XNUT,MQUIT/4H    ,1H ,4HV   ,4H*   ,4HQUIT/
+      |                                         1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:23:48:
+
+   23 |       DATA NBLANK,XBLANK,HV,XNUT,MQUIT/4H    ,1H ,4HV   ,4H*   ,4HQUIT/
+      |                                                1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:23:52:
+
+   23 |       DATA NBLANK,XBLANK,HV,XNUT,MQUIT/4H    ,1H ,4HV   ,4H*   ,4HQUIT/
+      |                                                    1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:23:59:
+
+   23 |       DATA NBLANK,XBLANK,HV,XNUT,MQUIT/4H    ,1H ,4HV   ,4H*   ,4HQUIT/
+      |                                                           1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:23:66:
+
+   23 |       DATA NBLANK,XBLANK,HV,XNUT,MQUIT/4H    ,1H ,4HV   ,4H*   ,4HQUIT/
+      |                                                                  1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:21:38:
+
+   21 |       DATA HSGT,CHAN,DSGL,HHH,HMULT/4HSGT ,4HCHAN,4HDSGL,4H    ,4HMULT/
+      |                                      1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:21:45:
+
+   21 |       DATA HSGT,CHAN,DSGL,HHH,HMULT/4HSGT ,4HCHAN,4HDSGL,4H    ,4HMULT/
+      |                                             1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:21:52:
+
+   21 |       DATA HSGT,CHAN,DSGL,HHH,HMULT/4HSGT ,4HCHAN,4HDSGL,4H    ,4HMULT/
+      |                                                    1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:21:59:
+
+   21 |       DATA HSGT,CHAN,DSGL,HHH,HMULT/4HSGT ,4HCHAN,4HDSGL,4H    ,4HMULT/
+      |                                                           1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:21:66:
+
+   21 |       DATA HSGT,CHAN,DSGL,HHH,HMULT/4HSGT ,4HCHAN,4HDSGL,4H    ,4HMULT/
+      |                                                                  1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:20:31:
+
+   20 |       DATA HY,HN,HE,HA,HI,HR/1HY,1HN,1HE,1HA,1HI,1HR/
+      |                               1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:20:35:
+
+   20 |       DATA HY,HN,HE,HA,HI,HR/1HY,1HN,1HE,1HA,1HI,1HR/
+      |                                   1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:20:39:
+
+   20 |       DATA HY,HN,HE,HA,HI,HR/1HY,1HN,1HE,1HA,1HI,1HR/
+      |                                       1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:20:43:
+
+   20 |       DATA HY,HN,HE,HA,HI,HR/1HY,1HN,1HE,1HA,1HI,1HR/
+      |                                           1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:20:47:
+
+   20 |       DATA HY,HN,HE,HA,HI,HR/1HY,1HN,1HE,1HA,1HI,1HR/
+      |                                               1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:20:51:
+
+   20 |       DATA HY,HN,HE,HA,HI,HR/1HY,1HN,1HE,1HA,1HI,1HR/
+      |                                                   1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1476:17:
+
+ 1476 |       DATA HPE/4HGO1 ,4HBEGI,4Hbegi,4HGO2 ,4HSOLU,4Hsolu,4HGO3 ,4HKINE,
+      |                 1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1476:24:
+
+ 1476 |       DATA HPE/4HGO1 ,4HBEGI,4Hbegi,4HGO2 ,4HSOLU,4Hsolu,4HGO3 ,4HKINE,
+      |                        1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1476:31:
+
+ 1476 |       DATA HPE/4HGO1 ,4HBEGI,4Hbegi,4HGO2 ,4HSOLU,4Hsolu,4HGO3 ,4HKINE,
+      |                               1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1476:38:
+
+ 1476 |       DATA HPE/4HGO1 ,4HBEGI,4Hbegi,4HGO2 ,4HSOLU,4Hsolu,4HGO3 ,4HKINE,
+      |                                      1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1476:45:
+
+ 1476 |       DATA HPE/4HGO1 ,4HBEGI,4Hbegi,4HGO2 ,4HSOLU,4Hsolu,4HGO3 ,4HKINE,
+      |                                             1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1476:52:
+
+ 1476 |       DATA HPE/4HGO1 ,4HBEGI,4Hbegi,4HGO2 ,4HSOLU,4Hsolu,4HGO3 ,4HKINE,
+      |                                                    1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1476:59:
+
+ 1476 |       DATA HPE/4HGO1 ,4HBEGI,4Hbegi,4HGO2 ,4HSOLU,4Hsolu,4HGO3 ,4HKINE,
+      |                                                           1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1476:66:
+
+ 1476 |       DATA HPE/4HGO1 ,4HBEGI,4Hbegi,4HGO2 ,4HSOLU,4Hsolu,4HGO3 ,4HKINE,
+      |                                                                  1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1477:8:
+
+ 1477 |      C4Hkine,4HGO4 ,4HOBSE,4Hobse,4HGO5 ,4HCHI2,4Hchi2,4HGO6 ,4HSAMP,
+      |        1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1477:15:
+
+ 1477 |      C4Hkine,4HGO4 ,4HOBSE,4Hobse,4HGO5 ,4HCHI2,4Hchi2,4HGO6 ,4HSAMP,
+      |               1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1477:22:
+
+ 1477 |      C4Hkine,4HGO4 ,4HOBSE,4Hobse,4HGO5 ,4HCHI2,4Hchi2,4HGO6 ,4HSAMP,
+      |                      1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1477:29:
+
+ 1477 |      C4Hkine,4HGO4 ,4HOBSE,4Hobse,4HGO5 ,4HCHI2,4Hchi2,4HGO6 ,4HSAMP,
+      |                             1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1477:36:
+
+ 1477 |      C4Hkine,4HGO4 ,4HOBSE,4Hobse,4HGO5 ,4HCHI2,4Hchi2,4HGO6 ,4HSAMP,
+      |                                    1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1477:43:
+
+ 1477 |      C4Hkine,4HGO4 ,4HOBSE,4Hobse,4HGO5 ,4HCHI2,4Hchi2,4HGO6 ,4HSAMP,
+      |                                           1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1477:50:
+
+ 1477 |      C4Hkine,4HGO4 ,4HOBSE,4Hobse,4HGO5 ,4HCHI2,4Hchi2,4HGO6 ,4HSAMP,
+      |                                                  1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1477:57:
+
+ 1477 |      C4Hkine,4HGO4 ,4HOBSE,4Hobse,4HGO5 ,4HCHI2,4Hchi2,4HGO6 ,4HSAMP,
+      |                                                         1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1477:64:
+
+ 1477 |      C4Hkine,4HGO4 ,4HOBSE,4Hobse,4HGO5 ,4HCHI2,4Hchi2,4HGO6 ,4HSAMP,
+      |                                                                1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1478:8:
+
+ 1478 |      C4Hsamp,4HGO7 ,4HPWAM,4Hpwam,4HGO8 ,4HPLAN,4Hplan,4HGO11,4HDBAS,
+      |        1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1478:15:
+
+ 1478 |      C4Hsamp,4HGO7 ,4HPWAM,4Hpwam,4HGO8 ,4HPLAN,4Hplan,4HGO11,4HDBAS,
+      |               1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1478:22:
+
+ 1478 |      C4Hsamp,4HGO7 ,4HPWAM,4Hpwam,4HGO8 ,4HPLAN,4Hplan,4HGO11,4HDBAS,
+      |                      1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1478:29:
+
+ 1478 |      C4Hsamp,4HGO7 ,4HPWAM,4Hpwam,4HGO8 ,4HPLAN,4Hplan,4HGO11,4HDBAS,
+      |                             1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1478:36:
+
+ 1478 |      C4Hsamp,4HGO7 ,4HPWAM,4Hpwam,4HGO8 ,4HPLAN,4Hplan,4HGO11,4HDBAS,
+      |                                    1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1478:43:
+
+ 1478 |      C4Hsamp,4HGO7 ,4HPWAM,4Hpwam,4HGO8 ,4HPLAN,4Hplan,4HGO11,4HDBAS,
+      |                                           1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1478:50:
+
+ 1478 |      C4Hsamp,4HGO7 ,4HPWAM,4Hpwam,4HGO8 ,4HPLAN,4Hplan,4HGO11,4HDBAS,
+      |                                                  1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1478:57:
+
+ 1478 |      C4Hsamp,4HGO7 ,4HPWAM,4Hpwam,4HGO8 ,4HPLAN,4Hplan,4HGO11,4HDBAS,
+      |                                                         1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1478:64:
+
+ 1478 |      C4Hsamp,4HGO7 ,4HPWAM,4Hpwam,4HGO8 ,4HPLAN,4Hplan,4HGO11,4HDBAS,
+      |                                                                1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1479:8:
+
+ 1479 |      C4Hdbas,4HGO14,4HCORR,4Hcorr,4HGO15,4HINTE,4Hinte,4HGO20,4HCONV,
+      |        1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1479:15:
+
+ 1479 |      C4Hdbas,4HGO14,4HCORR,4Hcorr,4HGO15,4HINTE,4Hinte,4HGO20,4HCONV,
+      |               1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1479:22:
+
+ 1479 |      C4Hdbas,4HGO14,4HCORR,4Hcorr,4HGO15,4HINTE,4Hinte,4HGO20,4HCONV,
+      |                      1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1479:29:
+
+ 1479 |      C4Hdbas,4HGO14,4HCORR,4Hcorr,4HGO15,4HINTE,4Hinte,4HGO20,4HCONV,
+      |                             1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1479:36:
+
+ 1479 |      C4Hdbas,4HGO14,4HCORR,4Hcorr,4HGO15,4HINTE,4Hinte,4HGO20,4HCONV,
+      |                                    1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1479:43:
+
+ 1479 |      C4Hdbas,4HGO14,4HCORR,4Hcorr,4HGO15,4HINTE,4Hinte,4HGO20,4HCONV,
+      |                                           1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1479:50:
+
+ 1479 |      C4Hdbas,4HGO14,4HCORR,4Hcorr,4HGO15,4HINTE,4Hinte,4HGO20,4HCONV,
+      |                                                  1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1479:57:
+
+ 1479 |      C4Hdbas,4HGO14,4HCORR,4Hcorr,4HGO15,4HINTE,4Hinte,4HGO20,4HCONV,
+      |                                                         1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1479:64:
+
+ 1479 |      C4Hdbas,4HGO14,4HCORR,4Hcorr,4HGO15,4HINTE,4Hinte,4HGO20,4HCONV,
+      |                                                                1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1480:8:
+
+ 1480 |      C4Hconv,4HGO25,4HPROD,4Hprod,4HGO30,4HMOVI,4Hmovi,4H?   ,4HHELP,
+      |        1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1480:15:
+
+ 1480 |      C4Hconv,4HGO25,4HPROD,4Hprod,4HGO30,4HMOVI,4Hmovi,4H?   ,4HHELP,
+      |               1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1480:22:
+
+ 1480 |      C4Hconv,4HGO25,4HPROD,4Hprod,4HGO30,4HMOVI,4Hmovi,4H?   ,4HHELP,
+      |                      1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1480:29:
+
+ 1480 |      C4Hconv,4HGO25,4HPROD,4Hprod,4HGO30,4HMOVI,4Hmovi,4H?   ,4HHELP,
+      |                             1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1480:36:
+
+ 1480 |      C4Hconv,4HGO25,4HPROD,4Hprod,4HGO30,4HMOVI,4Hmovi,4H?   ,4HHELP,
+      |                                    1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1480:43:
+
+ 1480 |      C4Hconv,4HGO25,4HPROD,4Hprod,4HGO30,4HMOVI,4Hmovi,4H?   ,4HHELP,
+      |                                           1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1480:50:
+
+ 1480 |      C4Hconv,4HGO25,4HPROD,4Hprod,4HGO30,4HMOVI,4Hmovi,4H?   ,4HHELP,
+      |                                                  1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1480:57:
+
+ 1480 |      C4Hconv,4HGO25,4HPROD,4Hprod,4HGO30,4HMOVI,4Hmovi,4H?   ,4HHELP,
+      |                                                         1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1480:64:
+
+ 1480 |      C4Hconv,4HGO25,4HPROD,4Hprod,4HGO30,4HMOVI,4Hmovi,4H?   ,4HHELP,
+      |                                                                1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1481:8:
+
+ 1481 |      C4Hhelp,4HGO99,4HSTOP,4Hstop,4HGO60,4HCONP,4Hconp,4HGO29,4HSPEE,
+      |        1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1481:15:
+
+ 1481 |      C4Hhelp,4HGO99,4HSTOP,4Hstop,4HGO60,4HCONP,4Hconp,4HGO29,4HSPEE,
+      |               1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1481:22:
+
+ 1481 |      C4Hhelp,4HGO99,4HSTOP,4Hstop,4HGO60,4HCONP,4Hconp,4HGO29,4HSPEE,
+      |                      1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1481:29:
+
+ 1481 |      C4Hhelp,4HGO99,4HSTOP,4Hstop,4HGO60,4HCONP,4Hconp,4HGO29,4HSPEE,
+      |                             1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1481:36:
+
+ 1481 |      C4Hhelp,4HGO99,4HSTOP,4Hstop,4HGO60,4HCONP,4Hconp,4HGO29,4HSPEE,
+      |                                    1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1481:43:
+
+ 1481 |      C4Hhelp,4HGO99,4HSTOP,4Hstop,4HGO60,4HCONP,4Hconp,4HGO29,4HSPEE,
+      |                                           1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1481:50:
+
+ 1481 |      C4Hhelp,4HGO99,4HSTOP,4Hstop,4HGO60,4HCONP,4Hconp,4HGO29,4HSPEE,
+      |                                                  1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1481:57:
+
+ 1481 |      C4Hhelp,4HGO99,4HSTOP,4Hstop,4HGO60,4HCONP,4Hconp,4HGO29,4HSPEE,
+      |                                                         1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1481:64:
+
+ 1481 |      C4Hhelp,4HGO99,4HSTOP,4Hstop,4HGO60,4HCONP,4Hconp,4HGO29,4HSPEE,
+      |                                                                1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1482:8:
+
+ 1482 |      C4Hspee/
+      |        1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1591:16:
+
+ 1591 |       DATA MK/4HK+P ,4HK+N ,4HK+NX,4HK0PX,4HKI=0,4HK+DC,4HK+DB/
+      |                1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:1591:23:
+
+ 1591 |       DATA MK/4HK+P ,4HK+N ,4HK+NX,4HK0PX,4HKI=0,4HK+DC,4HK+DB/
+      |                       1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:1591:30:
+
+ 1591 |       DATA MK/4HK+P ,4HK+N ,4HK+NX,4HK0PX,4HKI=0,4HK+DC,4HK+DB/
+      |                              1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:1591:37:
+
+ 1591 |       DATA MK/4HK+P ,4HK+N ,4HK+NX,4HK0PX,4HKI=0,4HK+DC,4HK+DB/
+      |                                     1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:1591:44:
+
+ 1591 |       DATA MK/4HK+P ,4HK+N ,4HK+NX,4HK0PX,4HKI=0,4HK+DC,4HK+DB/
+      |                                            1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:1591:51:
+
+ 1591 |       DATA MK/4HK+P ,4HK+N ,4HK+NX,4HK0PX,4HKI=0,4HK+DC,4HK+DB/
+      |                                                   1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:1591:58:
+
+ 1591 |       DATA MK/4HK+P ,4HK+N ,4HK+NX,4HK0PX,4HKI=0,4HK+DC,4HK+DB/
+      |                                                          1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:1588:16:
+
+ 1588 |       DATA MP/4HPI+P,4HPI-P,4HCXS ,4HPNI1,4HPNI3,4HETAN/
+      |                1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:1588:23:
+
+ 1588 |       DATA MP/4HPI+P,4HPI-P,4HCXS ,4HPNI1,4HPNI3,4HETAN/
+      |                       1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:1588:30:
+
+ 1588 |       DATA MP/4HPI+P,4HPI-P,4HCXS ,4HPNI1,4HPNI3,4HETAN/
+      |                              1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:1588:37:
+
+ 1588 |       DATA MP/4HPI+P,4HPI-P,4HCXS ,4HPNI1,4HPNI3,4HETAN/
+      |                                     1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:1588:44:
+
+ 1588 |       DATA MP/4HPI+P,4HPI-P,4HCXS ,4HPNI1,4HPNI3,4HETAN/
+      |                                            1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:1588:51:
+
+ 1588 |       DATA MP/4HPI+P,4HPI-P,4HCXS ,4HPNI1,4HPNI3,4HETAN/
+      |                                                   1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:1587:17:
+
+ 1587 |       DATA NBL/4H    /
+      |                 1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:4861:28:
+
+ 4861 |       DATA HHR,HD,H3D,YES/1HR,1HD,1H3,1HY/
+      |                            1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:4861:32:
+
+ 4861 |       DATA HHR,HD,H3D,YES/1HR,1HD,1H3,1HY/
+      |                                1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:4861:36:
+
+ 4861 |       DATA HHR,HD,H3D,YES/1HR,1HD,1H3,1HY/
+      |                                    1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:4861:40:
+
+ 4861 |       DATA HHR,HD,H3D,YES/1HR,1HD,1H3,1HY/
+      |                                        1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1144:25:
+
+ 1144 |       DATA TKA85,HMODF/4HKA85,4HMODF/
+      |                         1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1144:32:
+
+ 1144 |       DATA TKA85,HMODF/4HKA85,4HMODF/
+      |                                1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1143:36:
+
+ 1143 |       DATA TNAM,TKX80,TKH80,TKA84/4HINTP,4HKX80,4HKH80,4HKA84/
+      |                                    1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1143:43:
+
+ 1143 |       DATA TNAM,TKX80,TKH80,TKA84/4HINTP,4HKX80,4HKH80,4HKA84/
+      |                                           1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1143:50:
+
+ 1143 |       DATA TNAM,TKX80,TKH80,TKA84/4HINTP,4HKX80,4HKH80,4HKA84/
+      |                                                  1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:1143:57:
+
+ 1143 |       DATA TNAM,TKX80,TKH80,TKA84/4HINTP,4HKX80,4HKH80,4HKA84/
+      |                                                         1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:6583:18:
+
+ 6583 |       DATA SLEE/4H S-L/
+      |                  1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:5907:35:
+
+ 5907 |       DATA NORG,BLNK,ZNUT,HYES/0,4H    ,4H*   ,4HY   /
+      |                                   1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:5907:42:
+
+ 5907 |       DATA NORG,BLNK,ZNUT,HYES/0,4H    ,4H*   ,4HY   /
+      |                                          1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:5907:49:
+
+ 5907 |       DATA NORG,BLNK,ZNUT,HYES/0,4H    ,4H*   ,4HY   /
+      |                                                 1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:5571:30:
+
+ 5571 |       DATA BLANK,H1,HREF,HQ/4H    ,1H1,1HS,4HQ   /
+      |                              1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:5571:37:
+
+ 5571 |       DATA BLANK,H1,HREF,HQ/4H    ,1H1,1HS,4HQ   /
+      |                                     1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:5571:41:
+
+ 5571 |       DATA BLANK,H1,HREF,HQ/4H    ,1H1,1HS,4HQ   /
+      |                                         1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:5571:45:
+
+ 5571 |       DATA BLANK,H1,HREF,HQ/4H    ,1H1,1HS,4HQ   /
+      |                                             1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:5275:25:
+
+ 5275 |       DATA BLANK,H1,NV/4H    ,1H1,70/
+      |                         1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:5275:32:
+
+ 5275 |       DATA BLANK,H1,NV/4H    ,1H1,70/
+      |                                1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:4796:19:
+
+ 4796 |       DATA HMODF/4HMODF/
+      |                   1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:4449:51:
+
+ 4449 |       DATA T1,DT,TP,TM,HY/30.0,10.0,150.0,-150.0,1HY/
+      |                                                   1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:4448:58:
+
+ 4448 |       DATA WPI,WN,WMX,CLSL,HSL/139.65,938.256,400.0,1.0,4HSL  /
+      |                                                          1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:3415:54:
+
+ 3415 |       DATA DINC,FRACT,HSCAL,NSCAL,NTORD,HSUM/.25,1.,4HSCAL,-1,0,4HSUM /
+      |                                                      1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:3415:66:
+
+ 3415 |       DATA DINC,FRACT,HSCAL,NSCAL,NTORD,HSUM/.25,1.,4HSCAL,-1,0,4HSUM /
+      |                                                                  1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:3414:45:
+
+ 3414 |       DATA NCURS,NF2,YES,HSIG,HCURS,HC/1,3,4HY   ,4HSIG ,4HCURS,0.20/
+      |                                             1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:3414:52:
+
+ 3414 |       DATA NCURS,NF2,YES,HSIG,HCURS,HC/1,3,4HY   ,4HSIG ,4HCURS,0.20/
+      |                                                    1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:3414:59:
+
+ 3414 |       DATA NCURS,NF2,YES,HSIG,HCURS,HC/1,3,4HY   ,4HSIG ,4HCURS,0.20/
+      |                                                           1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:3411:19:
+
+ 3411 |       DATA HRESX/4HFA02/
+      |                   1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:6314:18:
+
+ 6314 |       DATA TTLS/4HFA03,4HSES-,4HKH80,4HCMB /
+      |                  1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:6314:25:
+
+ 6314 |       DATA TTLS/4HFA03,4HSES-,4HKH80,4HCMB /
+      |                         1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:6314:32:
+
+ 6314 |       DATA TTLS/4HFA03,4HSES-,4HKH80,4HCMB /
+      |                                1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:6314:39:
+
+ 6314 |       DATA TTLS/4HFA03,4HSES-,4HKH80,4HCMB /
+      |                                       1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:6312:16:
+
+ 6312 |       DATA CC/4HPI0P,4HPI+N,4HPI-P,4HPI0N,4HALL /
+      |                1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:6312:23:
+
+ 6312 |       DATA CC/4HPI0P,4HPI+N,4HPI-P,4HPI0N,4HALL /
+      |                       1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:6312:30:
+
+ 6312 |       DATA CC/4HPI0P,4HPI+N,4HPI-P,4HPI0N,4HALL /
+      |                              1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:6312:37:
+
+ 6312 |       DATA CC/4HPI0P,4HPI+N,4HPI-P,4HPI0N,4HALL /
+      |                                     1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:6312:44:
+
+ 6312 |       DATA CC/4HPI0P,4HPI+N,4HPI-P,4HPI0N,4HALL /
+      |                                            1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:3097:22:
+
+ 3097 |       DATA ALL,BLNK/4HALL ,4H    /
+      |                      1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:3097:29:
+
+ 3097 |       DATA ALL,BLNK/4HALL ,4H    /
+      |                             1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:3294:25:
+
+ 3294 |       DATA INTP,NSTART/4HINTP,0/
+      |                         1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:1632:29:
+
+ 1632 |       DATA HY,PPWCS,NLPROD/1HY,'P11 ','D13 ','F15 ','G17 ','S11 '
+      |                             1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2637:16:
+
+ 2637 |       DATA IL/1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9/
+      |                1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2637:20:
+
+ 2637 |       DATA IL/1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9/
+      |                    1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2637:24:
+
+ 2637 |       DATA IL/1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9/
+      |                        1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2637:28:
+
+ 2637 |       DATA IL/1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9/
+      |                            1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2637:32:
+
+ 2637 |       DATA IL/1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9/
+      |                                1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2637:36:
+
+ 2637 |       DATA IL/1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9/
+      |                                    1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2637:40:
+
+ 2637 |       DATA IL/1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9/
+      |                                        1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2637:44:
+
+ 2637 |       DATA IL/1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9/
+      |                                            1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2637:48:
+
+ 2637 |       DATA IL/1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9/
+      |                                                1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2636:16:
+
+ 2636 |       DATA AL/1HS,1HP,1HD,1HF,1HG,1HH/
+      |                1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2636:20:
+
+ 2636 |       DATA AL/1HS,1HP,1HD,1HF,1HG,1HH/
+      |                    1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2636:24:
+
+ 2636 |       DATA AL/1HS,1HP,1HD,1HF,1HG,1HH/
+      |                        1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2636:28:
+
+ 2636 |       DATA AL/1HS,1HP,1HD,1HF,1HG,1HH/
+      |                            1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2636:32:
+
+ 2636 |       DATA AL/1HS,1HP,1HD,1HF,1HG,1HH/
+      |                                1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2636:36:
+
+ 2636 |       DATA AL/1HS,1HP,1HD,1HF,1HG,1HH/
+      |                                    1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2634:16:
+
+ 2634 |       DATA IS/4HDL- ,4HDL+ ,4HR3- ,4HR3+ ,4HR1  ,4HEPS ,4HP11 ,4HD13-,4H
+      |                1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2634:23:
+
+ 2634 |       DATA IS/4HDL- ,4HDL+ ,4HR3- ,4HR3+ ,4HR1  ,4HEPS ,4HP11 ,4HD13-,4H
+      |                       1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2634:30:
+
+ 2634 |       DATA IS/4HDL- ,4HDL+ ,4HR3- ,4HR3+ ,4HR1  ,4HEPS ,4HP11 ,4HD13-,4H
+      |                              1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2634:37:
+
+ 2634 |       DATA IS/4HDL- ,4HDL+ ,4HR3- ,4HR3+ ,4HR1  ,4HEPS ,4HP11 ,4HD13-,4H
+      |                                     1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2634:44:
+
+ 2634 |       DATA IS/4HDL- ,4HDL+ ,4HR3- ,4HR3+ ,4HR1  ,4HEPS ,4HP11 ,4HD13-,4H
+      |                                            1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2634:51:
+
+ 2634 |       DATA IS/4HDL- ,4HDL+ ,4HR3- ,4HR3+ ,4HR1  ,4HEPS ,4HP11 ,4HD13-,4H
+      |                                                   1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2634:58:
+
+ 2634 |       DATA IS/4HDL- ,4HDL+ ,4HR3- ,4HR3+ ,4HR1  ,4HEPS ,4HP11 ,4HD13-,4H
+      |                                                          1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2634:65:
+
+ 2634 |       DATA IS/4HDL- ,4HDL+ ,4HR3- ,4HR3+ ,4HR1  ,4HEPS ,4HP11 ,4HD13-,4H
+      |                                                                 1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2634:72:
+
+ 2634 |       DATA IS/4HDL- ,4HDL+ ,4HR3- ,4HR3+ ,4HR1  ,4HEPS ,4HP11 ,4HD13-,4H
+      |                                                                        1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2635:13:
+
+ 2635 |      1D13+,4HS11 ,4HF15-,4HF15 ,4HF15+/
+      |             1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2635:20:
+
+ 2635 |      1D13+,4HS11 ,4HF15-,4HF15 ,4HF15+/
+      |                    1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2635:27:
+
+ 2635 |      1D13+,4HS11 ,4HF15-,4HF15 ,4HF15+/
+      |                           1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2635:34:
+
+ 2635 |      1D13+,4HS11 ,4HF15-,4HF15 ,4HF15+/
+      |                                  1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2319:34:
+
+ 2319 |       DATA NBINM,NBINA,HP/50,40,1HP/
+      |                                  1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2713:18:
+
+ 2713 |       DATA HIDV/4HTHTA,4HTLAB,4HPLAB,4HWCM /
+      |                  1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2713:25:
+
+ 2713 |       DATA HIDV/4HTHTA,4HTLAB,4HPLAB,4HWCM /
+      |                         1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2713:32:
+
+ 2713 |       DATA HIDV/4HTHTA,4HTLAB,4HPLAB,4HWCM /
+      |                                1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2713:39:
+
+ 2713 |       DATA HIDV/4HTHTA,4HTLAB,4HPLAB,4HWCM /
+      |                                       1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2712:42:
+
+ 2712 |       DATA NSST,HPLOT,TDMAX,LOGO,AMPL/0,4HPLOT,50000.,4HLOGO,4HAMPL/
+      |                                          1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2712:56:
+
+ 2712 |       DATA NSST,HPLOT,TDMAX,LOGO,AMPL/0,4HPLOT,50000.,4HLOGO,4HAMPL/
+      |                                                        1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2712:63:
+
+ 2712 |       DATA NSST,HPLOT,TDMAX,LOGO,AMPL/0,4HPLOT,50000.,4HLOGO,4HAMPL/
+      |                                                               1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2711:19:
+
+ 2711 |       DATA NBLNK/4H    /
+      |                   1
+Warning: Extension: Conversion from HOLLERITH to INTEGER(4) at (1)
+knsd.f:2710:31:
+
+ 2710 |       DATA HY,HN,HE,HA,HI,HR/1HY,1HN,1HE,1HA,1HI,1HR/
+      |                               1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2710:35:
+
+ 2710 |       DATA HY,HN,HE,HA,HI,HR/1HY,1HN,1HE,1HA,1HI,1HR/
+      |                                   1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2710:39:
+
+ 2710 |       DATA HY,HN,HE,HA,HI,HR/1HY,1HN,1HE,1HA,1HI,1HR/
+      |                                       1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2710:43:
+
+ 2710 |       DATA HY,HN,HE,HA,HI,HR/1HY,1HN,1HE,1HA,1HI,1HR/
+      |                                           1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2710:47:
+
+ 2710 |       DATA HY,HN,HE,HA,HI,HR/1HY,1HN,1HE,1HA,1HI,1HR/
+      |                                               1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2710:51:
+
+ 2710 |       DATA HY,HN,HE,HA,HI,HR/1HY,1HN,1HE,1HA,1HI,1HR/
+      |                                                   1
+Warning: Extension: Conversion from HOLLERITH to REAL(4) at (1)
+knsd.f:2721:17:
+
+ 1028 |       CALL DATA1(NIT,7,MTRN)
+      |                 2
+......
+ 2721 |       CALL DATA1(H,-11,MTRN)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+knsd.f:2733:17:
+
+ 1028 |       CALL DATA1(NIT,7,MTRN)
+      |                 2
+......
+ 2733 |       CALL DATA1(MTP,1,MTRN)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+knsd.f:2938:21:
+
+ 1428 |       CALL DATA3(Z,1,P1C,1,P2C,1,MTRN)
+      |                     2
+......
+ 2938 |       CALL DATA3(T,1,NDX,1,ZERR,1,M)
+      |                     1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+knsd.f:2953:16:
+
+ 2740 |       CALL XCHG(HPP,MTTL(MTP))
+      |                2
+......
+ 2953 |       CALL XCHG(INPT(J),XHA(J))
+      |                1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+knsd.f:2953:24:
+
+ 2740 |       CALL XCHG(HPP,MTTL(MTP))
+      |                    2    
+......
+ 2953 |       CALL XCHG(INPT(J),XHA(J))
+      |                        1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+knsd.f:3012:28:
+
+ 2974 |       CALL SYMBOL(-.6,-.2,.1,TTL,0.,9)
+      |                             2
+......
+ 3012 |       CALL SYMBOL(6.,4.1,.1,'  DATA',0.,5)
+      |                            1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(6)/REAL(4)).
+knsd.f:1643:17:
+
+ 1428 |       CALL DATA3(Z,1,P1C,1,P2C,1,MTRN)
+      |                 2
+......
+ 1643 |       CALL DATA3(IWPR(I),1,NPWE,1,NPW,1,M)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+knsd.f:1643:34:
+
+ 1428 |       CALL DATA3(Z,1,P1C,1,P2C,1,MTRN)
+      |                           2       
+......
+ 1643 |       CALL DATA3(IWPR(I),1,NPWE,1,NPW,1,M)
+      |                                  1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+knsd.f:1652:17:
+
+ 1028 |       CALL DATA1(NIT,7,MTRN)
+      |                 2
+......
+ 1652 |     4 CALL DATA1(NL,1,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+knsd.f:1708:17:
+
+ 1028 |       CALL DATA1(NIT,7,MTRN)
+      |                 2
+......
+ 1708 |       CALL DATA1(N,1,MTRN)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+knsd.f:1753:28:
+
+ 1753 |       IF(N.EQ.1) CALL ASYMB('PI-P',0.5,3.0,0.4,0.0)
+      |                            1
+......
+ 2977 |       CALL ASYMB(HIND,1.6,-0.3,0.15,0.0)
+      |                 2           
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(4)/REAL(4)).
+knsd.f:1861:17:
+
+ 1861 |       CALL DATA2(NX,1,DUM,8,M)
+      |                 1
+......
+ 2855 |       CALL DATA2(XFYMN,1,XFYMX,1,MTRN)
+      |                 2
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+knsd.f:1861:22:
+
+ 1861 |       CALL DATA2(NX,1,DUM,8,M)
+      |                      1
+......
+ 2855 |       CALL DATA2(XFYMN,1,XFYMX,1,MTRN)
+      |                         2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+knsd.f:1887:48:
+
+ 1887 |       CALL LABEL(M,MM,PWNAM(1,N),PWNAM(2,N),LEL)
+      |                                                1
+Warning: Type mismatch in argument 'l1' at (1); passed REAL(4) to INTEGER(4)
+knsd.f:1887:48:
+
+ 1887 |       CALL LABEL(M,MM,PWNAM(1,N),PWNAM(2,N),LEL)
+      |                                                1
+Warning: Type mismatch in argument 'l2' at (1); passed REAL(4) to INTEGER(4)
+knsd.f:2019:17:
+
+ 1028 |       CALL DATA1(NIT,7,MTRN)
+      |                 2
+......
+ 2019 |       CALL DATA1(NCH,1,NGO)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+knsd.f:2365:25:
+
+ 2365 |       CALL DATA2(NBINM,1,NBINA,1,NGO)
+      |                         1
+......
+ 2855 |       CALL DATA2(XFYMN,1,XFYMX,1,MTRN)
+      |                         2
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+knsd.f:2381:17:
+
+ 1028 |       CALL DATA1(NIT,7,MTRN)
+      |                 2
+......
+ 2381 |       CALL DATA1(NVX,1,NGO)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+knsd.f:3318:17:
+
+ 1028 |       CALL DATA1(NIT,7,MTRN)
+      |                 2
+......
+ 3318 |       CALL DATA1(NAME,-14,MTRN)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+knsd.f:3103:24:
+
+ 2894 |       CALL PNRDH(8,DTTL,MTTL,TYPE,FASE,EE,WI,WT,M)
+      |                        2
+......
+ 3103 |       CALL PNRDH(8,DTTL,RTP,TYP,DUM,EE,WI,WT,N)
+      |                        1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+knsd.f:3134:17:
+
+ 1028 |       CALL DATA1(NIT,7,MTRN)
+      |                 2
+......
+ 3134 |       CALL DATA1(IR,1,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+knsd.f:3202:40:
+
+ 2902 |       CALL PNRDX(NTP,T,ITX,MT,NDX,ZX,ZERR,INPT,MMO,MMY,XEX,M)
+      |                                          2
+......
+ 3202 |       CALL PNRDX(NTP,T,IT,IP,ND,ZX,ZERR,DTTL,MMO,MMY,DUM,N)
+      |                                        1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+knsd.f:6342:17:
+
+ 1028 |       CALL DATA1(NIT,7,MTRN)
+      |                 2
+......
+ 6342 |       CALL DATA1(NRCT,1,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+knsd.f:6344:17:
+
+ 1028 |       CALL DATA1(NIT,7,MTRN)
+      |                 2
+......
+ 6344 |       CALL DATA1(NSOL,1,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+knsd.f:6440:17:
+
+ 1028 |       CALL DATA1(NIT,7,MTRN)
+      |                 2
+......
+ 6440 |       CALL DATA1(IC,1,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+knsd.f:4099:17:
+
+ 1028 |       CALL DATA1(NIT,7,MTRN)
+      |                 2
+......
+ 4099 |       CALL DATA1(LMIN,1,MTRN)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+knsd.f:4115:17:
+
+ 1028 |       CALL DATA1(NIT,7,MTRN)
+      |                 2
+......
+ 4115 |       CALL DATA1(LMAX,1,MTRN)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+knsd.f:4315:27:
+
+ 2974 |       CALL SYMBOL(-.6,-.2,.1,TTL,0.,9)
+      |                             2
+......
+ 4315 |       CALL SYMBOL(X,Y,0.11,HRESX,0.0,1)
+      |                           1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+knsd.f:3493:17:
+
+ 1833 |       CALL DATA4(IW,1,NPWE,1,NPW,1,THTX(I),1,M)
+      |                 2
+......
+ 3493 |       CALL DATA4(T1,1,TMAX,1,PWZ,1,Z,1,MTRN)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+knsd.f:3493:22:
+
+ 1833 |       CALL DATA4(IW,1,NPWE,1,NPW,1,THTX(I),1,M)
+      |                      2
+......
+ 3493 |       CALL DATA4(T1,1,TMAX,1,PWZ,1,Z,1,MTRN)
+      |                      1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+knsd.f:3493:29:
+
+ 1833 |       CALL DATA4(IW,1,NPWE,1,NPW,1,THTX(I),1,M)
+      |                             2
+......
+ 3493 |       CALL DATA4(T1,1,TMAX,1,PWZ,1,Z,1,MTRN)
+      |                             1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+knsd.f:3974:32:
+
+ 2974 |       CALL SYMBOL(-.6,-.2,.1,TTL,0.,9)
+      |                             2   
+......
+ 3974 |       CALL SYMBOL(X-0.05,Y,0.11,HRESX,0.0,1)
+      |                                1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+knsd.f:4378:33:
+
+ 1833 |       CALL DATA4(IW,1,NPWE,1,NPW,1,THTX(I),1,M)
+      |                                   2
+......
+ 4378 |       CALL DATA4(NSL,1,E1,1,E2,1,LMX,1,MTRN)
+      |                                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+knsd.f:4890:17:
+
+ 1028 |       CALL DATA1(NIT,7,MTRN)
+      |                 2
+......
+ 4890 |       CALL DATA1(KSOL,1,MTRN)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+knsd.f:4923:17:
+
+ 1028 |       CALL DATA1(NIT,7,MTRN)
+      |                 2
+......
+ 4923 |       CALL DATA1(IR,1,MTRN)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+knsd.f:5417:46:
+
+ 2902 |       CALL PNRDX(NTP,T,ITX,MT,NDX,ZX,ZERR,INPT,MMO,MMY,XEX,M)
+      |                                               2
+......
+ 5417 |     3 CALL PNRDX(NTP,T,IT,IPP,NDX,ZX,ZERR,TTX,TTX(13),H,XEX,M)
+      |                                              1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+knsd.f:5417:54:
+
+ 2902 |       CALL PNRDX(NTP,T,ITX,MT,NDX,ZX,ZERR,INPT,MMO,MMY,XEX,M)
+      |                                                   2   
+......
+ 5417 |     3 CALL PNRDX(NTP,T,IT,IPP,NDX,ZX,ZERR,TTX,TTX(13),H,XEX,M)
+      |                                                      1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+knsd.f:6590:61:
+
+ 6590 |       IF(TITLE(2).EQ.SLEE) CALL PWMODLEES(TLB,TRZ,TIZ,PM,LMX)
+      |                                                             1
+Warning: More actual than formal arguments in procedure call at (1)
+knsd.f:223:17:
+
+  223 |       CALL DATA1(MTP,1,MTRN)
+      |                 1
+......
+ 1028 |       CALL DATA1(NIT,7,MTRN)
+      |                 2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:7632:11:
+
+ 7631 |    10 DO 20 L=1,8
+      |                 2
+ 7632 |    20 ISYM(L)=IPW(NN,L)
+      |           1
+Warning: Array reference at (1) out of bounds (8 > 2) in loop beginning at (2)
+pn1.f:4970:32-43:
+
+ 4970 |       WRITE(CSTR,155) TED,(INPT(K),K=11,72),(INPTX(K),K=1,10)
+      |                                1          2
+Warning: Array reference at (1) out of bounds (72 > 70) in loop beginning at (2)
+pn1.f:3367:36:
+
+ 3367 |       DL=YINT(W,WINT,TRINT(1,NN,LL),-1.,NTINT,NMX,MMX,1,PINT,Z)
+      |                                    1
+Warning: Rank mismatch in argument 'e' at (1) (rank-1 and scalar)
+pn1.f:3368:36:
+
+ 3368 |       SR=YINT(W,WINT,TIINT(1,NN,LL),-.1,NTINT,NMX,MMX,1,PINT,Z)
+      |                                    1
+Warning: Rank mismatch in argument 'e' at (1) (rank-1 and scalar)
+pn1.f:3550:18:
+
+ 3550 |       call ebacpn(title,e(ie),nl,trx,tix)
+      |                  1
+Warning: Rank mismatch in argument 'ttl1' at (1) (scalar and rank-1)
+pn1.f:4969:16:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2
+......
+ 4969 |       CALL XCHG(TED,4HSES-)
+      |                1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:5100:17:
+
+ 4955 |       CALL DATA1(X,-14,MTRN)
+      |                 2
+......
+ 5100 |       CALL DATA1(TITLE,-184,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pn1.f:5101:36:
+
+ 4955 |       CALL DATA1(X,-14,MTRN)
+      |                 2                   
+......
+ 5101 |       IF(TITLE(1).EQ.HV) CALL DATA1(TITLE,-184,M)
+      |                                    1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pn1.f:5168:23:
+
+ 4976 |       CALL DATA2(NL,1,YZ,4,M)
+      |                      2 
+......
+ 5168 |       CALL DATA2(NMX,1,MMX,1,MTRN)
+      |                       1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pn1.f:5192:17:
+
+ 4955 |       CALL DATA1(X,-14,MTRN)
+      |                 2
+......
+ 5192 |       CALL DATA1(WINT,60,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pn1.f:5237:17:
+
+ 4955 |       CALL DATA1(X,-14,MTRN)
+      |                 2
+......
+ 5237 |       CALL DATA1(LMX,1,M)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pn1.f:5253:17:
+
+ 4955 |       CALL DATA1(X,-14,MTRN)
+      |                 2
+......
+ 5253 |       CALL DATA1(ERMTX,NMX,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pn1.f:5307:17:
+
+ 4976 |       CALL DATA2(NL,1,YZ,4,M)
+      |                 2
+......
+ 5307 |       CALL DATA2(ZR,1,ZI,1,MTRN)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+pn1.f:5307:22:
+
+ 4976 |       CALL DATA2(NL,1,YZ,4,M)
+      |                      2
+......
+ 5307 |       CALL DATA2(ZR,1,ZI,1,MTRN)
+      |                      1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:5410:16:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2
+......
+ 5410 |       CALL XCHG(H1,4HBBBB)
+      |                1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:5411:28:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2            
+......
+ 5411 |       IF(K.GT.10) CALL XCHG(H1,4HRRRR)
+      |                            1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:5412:16:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2
+......
+ 5412 |       CALL XCHG(HP1,4Hpi  )
+      |                1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:5413:47:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2                               
+......
+ 5413 |       IF(K.EQ.3.OR.K.EQ.5.OR.K.EQ.8) CALL XCHG(HP1,4HDlta)
+      |                                               1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:5414:37:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2                     
+......
+ 5414 |       IF(K.EQ.6.OR.K.EQ.9) CALL XCHG(HP1,4Hrho )
+      |                                     1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:5415:28:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2            
+......
+ 5415 |       IF(K.EQ.10) CALL XCHG(HP1,4Heta )
+      |                            1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:5417:27:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2           
+......
+ 5417 |       IF(K.EQ.2) CALL XCHG(HP2,4HDlta)
+      |                           1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:5418:27:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2           
+......
+ 5418 |       IF(K.GT.3) CALL XCHG(HP2,4Hrho )
+      |                           1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:5419:27:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2           
+......
+ 5419 |       IF(K.GT.6) CALL XCHG(HP2,4Heta )
+      |                           1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:5424:16:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2
+......
+ 5424 |       CALL XCHG(H1,4HMass)
+      |                1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:5425:39:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2                       
+......
+ 5425 |       IF(K.EQ.12.or.K.EQ.17) CALL XCHG(H1,4Hpi  )
+      |                                       1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:5426:39:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2                       
+......
+ 5426 |       IF(K.EQ.13.OR.K.EQ.18) CALL XCHG(H1,4HDlta)
+      |                                       1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:5427:39:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2                       
+......
+ 5427 |       IF(K.EQ.14.OR.K.EQ.19) CALL XCHG(H1,4Hrho )
+      |                                       1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:5428:39:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2                       
+......
+ 5428 |       IF(K.EQ.15.OR.K.EQ.20) CALL XCHG(H1,4Heta )
+      |                                       1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:3779:19:
+
+ 3779 |       call mainzpn(title,tlb,nl,trx,tix)
+      |                   1
+Warning: Rank mismatch in argument 'ttl' at (1) (scalar and rank-1)
+pn1.f:3780:18:
+
+ 3780 |       call ebacpn(title,tlb,nl,trx,tix)
+      |                  1
+Warning: Rank mismatch in argument 'ttl1' at (1) (scalar and rank-1)
+pn1.f:3781:19:
+
+ 3781 |       call juelich(title,tlb,nl,trx,tix)
+      |                   1
+Warning: Rank mismatch in argument 'ttl1' at (1) (scalar and rank-1)
+pn1.f:3782:19:
+
+ 3782 |       call giesspn(title,tlb,nl,trx,tix)
+      |                   1
+Warning: Rank mismatch in argument 'ttl' at (1) (scalar and rank-1)
+pn1.f:3783:16:
+
+ 3783 |       call bgpn(title,tlb,nl,trx,tix)
+      |                1
+Warning: Rank mismatch in argument 'ttl1' at (1) (scalar and rank-1)
+pn1.f:5665:19:
+
+ 5665 |       CALL BINT(NI,PI,XX,XX,1,YINT)
+      |                   1
+Warning: Actual argument contains too few elements for dummy argument 'pi' (2/30) at (1)
+pn1.f:5665:30:
+
+ 5665 |       CALL BINT(NI,PI,XX,XX,1,YINT)
+      |                              1
+Warning: Rank mismatch in argument 'b' at (1) (rank-1 and scalar)
+pn1.f:5688:19:
+
+ 5688 |       CALL BINT(NI,PI,XX,X(KK),NMX,DPZ)
+      |                   1
+Warning: Actual argument contains too few elements for dummy argument 'pi' (2/30) at (1)
+pn1.f:2422:17:
+
+ 2422 |       CALL DATA1(TTL,-154,M)
+      |                 1
+......
+ 4955 |       CALL DATA1(X,-14,MTRN)
+      |                 2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pn1.f:2426:17:
+
+ 2426 |       CALL DATA3(WMN,1,DW,1,WMX,1,M)
+      |                 1
+......
+ 5141 |       CALL DATA3(NTINT,1,PINT,2,WINT,NTINT,M)
+      |                 2
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+pn1.f:2426:23:
+
+ 2426 |       CALL DATA3(WMN,1,DW,1,WMX,1,M)
+      |                       1
+......
+ 5141 |       CALL DATA3(NTINT,1,PINT,2,WINT,NTINT,M)
+      |                         2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:2426:28:
+
+ 2426 |       CALL DATA3(WMN,1,DW,1,WMX,1,M)
+      |                            1
+......
+ 5141 |       CALL DATA3(NTINT,1,PINT,2,WINT,NTINT,M)
+      |                                2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:3851:22:
+
+ 3851 |       CALL DATA3(W0,1,DW,1,Z,1,M)
+      |                      1
+......
+ 5141 |       CALL DATA3(NTINT,1,PINT,2,WINT,NTINT,M)
+      |                         2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:3851:27:
+
+ 3851 |       CALL DATA3(W0,1,DW,1,Z,1,M)
+      |                           1
+......
+ 5141 |       CALL DATA3(NTINT,1,PINT,2,WINT,NTINT,M)
+      |                                2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:2810:38:
+
+ 2810 |       CALL CMRHO(WRL,WIM,WC,WSE,0.,LE,RR,RI)
+      |                                      1
+Warning: Actual argument contains too few elements for dummy argument 'cr' (10/20) at (1)
+pn1.f:2810:41:
+
+ 2810 |       CALL CMRHO(WRL,WIM,WC,WSE,0.,LE,RR,RI)
+      |                                         1
+Warning: Actual argument contains too few elements for dummy argument 'ci' (10/20) at (1)
+pn1.f:7229:22:
+
+ 5141 |       CALL DATA3(NTINT,1,PINT,2,WINT,NTINT,M)
+      |                         2
+......
+ 7229 |       CALL DATA3(WM,1,WP,1,WIM,1,NGO)
+      |                      1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:7229:27:
+
+ 5141 |       CALL DATA3(NTINT,1,PINT,2,WINT,NTINT,M)
+      |                                2
+......
+ 7229 |       CALL DATA3(WM,1,WP,1,WIM,1,NGO)
+      |                           1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:7314:28:
+
+ 7244 |       CALL SYMBOL(0.2,1.8,0.15,'    0',0.0,5)
+      |                               2
+......
+ 7314 |       CALL SYMBOL(XX,Y,0.15,SRX,0.0,4)
+      |                            1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/CHARACTER(*)).
+pn1.f:7333:25:
+
+ 7333 |       CALL PWSYM(N,L,HPW)
+      |                         1
+Warning: Type mismatch in argument 'isym' at (1); passed REAL(4) to INTEGER(4)
+pn1.f:7405:17:
+
+ 7272 |       CALL ASYMB(4HREW ,3.0,0.2,0.16,0.0)
+      |                 2
+......
+ 7405 |       CALL ASYMB(HPW,0.6,YRES+0.10,0.13,0.0)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/HOLLERITH).
+pn1.f:7672:24:
+
+ 5141 |       CALL DATA3(NTINT,1,PINT,2,WINT,NTINT,M)
+      |                         2
+......
+ 7672 |       CALL DATA3(WMIN,1,DW,1,WMAX,1,MTRN)
+      |                        1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:7672:29:
+
+ 5141 |       CALL DATA3(NTINT,1,PINT,2,WINT,NTINT,M)
+      |                                2
+......
+ 7672 |       CALL DATA3(WMIN,1,DW,1,WMAX,1,MTRN)
+      |                             1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:142:25:
+
+  142 |       CALL DATA4(NTINT,1,Z,1,Z,1,DUM,NTINT,M)
+      |                         1
+......
+ 5223 |       CALL DATA4(N,1,L,1,NFX,1,DUM,30,M)
+      |                     2    
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+pn1.f:142:29:
+
+  142 |       CALL DATA4(NTINT,1,Z,1,Z,1,DUM,NTINT,M)
+      |                             1
+......
+ 5223 |       CALL DATA4(N,1,L,1,NFX,1,DUM,30,M)
+      |                         2    
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+pn1.f:242:16:
+
+  242 |       CALL XCHG(HPP,4HPI-N)
+      |                1
+......
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:243:31:
+
+  243 |       IF(WI.GT.200.) CALL XCHG(HPP,4HK+N )
+      |                               1
+......
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2               
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:245:29:
+
+  245 |       IF(MTP.NE.0) CALL XCHG(HPP,MTTL(MTP))
+      |                             1
+......
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2             
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:245:33:
+
+  245 |       IF(MTP.NE.0) CALL XCHG(HPP,MTTL(MTP))
+      |                                 1
+......
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                     2            
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/HOLLERITH).
+pn1.f:255:24:
+
+  255 |       CALL DATA3(TMIN,1,DT,1,TMAX,1,MTRN)
+      |                        1
+......
+ 5141 |       CALL DATA3(NTINT,1,PINT,2,WINT,NTINT,M)
+      |                         2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:255:29:
+
+  255 |       CALL DATA3(TMIN,1,DT,1,TMAX,1,MTRN)
+      |                             1
+......
+ 5141 |       CALL DATA3(NTINT,1,PINT,2,WINT,NTINT,M)
+      |                                2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:742:17:
+
+  742 |       CALL DATA4(R,1,GT,1,WR,1,B,1,MTRN)
+      |                 1
+......
+ 5223 |       CALL DATA4(N,1,L,1,NFX,1,DUM,30,M)
+      |                 2
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+pn1.f:742:31:
+
+  742 |       CALL DATA4(R,1,GT,1,WR,1,B,1,MTRN)
+      |                               1
+......
+ 5223 |       CALL DATA4(N,1,L,1,NFX,1,DUM,30,M)
+      |                               2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:781:23:
+
+  781 |       CALL DATA2(DLM,1,DLP,1,MTRN)
+      |                       1
+......
+ 4976 |       CALL DATA2(NL,1,YZ,4,M)
+      |                      2 
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:808:21:
+
+  808 |       CALL GETBWP(NE,E,TR(1,NN,LL),TI(1,NN,LL),WRES,GT,R)
+      |                     1
+Warning: Actual argument contains too few elements for dummy argument 'e' (70/100) at (1)
+pn1.f:1115:21:
+
+ 1115 |       CALL GETBWP(NE,E,TPR,TPI,WRES,GT,R)
+      |                     1
+Warning: Actual argument contains too few elements for dummy argument 'e' (70/100) at (1)
+pn1.f:1634:16:
+
+ 1634 |       CALL XCHG(HTP,4HTlab)
+      |                1
+......
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:1635:29:
+
+ 1635 |       IF(IDV.EQ.4) CALL XCHG(HTP,4HWcm )
+      |                             1
+......
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2             
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:1640:24:
+
+ 1640 |       CALL DATA3(TMIN,1,DT,1,TMAX,1,MTRN)
+      |                        1
+......
+ 5141 |       CALL DATA3(NTINT,1,PINT,2,WINT,NTINT,M)
+      |                         2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:1640:29:
+
+ 1640 |       CALL DATA3(TMIN,1,DT,1,TMAX,1,MTRN)
+      |                             1
+......
+ 5141 |       CALL DATA3(NTINT,1,PINT,2,WINT,NTINT,M)
+      |                                2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:1780:16:
+
+ 1780 |       CALL XCHG(HPP,4HPiN )
+      |                1
+......
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:1830:24:
+
+ 1830 |       CALL DATA2(TIMN,1,TIMX,1,MTRN)
+      |                        1
+......
+ 4976 |       CALL DATA2(NL,1,YZ,4,M)
+      |                      2  
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:1941:23:
+
+ 1941 |       CALL DATA2(DLM,1,DLP,1,MTRN)
+      |                       1
+......
+ 4976 |       CALL DATA2(NL,1,YZ,4,M)
+      |                      2 
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:2178:16:
+
+ 2178 |       CALL XCHG(H,4HB   )
+      |                1
+......
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:2179:30:
+
+ 2179 |       IF(NKRF.EQ.2) CALL XCHG(H,4HR1  )
+      |                              1
+......
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2              
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:2180:30:
+
+ 2180 |       IF(NKRF.EQ.3) CALL XCHG(H,4HR2  )
+      |                              1
+......
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2              
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:5989:16:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2
+......
+ 5989 |       CALL XCHG(HHH,MTTL(MTP))
+      |                1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:6006:21:
+
+ 5141 |       CALL DATA3(NTINT,1,PINT,2,WINT,NTINT,M)
+      |                         2
+......
+ 6006 |       CALL DATA3(T,1,NA,1,XERR,1,M)
+      |                     1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pn1.f:6006:26:
+
+ 5141 |       CALL DATA3(NTINT,1,PINT,2,WINT,NTINT,M)
+      |                                2
+......
+ 6006 |       CALL DATA3(T,1,NA,1,XERR,1,M)
+      |                          1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:6014:17:
+
+ 4955 |       CALL DATA1(X,-14,MTRN)
+      |                 2
+......
+ 6014 |       CALL DATA1(XEX,NN,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pn1.f:6068:16:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2
+......
+ 6068 |       CALL XCHG(THCS,4HAcm )
+      |                1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:6069:30:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2              
+......
+ 6069 |       IF(ICOS.EQ.1) CALL XCHG(THCS,4HCos )
+      |                              1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:6088:36:
+
+ 5223 |       CALL DATA4(N,1,L,1,NFX,1,DUM,30,M)
+      |                               2     
+......
+ 6088 |       CALL DATA4(AMIN,1,DA,1,AMAX,1,ERRC,1,MTRN)
+      |                                    1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:6170:30:
+
+ 3309 |       CALL XCHG(TTLX,4HKA84)
+      |                2              
+......
+ 6170 |    23 IF(H.EQ.SENS) CALL XCHG(HHH,MTTL(IP))
+      |                              1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:6442:24:
+
+ 6149 |       CALL PNRDH(8,DTTL,MTTL,TYPE,FASE,EE,WI,WT,M)
+      |                        2
+......
+ 6442 |       CALL PNRDH(8,DTTL,RTP,TYP,DUM,EE,WI,WT,N)
+      |                        1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+pn1.f:6491:38:
+
+ 5223 |       CALL DATA4(N,1,L,1,NFX,1,DUM,30,M)
+      |                               2       
+......
+ 6491 |       CALL DATA4(TMIN,1,TMAX,1,AMIN,1,AMAX,1,M)
+      |                                      1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:6819:23:
+
+ 4976 |       CALL DATA2(NL,1,YZ,4,M)
+      |                      2 
+......
+ 6819 |       CALL DATA2(SEX,1,SRX,1,M)
+      |                       1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:6825:24:
+
+ 4976 |       CALL DATA2(NL,1,YZ,4,M)
+      |                      2  
+......
+ 6825 |       CALL DATA2(ERRF,1,ERRP,1,M)
+      |                        1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:6832:24:
+
+ 4976 |       CALL DATA2(NL,1,YZ,4,M)
+      |                      2  
+......
+ 6832 |       CALL DATA2(TMN0,1,TMX0,1,M)
+      |                        1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn1.f:6878:40:
+
+ 6155 |       CALL PNRDX(NTP,T,IT,IP,NA,ZX,XERR,INPT,MMOX,MMYX,XEX,M)
+      |                                        2
+......
+ 6878 |       CALL PNRDX(8,T,ITX,MT,NDX,ZX,ZERR,TTL,MMO,MMYX,DUM,N)
+      |                                        1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+pn2.f:94:17:
+
+   47 |       CALL DATA1(N,1,MTRN)
+      |                 2
+......
+   94 |       CALL DATA1(XYR,-14,MTRN)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+pn2.f:114:17:
+
+   37 |       CALL DATA2(EMIN,1,EMAX,1,MTRN)
+      |                 2
+......
+  114 |       CALL DATA2(NYI,1,NYF,1,MTRN)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pn2.f:114:23:
+
+   37 |       CALL DATA2(EMIN,1,EMAX,1,MTRN)
+      |                        2
+......
+  114 |       CALL DATA2(NYI,1,NYF,1,MTRN)
+      |                       1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pn2.f:3506:17:
+
+   47 |       CALL DATA1(N,1,MTRN)
+      |                 2
+......
+ 3506 |       CALL DATA1(NPS,7,MTRN)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pn2.f:1470:62:
+
+ 1470 |   420 CALL SMPSN2 (FUNCIJ,ZLIMIT,PKL,PKU,IDWF,CNVG,NDIV,CV,ND,F,4)
+      |                                                              1
+Warning: Actual argument contains too few elements for dummy argument 'z' (4/10) at (1)
+pn2.f:865:31:
+
+  842 |       CALL SYMBOL(0.9,Y+1.5,0.15,TTL,90.0,4)
+      |                                 2
+......
+  865 |       CALL SYMBOL(3.35,1.0,0.3,'#w',0.0,2)
+      |                               1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(2)/REAL(4)).
+pn2.f:437:41:
+
+  169 |       CALL PNRDX(NTP,T,ITP,MTP,NDX,ZX,ZERR,INPT,MMO,MMY,XEX,N)
+      |                                           2
+......
+  437 |       CALL PNRDX(8,T,ITP,MTP,NDX,ZX,ZERR,INPT,MMO,MMY,XEX,N)
+      |                                         1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn2.f:688:44:
+
+  169 |       CALL PNRDX(NTP,T,ITP,MTP,NDX,ZX,ZERR,INPT,MMO,MMY,XEX,N)
+      |                                           2 
+......
+  688 |     3 CALL PNRDX(NDTP,T,ITP,MTP,NDX,ZX,ZERR,TTX,MMO,MMY,XEX,M)
+      |                                            1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+pn2.f:697:16:
+
+  297 |       CALL XCHG(HPP,MTTL(MTP))
+      |                2
+......
+  697 |       CALL XCHG(IFCSTR,TTX(3))
+      |                1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+pn2.f:697:23:
+
+  297 |       CALL XCHG(HPP,MTTL(MTP))
+      |                    2   
+......
+  697 |       CALL XCHG(IFCSTR,TTX(3))
+      |                       1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+pn2.f:2248:17:
+
+ 2210 |       CALL ASYMB(4HTLAB,2.3,-0.4,0.22,0.0)
+      |                 2
+......
+ 2248 |       CALL ASYMB(FASE(LL,NN),-0.8,3.2,0.3,0.0)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/HOLLERITH).
+pn2.f:2970:39:
+
+ 2970 |       IF(IC.EQ.88) CALL RESIN(NL,WC,TT,PR,WMIN,DXDW,TMN,DYDT)
+      |                                       1
+Warning: Actual argument contains too few elements for dummy argument 'pr' (7/8) at (1)
+pn2.f:3672:17:
+
+   47 |       CALL DATA1(N,1,MTRN)
+      |                 2
+......
+ 3672 |       CALL DATA1(NLPW,8,MTRN)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pn2.f:3995:21:
+
+   37 |       CALL DATA2(EMIN,1,EMAX,1,MTRN)
+      |                        2
+......
+ 3995 |       CALL DATA2(Z,1,PRES,4,MTRN)
+      |                     1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+pn2.f:4107:43:
+
+  842 |       CALL SYMBOL(0.9,Y+1.5,0.15,TTL,90.0,4)
+      |                                 2          
+......
+ 4107 |       IF(NA.EQ.1) CALL SYMBOL(0.4,3.5,0.15,4H dP ,0.0,4)
+      |                                           1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn2.f:4108:43:
+
+  842 |       CALL SYMBOL(0.9,Y+1.5,0.15,TTL,90.0,4)
+      |                                 2          
+......
+ 4108 |       IF(NA.GT.1) CALL SYMBOL(0.4,3.5,0.15,4HWCM ,0.0,4)
+      |                                           1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+pn2.f:4309:21:
+
+ 4309 |       CALL PIUNIT(W8,P8,TR8,TI8)
+      |                     1
+Warning: Actual argument contains too few elements for dummy argument 'parain' (10/20) at (1)
+pnu.f:4337:10:
+
+ 4326 |       DO 7 I=2,NDIM
+      |                   2
+......
+ 4337 |       AUX(I)=.5*AUX(I-1)+P*SM
+      |          1
+Warning: Array reference at (1) out of bounds (2 > 1) in loop beginning at (2)
+pnu.f:3628:42:
+
+ 3628 |       IF(EQ.NE.0.) CALL COUL(EQ,E,WI,WT,A,F,F(2),G)
+      |                                          1
+Warning: Rank mismatch in argument 'fr' at (1) (scalar and rank-1)
+pnu.f:3628:49:
+
+ 3628 |       IF(EQ.NE.0.) CALL COUL(EQ,E,WI,WT,A,F,F(2),G)
+      |                                                 1
+Warning: Rank mismatch in argument 'gr' at (1) (scalar and rank-1)
+pnu.f:1615:39:
+
+ 1615 |       CALL GETT3(WRL,WSE,NL,IR,CCR,CCI,P,TRL,TIM,DR,DI)
+      |                                       1
+Warning: Actual argument contains too few elements for dummy argument 'p' (30/50) at (1)
+pnu.f:1620:39:
+
+ 1620 |       CALL GETT4(WRL,WSE,NL,IR,CCR,CCI,P,TRL,TIM,DR,DI)
+      |                                       1
+Warning: Actual argument contains too few elements for dummy argument 'p' (30/50) at (1)
+pnu.f:1627:40:
+
+ 1627 |       CALL GETT5(WRL,WSE,NLX,IR,CCR,CCI,P,TRL,TIM,DR,DI)
+      |                                        1
+Warning: Actual argument contains too few elements for dummy argument 'p' (30/50) at (1)
+pnu.f:3591:30:
+
+ 3591 |       CALL KHAMP(E,90.,F,G,IR,NT)
+      |                              1
+Warning: Rank mismatch in argument 'ntitl' at (1) (scalar and rank-1)
+pnu.f:2194:45:
+
+ 2194 |       IF(NAME.EQ.KB84) CALL PNAMPK(E,0,TR,TI,NKA)
+      |                                             1
+Warning: Actual argument contains too few elements for dummy argument 'nt' (13/18) at (1)
+pnu.f:2195:54:
+
+ 2195 |       IF(NAME.EQ.KB95) CALL PNAMP2(E,-1.0,0,TR,TI,F,G,NTSM)
+      |                                                      1
+Warning: Actual argument contains too few elements for dummy argument 'ntl' (13/18) at (1)
+pnu.f:2196:54:
+
+ 2196 |       IF(NAME.EQ.KC95) CALL PNAMP2(E,-1.0,0,TR,TI,F,G,NTSM)
+      |                                                      1
+Warning: Actual argument contains too few elements for dummy argument 'ntl' (13/18) at (1)
+pnu.f:2249:48:
+
+ 2249 |     1 IF(NAME.EQ.KB84) CALL PNAMPK(TLB,IR,TR,TI,NKA)
+      |                                                1
+Warning: Actual argument contains too few elements for dummy argument 'nt' (13/18) at (1)
+pnu.f:2250:57:
+
+ 2250 |       IF(NAME.EQ.KB95) CALL PNAMP2(TLB,-1.0,IR,TR,TI,F,G,NTSM)
+      |                                                         1
+Warning: Actual argument contains too few elements for dummy argument 'ntl' (13/18) at (1)
+pnu.f:2251:57:
+
+ 2251 |       IF(NAME.EQ.KC95) CALL PNAMP2(TLB,-1.0,IR,TR,TI,F,G,NTSM)
+      |                                                         1
+Warning: Actual argument contains too few elements for dummy argument 'ntl' (13/18) at (1)
+pnu.f:1332:44:
+
+ 1332 |    50 IF(E.GT.TKARL) CALL PNAMPK(E,IR,TR,TI,NKH)
+      |                                            1
+Warning: Actual argument contains too few elements for dummy argument 'nt' (13/18) at (1)
+pnu.f:1369:30:
+
+ 1369 |       CALL PNAMPK(EX,IR,TR,TI,NKH)
+      |                              1
+Warning: Actual argument contains too few elements for dummy argument 'nt' (13/18) at (1)
+pnu.f:1420:47:
+
+ 1420 |       IF(NAME.EQ.KVPI) CALL PNAMPK(EX,IR,TR,TI,NKH)
+      |                                               1
+Warning: Actual argument contains too few elements for dummy argument 'nt' (13/18) at (1)
+pnu.f:533:42:
+
+  533 |       IF(EQ.NE.0.) CALL COUL(EQ,E,WI,WT,A,F,F(2),G)
+      |                                          1
+Warning: Rank mismatch in argument 'fr' at (1) (scalar and rank-1)
+pnu.f:533:49:
+
+  533 |       IF(EQ.NE.0.) CALL COUL(EQ,E,WI,WT,A,F,F(2),G)
+      |                                                 1
+Warning: Rank mismatch in argument 'gr' at (1) (scalar and rank-1)
+pnu.f:1054:44:
+
+ 1054 |    50 IF(E.GT.TKARL) CALL PNAMPK(E,IR,TR,TI,NKH)
+      |                                            1
+Warning: Actual argument contains too few elements for dummy argument 'nt' (13/18) at (1)
+pnu.f:1091:30:
+
+ 1091 |       CALL PNAMPK(EX,IR,TR,TI,NKH)
+      |                              1
+Warning: Actual argument contains too few elements for dummy argument 'nt' (13/18) at (1)
+pnu.f:1146:47:
+
+ 1146 |       IF(NAME.EQ.KVPI) CALL PNAMPK(EX,IR,TR,TI,NKH)
+      |                                               1
+Warning: Actual argument contains too few elements for dummy argument 'nt' (13/18) at (1)
+pnu.f:4562:17:
+
+ 4543 |       CALL DATA1(T,1,M)
+      |                 2
+......
+ 4562 |       CALL DATA1(DTA,II,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
