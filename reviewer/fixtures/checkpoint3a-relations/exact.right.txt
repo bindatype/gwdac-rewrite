@@ -1,0 +1,2 @@
+SAID checkpoint relation fixture
+No volatile fields

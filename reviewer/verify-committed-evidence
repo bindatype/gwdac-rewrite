@@ -100,12 +100,27 @@ check_tracked_file() {
 for gate_contract_file in \
 	reviewer/verify-committed-evidence \
 	reviewer/verify-evidence-sort-policy \
-	reviewer/verify-evidence-sort-policy-fixtures \
-	reviewer/verify-runtime-refresh-contract-fixtures \
-	reviewer/write-runtime-refresh-aggregate \
-	reviewer/lib/exit-codes.sh \
-	reviewer/config/evidence-manifests.tsv \
-	reviewer/config/runtime-refresh-packages.tsv; do
+		reviewer/verify-evidence-sort-policy-fixtures \
+		reviewer/verify-runtime-refresh-contract-fixtures \
+		reviewer/verify-checkpoint3a-contract \
+		reviewer/verify-checkpoint3a-contract-fixtures \
+		reviewer/verify-checkpoint3a-relation-fixtures \
+		reviewer/write-runtime-refresh-aggregate \
+		reviewer/lib/exit-codes.sh \
+		reviewer/config/evidence-manifests.tsv \
+		reviewer/config/runtime-refresh-packages.tsv \
+		phase1/config/checkpoint3a-engines.tsv \
+		phase1/scripts/classify-checkpoint3a-relation \
+		phase1/scripts/run-checkpoint3a-measurement \
+		phase1/scripts/verify-checkpoint3a-measurement \
+		reviewer/fixtures/checkpoint3a-relations/data-root.left.txt \
+		reviewer/fixtures/checkpoint3a-relations/data-root.negative.txt \
+		reviewer/fixtures/checkpoint3a-relations/data-root.right.txt \
+		reviewer/fixtures/checkpoint3a-relations/date.left.txt \
+		reviewer/fixtures/checkpoint3a-relations/date.negative.txt \
+		reviewer/fixtures/checkpoint3a-relations/date.right.txt \
+		reviewer/fixtures/checkpoint3a-relations/exact.left.txt \
+		reviewer/fixtures/checkpoint3a-relations/exact.right.txt; do
 	check_tracked_file "${gate_contract_file}" || true
 done
 
@@ -481,6 +496,10 @@ fi
 
 if ! "${script_root}/verify-evidence-sort-policy"; then
 	integrity_failure 'evidence-sort-policy rejected the committed scripts'
+fi
+
+if ! "${script_root}/verify-checkpoint3a-contract"; then
+	integrity_failure 'checkpoint 3A contract rejected committed evidence'
 fi
 
 verify_unpatched_priming_summary

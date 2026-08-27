@@ -1,0 +1,3 @@
+ NO  FN         File
+  3   8 - /workspace/arndt64/sdat/kndat.dat
+  4   1 - /workspace/arndt64/sdat/knsol.dat

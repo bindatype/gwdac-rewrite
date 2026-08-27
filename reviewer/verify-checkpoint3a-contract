@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly outputs_root="$(cd "${script_root}/.." && pwd)"
+readonly registry="${outputs_root}/phase1/config/checkpoint3a-engines.tsv"
+engines=0
+
+"${script_root}/verify-checkpoint3a-relation-fixtures"
+"${script_root}/verify-checkpoint3a-contract-fixtures"
+
+while IFS=$'\t' read -r engine _; do
+    [[ "${engine}" == engine ]] && continue
+    [[ -n "${engine}" ]] || continue
+    "${outputs_root}/phase1/scripts/verify-checkpoint3a-measurement" "${engine}"
+    engines=$((engines + 1))
+done <"${registry}"
+
+if [[ "${engines}" -eq 0 ]]; then
+    printf 'checkpoint 3A contract: registry has no engines\n' >&2
+    exit 64
+fi
+
+printf 'checkpoint 3A contract: PASS engines=%s\n' "${engines}"

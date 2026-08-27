@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly outputs_root="$(cd "${script_root}/.." && pwd)"
+readonly verifier="${outputs_root}/phase1/scripts/verify-checkpoint3a-measurement"
+readonly registry="${outputs_root}/phase1/config/checkpoint3a-engines.tsv"
+readonly workspace="$(mktemp -d "${TMPDIR:-/tmp}/checkpoint3a-contract.XXXXXX")"
+
+cleanup() {
+    rm -rf "${workspace}"
+}
+trap cleanup EXIT
+
+for tool in awk head mktemp; do
+    if ! command -v "${tool}" >/dev/null 2>&1; then
+        printf 'checkpoint 3A contract fixtures: missing tool: %s\n' \
+            "${tool}" >&2
+        exit 40
+    fi
+done
+
+set +e
+"${verifier}" unregistered-engine >"${workspace}/unsupported.stdout" \
+    2>"${workspace}/unsupported.stderr"
+unsupported_status=$?
+set -e
+if [[ "${unsupported_status}" -ne 64 ]]; then
+    printf 'checkpoint 3A contract fixtures: unsupported engine status=%s expected=64\n' \
+        "${unsupported_status}" >&2
+    exit 1
+fi
+
+{
+    head -n 1 "${registry}"
+    awk -F '\t' 'NR == 2 {print $1 "\t" $2 "\t" $3}' "${registry}"
+} >"${workspace}/incomplete.tsv"
+set +e
+CHECKPOINT3A_REGISTRY="${workspace}/incomplete.tsv" \
+    "${verifier}" pdsd >"${workspace}/incomplete.stdout" \
+        2>"${workspace}/incomplete.stderr"
+incomplete_status=$?
+set -e
+if [[ "${incomplete_status}" -ne 64 ]]; then
+    printf 'checkpoint 3A contract fixtures: incomplete row status=%s expected=64\n' \
+        "${incomplete_status}" >&2
+    exit 1
+fi
+
+printf 'checkpoint 3A contract fixtures: PASS unsupported=1 incomplete=1\n'

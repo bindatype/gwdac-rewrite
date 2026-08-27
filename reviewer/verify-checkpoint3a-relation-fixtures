@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly outputs_root="$(cd "${script_root}/.." && pwd)"
+readonly classifier="${outputs_root}/phase1/scripts/classify-checkpoint3a-relation"
+readonly fixtures="${script_root}/fixtures/checkpoint3a-relations"
+readonly workspace="$(mktemp -d "${TMPDIR:-/tmp}/checkpoint3a-relations.XXXXXX")"
+
+cleanup() {
+    rm -rf "${workspace}"
+}
+trap cleanup EXIT
+
+for tool in awk grep mktemp perl; do
+    if ! command -v "${tool}" >/dev/null 2>&1; then
+        printf 'checkpoint 3A relation fixtures: missing tool: %s\n' "${tool}" >&2
+        exit 40
+    fi
+done
+
+test "$("${classifier}" \
+    --mode exact \
+    --left "${fixtures}/exact.left.txt" \
+    --right "${fixtures}/exact.right.txt" \
+    --inventory "${workspace}/exact.tsv")" = 'exact fields=0'
+test "$(awk 'END {print NR - 1}' "${workspace}/exact.tsv")" -eq 0
+
+test "$("${classifier}" \
+    --mode data_root_display_only \
+    --left "${fixtures}/data-root.left.txt" \
+    --right "${fixtures}/data-root.right.txt" \
+    --inventory "${workspace}/data-root.tsv" \
+    --left-root /home/arndt64 \
+    --right-root /workspace/arndt64)" = \
+    'data_root_display_only fields=2'
+test "$(awk -F '\t' 'NR > 1 && $6 == "data_root_display_only" {count++} END {print count + 0}' \
+    "${workspace}/data-root.tsv")" -eq 2
+
+if "${classifier}" \
+    --mode data_root_display_only \
+    --left "${fixtures}/data-root.left.txt" \
+    --right "${fixtures}/data-root.negative.txt" \
+    --inventory "${workspace}/data-root-negative.tsv" \
+    --left-root /home/arndt64 \
+    --right-root /workspace/arndt64 >/dev/null 2>&1; then
+    printf 'checkpoint 3A relation fixtures: unattributed root difference passed\n' >&2
+    exit 1
+fi
+
+test "$("${classifier}" \
+    --mode date_fields_only \
+    --left "${fixtures}/date.left.txt" \
+    --right "${fixtures}/date.right.txt" \
+    --inventory "${workspace}/date.tsv")" = \
+    'date_fields_only volatile=1 protected=1'
+test "$(awk -F '\t' 'NR > 1 && $5 == "execution_metadata" && $6 == "measured_volatile" {count++} END {print count + 0}' \
+    "${workspace}/date.tsv")" -eq 1
+test "$(awk -F '\t' 'NR > 1 && $5 == "protected_date" && $6 == "exact" && $3 == "8/20/13" && $4 == "8/20/13" {count++} END {print count + 0}' \
+    "${workspace}/date.tsv")" -eq 1
+
+if "${classifier}" \
+    --mode date_fields_only \
+    --left "${fixtures}/date.left.txt" \
+    --right "${fixtures}/date.negative.txt" \
+    --inventory "${workspace}/date-negative.tsv" >/dev/null 2>&1; then
+    printf 'checkpoint 3A relation fixtures: unattributed date-line difference passed\n' >&2
+    exit 1
+fi
+
+printf 'checkpoint 3A relation fixtures: PASS exact=1 data_root_positive=1 date_positive=1 negative=2\n'
