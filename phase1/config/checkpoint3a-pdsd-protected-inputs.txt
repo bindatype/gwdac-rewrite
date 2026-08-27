@@ -1,0 +1,9 @@
+said/PIDSOL.USR
+said/SAID.DS
+said/NEWDAT.DAT
+sdat/ppamp.dat
+sdat/pidmsg.dat
+sdat/pidcd.dat
+sdat/pidsol.dat
+sdat/pidses.dat
+sdat/secpr.dat

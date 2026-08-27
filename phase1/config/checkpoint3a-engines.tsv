@@ -1,0 +1,2 @@
+engine	checkpoint	report_name	protected_inputs	run_subdir	input_kind	input_rel	transcript_rel	expected_stdout_relation
+pdsd	3A.1	checkpoint3a1-pdsd-measurement	phase1/config/checkpoint3a-pdsd-protected-inputs.txt	said	synthetic_quit_probe	-	-	exact

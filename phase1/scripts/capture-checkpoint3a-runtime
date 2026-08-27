@@ -1,0 +1,185 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "$#" -ne 6 ]]; then
+    printf 'usage: %s <engine> <historical|modern> <run-subdir> <input-kind> <input-rel> <transcript-rel>\n' "$0" >&2
+    exit 64
+fi
+
+readonly engine="$1"
+readonly lineage="$2"
+readonly run_subdir="$3"
+readonly input_kind="$4"
+readonly input_rel="$5"
+readonly transcript_rel="$6"
+
+case "${lineage}" in
+    historical|modern) ;;
+    *)
+        printf 'checkpoint 3A capture: unsupported lineage: %s\n' "${lineage}" >&2
+        exit 64
+        ;;
+esac
+case "${input_kind}" in
+    archived_deck|synthetic_quit_probe) ;;
+    *)
+        printf 'checkpoint 3A capture: unsupported input kind: %s\n' "${input_kind}" >&2
+        exit 64
+        ;;
+esac
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly report_root="${CHECKPOINT3A_REPORT_ROOT:?CHECKPOINT3A_REPORT_ROOT is required}"
+readonly state_root="${CHECKPOINT3A_STATE_ROOT:?CHECKPOINT3A_STATE_ROOT is required}"
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-120}"
+readonly source_commit="${CHECKPOINT3A_SOURCE_COMMIT:?CHECKPOINT3A_SOURCE_COMMIT is required}"
+readonly source_short="${source_commit:0:12}"
+readonly input_file="${report_root}/input.txt"
+readonly stdout_file="${report_root}/stdout.txt"
+readonly stderr_file="${report_root}/stderr.txt"
+readonly trace_file="${report_root}/file-trace.tsv"
+readonly opened_file="${report_root}/opened-files.txt"
+readonly manifest="${report_root}/manifest.txt"
+
+mkdir -p "${state_root}/runs" "${report_root}"
+readonly run_root="$(mktemp -d "${state_root}/runs/${lineage}.XXXXXX")"
+readonly work_root="${run_root}/work"
+cp -a "${source_root}/${run_subdir}" "${work_root}"
+rm -f \
+    "${work_root}/SAID.TMP" \
+    "${work_root}/SAID.PCT" \
+    "${work_root}/SAID.LOG" \
+    "${work_root}/SAID.PS" \
+    "${work_root}/fort.3" \
+    "${work_root}/fort.7"
+
+if [[ "${input_kind}" == archived_deck ]]; then
+    [[ "${input_rel}" != - ]]
+    cp "${source_root}/${input_rel}" "${input_file}"
+else
+    printf '\nqt\n' >"${input_file}"
+fi
+
+if [[ "${lineage}" == historical ]]; then
+    readonly binary="${source_root}/said/${engine}"
+    readonly trace_library=/opt/oracle/file-trace.so
+    readonly evidence_label=oracle
+else
+    readonly binary="${state_root}/artifacts/${source_short}/${engine}"
+    readonly trace_source="${phase1_root}/scripts/runtime-file-trace.c"
+    readonly trace_library="${state_root}/file-trace.so"
+    readonly evidence_label=reference
+    gcc -O2 -Wall -Wextra -Werror -fPIC -shared \
+        "${trace_source}" -ldl -o "${trace_library}"
+fi
+test -x "${binary}"
+
+: >"${trace_file}"
+set +e
+if [[ "${lineage}" == historical ]]; then
+    (
+        cd "${work_root}"
+        timeout "${timeout_seconds}" \
+            env \
+            LD_PRELOAD="${trace_library}" \
+            ORACLE_FILE_TRACE="${trace_file}" \
+            "${binary}" \
+            <"${input_file}" \
+            >"${stdout_file}" \
+            2>"${stderr_file}"
+    )
+else
+    (
+        cd "${work_root}"
+        timeout "${timeout_seconds}" \
+            env \
+            SAID_DATA_ROOT="${source_root}/sdat" \
+            LD_PRELOAD="${trace_library}" \
+            ORACLE_FILE_TRACE="${trace_file}" \
+            "${binary}" \
+            <"${input_file}" \
+            >"${stdout_file}" \
+            2>"${stderr_file}"
+    )
+fi
+status=$?
+set -e
+
+cut -f2- "${trace_file}" | LC_ALL=C sort -u >"${opened_file}"
+normal_exit=no
+if [[ "${input_kind}" == synthetic_quit_probe && "${status}" -eq 0 ]]; then
+    normal_exit=yes
+elif grep -Fq 'Thanks for using SAID' "${stdout_file}"; then
+    normal_exit=yes
+fi
+
+transcript_exact=not_applicable
+if [[ "${transcript_rel}" != - ]]; then
+    transcript_exact=no
+    if cmp -s "${stdout_file}" "${source_root}/${transcript_rel}"; then
+        transcript_exact=yes
+    fi
+fi
+
+said_ps_witness=absent
+said_ps_bytes=0
+if [[ -f "${work_root}/SAID.PS" ]]; then
+    said_ps_witness=created
+    said_ps_bytes="$(wc -c <"${work_root}/SAID.PS" | tr -d ' ')"
+fi
+case "${engine}" in
+    knsd)
+        if [[ "${said_ps_witness}" != created || "${said_ps_bytes}" -ne 0 ]]; then
+            printf 'checkpoint 3A capture: invalid SAID.PS witness engine=%s state=%s bytes=%s\n' \
+                "${engine}" "${said_ps_witness}" "${said_ps_bytes}" >&2
+            exit 1
+        fi
+        ;;
+esac
+rm -f "${work_root}/SAID.PS"
+
+artifact_inputs=()
+for name in SAID.TMP SAID.PCT SAID.LOG fort.3 fort.7; do
+    if [[ -f "${work_root}/${name}" ]]; then
+        install -m 644 "${work_root}/${name}" "${report_root}/${name}"
+        artifact_inputs+=("${report_root}/${name}")
+    fi
+done
+
+{
+    printf 'evidence_label=%s\n' "${evidence_label}"
+    printf 'role=%s_runtime_raw_capture\n' "${lineage}"
+    printf 'engine=%s\n' "${engine}"
+    printf 'source_commit=%s\n' "${source_commit}"
+    printf 'binary_sha256=%s\n' "$(sha256sum "${binary}" | awk '{print $1}')"
+    printf 'input_kind=%s\n' "${input_kind}"
+    printf 'input_sha256=%s\n' "$(sha256sum "${input_file}" | awk '{print $1}')"
+    printf 'transcript_relation=%s\n' "${transcript_rel}"
+    printf 'transcript_exact=%s\n' "${transcript_exact}"
+    printf 'said_ps_witness=%s\n' "${said_ps_witness}"
+    printf 'said_ps_bytes=%s\n' "${said_ps_bytes}"
+    printf 'exit_status=%s\n' "${status}"
+    printf 'timed_out=%s\n' "$([[ "${status}" -eq 124 ]] && printf yes || printf no)"
+    printf 'normal_exit=%s\n' "${normal_exit}"
+    printf 'stdout_bytes=%s\n' "$(wc -c <"${stdout_file}" | tr -d ' ')"
+    printf 'stderr_bytes=%s\n' "$(wc -c <"${stderr_file}" | tr -d ' ')"
+    printf 'opened_file_paths=%s\n' "$(wc -l <"${opened_file}" | tr -d ' ')"
+    if [[ "${lineage}" == modern ]]; then
+        printf 'trace_source_sha256=%s\n' "$(sha256sum "${trace_source}" | awk '{print $1}')"
+        objdump -p "${binary}" | sed -n 's/^[[:space:]]*NEEDED[[:space:]]*/needed=/p'
+    else
+        ldd "${binary}" | sed 's/^/ldd=/'
+    fi
+    sha256sum \
+        "${binary}" \
+        "${input_file}" \
+        "${stdout_file}" \
+        "${stderr_file}" \
+        "${trace_file}" \
+        "${opened_file}" \
+        "${artifact_inputs[@]}"
+} >"${manifest}"
+
+printf 'checkpoint 3A raw capture: engine=%s lineage=%s exit=%s normal_exit=%s\n' \
+    "${engine}" "${lineage}" "${status}" "${normal_exit}"

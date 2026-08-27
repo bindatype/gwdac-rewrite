@@ -1,0 +1,617 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly outputs_root="$(cd "${script_root}/../.." && pwd)"
+readonly compose_file="${outputs_root}/container-environment/compose.yaml"
+readonly registry="${outputs_root}/phase1/config/checkpoint3a-engines.tsv"
+readonly base_commit=eac47653b140ca3781f713aa8b279706373481a5
+readonly stable_main=3b56542884efc5c24d302335b263f6c50eed5dd0
+readonly expected_dirty_entries=567
+readonly expected_dirty_sha256=9301c33f06487ac65c131d2e090dc23b33e86a9a0e1066ed18ab7dc5bcb35632
+readonly source_commit=f6c81d01a1fe8b007c247acc2213f821a62dc4f2
+readonly source_short="${source_commit:0:12}"
+
+if [[ "$#" -ne 1 ]]; then
+    printf 'usage: %s <engine>\n' "$0" >&2
+    exit 64
+fi
+readonly requested_engine="$1"
+
+config_row="$(awk -F '\t' -v engine="${requested_engine}" \
+    'NR > 1 && $1 == engine {print; count++} END {if (count != 1) exit 1}' \
+    "${registry}")" || {
+    printf 'checkpoint 3A: engine is not registered exactly once: %s\n' \
+        "${requested_engine}" >&2
+    exit 64
+}
+IFS=$'\t' read -r \
+    engine checkpoint report_name protected_config_rel run_subdir input_kind \
+    input_rel transcript_rel expected_stdout_relation <<<"${config_row}"
+readonly engine checkpoint report_name protected_config_rel run_subdir input_kind
+readonly input_rel transcript_rel expected_stdout_relation
+readonly protected_config="${outputs_root}/${protected_config_rel}"
+readonly report_root="${outputs_root}/phase1/reports/${report_name}"
+readonly work_reports="${report_root}/working-reports"
+readonly raw_root="${report_root}/raw"
+readonly state_root="/workspace/phase1/checkpoint3a/${engine}/state"
+readonly project="gwdac-checkpoint3a-${engine}-$(git -C "${outputs_root}" rev-parse --short=12 HEAD)-$$"
+
+# POSIX TZ signs are inverted: UTC-14 is 14 hours ahead of UTC, while UTC+12
+# is 12 hours behind. These strings do not require tzdata in either image.
+readonly -a context_slugs=(utc-plus-14 utc-minus-12)
+readonly -a context_timezones=(UTC-14 UTC+12)
+readonly -a context_offsets=(+1400 -1200)
+
+runtime_started=0
+completed=0
+authoritative_status=''
+
+for tool in git docker awk cmp diff find grep sed shasum tr wc; do
+    if ! command -v "${tool}" >/dev/null 2>&1; then
+        printf 'checkpoint 3A: missing tool: %s\n' "${tool}" >&2
+        exit 40
+    fi
+done
+if ! docker compose version >/dev/null 2>&1; then
+    printf 'checkpoint 3A: Docker Compose unavailable\n' >&2
+    exit 40
+fi
+if [[ ! -f "${protected_config}" ]]; then
+    printf 'checkpoint 3A: missing protected-input config: %s\n' \
+        "${protected_config_rel}" >&2
+    exit 64
+fi
+if [[ -e "${report_root}" ]]; then
+    printf 'checkpoint 3A: report root already exists: %s\n' "${report_root}" >&2
+    exit 64
+fi
+if [[ -n "$(git -C "${outputs_root}" status --porcelain=v1 --untracked-files=all)" ]]; then
+    printf 'checkpoint 3A: isolated candidate must be clean before capture\n' >&2
+    exit 64
+fi
+
+hash_file() {
+    shasum -a 256 "$1" | awk '{print $1}'
+}
+
+readonly authoritative_root="$(git -C "${outputs_root}" remote get-url origin)"
+if [[ "${authoritative_root}" != /* ]] || \
+   ! git -C "${authoritative_root}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    printf 'checkpoint 3A: origin is not the authoritative local checkout: %s\n' \
+        "${authoritative_root}" >&2
+    exit 64
+fi
+if ! git -C "${outputs_root}" merge-base --is-ancestor "${base_commit}" HEAD; then
+    printf 'checkpoint 3A: candidate does not descend from base %s\n' \
+        "${base_commit}" >&2
+    exit 64
+fi
+if [[ "$(git -C "${authoritative_root}" rev-parse dev)" != "${base_commit}" || \
+      "$(git -C "${authoritative_root}" rev-parse origin/dev)" != "${base_commit}" || \
+      "$(git -C "${authoritative_root}" rev-parse main)" != "${stable_main}" ]]; then
+    printf 'checkpoint 3A: authoritative refs moved from the authorized boundary\n' >&2
+    exit 64
+fi
+authoritative_status="$(mktemp "${TMPDIR:-/tmp}/checkpoint3a-authoritative-status.XXXXXX")"
+git -C "${authoritative_root}" status --porcelain=v1 --untracked-files=all \
+    >"${authoritative_status}"
+readonly authoritative_dirty_entries="$(wc -l <"${authoritative_status}" | tr -d ' ')"
+readonly authoritative_dirty_sha256="$(hash_file "${authoritative_status}")"
+if [[ "${authoritative_dirty_entries}" -ne "${expected_dirty_entries}" || \
+      "${authoritative_dirty_sha256}" != "${expected_dirty_sha256}" ]]; then
+    printf 'checkpoint 3A: authoritative dirty inventory changed entries=%s sha256=%s\n' \
+        "${authoritative_dirty_entries}" "${authoritative_dirty_sha256}" >&2
+    exit 64
+fi
+
+compose() {
+    PHASE1_REPORTS_HOST="${work_reports}" \
+        docker compose -p "${project}" -f "${compose_file}" "$@"
+}
+
+cleanup() {
+    if [[ "${runtime_started}" -eq 1 ]]; then
+        compose down --volumes >/dev/null 2>&1 || true
+    fi
+    if [[ "${completed}" -eq 0 && -e "${report_root}" ]]; then
+        printf 'checkpoint 3A: stopped; partial capture retained at %s\n' \
+            "${report_root}" >&2
+    fi
+    if [[ -n "${authoritative_status}" ]]; then
+        rm -f "${authoritative_status}"
+    fi
+}
+trap cleanup EXIT
+
+capture_command() {
+    local stdout_file="$1"
+    local stderr_file="$2"
+    shift 2
+    local status=0
+
+    set +e
+    "$@" >"${stdout_file}" 2>"${stderr_file}"
+    status=$?
+    set -e
+    printf '%s\n' "${status}" >"${stdout_file}.exit"
+    if [[ "${status}" -ne 0 ]]; then
+        printf 'checkpoint 3A: command failed status=%s stdout=%s stderr=%s\n' \
+            "${status}" "${stdout_file}" "${stderr_file}" >&2
+        exit "${status}"
+    fi
+}
+
+write_tree_manifest() {
+    local tree="$1"
+    local manifest="$2"
+    local relative
+
+    : >"${manifest}"
+    while IFS= read -r relative; do
+        printf '%s  %s\n' "$(hash_file "${tree}/${relative}")" "${relative}" \
+            >>"${manifest}"
+    done < <(
+        cd "${tree}"
+        find . -type f -print | sed 's#^\./##' | LC_ALL=C sort
+    )
+}
+
+reset_build_stage() {
+    case "${work_reports}" in
+        "${report_root}/working-reports") ;;
+        *)
+            printf 'checkpoint 3A: unsafe staging path: %s\n' "${work_reports}" >&2
+            exit 70
+            ;;
+    esac
+    rm -rf "${work_reports}/runtime-refresh/${engine}"
+    mkdir -p "${work_reports}/runtime-refresh"
+}
+
+reset_direct_stage() {
+    case "${work_reports}" in
+        "${report_root}/working-reports") ;;
+        *)
+            printf 'checkpoint 3A: unsafe staging path: %s\n' "${work_reports}" >&2
+            exit 70
+            ;;
+    esac
+    rm -rf "${work_reports}/direct"
+    mkdir -p "${work_reports}/direct"
+}
+
+capture_context_preflight() {
+    local output="${report_root}/context-preflight.tsv"
+    local service
+    local slug
+    local timezone
+    local expected_offset
+    local observed
+    local observed_date
+    local observed_offset
+    local container_id
+    local image_id
+    local index
+    local first_date
+    local second_date
+
+    printf '%s\n' $'context\tservice\trequested_tz\texpected_offset\tobserved_timestamp\tobserved_date\tobserved_offset\tcontainer_id\timage_id' \
+        >"${output}"
+    for service in oracle dev; do
+        container_id="$(compose ps -q "${service}")"
+        [[ -n "${container_id}" ]]
+        image_id="$(docker inspect --format '{{.Image}}' "${container_id}")"
+        for index in 0 1; do
+            slug="${context_slugs[${index}]}"
+            timezone="${context_timezones[${index}]}"
+            expected_offset="${context_offsets[${index}]}"
+            observed="$(compose exec -T "${service}" env TZ="${timezone}" \
+                date '+%Y-%m-%dT%H:%M:%S%z' | tr -d '\r')"
+            observed_date="${observed:0:10}"
+            observed_offset="${observed: -5}"
+            if [[ "${observed_offset}" != "${expected_offset}" ]]; then
+                printf 'checkpoint 3A: ineffective timezone service=%s requested=%s expected=%s observed=%s\n' \
+                    "${service}" "${timezone}" "${expected_offset}" \
+                    "${observed_offset}" >&2
+                exit 1
+            fi
+            printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+                "${slug}" "${service}" "${timezone}" "${expected_offset}" \
+                "${observed}" "${observed_date}" "${observed_offset}" \
+                "${container_id}" "${image_id}" >>"${output}"
+        done
+        first_date="$(awk -F '\t' -v service="${service}" \
+            '$1 == "utc-plus-14" && $2 == service {print $6}' "${output}")"
+        second_date="$(awk -F '\t' -v service="${service}" \
+            '$1 == "utc-minus-12" && $2 == service {print $6}' "${output}")"
+        if [[ -z "${first_date}" || -z "${second_date}" || \
+              "${first_date}" == "${second_date}" ]]; then
+            printf 'checkpoint 3A: timezone contexts did not produce distinct civil dates for %s\n' \
+                "${service}" >&2
+            exit 1
+        fi
+    done
+}
+
+capture_protected_inputs() {
+    local destination="$1"
+
+    compose exec -T dev env \
+        PROTECTED_CONFIG="/phase1/config/${protected_config_rel#phase1/config/}" \
+        sh -eu -c '
+        cd /workspace/arndt64
+        while IFS= read -r relative; do
+            [ -n "${relative}" ] || continue
+            [ -f "${relative}" ] || {
+                printf "missing protected input: %s\n" "${relative}" >&2
+                exit 1
+            }
+            sha256sum "${relative}"
+        done <"${PROTECTED_CONFIG}"
+    ' >"${destination}"
+}
+
+capture_build() {
+    local label="$1"
+    local destination="${raw_root}/${label}"
+    local stage="${work_reports}/runtime-refresh/${engine}"
+
+    reset_build_stage
+    mkdir -p "${destination}/operator"
+    capture_command \
+        "${destination}/operator/command.stdout" \
+        "${destination}/operator/command.stderr" \
+        compose exec -T dev env PHASE1_STATE_ROOT="${state_root}" \
+            /phase1/scripts/build-runtime-engine-smoke "${engine}"
+    test "$(awk -F= '$1 == "build_status" {print $2}' \
+        "${stage}/build/manifest.txt")" = linked
+    mkdir -p "${destination}/build" "${destination}/artifact"
+    cp -a "${stage}/build/." "${destination}/build/"
+    compose exec -T dev cat \
+        "${state_root}/artifacts/${source_short}/${engine}" \
+        >"${destination}/artifact/${engine}"
+    chmod 755 "${destination}/artifact/${engine}"
+}
+
+compare_builds() {
+    local build_a="${raw_root}/build-a"
+    local build_b="${raw_root}/build-b"
+    local manifest_a="${build_a}/build/manifest.txt"
+    local manifest_b="${build_b}/build/manifest.txt"
+    local list_a="${report_root}/build-a.files"
+    local list_b="${report_root}/build-b.files"
+    local comparison="${report_root}/build-package-comparison.tsv"
+    local relative
+    local hash_a
+    local hash_b
+    local relation
+    local differences=0
+    local path_a
+    local path_b
+    local prefix="${state_root}/build-${source_short}."
+
+    (cd "${build_a}" && find . -type f -print | sed 's#^\./##' | LC_ALL=C sort) \
+        >"${list_a}"
+    (cd "${build_b}" && find . -type f -print | sed 's#^\./##' | LC_ALL=C sort) \
+        >"${list_b}"
+    if ! cmp -s "${list_a}" "${list_b}"; then
+        diff -u "${list_a}" "${list_b}" >"${report_root}/build-file-list.diff" || true
+        printf 'checkpoint 3A: Build A/B file inventories differ\n' >&2
+        exit 1
+    fi
+
+    printf '%s\n' $'path\tbuild_a_sha256\tbuild_b_sha256\trelation' >"${comparison}"
+    while IFS= read -r relative; do
+        hash_a="$(hash_file "${build_a}/${relative}")"
+        hash_b="$(hash_file "${build_b}/${relative}")"
+        relation=exact
+        if [[ "${hash_a}" != "${hash_b}" ]]; then
+            relation=different
+            differences=$((differences + 1))
+        fi
+        printf '%s\t%s\t%s\t%s\n' \
+            "${relative}" "${hash_a}" "${hash_b}" "${relation}" \
+            >>"${comparison}"
+    done <"${list_a}"
+    rm -f "${list_a}" "${list_b}"
+
+    diff -u --label build-a/manifest.txt --label build-b/manifest.txt \
+        "${manifest_a}" "${manifest_b}" >"${report_root}/build-manifest.diff" || true
+    if [[ "${differences}" -ne 1 ]] || \
+       ! awk -F '\t' '$1 == "build/manifest.txt" && $4 == "different" {found++} END {exit found != 1}' \
+            "${comparison}"; then
+        printf 'checkpoint 3A: expected only build/manifest.txt to differ; found=%s\n' \
+            "${differences}" >&2
+        exit 1
+    fi
+
+    path_a="$(grep -oE "${state_root}/build-${source_short}\\.[[:alnum:]]+/${engine}" \
+        "${manifest_a}" || true)"
+    path_b="$(grep -oE "${state_root}/build-${source_short}\\.[[:alnum:]]+/${engine}" \
+        "${manifest_b}" || true)"
+    if [[ "$(printf '%s\n' "${path_a}" | awk 'NF {count++} END {print count + 0}')" -ne 1 || \
+          "$(printf '%s\n' "${path_b}" | awk 'NF {count++} END {print count + 0}')" -ne 1 || \
+          "${path_a}" == "${path_b}" || \
+          "${path_a}" != "${prefix}"* || "${path_b}" != "${prefix}"* ]]; then
+        printf 'checkpoint 3A: build-root suffix attribution failed\n' >&2
+        exit 1
+    fi
+    if ! cmp -s \
+        <(sed "s#${path_a}#<MEASURED-BUILD-ROOT>/${engine}#" "${manifest_a}") \
+        <(sed "s#${path_b}#<MEASURED-BUILD-ROOT>/${engine}#" "${manifest_b}"); then
+        printf 'checkpoint 3A: build manifest differs outside measured root suffix\n' >&2
+        exit 1
+    fi
+}
+
+capture_runtime_lineage() {
+    local slug="$1"
+    local timezone="$2"
+    local lineage="$3"
+    local service
+    local capture_state_root
+    local destination="${raw_root}/runtime/${slug}/${lineage}"
+    local operator="${raw_root}/runtime/${slug}/operator"
+    local stage="${work_reports}/direct/${lineage}"
+
+    if [[ "${lineage}" == historical ]]; then
+        service=oracle
+        capture_state_root="/oracle-work/checkpoint3a/${engine}/${slug}"
+    else
+        service=dev
+        capture_state_root="${state_root}"
+    fi
+    reset_direct_stage
+    mkdir -p "${operator}"
+    capture_command \
+        "${operator}/${lineage}-command.stdout" \
+        "${operator}/${lineage}-command.stderr" \
+        compose exec -T "${service}" env \
+            TZ="${timezone}" \
+            CHECKPOINT3A_SOURCE_COMMIT="${source_commit}" \
+            CHECKPOINT3A_REPORT_ROOT="/phase1/reports/direct/${lineage}" \
+            CHECKPOINT3A_STATE_ROOT="${capture_state_root}" \
+            /phase1/scripts/capture-checkpoint3a-runtime \
+                "${engine}" "${lineage}" "${run_subdir}" "${input_kind}" \
+                "${input_rel}" "${transcript_rel}"
+    test -d "${stage}"
+    cp -a "${stage}" "${destination}"
+}
+
+compare_runtime_pair() {
+    local slug="$1"
+    local root="${raw_root}/runtime/${slug}"
+    local historical="${root}/historical"
+    local modern="${root}/modern"
+    local historical_exit
+    local modern_exit
+    local historical_normal
+    local modern_normal
+    local stdout_relation=different
+    local context_manifest_tmp
+
+    historical_exit="$(awk -F= '$1 == "exit_status" {print $2}' "${historical}/manifest.txt")"
+    modern_exit="$(awk -F= '$1 == "exit_status" {print $2}' "${modern}/manifest.txt")"
+    historical_normal="$(awk -F= '$1 == "normal_exit" {print $2}' "${historical}/manifest.txt")"
+    modern_normal="$(awk -F= '$1 == "normal_exit" {print $2}' "${modern}/manifest.txt")"
+    if cmp -s "${historical}/stdout.txt" "${modern}/stdout.txt"; then
+        stdout_relation=exact
+    fi
+
+    diff -u --label historical --label modern \
+        "${historical}/stdout.txt" "${modern}/stdout.txt" \
+        >"${root}/historical-vs-modern.first.diff" || true
+    printf '%s\n' $'metric\thistorical\tmodern\trelation' >"${root}/comparison.tsv"
+    printf 'exit_status\t%s\t%s\t%s\n' \
+        "${historical_exit}" "${modern_exit}" \
+        "$([[ "${historical_exit}" == "${modern_exit}" ]] && printf exact || printf different)" \
+        >>"${root}/comparison.tsv"
+    printf 'normal_exit\t%s\t%s\t%s\n' \
+        "${historical_normal}" "${modern_normal}" \
+        "$([[ "${historical_normal}" == "${modern_normal}" ]] && printf exact || printf different)" \
+        >>"${root}/comparison.tsv"
+    printf 'stdout_sha256\t%s\t%s\t%s\n' \
+        "$(hash_file "${historical}/stdout.txt")" \
+        "$(hash_file "${modern}/stdout.txt")" "${stdout_relation}" \
+        >>"${root}/comparison.tsv"
+
+    printf '%s\n' $'engine\thistorical_exit\thistorical_normal_exit\tmodern_exit\tmodern_normal_exit\tstdout_relation\tresult' \
+        >"${root}/smoke-summary.tsv"
+    if [[ "${historical_exit}" == 0 && "${modern_exit}" == 0 && \
+          "${historical_normal}" == yes && "${modern_normal}" == yes && \
+          "${stdout_relation}" == "${expected_stdout_relation}" ]]; then
+        printf '%s\t%s\t%s\t%s\t%s\t%s\texact_smoke_pass\n' \
+            "${engine}" "${historical_exit}" "${historical_normal}" \
+            "${modern_exit}" "${modern_normal}" "${stdout_relation}" \
+            >>"${root}/smoke-summary.tsv"
+    else
+        printf '%s\t%s\t%s\t%s\t%s\t%s\tunclassified\n' \
+            "${engine}" "${historical_exit}" "${historical_normal}" \
+            "${modern_exit}" "${modern_normal}" "${stdout_relation}" \
+            >>"${root}/smoke-summary.tsv"
+        printf 'checkpoint 3A: unclassified historical/modern relation context=%s\n' \
+            "${slug}" >&2
+        exit 1
+    fi
+    context_manifest_tmp="$(mktemp "${TMPDIR:-/tmp}/checkpoint3a-context-manifest.XXXXXX")"
+    write_tree_manifest "${root}" "${context_manifest_tmp}"
+    mv "${context_manifest_tmp}" "${root}/evidence-manifest.sha256"
+}
+
+capture_runtime_context() {
+    local index="$1"
+    local slug="${context_slugs[${index}]}"
+    local timezone="${context_timezones[${index}]}"
+    local operator="${raw_root}/runtime/${slug}/operator"
+
+    mkdir -p "${operator}"
+    {
+        head -n 1 "${report_root}/context-preflight.tsv"
+        awk -F '\t' -v slug="${slug}" '$1 == slug' \
+            "${report_root}/context-preflight.tsv"
+    } >"${operator}/context.tsv"
+    capture_runtime_lineage "${slug}" "${timezone}" historical
+    capture_runtime_lineage "${slug}" "${timezone}" modern
+    compare_runtime_pair "${slug}"
+}
+
+compare_runtime_lineage() {
+    local lineage="$1"
+    local left="${raw_root}/runtime/${context_slugs[0]}/${lineage}"
+    local right="${raw_root}/runtime/${context_slugs[1]}/${lineage}"
+    local output="${report_root}/runtime-${lineage}-timezone-comparison.tsv"
+    local list_left="${report_root}/${lineage}-left.files"
+    local list_right="${report_root}/${lineage}-right.files"
+    local relative
+    local hash_left
+    local hash_right
+
+    (cd "${left}" && find . -type f -print | sed 's#^\./##' | LC_ALL=C sort) \
+        >"${list_left}"
+    (cd "${right}" && find . -type f -print | sed 's#^\./##' | LC_ALL=C sort) \
+        >"${list_right}"
+    if ! cmp -s "${list_left}" "${list_right}"; then
+        printf 'checkpoint 3A: %s context file inventories differ\n' \
+            "${lineage}" >&2
+        exit 1
+    fi
+
+    printf '%s\n' $'path\tutc_plus_14_sha256\tutc_minus_12_sha256\trelation' \
+        >"${output}"
+    while IFS= read -r relative; do
+        hash_left="$(hash_file "${left}/${relative}")"
+        hash_right="$(hash_file "${right}/${relative}")"
+        if [[ "${hash_left}" != "${hash_right}" ]]; then
+            printf '%s\t%s\t%s\tdifferent\n' \
+                "${relative}" "${hash_left}" "${hash_right}" >>"${output}"
+            printf 'checkpoint 3A: unclassified %s context difference: %s\n' \
+                "${lineage}" "${relative}" >&2
+            exit 1
+        fi
+        printf '%s\t%s\t%s\texact\n' \
+            "${relative}" "${hash_left}" "${hash_right}" >>"${output}"
+    done <"${list_left}"
+    rm -f "${list_left}" "${list_right}"
+}
+
+mkdir -p "${report_root}" "${work_reports}" "${raw_root}"
+cat >"${report_root}/run-context.txt" <<EOF
+evidence_label=captured
+checkpoint=${checkpoint}
+engine=${engine}
+authorized_base_commit=${base_commit}
+outputs_commit=$(git -C "${outputs_root}" rev-parse HEAD)
+authoritative_dev=${base_commit}
+authoritative_origin_dev=${base_commit}
+authoritative_main=${stable_main}
+authoritative_dirty_entries=${authoritative_dirty_entries}
+authoritative_dirty_sha256=${authoritative_dirty_sha256}
+source_commit=${source_commit}
+architecture=linux/amd64
+builds=2
+runtime_executions=4
+timezones=UTC-14,UTC+12
+context_assertions=expected_offsets_and_distinct_civil_dates
+capture_order=raw_before_compatibility
+canonicalization=none
+physics_review=pending
+EOF
+
+printf 'checkpoint 3A: starting one dev/oracle container pair engine=%s\n' "${engine}"
+compose up -d --build dev oracle
+runtime_started=1
+compose exec -T dev bootstrap-repos
+test "$(compose exec -T dev git -C /workspace/arndt64 rev-parse HEAD | tr -d '\r')" = \
+    "${source_commit}"
+
+# The environmental control is proven before any engine build or execution.
+capture_context_preflight
+capture_protected_inputs "${report_root}/protected-inputs.before.sha256"
+capture_build build-a
+capture_build build-b
+compare_builds
+capture_runtime_context 0
+capture_runtime_context 1
+compare_runtime_lineage historical
+compare_runtime_lineage modern
+capture_protected_inputs "${report_root}/protected-inputs.after.sha256"
+if ! cmp -s "${report_root}/protected-inputs.before.sha256" \
+           "${report_root}/protected-inputs.after.sha256"; then
+    diff -u "${report_root}/protected-inputs.before.sha256" \
+        "${report_root}/protected-inputs.after.sha256" \
+        >"${report_root}/protected-inputs.diff" || true
+    printf 'checkpoint 3A: protected input mutation detected\n' >&2
+    exit 1
+fi
+
+printf '%s\n' $'artifact\tfield_selector\tclass\tobserved_count\tevidence\tresult' \
+    >"${report_root}/volatile-fields.tsv"
+printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+    'raw/build-{a,b}/build/manifest.txt' \
+    "binary SHA-256 record path: state/build-${source_short}.<suffix>/${engine}" \
+    execution_metadata 1 'Build A/B direct diff' measured_volatile \
+    >>"${report_root}/volatile-fields.tsv"
+
+printf '%s\n' $'class\tartifact_or_source\tevidence\tresult' \
+    >"${report_root}/protected-fields.tsv"
+while IFS= read -r relative; do
+    [[ -n "${relative}" ]] || continue
+    printf 'request_input\t/workspace/arndt64/%s\tpre/post SHA-256\texact\n' \
+        "${relative}" >>"${report_root}/protected-fields.tsv"
+done <"${protected_config}"
+printf '%s\t%s\t%s\t%s\n' \
+    request_input 'raw/runtime/*/{historical,modern}/input.txt' \
+    'four-package direct hash comparison' exact \
+    >>"${report_root}/protected-fields.tsv"
+printf '%s\t%s\t%s\t%s\n' \
+    retained_output 'raw/runtime/*/{historical,modern}/*' \
+    'historical and modern cross-context package comparisons' exact \
+    >>"${report_root}/protected-fields.tsv"
+printf '%s\t%s\t%s\t%s\n' \
+    retained_artifact "raw/build-{a,b}/artifact/${engine}" \
+    'Build A/B direct SHA-256' exact \
+    >>"${report_root}/protected-fields.tsv"
+
+cat >"${report_root}/README.md" <<EOF
+# Shared Checkpoint ${checkpoint} ${engine} measurement
+
+Evidence label: **captured** for raw execution products and **inferred** for the
+field classifications derived from their direct diffs. Physics review remains
+pending.
+
+This package uses the shared engine-parameterized Checkpoint 3A primitive at
+outputs commit $(git -C "${outputs_root}" rev-parse HEAD). It measures only the
+${engine} startup/quit control. The unchanged dev and oracle images were each
+verified to honor POSIX UTC-14 (+1400) and UTC+12 (-1200), with distinct civil
+dates, before any engine build or execution. Requested and observed contexts,
+image identities, and container identities are recorded in
+context-preflight.tsv and each runtime operator/context.tsv.
+
+The modern engine was built twice in independent roots. Historical and modern
+executions were captured independently and packaged before any compatibility
+comparison. The engine files under raw/build-* and
+raw/runtime/*/{historical,modern} are unmodified captures; derived relation
+tables sit beside them. No canonical copy or normalization exists.
+
+Direct diffs found one volatile build metadata field: the random build-root
+suffix in build/manifest.txt. The executable and all other build files were
+exact. Historical and modern runtime packages were each exact across the two
+effective timezone contexts, and each historical/modern pair retained the
+exact startup/quit relation. Protected inputs were byte-identical before and
+after execution.
+
+This corrected package supersedes local candidate f96abae without rewriting or
+deleting that audit commit. It is a 3A measurement result, not a canonicalizer,
+Checkpoint 3B acceptance, physics approval, or Gate 1 registration of this
+package.
+EOF
+
+rm -rf "${work_reports}"
+write_tree_manifest "${raw_root}" "${report_root}/raw-manifest.sha256"
+final_manifest_tmp="$(mktemp "${TMPDIR:-/tmp}/checkpoint3a-manifest.XXXXXX")"
+write_tree_manifest "${report_root}" "${final_manifest_tmp}"
+mv "${final_manifest_tmp}" "${report_root}/manifest.sha256"
+
+completed=1
+printf 'checkpoint 3A: PASS engine=%s report=%s\n' "${engine}" "${report_root}"
