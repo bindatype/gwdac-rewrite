@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 use Getopt::Long qw(GetOptions);
+use Digest::SHA ();
 
 my ($mode, $left_path, $right_path, $inventory_path);
-my ($left_root, $right_root);
+my ($left_root, $right_root, $lineage);
 
 GetOptions(
     'mode=s'       => \$mode,
@@ -14,12 +15,13 @@ GetOptions(
     'inventory=s'  => \$inventory_path,
     'left-root=s'  => \$left_root,
     'right-root=s' => \$right_root,
+    'lineage=s'    => \$lineage,
 ) or usage();
 
 usage() unless defined $mode && defined $left_path && defined $right_path
     && defined $inventory_path;
 usage() unless $mode eq 'exact' || $mode eq 'data_root_display_only'
-    || $mode eq 'date_fields_only';
+    || $mode eq 'date_fields_only' || $mode eq 'hash_manifest_only';
 
 my @left = read_lines($left_path);
 my @right = read_lines($right_path);
@@ -72,6 +74,45 @@ if ($mode eq 'data_root_display_only') {
     fail('configured roots produced no changed lines') unless $changed;
     close $inventory or fail("cannot close inventory: $inventory_path: $!");
     print "data_root_display_only fields=$changed\n";
+    exit 0;
+}
+
+if ($mode eq 'hash_manifest_only') {
+    usage() unless defined $left_root && defined $right_root
+        && -d $left_root && -d $right_root && $left_root ne $right_root
+        && defined $lineage && ($lineage eq 'historical' || $lineage eq 'modern');
+
+    my $changed = 0;
+    for my $index (0 .. $#left) {
+        next if $left[$index] eq $right[$index];
+
+        my ($left_hash, $left_lineage, $left_relative) =
+            manifest_hash_field($left[$index]);
+        my ($right_hash, $right_lineage, $right_relative) =
+            manifest_hash_field($right[$index]);
+        fail("line " . ($index + 1) . " is not a bound artifact hash")
+            unless defined $left_hash && defined $right_hash
+                && $left_lineage eq $right_lineage
+                && $left_lineage eq $lineage
+                && $left_relative eq $right_relative;
+
+        my $left_artifact = "$left_root/$left_relative";
+        my $right_artifact = "$right_root/$right_relative";
+        fail("line " . ($index + 1) . " references a missing artifact")
+            unless -f $left_artifact && -f $right_artifact;
+        fail("line " . ($index + 1) . " carries a stale left hash")
+            unless file_sha256($left_artifact) eq $left_hash;
+        fail("line " . ($index + 1) . " carries a stale right hash")
+            unless file_sha256($right_artifact) eq $right_hash;
+
+        $changed++;
+        print {$inventory} join("\t",
+            $index + 1, "sha256:$left_relative", $left_hash, $right_hash,
+            'execution_metadata', 'derived_hash'), "\n";
+    }
+    fail('hash-manifest relation produced no changed fields') unless $changed;
+    close $inventory or fail("cannot close inventory: $inventory_path: $!");
+    print "hash_manifest_only fields=$changed\n";
     exit 0;
 }
 
@@ -134,8 +175,24 @@ sub dates_in {
     return @dates;
 }
 
+sub manifest_hash_field {
+    my ($line) = @_;
+    return unless $line =~ m{\A([0-9a-f]{64})  /phase1/reports/direct/(historical|modern)/([A-Za-z0-9._-]+)\r?\n?\z};
+    return ($1, $2, $3);
+}
+
+sub file_sha256 {
+    my ($path) = @_;
+    open my $handle, '<', $path or fail("cannot read $path: $!");
+    binmode $handle;
+    my $digest = Digest::SHA->new(256);
+    $digest->addfile($handle);
+    close $handle or fail("cannot close $path: $!");
+    return $digest->hexdigest;
+}
+
 sub usage {
-    print STDERR "usage: classify-checkpoint3a-relation --mode MODE --left FILE --right FILE --inventory FILE [--left-root ROOT --right-root ROOT]\n";
+    print STDERR "usage: classify-checkpoint3a-relation --mode MODE --left FILE --right FILE --inventory FILE [--left-root ROOT --right-root ROOT] [--lineage historical|modern]\n";
     exit 64;
 }
 

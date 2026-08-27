@@ -12,7 +12,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-for tool in awk grep mktemp perl; do
+for tool in awk cp grep mkdir mktemp perl shasum; do
     if ! command -v "${tool}" >/dev/null 2>&1; then
         printf 'checkpoint 3A relation fixtures: missing tool: %s\n' "${tool}" >&2
         exit 40
@@ -48,6 +48,54 @@ if "${classifier}" \
     exit 1
 fi
 
+mkdir -p "${workspace}/hash-left" "${workspace}/hash-right"
+cp "${fixtures}/date.left.txt" "${workspace}/hash-left/stdout.txt"
+cp "${fixtures}/date.right.txt" "${workspace}/hash-right/stdout.txt"
+left_hash="$(shasum -a 256 "${workspace}/hash-left/stdout.txt" | awk '{print $1}')"
+right_hash="$(shasum -a 256 "${workspace}/hash-right/stdout.txt" | awk '{print $1}')"
+printf '%s  /phase1/reports/direct/historical/stdout.txt\n' "${left_hash}" \
+    >"${workspace}/hash-left/manifest.txt"
+printf '%s  /phase1/reports/direct/historical/stdout.txt\n' "${right_hash}" \
+    >"${workspace}/hash-right/manifest.txt"
+test "$("${classifier}" \
+    --mode hash_manifest_only \
+    --left "${workspace}/hash-left/manifest.txt" \
+    --right "${workspace}/hash-right/manifest.txt" \
+    --left-root "${workspace}/hash-left" \
+    --right-root "${workspace}/hash-right" \
+    --lineage historical \
+    --inventory "${workspace}/hash-manifest.tsv")" = \
+    'hash_manifest_only fields=1'
+test "$(awk -F '\t' 'NR > 1 && $5 == "execution_metadata" && \
+    $6 == "derived_hash" {count++} END {print count + 0}' \
+    "${workspace}/hash-manifest.tsv")" -eq 1
+
+if "${classifier}" \
+    --mode hash_manifest_only \
+    --left "${workspace}/hash-left/manifest.txt" \
+    --right "${workspace}/hash-right/manifest.txt" \
+    --left-root "${workspace}/hash-left" \
+    --right-root "${workspace}/hash-right" \
+    --lineage modern \
+    --inventory "${workspace}/hash-lineage-negative.tsv" >/dev/null 2>&1; then
+    printf 'checkpoint 3A relation fixtures: wrong manifest lineage passed\n' >&2
+    exit 1
+fi
+
+printf '%064d  /phase1/reports/direct/historical/stdout.txt\n' 0 \
+    >"${workspace}/hash-right/stale-manifest.txt"
+if "${classifier}" \
+    --mode hash_manifest_only \
+    --left "${workspace}/hash-left/manifest.txt" \
+    --right "${workspace}/hash-right/stale-manifest.txt" \
+    --left-root "${workspace}/hash-left" \
+    --right-root "${workspace}/hash-right" \
+    --lineage historical \
+    --inventory "${workspace}/hash-manifest-negative.tsv" >/dev/null 2>&1; then
+    printf 'checkpoint 3A relation fixtures: stale manifest hash passed\n' >&2
+    exit 1
+fi
+
 test "$("${classifier}" \
     --mode date_fields_only \
     --left "${fixtures}/date.left.txt" \
@@ -68,4 +116,4 @@ if "${classifier}" \
     exit 1
 fi
 
-printf 'checkpoint 3A relation fixtures: PASS exact=1 data_root_positive=1 date_positive=1 negative=2\n'
+printf 'checkpoint 3A relation fixtures: PASS exact=1 data_root_positive=1 date_positive=1 hash_manifest_positive=1 negative=4\n'

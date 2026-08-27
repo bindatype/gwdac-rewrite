@@ -134,7 +134,7 @@ case "${expected_stdout_relation}" in
         ;;
 esac
 case "${expected_cross_context_relation}" in
-    exact|date_fields_only) ;;
+    exact|date_fields_only|date_fields_and_hashes_only) ;;
     *)
         printf 'checkpoint 3A: unsupported cross-context relation: %s\n' \
             "${expected_cross_context_relation}" >&2
@@ -215,7 +215,8 @@ if [[ "${expected_build_difference_count}" -ne 1 || \
 fi
 if [[ "${expected_cross_context_relation}" == exact && \
       "${expected_cross_context_difference_files}" -ne 0 ]] || \
-   [[ "${expected_cross_context_relation}" == date_fields_only && \
+   [[ ( "${expected_cross_context_relation}" == date_fields_only || \
+        "${expected_cross_context_relation}" == date_fields_and_hashes_only ) && \
       "${expected_cross_context_difference_files}" -eq 0 ]]; then
     printf 'checkpoint 3A: cross-context relation/count contract is inconsistent\n' >&2
     exit 64
@@ -241,7 +242,8 @@ if [[ "${expected_cross_context_relation}" == exact && \
         "${expected_historical_minus12_stdout_sha256}" || \
         "${expected_modern_plus14_stdout_sha256}" != \
         "${expected_modern_minus12_stdout_sha256}" ) ]] || \
-   [[ "${expected_cross_context_relation}" == date_fields_only && \
+   [[ ( "${expected_cross_context_relation}" == date_fields_only || \
+        "${expected_cross_context_relation}" == date_fields_and_hashes_only ) && \
       "${expected_historical_plus14_stdout_sha256}" != MEASURE && \
       ( "${expected_historical_plus14_stdout_sha256}" == \
         "${expected_historical_minus12_stdout_sha256}" || \
@@ -675,6 +677,7 @@ compare_runtime_lineage() {
     local hash_right
     local relation
     local relation_inventory
+    local -a classifier_args
     local changed_files=0
 
     (cd "${left}" && find . -type f -print | sed 's#^\./##' | LC_ALL=C sort) \
@@ -694,22 +697,40 @@ compare_runtime_lineage() {
         hash_right="$(hash_file "${right}/${relative}")"
         relation=exact
         if [[ "${hash_left}" != "${hash_right}" ]]; then
-            if [[ "${expected_cross_context_relation}" != date_fields_only ]]; then
+            if [[ "${expected_cross_context_relation}" == exact ]]; then
                 printf 'checkpoint 3A: unclassified %s context difference: %s\n' \
                     "${lineage}" "${relative}" >&2
                 exit 1
             fi
-            relation_inventory="${report_root}/runtime-${lineage}-${relative//\//_}-date-fields.tsv"
-            if ! "${relation_classifier}" \
-                --mode date_fields_only \
-                --left "${left}/${relative}" \
-                --right "${right}/${relative}" \
-                --inventory "${relation_inventory}" >/dev/null; then
+            if [[ "${relative}" == manifest.txt && \
+                  "${expected_cross_context_relation}" == \
+                      date_fields_and_hashes_only ]]; then
+                relation_inventory="${report_root}/runtime-${lineage}-${relative//\//_}-hash-fields.tsv"
+                classifier_args=(
+                    --mode hash_manifest_only
+                    --left "${left}/${relative}"
+                    --right "${right}/${relative}"
+                    --inventory "${relation_inventory}"
+                    --left-root "${left}"
+                    --right-root "${right}"
+                    --lineage "${lineage}"
+                )
+                relation=hash_manifest_only
+            else
+                relation_inventory="${report_root}/runtime-${lineage}-${relative//\//_}-date-fields.tsv"
+                classifier_args=(
+                    --mode date_fields_only
+                    --left "${left}/${relative}"
+                    --right "${right}/${relative}"
+                    --inventory "${relation_inventory}"
+                )
+                relation=date_fields_only
+            fi
+            if ! "${relation_classifier}" "${classifier_args[@]}" >/dev/null; then
                 printf 'checkpoint 3A: unclassified %s context difference: %s\n' \
                     "${lineage}" "${relative}" >&2
                 exit 1
             fi
-            relation=date_fields_only
             changed_files=$((changed_files + 1))
         fi
         printf '%s\t%s\t%s\t%s\n' \
@@ -783,7 +804,7 @@ printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
     "binary SHA-256 record path: state/build-${source_short}.<suffix>/${engine}" \
     execution_metadata 1 'Build A/B direct diff' measured_volatile \
     >>"${report_root}/volatile-fields.tsv"
-if [[ "${expected_cross_context_relation}" == date_fields_only ]]; then
+if [[ "${expected_cross_context_relation}" != exact ]]; then
     while IFS= read -r date_inventory; do
         volatile_count="$(awk -F '\t' \
             'NR > 1 && $5 == "execution_metadata" && \
@@ -798,6 +819,21 @@ if [[ "${expected_cross_context_relation}" == date_fields_only ]]; then
         fi
     done < <(find "${report_root}" -maxdepth 1 -type f \
         -name 'runtime-*-date-fields.tsv' -print | LC_ALL=C sort)
+fi
+if [[ "${expected_cross_context_relation}" == date_fields_and_hashes_only ]]; then
+    while IFS= read -r hash_inventory; do
+        derived_count="$(awk -F '\t' \
+            'NR > 1 && $5 == "execution_metadata" && $6 == "derived_hash" \
+                {count++} END {print count + 0}' "${hash_inventory}")"
+        if [[ "${derived_count}" -gt 0 ]]; then
+            printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+                "${hash_inventory#${report_root}/}" 'changed artifact hashes' \
+                execution_metadata "${derived_count}" \
+                'hash-bound cross-context field inventory' measured_volatile \
+                >>"${report_root}/volatile-fields.tsv"
+        fi
+    done < <(find "${report_root}" -maxdepth 1 -type f \
+        -name 'runtime-*-hash-fields.tsv' -print | LC_ALL=C sort)
 fi
 if [[ "$(awk 'END {print NR - 1}' "${report_root}/volatile-fields.tsv")" -ne \
       "${expected_volatile_field_count}" ]]; then
@@ -862,6 +898,8 @@ else
 fi
 if [[ "${expected_cross_context_relation}" == exact ]]; then
     context_summary='Each lineage was exact across the two effective timezone contexts.'
+elif [[ "${expected_cross_context_relation}" == date_fields_and_hashes_only ]]; then
+    context_summary='Cross-context differences were confined to measured execution-date fields and the directly bound hashes of those artifacts; unchanged date-shaped fields remain protected scientific identity.'
 else
     context_summary='Cross-context differences were confined to measured execution-date fields; unchanged date-shaped fields remain protected scientific identity.'
 fi

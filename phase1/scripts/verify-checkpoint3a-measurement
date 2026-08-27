@@ -95,7 +95,7 @@ case "${expected_stdout_relation}" in
         ;;
 esac
 case "${expected_cross_context_relation}" in
-    exact|date_fields_only) ;;
+    exact|date_fields_only|date_fields_and_hashes_only) ;;
     *)
         printf 'checkpoint 3A verifier: unsupported cross-context relation: %s\n' \
             "${expected_cross_context_relation}" >&2
@@ -163,7 +163,8 @@ if [[ "${expected_build_difference_count}" -ne 1 || \
 fi
 if [[ "${expected_cross_context_relation}" == exact && \
       "${expected_cross_context_difference_files}" -ne 0 ]] || \
-   [[ "${expected_cross_context_relation}" == date_fields_only && \
+   [[ ( "${expected_cross_context_relation}" == date_fields_only || \
+        "${expected_cross_context_relation}" == date_fields_and_hashes_only ) && \
       "${expected_cross_context_difference_files}" -eq 0 ]]; then
     printf 'checkpoint 3A verifier: cross-context relation/count contract is inconsistent\n' >&2
     exit 64
@@ -186,7 +187,8 @@ if [[ "${expected_cross_context_relation}" == exact && \
         "${expected_historical_minus12_stdout_sha256}" || \
         "${expected_modern_plus14_stdout_sha256}" != \
         "${expected_modern_minus12_stdout_sha256}" ) ]] || \
-   [[ "${expected_cross_context_relation}" == date_fields_only && \
+   [[ ( "${expected_cross_context_relation}" == date_fields_only || \
+        "${expected_cross_context_relation}" == date_fields_and_hashes_only ) && \
       ( "${expected_historical_plus14_stdout_sha256}" == \
         "${expected_historical_minus12_stdout_sha256}" || \
         "${expected_modern_plus14_stdout_sha256}" == \
@@ -398,7 +400,7 @@ test "$(wc -l <"${report_root}/protected-inputs.before.sha256" | tr -d ' ')" -eq
     "${expected_protected_input_count}"
 test "$(awk -F '\t' \
     'NR > 1 && $4 != "exact" && $4 != "data_root_display_only" && \
-        $4 != "date_fields_only" {bad++} \
+        $4 != "date_fields_only" && $4 != "date_fields_and_hashes_only" {bad++} \
      END {print bad + 0}' "${report_root}/protected-fields.tsv")" -eq 0
 test "$(awk 'END {print NR - 1}' "${report_root}/protected-fields.tsv")" -eq \
     "${expected_protected_field_count}"
@@ -442,13 +444,30 @@ for lineage in historical modern; do
         if [[ "${relation}" == exact ]]; then
             cmp "${left}" "${right}"
         elif [[ "${relation}" == date_fields_only && \
-                "${expected_cross_context_relation}" == date_fields_only ]]; then
+                "${expected_cross_context_relation}" != exact ]]; then
             inventory="$(mktemp "${TMPDIR:-/tmp}/checkpoint3a-date-fields.XXXXXX")"
             if ! "${relation_classifier}" --mode date_fields_only \
                 --left "${left}" --right "${right}" \
                 --inventory "${inventory}" >/dev/null; then
                 rm -f "${inventory}"
                 printf 'checkpoint 3A verifier: invalid date-only relation lineage=%s path=%s\n' \
+                    "${lineage}" "${relative}" >&2
+                exit 30
+            fi
+            rm -f "${inventory}"
+            changed_files=$((changed_files + 1))
+        elif [[ "${relation}" == hash_manifest_only && \
+                "${expected_cross_context_relation}" == \
+                    date_fields_and_hashes_only ]]; then
+            inventory="$(mktemp "${TMPDIR:-/tmp}/checkpoint3a-hash-fields.XXXXXX")"
+            if ! "${relation_classifier}" --mode hash_manifest_only \
+                --left "${left}" --right "${right}" \
+                --left-root "${raw_root}/runtime/utc-plus-14/${lineage}" \
+                --right-root "${raw_root}/runtime/utc-minus-12/${lineage}" \
+                --lineage "${lineage}" \
+                --inventory "${inventory}" >/dev/null; then
+                rm -f "${inventory}"
+                printf 'checkpoint 3A verifier: invalid hash-manifest relation lineage=%s path=%s\n' \
                     "${lineage}" "${relative}" >&2
                 exit 30
             fi
