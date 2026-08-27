@@ -12,7 +12,7 @@ if [[ "$#" -ne 1 ]]; then
 fi
 readonly requested_engine="$1"
 
-readonly expected_registry_header=$'engine\tcheckpoint\treport_name\tprotected_inputs\trun_subdir\tinput_kind\tinput_rel\ttranscript_rel\tcapture_commit\tauthorized_base_commit\texpected_stdout_relation\texpected_smoke_result\texpected_cross_context_relation\texpected_cross_context_difference_files\texpected_report_files\texpected_raw_files\texpected_manifest_entries\texpected_raw_manifest_entries\texpected_build_comparison_rows\texpected_build_difference_count\texpected_build_difference_path\texpected_context_manifest_entries\texpected_runtime_comparison_rows\texpected_protected_input_count\texpected_protected_field_count\texpected_volatile_field_count\texpected_binary_sha256\texpected_input_sha256\texpected_historical_stdout_sha256\texpected_modern_stdout_sha256\thistorical_data_root\tmodern_data_root'
+readonly expected_registry_header=$'engine\tcheckpoint\treport_name\tprotected_inputs\trun_subdir\tinput_kind\tinput_rel\ttranscript_rel\texpected_said_ps_witness\texpected_said_ps_bytes\tcapture_commit\tauthorized_base_commit\texpected_stdout_relation\texpected_smoke_result\texpected_cross_context_relation\texpected_cross_context_difference_files\texpected_report_files\texpected_raw_files\texpected_manifest_entries\texpected_raw_manifest_entries\texpected_build_comparison_rows\texpected_build_difference_count\texpected_build_difference_path\texpected_context_manifest_entries\texpected_runtime_comparison_rows\texpected_protected_input_count\texpected_protected_field_count\texpected_volatile_field_count\texpected_binary_sha256\texpected_input_sha256\texpected_historical_plus14_stdout_sha256\texpected_historical_minus12_stdout_sha256\texpected_modern_plus14_stdout_sha256\texpected_modern_minus12_stdout_sha256\thistorical_data_root\tmodern_data_root'
 IFS= read -r actual_registry_header <"${registry}"
 if [[ "${actual_registry_header}" != "${expected_registry_header}" ]]; then
     printf 'checkpoint 3A verifier: registry schema mismatch\n' >&2
@@ -28,7 +28,8 @@ config_row="$(awk -F '\t' -v engine="${requested_engine}" \
 }
 IFS=$'\t' read -r \
     engine checkpoint report_name protected_config_rel run_subdir input_kind \
-    input_rel transcript_rel capture_commit authorized_base_commit \
+    input_rel transcript_rel expected_said_ps_witness expected_said_ps_bytes \
+    capture_commit authorized_base_commit \
     expected_stdout_relation expected_smoke_result \
     expected_cross_context_relation expected_cross_context_difference_files \
     expected_report_files expected_raw_files expected_manifest_entries \
@@ -37,10 +38,14 @@ IFS=$'\t' read -r \
     expected_context_manifest_entries expected_runtime_comparison_rows \
     expected_protected_input_count expected_protected_field_count \
     expected_volatile_field_count expected_binary_sha256 expected_input_sha256 \
-    expected_historical_stdout_sha256 expected_modern_stdout_sha256 \
+    expected_historical_plus14_stdout_sha256 \
+    expected_historical_minus12_stdout_sha256 \
+    expected_modern_plus14_stdout_sha256 \
+    expected_modern_minus12_stdout_sha256 \
     historical_data_root modern_data_root <<<"${config_row}"
 readonly engine checkpoint report_name protected_config_rel run_subdir input_kind
-readonly input_rel transcript_rel capture_commit authorized_base_commit
+readonly input_rel transcript_rel expected_said_ps_witness expected_said_ps_bytes
+readonly capture_commit authorized_base_commit
 readonly expected_stdout_relation expected_smoke_result
 readonly expected_cross_context_relation expected_cross_context_difference_files
 readonly expected_report_files expected_raw_files expected_manifest_entries
@@ -49,7 +54,9 @@ readonly expected_build_difference_count expected_build_difference_path
 readonly expected_context_manifest_entries expected_runtime_comparison_rows
 readonly expected_protected_input_count expected_protected_field_count
 readonly expected_volatile_field_count expected_binary_sha256 expected_input_sha256
-readonly expected_historical_stdout_sha256 expected_modern_stdout_sha256
+readonly expected_historical_plus14_stdout_sha256
+readonly expected_historical_minus12_stdout_sha256
+readonly expected_modern_plus14_stdout_sha256 expected_modern_minus12_stdout_sha256
 readonly historical_data_root modern_data_root
 readonly report_rel="phase1/reports/${report_name}"
 readonly report_root="${outputs_root}/${report_rel}"
@@ -95,6 +102,18 @@ case "${expected_cross_context_relation}" in
         exit 64
         ;;
 esac
+case "${expected_said_ps_witness}" in
+    absent|created) ;;
+    *)
+        printf 'checkpoint 3A verifier: unsupported SAID.PS witness: %s\n' \
+            "${expected_said_ps_witness}" >&2
+        exit 64
+        ;;
+esac
+if [[ ! "${expected_said_ps_bytes}" =~ ^[0-9]+$ ]]; then
+    printf 'checkpoint 3A verifier: SAID.PS byte count is not numeric\n' >&2
+    exit 64
+fi
 for expected_count in \
     "${expected_cross_context_difference_files}" \
     "${expected_report_files}" "${expected_raw_files}" \
@@ -111,8 +130,10 @@ for expected_count in \
 done
 for expected_hash in \
     "${expected_binary_sha256}" "${expected_input_sha256}" \
-    "${expected_historical_stdout_sha256}" \
-    "${expected_modern_stdout_sha256}"; do
+    "${expected_historical_plus14_stdout_sha256}" \
+    "${expected_historical_minus12_stdout_sha256}" \
+    "${expected_modern_plus14_stdout_sha256}" \
+    "${expected_modern_minus12_stdout_sha256}"; do
     if [[ ! "${expected_hash}" =~ ^[0-9a-f]{64}$ ]]; then
         printf 'checkpoint 3A verifier: registry hash is not lowercase 64-hex\n' >&2
         exit 64
@@ -148,12 +169,29 @@ if [[ "${expected_cross_context_relation}" == exact && \
     exit 64
 fi
 if [[ "${expected_stdout_relation}" == exact && \
-      "${expected_historical_stdout_sha256}" != \
-      "${expected_modern_stdout_sha256}" ]] || \
+      ( "${expected_historical_plus14_stdout_sha256}" != \
+        "${expected_modern_plus14_stdout_sha256}" || \
+        "${expected_historical_minus12_stdout_sha256}" != \
+        "${expected_modern_minus12_stdout_sha256}" ) ]] || \
    [[ "${expected_stdout_relation}" == data_root_display_only && \
-      "${expected_historical_stdout_sha256}" == \
-      "${expected_modern_stdout_sha256}" ]]; then
+      ( "${expected_historical_plus14_stdout_sha256}" == \
+        "${expected_modern_plus14_stdout_sha256}" || \
+        "${expected_historical_minus12_stdout_sha256}" == \
+        "${expected_modern_minus12_stdout_sha256}" ) ]]; then
     printf 'checkpoint 3A verifier: stdout relation/hash contract is inconsistent\n' >&2
+    exit 64
+fi
+if [[ "${expected_cross_context_relation}" == exact && \
+      ( "${expected_historical_plus14_stdout_sha256}" != \
+        "${expected_historical_minus12_stdout_sha256}" || \
+        "${expected_modern_plus14_stdout_sha256}" != \
+        "${expected_modern_minus12_stdout_sha256}" ) ]] || \
+   [[ "${expected_cross_context_relation}" == date_fields_only && \
+      ( "${expected_historical_plus14_stdout_sha256}" == \
+        "${expected_historical_minus12_stdout_sha256}" || \
+        "${expected_modern_plus14_stdout_sha256}" == \
+        "${expected_modern_minus12_stdout_sha256}" ) ]]; then
+    printf 'checkpoint 3A verifier: cross-context relation/hash contract is inconsistent\n' >&2
     exit 64
 fi
 
@@ -298,9 +336,13 @@ case "${historical_registry_header}" in
         ;;
     "${expected_registry_header}")
         historical_capture_field="$(printf '%s\n' "${historical_config_row}" \
-            | awk -F '\t' '{print $9}')"
+            | awk -F '\t' '{print $11}')"
         if [[ "$(printf '%s\n' "${historical_config_row}" | cut -f1-8)" != \
               "${current_capture_core}" || \
+              "$(printf '%s\n' "${historical_config_row}" | cut -f9)" != \
+              "${expected_said_ps_witness}" || \
+              "$(printf '%s\n' "${historical_config_row}" | cut -f10)" != \
+              "${expected_said_ps_bytes}" || \
               ( "${historical_capture_field}" != HEAD && \
                 "${historical_capture_field}" != "${capture_commit}" ) ]]; then
             printf 'checkpoint 3A verifier: capture registry producer differs engine=%s\n' \
@@ -421,7 +463,17 @@ for lineage in historical modern; do
     test "${changed_files}" -eq "${expected_cross_context_difference_files}"
 done
 
-for context in utc-plus-14 utc-minus-12; do
+readonly -a contexts=(utc-plus-14 utc-minus-12)
+readonly -a expected_historical_stdout_hashes=(
+    "${expected_historical_plus14_stdout_sha256}"
+    "${expected_historical_minus12_stdout_sha256}"
+)
+readonly -a expected_modern_stdout_hashes=(
+    "${expected_modern_plus14_stdout_sha256}"
+    "${expected_modern_minus12_stdout_sha256}"
+)
+for index in 0 1; do
+    context="${contexts[${index}]}"
     context_root="${raw_root}/runtime/${context}"
     verify_manifest_inventory "${context_root}" \
         "${context_root}/evidence-manifest.sha256" evidence-manifest.sha256
@@ -471,12 +523,16 @@ for context in utc-plus-14 utc-minus-12; do
     test "$(hash_file "${historical_run}/input.txt")" = "${expected_input_sha256}"
     test "$(hash_file "${modern_run}/input.txt")" = "${expected_input_sha256}"
     test "$(hash_file "${historical_run}/stdout.txt")" = \
-        "${expected_historical_stdout_sha256}"
+        "${expected_historical_stdout_hashes[${index}]}"
     test "$(hash_file "${modern_run}/stdout.txt")" = \
-        "${expected_modern_stdout_sha256}"
+        "${expected_modern_stdout_hashes[${index}]}"
     for run_root in "${historical_run}" "${modern_run}"; do
         test "$(manifest_value exit_status "${run_root}/manifest.txt")" = 0
         test "$(manifest_value normal_exit "${run_root}/manifest.txt")" = yes
+        test "$(manifest_value said_ps_witness "${run_root}/manifest.txt")" = \
+            "${expected_said_ps_witness}"
+        test "$(manifest_value said_ps_bytes "${run_root}/manifest.txt")" = \
+            "${expected_said_ps_bytes}"
     done
 done
 

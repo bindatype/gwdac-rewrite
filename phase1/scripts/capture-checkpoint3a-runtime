@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ "$#" -ne 6 ]]; then
-    printf 'usage: %s <engine> <historical|modern> <run-subdir> <input-kind> <input-rel> <transcript-rel>\n' "$0" >&2
+if [[ "$#" -ne 8 ]]; then
+    printf 'usage: %s <engine> <historical|modern> <run-subdir> <input-kind> <input-rel> <transcript-rel> <said-ps-witness> <said-ps-bytes>\n' "$0" >&2
     exit 64
 fi
 
@@ -12,6 +12,8 @@ readonly run_subdir="$3"
 readonly input_kind="$4"
 readonly input_rel="$5"
 readonly transcript_rel="$6"
+readonly expected_said_ps_witness="$7"
+readonly expected_said_ps_bytes="$8"
 
 case "${lineage}" in
     historical|modern) ;;
@@ -27,6 +29,18 @@ case "${input_kind}" in
         exit 64
         ;;
 esac
+case "${expected_said_ps_witness}" in
+    absent|created) ;;
+    *)
+        printf 'checkpoint 3A capture: unsupported SAID.PS witness: %s\n' \
+            "${expected_said_ps_witness}" >&2
+        exit 64
+        ;;
+esac
+if [[ ! "${expected_said_ps_bytes}" =~ ^[0-9]+$ ]]; then
+    printf 'checkpoint 3A capture: SAID.PS byte count is not numeric\n' >&2
+    exit 64
+fi
 
 readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
 readonly phase1_root="${PHASE1_ROOT:-/phase1}"
@@ -128,15 +142,13 @@ if [[ -f "${work_root}/SAID.PS" ]]; then
     said_ps_witness=created
     said_ps_bytes="$(wc -c <"${work_root}/SAID.PS" | tr -d ' ')"
 fi
-case "${engine}" in
-    knsd)
-        if [[ "${said_ps_witness}" != created || "${said_ps_bytes}" -ne 0 ]]; then
-            printf 'checkpoint 3A capture: invalid SAID.PS witness engine=%s state=%s bytes=%s\n' \
-                "${engine}" "${said_ps_witness}" "${said_ps_bytes}" >&2
-            exit 1
-        fi
-        ;;
-esac
+if [[ "${said_ps_witness}" != "${expected_said_ps_witness}" || \
+      "${said_ps_bytes}" -ne "${expected_said_ps_bytes}" ]]; then
+    printf 'checkpoint 3A capture: invalid SAID.PS witness engine=%s state=%s bytes=%s expected_state=%s expected_bytes=%s\n' \
+        "${engine}" "${said_ps_witness}" "${said_ps_bytes}" \
+        "${expected_said_ps_witness}" "${expected_said_ps_bytes}" >&2
+    exit 1
+fi
 rm -f "${work_root}/SAID.PS"
 
 artifact_inputs=()
