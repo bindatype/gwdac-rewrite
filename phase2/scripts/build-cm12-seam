@@ -40,6 +40,9 @@ if [[ "${skip_prsdd_build}" != "1" ]]; then
         bash "${phase1_root}/scripts/build-prsdd"
 fi
 test -x "${artifact_root}/prsdd-headless"
+install -m 0755 \
+    "${phase2_root}/scripts/prsdd-headless-cm12-accepted" \
+    "${artifact_root}/prsdd-headless-cm12-accepted"
 
 rm -f "${probe_build_root}"/*.o "${probe_build_root}"/*.mod
 gfortran \
@@ -455,6 +458,7 @@ fi
     printf 'solution_sha256=%s\n' "${solution_sha256}"
     sha256sum \
         "${artifact_root}/prsdd-headless" \
+        "${artifact_root}/prsdd-headless-cm12-accepted" \
         "${artifact_root}/cm12-dataset-probe" \
         "${artifact_root}/cm12-solution-probe" \
         "${artifact_root}/cm12-scalar-parity-probe" \

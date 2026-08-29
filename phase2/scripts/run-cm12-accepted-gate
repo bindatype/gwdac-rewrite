@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+export GWDAC_GATE_SEAM_ENGINE=accepted-seam
+export GWDAC_GATE_REQUIRE_CANDIDATE=1
+export GWDAC_GATE_ALLOW_REQUEST_PROBE_MISMATCH=1
+exec "${script_root}/run-cm12-gate" "$@"

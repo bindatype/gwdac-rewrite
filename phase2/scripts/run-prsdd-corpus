@@ -36,6 +36,14 @@ case "${engine}" in
         readonly state_root="${PRSD_STATE_ROOT:-/workspace/phase2/seam-corpus}"
         readonly runtime_library_path="${LD_LIBRARY_PATH:-}"
         ;;
+    accepted-seam)
+        readonly executable="$(
+            printf '/workspace/phase2/reproducible/artifacts/%s/prsdd-headless-cm12-accepted' \
+                "${short_commit}"
+        )"
+        readonly state_root="${PRSD_STATE_ROOT:-/workspace/phase2/accepted-seam-corpus}"
+        readonly runtime_library_path="${LD_LIBRARY_PATH:-}"
+        ;;
     arndt64)
         readonly executable="${source_root}/said/prsdd"
         readonly state_root="${PRSD_STATE_ROOT:-/oracle-work/phase2/corpus}"

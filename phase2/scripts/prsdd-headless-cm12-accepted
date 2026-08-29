@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly launcher_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+unset CM12_FORCE_LEGACY_PRBAS
+export CM12_PRBAS_MODE=legacy
+exec "${launcher_root}/prsdd-headless" "$@"

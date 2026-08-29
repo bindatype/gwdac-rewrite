@@ -56,6 +56,24 @@ diagnosis.
 The oracle container remains network-disabled and read-only apart from its
 dedicated work volume and report mount.
 
+## Run the accepted CM12 seam
+
+The accepted entry point is generated beside the Phase 2 binary as
+`prsdd-headless-cm12-accepted`. It fixes legacy request orchestration with
+diagnostic trace output disabled; the experimental typed request path remains
+available only through the separately named `seam` engine.
+
+From a clean repository root, run the scoped four-engine gate with:
+
+```sh
+make reviewer-reproduce-cm12-accepted
+```
+
+The gate sets `PRSD_ENGINE=accepted-seam` explicitly for all 24 fixtures and
+288 displayed records. It also runs one route witness through the forensic
+`CM12_FORCE_LEGACY_PRBAS=1` path and requires the accepted launcher to emit
+zero `CM12DIAG` records.
+
 For review, use the repository-level harness instead of writing generated
 reports into the authoritative checkout:
 

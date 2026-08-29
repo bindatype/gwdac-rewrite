@@ -18,6 +18,7 @@ readonly summary="${host_report_root}/summary.txt"
 readonly keep_environment="${GWDAC_GATE_KEEP_ENVIRONMENT:-0}"
 readonly require_candidate="${GWDAC_GATE_REQUIRE_CANDIDATE:-1}"
 readonly allow_request_probe_mismatch="${GWDAC_GATE_ALLOW_REQUEST_PROBE_MISMATCH:-0}"
+readonly seam_engine="${GWDAC_GATE_SEAM_ENGINE:-seam}"
 readonly -a compose=(
     docker compose
     -p "${project}"
@@ -32,6 +33,10 @@ fi
 if [[ "${allow_request_probe_mismatch}" != 0 && \
     "${allow_request_probe_mismatch}" != 1 ]]; then
     printf 'GWDAC_GATE_ALLOW_REQUEST_PROBE_MISMATCH must be 0 or 1\n' >&2
+    exit 2
+fi
+if [[ "${seam_engine}" != seam && "${seam_engine}" != accepted-seam ]]; then
+    printf 'GWDAC_GATE_SEAM_ENGINE must be seam or accepted-seam\n' >&2
     exit 2
 fi
 printf '%s\n' $'step\tstatus' >"${command_table}"
@@ -71,7 +76,7 @@ run_step build-candidate \
     -e "CM12_ALLOW_REQUEST_PROBE_MISMATCH=${allow_request_probe_mismatch}" \
     dev bash /phase2/scripts/build-cm12-seam
 
-for engine in modern seam; do
+for engine in modern "${seam_engine}"; do
     run_step "dsg-${engine}" \
         "${compose[@]}" exec -T \
         -e "PRSD_ENGINE=${engine}" \
@@ -83,6 +88,13 @@ for engine in modern seam; do
         -e "PHASE2_REPORT_ROOT=${container_report_root}" \
         dev bash /phase2/scripts/run-prsdd-amplitude-corpus
 done
+
+if [[ "${seam_engine}" == accepted-seam ]]; then
+    run_step accepted-route \
+        "${compose[@]}" exec -T \
+        -e "PHASE2_REPORT_ROOT=${container_report_root}" \
+        dev bash /phase2/scripts/verify-cm12-accepted-route
+fi
 
 for engine in arndt64 gwdac; do
     run_step "dsg-${engine}" \
@@ -123,7 +135,7 @@ compare_fixture() {
     local modern="${host_report_root}/${result_subdir}/modern/${id}.results.tsv"
     local arndt64="${host_report_root}/${result_subdir}/arndt64/${id}.results.tsv"
     local gwdac="${host_report_root}/${result_subdir}/gwdac/${id}.results.tsv"
-    local candidate="${host_report_root}/${result_subdir}/seam/${id}.results.tsv"
+    local candidate="${host_report_root}/${result_subdir}/${seam_engine}/${id}.results.tsv"
     local modern_sha
     local arndt64_sha
     local gwdac_sha
@@ -200,6 +212,7 @@ done <"${phase2_root}/fixtures/amplitudes/corpus.tsv"
     printf 'oracle_failures=%s\n' "${oracle_failures}"
     printf 'candidate_failures=%s\n' "${candidate_failures}"
     printf 'candidate_required=%s\n' "${require_candidate}"
+    printf 'seam_engine=%s\n' "${seam_engine}"
     printf 'request_probe_mismatch_allowed=%s\n' \
         "${allow_request_probe_mismatch}"
     printf 'gate_table_sha256=%s\n' "$(

@@ -95,6 +95,9 @@ subroutine prbas
     integer :: diagnostic_length
     integer :: diagnostic_status
     character(len=8) :: diagnostic_value
+    integer :: mode_length
+    integer :: mode_status
+    character(len=16) :: mode_value
     external :: prbas_legacy
     common /cm12diag/ cm12_diagnostic
 
@@ -107,6 +110,16 @@ subroutine prbas
         diagnostic_status == 0 .and. diagnostic_length > 0 .and. &
         diagnostic_value(1:1) == '1') then
         cm12_diagnostic = 1
+        call prbas_legacy
+        return
+    end if
+    mode_value = ''
+    call get_environment_variable( &
+        'CM12_PRBAS_MODE', mode_value, &
+        length=mode_length, status=mode_status)
+    if ( &
+        mode_status == 0 .and. mode_length > 0 .and. &
+        trim(mode_value) == 'legacy') then
         call prbas_legacy
         return
     end if
