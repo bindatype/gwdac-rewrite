@@ -6,6 +6,7 @@ readonly outputs_root="$(cd "${script_root}/../.." && pwd)"
 readonly compose_file="${outputs_root}/container-environment/compose.yaml"
 readonly registry="${outputs_root}/phase1/config/checkpoint3a-engines.tsv"
 readonly relation_classifier="${outputs_root}/phase1/scripts/classify-checkpoint3a-relation"
+readonly volatile_ledger_verifier="${outputs_root}/phase1/scripts/verify-checkpoint3a-volatile-ledger"
 readonly stable_main=3b56542884efc5c24d302335b263f6c50eed5dd0
 readonly expected_dirty_entries=567
 readonly expected_dirty_sha256=9301c33f06487ac65c131d2e090dc23b33e86a9a0e1066ed18ab7dc5bcb35632
@@ -18,7 +19,7 @@ if [[ "$#" -ne 1 ]]; then
 fi
 readonly requested_engine="$1"
 
-readonly expected_registry_header=$'engine\tcheckpoint\treport_name\tprotected_inputs\trun_subdir\tinput_kind\tinput_rel\ttranscript_rel\texpected_said_ps_witness\texpected_said_ps_bytes\tcapture_commit\tauthorized_base_commit\texpected_stdout_relation\texpected_smoke_result\texpected_cross_context_relation\texpected_cross_context_difference_files\texpected_report_files\texpected_raw_files\texpected_manifest_entries\texpected_raw_manifest_entries\texpected_build_comparison_rows\texpected_build_difference_count\texpected_build_difference_path\texpected_context_manifest_entries\texpected_runtime_comparison_rows\texpected_protected_input_count\texpected_protected_field_count\texpected_volatile_field_count\texpected_binary_sha256\texpected_input_sha256\texpected_historical_plus14_stdout_sha256\texpected_historical_minus12_stdout_sha256\texpected_modern_plus14_stdout_sha256\texpected_modern_minus12_stdout_sha256\thistorical_data_root\tmodern_data_root'
+readonly expected_registry_header=$'engine\tcheckpoint\treport_name\tprotected_inputs\trun_subdir\tinput_kind\tinput_rel\ttranscript_rel\texpected_said_ps_witness\texpected_said_ps_bytes\tcapture_commit\tauthorized_base_commit\texpected_stdout_relation\texpected_smoke_result\texpected_cross_context_relation\texpected_cross_context_difference_files\texpected_report_files\texpected_raw_files\texpected_manifest_entries\texpected_raw_manifest_entries\texpected_build_comparison_rows\texpected_build_difference_count\texpected_build_difference_path\texpected_context_manifest_entries\texpected_runtime_comparison_rows\texpected_protected_input_count\texpected_protected_row_count\texpected_volatile_row_count\texpected_volatile_observed_count\texpected_binary_sha256\texpected_input_sha256\texpected_historical_plus14_stdout_sha256\texpected_historical_minus12_stdout_sha256\texpected_modern_plus14_stdout_sha256\texpected_modern_minus12_stdout_sha256\thistorical_data_root\tmodern_data_root'
 IFS= read -r actual_registry_header <"${registry}"
 if [[ "${actual_registry_header}" != "${expected_registry_header}" ]]; then
     printf 'checkpoint 3A: registry schema mismatch\n' >&2
@@ -42,8 +43,9 @@ IFS=$'\t' read -r \
     expected_raw_manifest_entries expected_build_comparison_rows \
     expected_build_difference_count expected_build_difference_path \
     expected_context_manifest_entries expected_runtime_comparison_rows \
-    expected_protected_input_count expected_protected_field_count \
-    expected_volatile_field_count expected_binary_sha256 expected_input_sha256 \
+    expected_protected_input_count expected_protected_row_count \
+    expected_volatile_row_count expected_volatile_observed_count \
+    expected_binary_sha256 expected_input_sha256 \
     expected_historical_plus14_stdout_sha256 \
     expected_historical_minus12_stdout_sha256 \
     expected_modern_plus14_stdout_sha256 \
@@ -58,8 +60,9 @@ readonly expected_report_files expected_raw_files expected_manifest_entries
 readonly expected_raw_manifest_entries expected_build_comparison_rows
 readonly expected_build_difference_count expected_build_difference_path
 readonly expected_context_manifest_entries expected_runtime_comparison_rows
-readonly expected_protected_input_count expected_protected_field_count
-readonly expected_volatile_field_count expected_binary_sha256 expected_input_sha256
+readonly expected_protected_input_count expected_protected_row_count
+readonly expected_volatile_row_count expected_volatile_observed_count
+readonly expected_binary_sha256 expected_input_sha256
 readonly expected_historical_plus14_stdout_sha256
 readonly expected_historical_minus12_stdout_sha256
 readonly expected_modern_plus14_stdout_sha256 expected_modern_minus12_stdout_sha256
@@ -99,6 +102,11 @@ fi
 if [[ ! -x "${relation_classifier}" ]]; then
     printf 'checkpoint 3A: missing relation classifier: %s\n' \
         "${relation_classifier}" >&2
+    exit 64
+fi
+if [[ ! -x "${volatile_ledger_verifier}" ]]; then
+    printf 'checkpoint 3A: missing volatile ledger verifier: %s\n' \
+        "${volatile_ledger_verifier}" >&2
     exit 64
 fi
 if [[ "${capture_commit}" != HEAD && \
@@ -159,8 +167,8 @@ for expected_count in \
     "${expected_manifest_entries}" "${expected_raw_manifest_entries}" \
     "${expected_build_comparison_rows}" "${expected_build_difference_count}" \
     "${expected_context_manifest_entries}" "${expected_runtime_comparison_rows}" \
-    "${expected_protected_input_count}" "${expected_protected_field_count}" \
-    "${expected_volatile_field_count}"; do
+    "${expected_protected_input_count}" "${expected_protected_row_count}" \
+    "${expected_volatile_row_count}" "${expected_volatile_observed_count}"; do
     if [[ "${expected_count}" != MEASURE && \
           ! "${expected_count}" =~ ^[0-9]+$ ]]; then
         printf 'checkpoint 3A: registry count is not numeric: %s\n' \
@@ -171,8 +179,9 @@ done
 for operational_count in \
     "${expected_cross_context_difference_files}" \
     "${expected_build_difference_count}" \
-    "${expected_protected_field_count}" \
-    "${expected_volatile_field_count}"; do
+    "${expected_protected_row_count}" \
+    "${expected_volatile_row_count}" \
+    "${expected_volatile_observed_count}"; do
     if [[ ! "${operational_count}" =~ ^[0-9]+$ ]]; then
         printf 'checkpoint 3A: operational registry count is not numeric: %s\n' \
             "${operational_count}" >&2
@@ -835,11 +844,8 @@ if [[ "${expected_cross_context_relation}" == date_fields_and_hashes_only ]]; th
     done < <(find "${report_root}" -maxdepth 1 -type f \
         -name 'runtime-*-hash-fields.tsv' -print | LC_ALL=C sort)
 fi
-if [[ "$(awk 'END {print NR - 1}' "${report_root}/volatile-fields.tsv")" -ne \
-      "${expected_volatile_field_count}" ]]; then
-    printf 'checkpoint 3A: volatile summary count differs from registry\n' >&2
-    exit 1
-fi
+"${volatile_ledger_verifier}" "${report_root}/volatile-fields.tsv" \
+    "${expected_volatile_row_count}" "${expected_volatile_observed_count}"
 
 printf '%s\n' $'class\tartifact_or_source\tevidence\tresult' \
     >"${report_root}/protected-fields.tsv"
@@ -886,8 +892,8 @@ printf '%s\t%s\t%s\t%s\n' \
     'Build A/B direct SHA-256' exact \
     >>"${report_root}/protected-fields.tsv"
 if [[ "$(awk 'END {print NR - 1}' "${report_root}/protected-fields.tsv")" -ne \
-      "${expected_protected_field_count}" ]]; then
-    printf 'checkpoint 3A: protected summary count differs from registry\n' >&2
+      "${expected_protected_row_count}" ]]; then
+    printf 'checkpoint 3A: protected summary row count differs from registry\n' >&2
     exit 1
 fi
 

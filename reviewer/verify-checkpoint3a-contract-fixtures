@@ -4,6 +4,7 @@ set -euo pipefail
 readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly outputs_root="$(cd "${script_root}/.." && pwd)"
 readonly verifier="${outputs_root}/phase1/scripts/verify-checkpoint3a-measurement"
+readonly volatile_ledger_verifier="${outputs_root}/phase1/scripts/verify-checkpoint3a-volatile-ledger"
 readonly registry="${outputs_root}/phase1/config/checkpoint3a-engines.tsv"
 readonly workspace="$(mktemp -d "${TMPDIR:-/tmp}/checkpoint3a-contract.XXXXXX")"
 
@@ -47,4 +48,25 @@ if [[ "${incomplete_status}" -ne 64 ]]; then
     exit 1
 fi
 
-printf 'checkpoint 3A contract fixtures: PASS unsupported=1 incomplete=1\n'
+"${volatile_ledger_verifier}" \
+    "${outputs_root}/phase1/reports/checkpoint3a1-pdsd-measurement/volatile-fields.tsv" \
+    1 1
+"${volatile_ledger_verifier}" \
+    "${outputs_root}/phase1/reports/checkpoint3a2-knsd-measurement/volatile-fields.tsv" \
+    7 9
+
+awk -F '\t' 'BEGIN {OFS = "\t"} NR == 7 {$4++} {print}' \
+    "${outputs_root}/phase1/reports/checkpoint3a2-knsd-measurement/volatile-fields.tsv" \
+    >"${workspace}/corrupt-observed-count.tsv"
+set +e
+"${volatile_ledger_verifier}" "${workspace}/corrupt-observed-count.tsv" 7 9 \
+    >"${workspace}/corrupt.stdout" 2>"${workspace}/corrupt.stderr"
+corrupt_status=$?
+set -e
+if [[ "${corrupt_status}" -ne 1 ]]; then
+    printf 'checkpoint 3A contract fixtures: corrupt observed count status=%s expected=1\n' \
+        "${corrupt_status}" >&2
+    exit 1
+fi
+
+printf 'checkpoint 3A contract fixtures: PASS unsupported=1 incomplete=1 volatile_positive=2 volatile_tally_negative=1\n'

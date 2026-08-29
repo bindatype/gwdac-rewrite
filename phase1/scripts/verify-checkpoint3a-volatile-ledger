@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "$#" -ne 3 ]]; then
+    printf 'usage: %s <ledger> <expected-row-count> <expected-observed-count>\n' \
+        "$0" >&2
+    exit 64
+fi
+
+readonly ledger="$1"
+readonly expected_row_count="$2"
+readonly expected_observed_count="$3"
+readonly expected_header=$'artifact\tfield_selector\tclass\tobserved_count\tevidence\tresult'
+
+if [[ ! -f "${ledger}" ]]; then
+    printf 'checkpoint 3A volatile ledger: missing ledger: %s\n' "${ledger}" >&2
+    exit 64
+fi
+for expected_count in "${expected_row_count}" "${expected_observed_count}"; do
+    if [[ ! "${expected_count}" =~ ^[0-9]+$ ]]; then
+        printf 'checkpoint 3A volatile ledger: expected count is not numeric: %s\n' \
+            "${expected_count}" >&2
+        exit 64
+    fi
+done
+
+IFS= read -r actual_header <"${ledger}"
+if [[ "${actual_header}" != "${expected_header}" ]]; then
+    printf 'checkpoint 3A volatile ledger: schema mismatch\n' >&2
+    exit 1
+fi
+
+readonly invalid_rows="$(awk -F '\t' '
+    NR > 1 && (NF != 6 || $1 == "" || $2 == "" ||
+        $3 != "execution_metadata" || $4 !~ /^[1-9][0-9]*$/ ||
+        $5 == "" || $6 != "measured_volatile") {count++}
+    END {print count + 0}
+' "${ledger}")"
+readonly actual_row_count="$(awk 'END {print NR - 1}' "${ledger}")"
+readonly actual_observed_count="$(awk -F '\t' '
+    NR > 1 {total += $4}
+    END {print total + 0}
+' "${ledger}")"
+
+if [[ "${invalid_rows}" -ne 0 ]]; then
+    printf 'checkpoint 3A volatile ledger: invalid rows=%s\n' \
+        "${invalid_rows}" >&2
+    exit 1
+fi
+if [[ "${actual_row_count}" -ne "${expected_row_count}" ]]; then
+    printf 'checkpoint 3A volatile ledger: row count=%s expected=%s\n' \
+        "${actual_row_count}" "${expected_row_count}" >&2
+    exit 1
+fi
+if [[ "${actual_observed_count}" -ne "${expected_observed_count}" ]]; then
+    printf 'checkpoint 3A volatile ledger: observed count=%s expected=%s\n' \
+        "${actual_observed_count}" "${expected_observed_count}" >&2
+    exit 1
+fi
