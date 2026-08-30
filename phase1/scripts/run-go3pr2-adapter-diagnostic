@@ -20,6 +20,13 @@ combine_results() {
     local live_value
     local adapter_equal
     local website_equal
+    local display_label
+    local recorded_value
+    local first_archived_value=
+    local first_live_value=
+    local all_rows_agree=yes
+    local all_website_match=yes
+    local row_count=0
 
     test -f "${report_root}/modern/results.tsv"
     test -f "${report_root}/historical/results.tsv"
@@ -59,7 +66,63 @@ combine_results() {
             >>"${comparison}"
     done
 
-    cat "${comparison}"
+    printf '%-30s  %-22s  %-28s  %s\n' \
+        'Executable' \
+        'Fresh request, no GO5' \
+        'Website request, GO5 primed' \
+        'Matches recorded website?'
+    printf '%-30s  %-22s  %-28s  %s\n' \
+        '------------------------------' \
+        '----------------------' \
+        '----------------------------' \
+        '-------------------------'
+    while IFS=$'\t' read -r label archived_value live_value \
+        adapter_equal recorded_value website_equal; do
+        if [[ "${label}" == label ]]; then
+            continue
+        fi
+        case "${label}" in
+            modern-headless)
+                display_label='Modern Ubuntu build'
+                ;;
+            arndt64)
+                display_label='Retained arndt64 executable'
+                ;;
+            gwdac)
+                display_label='Retained GWDAC executable'
+                ;;
+            *)
+                printf 'Unknown comparison label: %s\n' "${label}" >&2
+                return 1
+                ;;
+        esac
+        row_count=$((row_count + 1))
+        if [[ -z "${first_archived_value}" ]]; then
+            first_archived_value="${archived_value}"
+            first_live_value="${live_value}"
+        elif [[ "${archived_value}" != "${first_archived_value}" || \
+            "${live_value}" != "${first_live_value}" ]]; then
+            all_rows_agree=no
+        fi
+        if [[ "${website_equal}" != yes ]]; then
+            all_website_match=no
+        fi
+        printf '%-30s  %-22s  %-28s  %s\n' \
+            "${display_label}" \
+            "${archived_value}" \
+            "${live_value}" \
+            "${website_equal}"
+    done <"${comparison}"
+    if [[ "${row_count}" -eq 3 && "${all_rows_agree}" == yes && \
+        "${all_website_match}" == yes && \
+        "${first_archived_value}" == 0.2036E+01 && \
+        "${first_live_value}" == 0.2098E+01 ]]; then
+        printf '\nAll three executables agree: GO5 priming changes the displayed\n'
+        printf 'result from 2.036 to 2.098, which matches the recorded website value.\n'
+    else
+        printf '\nThe comparison differs from the accepted website-equivalent result.\n'
+        return 1
+    fi
 }
 
 if [[ "${mode}" == "compare" ]]; then
