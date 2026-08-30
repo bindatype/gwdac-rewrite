@@ -1,0 +1,219 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly outputs_root="$(cd "${script_root}/.." && pwd)"
+readonly workspace="$(mktemp -d "${TMPDIR:-/tmp}/checkpoint3a-mixed-package.XXXXXX")"
+readonly fixture_root="${workspace}/outputs"
+readonly report_rel=phase1/reports/checkpoint3a1-pdsd-measurement
+readonly report_root="${fixture_root}/${report_rel}"
+readonly raw_root="${report_root}/raw"
+
+cleanup() {
+    rm -rf "${workspace}"
+}
+trap cleanup EXIT
+
+for tool in awk cmp cp find git grep mktemp mv rm sed shasum sort wc; do
+    if ! command -v "${tool}" >/dev/null 2>&1; then
+        printf 'checkpoint 3A mixed-package fixture: missing tool: %s\n' \
+            "${tool}" >&2
+        exit 40
+    fi
+done
+
+hash_file() {
+    shasum -a 256 "$1" | awk '{print $1}'
+}
+
+replace_file() {
+    local source="$1"
+    local target="$2"
+
+    mv "${source}" "${target}"
+}
+
+write_tree_manifest() {
+    local tree="$1"
+    local manifest="$2"
+    local exclude="$3"
+    local temporary
+    local relative
+
+    temporary="$(mktemp "${TMPDIR:-/tmp}/checkpoint3a-manifest.XXXXXX")"
+    while IFS= read -r relative; do
+        printf '%s  %s\n' "$(hash_file "${tree}/${relative}")" "${relative}" \
+            >>"${temporary}"
+    done < <(
+        cd "${tree}"
+        find . -type f -print | sed 's#^\./##' \
+            | awk -v exclude="${exclude}" '$0 != exclude' \
+            | LC_ALL=C sort
+    )
+    replace_file "${temporary}" "${manifest}"
+}
+
+rewrite_registry() {
+    local requested_capture_commit="$1"
+    local temporary
+
+    temporary="$(mktemp "${TMPDIR:-/tmp}/checkpoint3a-registry.XXXXXX")"
+    awk -F '\t' -v capture_commit="${requested_capture_commit}" 'BEGIN {OFS = "\t"}
+        NR == 1 {print; next}
+        $1 == "pdsd" {
+            $11 = capture_commit
+            $15 = "date_fields_and_hashes_only"
+            $16 = 2
+        }
+        {print}
+    ' "${fixture_root}/phase1/config/checkpoint3a-engines.tsv" >"${temporary}"
+    replace_file "${temporary}" \
+        "${fixture_root}/phase1/config/checkpoint3a-engines.tsv"
+}
+
+rewrite_manifest_artifact_hash() {
+    local manifest="$1"
+    local artifact="$2"
+    local artifact_hash
+    local temporary
+
+    artifact_hash="$(hash_file "${artifact}")"
+    temporary="$(mktemp "${TMPDIR:-/tmp}/checkpoint3a-run-manifest.XXXXXX")"
+    awk -v hash="${artifact_hash}" '
+        /  \/phase1\/reports\/direct\/(historical|modern)\/SAID.TMP$/ {
+            sub(/^[0-9a-f]{64}/, hash)
+        }
+        {print}
+    ' "${manifest}" >"${temporary}"
+    replace_file "${temporary}" "${manifest}"
+}
+
+write_runtime_comparison() {
+    local lineage="$1"
+    local output="${report_root}/runtime-${lineage}-timezone-comparison.tsv"
+    local left_root="${raw_root}/runtime/utc-plus-14/${lineage}"
+    local right_root="${raw_root}/runtime/utc-minus-12/${lineage}"
+    local temporary
+    local inventory
+    local relative
+    local relation
+    local changed=0
+
+    temporary="$(mktemp "${TMPDIR:-/tmp}/checkpoint3a-comparison.XXXXXX")"
+    inventory="$(mktemp "${TMPDIR:-/tmp}/checkpoint3a-inventory.XXXXXX")"
+    printf 'path\tutc_plus_14_sha256\tutc_minus_12_sha256\trelation\n' \
+        >"${temporary}"
+    while IFS= read -r relative; do
+        if cmp -s "${left_root}/${relative}" "${right_root}/${relative}"; then
+            relation=exact
+        elif [[ "${relative}" == SAID.TMP ]]; then
+            "${fixture_root}/phase1/scripts/classify-checkpoint3a-relation" \
+                --mode date_fields_only \
+                --left "${left_root}/${relative}" \
+                --right "${right_root}/${relative}" \
+                --inventory "${inventory}" >/dev/null
+            relation=date_fields_only
+            changed=$((changed + 1))
+        elif [[ "${relative}" == manifest.txt ]]; then
+            "${fixture_root}/phase1/scripts/classify-checkpoint3a-relation" \
+                --mode hash_manifest_only \
+                --left "${left_root}/${relative}" \
+                --right "${right_root}/${relative}" \
+                --left-root "${left_root}" \
+                --right-root "${right_root}" \
+                --lineage "${lineage}" \
+                --inventory "${inventory}" >/dev/null
+            relation=hash_manifest_only
+            changed=$((changed + 1))
+        else
+            printf 'checkpoint 3A mixed-package fixture: unclassified path=%s lineage=%s\n' \
+                "${relative}" "${lineage}" >&2
+            exit 1
+        fi
+        printf '%s\t%s\t%s\t%s\n' \
+            "${relative}" \
+            "$(hash_file "${left_root}/${relative}")" \
+            "$(hash_file "${right_root}/${relative}")" \
+            "${relation}" >>"${temporary}"
+    done < <(
+        cd "${left_root}"
+        find . -type f -print | sed 's#^\./##' | LC_ALL=C sort
+    )
+    if [[ "${changed}" -ne 2 ]]; then
+        printf 'checkpoint 3A mixed-package fixture: changed files=%s expected=2 lineage=%s\n' \
+            "${changed}" "${lineage}" >&2
+        exit 1
+    fi
+    replace_file "${temporary}" "${output}"
+    rm -f "${inventory}"
+}
+
+git clone --quiet --no-hardlinks "${outputs_root}" "${fixture_root}"
+cp "${outputs_root}/phase1/scripts/run-checkpoint3a-measurement" \
+    "${fixture_root}/phase1/scripts/run-checkpoint3a-measurement"
+cp "${outputs_root}/phase1/scripts/verify-checkpoint3a-measurement" \
+    "${fixture_root}/phase1/scripts/verify-checkpoint3a-measurement"
+rewrite_registry HEAD
+git -C "${fixture_root}" add \
+    phase1/config/checkpoint3a-engines.tsv \
+    phase1/scripts/run-checkpoint3a-measurement \
+    phase1/scripts/verify-checkpoint3a-measurement
+git -C "${fixture_root}" -c user.name='GWDAC fixture' \
+    -c user.email='fixture.invalid' commit --quiet \
+    -m 'fixture: define mixed package producer'
+readonly capture_commit="$(git -C "${fixture_root}" rev-parse HEAD)"
+
+for lineage in historical modern; do
+    printf '\nFixture run date 8/30/26\n' \
+        >>"${raw_root}/runtime/utc-plus-14/${lineage}/SAID.TMP"
+    printf '\nFixture run date 8/29/26\n' \
+        >>"${raw_root}/runtime/utc-minus-12/${lineage}/SAID.TMP"
+    rewrite_manifest_artifact_hash \
+        "${raw_root}/runtime/utc-plus-14/${lineage}/manifest.txt" \
+        "${raw_root}/runtime/utc-plus-14/${lineage}/SAID.TMP"
+    rewrite_manifest_artifact_hash \
+        "${raw_root}/runtime/utc-minus-12/${lineage}/manifest.txt" \
+        "${raw_root}/runtime/utc-minus-12/${lineage}/SAID.TMP"
+done
+
+for context in utc-plus-14 utc-minus-12; do
+    write_tree_manifest "${raw_root}/runtime/${context}" \
+        "${raw_root}/runtime/${context}/evidence-manifest.sha256" \
+        evidence-manifest.sha256
+done
+write_runtime_comparison historical
+write_runtime_comparison modern
+
+temporary="$(mktemp "${TMPDIR:-/tmp}/checkpoint3a-protected.XXXXXX")"
+awk -F '\t' 'BEGIN {OFS = "\t"}
+    $1 == "retained_output" && $2 == "raw/runtime/*/{historical,modern}/*" {
+        $4 = "date_fields_and_hashes_only"
+    }
+    {print}
+' "${report_root}/protected-fields.tsv" >"${temporary}"
+replace_file "${temporary}" "${report_root}/protected-fields.tsv"
+
+temporary="$(mktemp "${TMPDIR:-/tmp}/checkpoint3a-context.XXXXXX")"
+awk -F= -v capture_commit="${capture_commit}" 'BEGIN {OFS = "="}
+    $1 == "outputs_commit" {$2 = capture_commit}
+    {print}
+' "${report_root}/run-context.txt" >"${temporary}"
+replace_file "${temporary}" "${report_root}/run-context.txt"
+rewrite_registry "${capture_commit}"
+write_tree_manifest "${raw_root}" "${report_root}/raw-manifest.sha256" -
+write_tree_manifest "${report_root}" "${report_root}/manifest.sha256" \
+    manifest.sha256
+
+git -C "${fixture_root}" add \
+    phase1/config/checkpoint3a-engines.tsv \
+    "${report_rel}"
+git -C "${fixture_root}" -c user.name='GWDAC fixture' \
+    -c user.email='fixture.invalid' commit --quiet \
+    -m 'fixture: capture mixed package'
+
+"${fixture_root}/phase1/scripts/verify-checkpoint3a-measurement" pdsd \
+    >"${workspace}/verifier.stdout"
+grep -Fq 'checkpoint 3A measurement: PASS engine=pdsd' \
+    "${workspace}/verifier.stdout"
+
+printf 'checkpoint 3A mixed-package fixture: PASS stdout_relation=exact package_relation=date_fields_and_hashes_only changed_files=2\n'

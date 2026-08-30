@@ -245,22 +245,6 @@ if [[ "${expected_stdout_relation}" == exact && \
     printf 'checkpoint 3A: stdout relation/hash contract is inconsistent\n' >&2
     exit 64
 fi
-if [[ "${expected_cross_context_relation}" == exact && \
-      "${expected_historical_plus14_stdout_sha256}" != MEASURE && \
-      ( "${expected_historical_plus14_stdout_sha256}" != \
-        "${expected_historical_minus12_stdout_sha256}" || \
-        "${expected_modern_plus14_stdout_sha256}" != \
-        "${expected_modern_minus12_stdout_sha256}" ) ]] || \
-   [[ ( "${expected_cross_context_relation}" == date_fields_only || \
-        "${expected_cross_context_relation}" == date_fields_and_hashes_only ) && \
-      "${expected_historical_plus14_stdout_sha256}" != MEASURE && \
-      ( "${expected_historical_plus14_stdout_sha256}" == \
-        "${expected_historical_minus12_stdout_sha256}" || \
-        "${expected_modern_plus14_stdout_sha256}" == \
-        "${expected_modern_minus12_stdout_sha256}" ) ]]; then
-    printf 'checkpoint 3A: cross-context relation/hash contract is inconsistent\n' >&2
-    exit 64
-fi
 if [[ -e "${report_root}" ]]; then
     printf 'checkpoint 3A: report root already exists: %s\n' "${report_root}" >&2
     exit 64

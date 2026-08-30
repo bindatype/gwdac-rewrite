@@ -5,6 +5,7 @@ readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly outputs_root="$(cd "${script_root}/.." && pwd)"
 readonly verifier="${outputs_root}/phase1/scripts/verify-checkpoint3a-measurement"
 readonly volatile_ledger_verifier="${outputs_root}/phase1/scripts/verify-checkpoint3a-volatile-ledger"
+readonly mixed_package_fixture="${outputs_root}/reviewer/verify-checkpoint3a-mixed-package-fixture"
 readonly registry="${outputs_root}/phase1/config/checkpoint3a-engines.tsv"
 readonly workspace="$(mktemp -d "${TMPDIR:-/tmp}/checkpoint3a-contract.XXXXXX")"
 
@@ -54,6 +55,7 @@ fi
 "${volatile_ledger_verifier}" \
     "${outputs_root}/phase1/reports/checkpoint3a2-knsd-measurement/volatile-fields.tsv" \
     7 9
+"${mixed_package_fixture}"
 
 awk -F '\t' 'BEGIN {OFS = "\t"} NR == 7 {$4++} {print}' \
     "${outputs_root}/phase1/reports/checkpoint3a2-knsd-measurement/volatile-fields.tsv" \
@@ -69,4 +71,4 @@ if [[ "${corrupt_status}" -ne 1 ]]; then
     exit 1
 fi
 
-printf 'checkpoint 3A contract fixtures: PASS unsupported=1 incomplete=1 volatile_positive=2 volatile_tally_negative=1\n'
+printf 'checkpoint 3A contract fixtures: PASS unsupported=1 incomplete=1 volatile_positive=2 volatile_tally_negative=1 mixed_package_positive=1\n'
