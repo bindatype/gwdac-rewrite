@@ -107,6 +107,20 @@ test "$(awk -F '\t' 'NR > 1 && $5 == "execution_metadata" && $6 == "measured_vol
 test "$(awk -F '\t' 'NR > 1 && $5 == "protected_date" && $6 == "exact" && $3 == "8/20/13" && $4 == "8/20/13" {count++} END {print count + 0}' \
     "${workspace}/date.tsv")" -eq 1
 
+test "$("${classifier}" \
+    --mode date_fields_only \
+    --left "${fixtures}/date-fixed-width.left.txt" \
+    --right "${fixtures}/date-fixed-width.right.txt" \
+    --inventory "${workspace}/date-fixed-width.tsv")" = \
+    'date_fields_only volatile=1 protected=1'
+test "$(awk -F '\t' 'NR > 1 && $5 == "execution_metadata" && \
+    $6 == "measured_volatile" && $3 == "9/ 1/26" && $4 == "8/31/26" \
+    {count++} END {print count + 0}' \
+    "${workspace}/date-fixed-width.tsv")" -eq 1
+test "$(awk -F '\t' 'NR > 1 && $5 == "protected_date" && $6 == "exact" && \
+    $3 == "8/08/07" && $4 == "8/08/07" {count++} END {print count + 0}' \
+    "${workspace}/date-fixed-width.tsv")" -eq 1
+
 if "${classifier}" \
     --mode date_fields_only \
     --left "${fixtures}/date.left.txt" \
@@ -116,4 +130,13 @@ if "${classifier}" \
     exit 1
 fi
 
-printf 'checkpoint 3A relation fixtures: PASS exact=1 data_root_positive=1 date_positive=1 hash_manifest_positive=1 negative=4\n'
+if "${classifier}" \
+    --mode date_fields_only \
+    --left "${fixtures}/date-fixed-width.left.txt" \
+    --right "${fixtures}/date-fixed-width.negative.txt" \
+    --inventory "${workspace}/date-fixed-width-negative.tsv" >/dev/null 2>&1; then
+    printf 'checkpoint 3A relation fixtures: fixed-width non-date difference passed\n' >&2
+    exit 1
+fi
+
+printf 'checkpoint 3A relation fixtures: PASS exact=1 data_root_positive=1 date_positive=1 date_fixed_width_positive=1 hash_manifest_positive=1 negative=5\n'
