@@ -1,0 +1,11 @@
+nn/NNF.INP
+nn/NNAMP.DAT
+nn/NNPRFD.DAT
+nn/NNSOL.USR
+nn/SAID.DS
+nn/NEWDAT.DAT
+sdat/nnmsg.dat
+sdat/nndat.dat
+sdat/nnsol.dat
+sdat/nnses.dat
+sdat/secpr.dat
