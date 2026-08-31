@@ -1,0 +1,189 @@
+
+ New contour plotter. Enter CONP or "GO60" to see.
+ Try the "GO55" alternative to "GO5"; gives Chi2 summary
+ The experimental data file is
+ NN091 Nucleon-Nucleon 05/09 Arndt(NIJM) 12/03/11                
+
+ CAUTION! do NOT use any solution outside its range of
+ validity. Extrapolation properties are generally BAD!
+
+ To change to an ALTERNATE data file enter "SWAP"
+
+ RETURN to continue ->  Your solution is
+  SP07 0-3.0 GEV PP=44463/24916 NP=21496/12693 RAA (147)  5/03/07  3
+ RETURN (or "GON") to continue -> Input*/HOME/IGOR/FORC_COSYA.DAT                                             
+ CAUTION!! do NOT use this solution outside its range of
+ validity. Extrapolation properties tend to be VERY poor.
+ An ALTERNATE solution can be obtained via "GO51"
+ It can be used for comparison plots or in the 
+ CONTOUR/3-D plotter.
+
+  Enter ? if you need instructions 
+ Reaction no-  1(PP  ) 2(NP  ) 3(NP1 ) 4(NP0 )
+ Enter reaction no -> Input* Q                                                                       
+ Reaction no-  1(PP  ) 2(NP  ) 3(NP1 ) 4(NP0 )
+ Enter reaction no -> Input* GO11                                                                    
+ Special "GO" commands in Data-Base plotter are:
+ "GO11" will return to these instructions
+ "GO12" Reentry of kinematic domain ( Tmin,Tmax,Amin,Amax)
+ "GO13" Specify observables (EG DSG,P,..) to be plotted
+ Any other "GO" will return to the main program
+ Enter beginning year( eg 1977), A minus year will divide 
+ the data at (-) that year (eg -1978)-> INPUT> 0 -200  NP   DSG  RA(98)                          
+ Enter final year(eg 1980)-> INPUT> 0 -200  NP   DSG  RA(01)                          
+ Data used is from    0 to    0
+ Enter reaction (PP,NP,NN)-> INPUT> Q                                                 
+ Enter Tmin Tmax Amin Amax-> INPUT> 3 0 3000 0 2000 Q0 Q                              
+ Enter Tmin Tmax Amin Amax-> INPUT>     2 0.0000E+00 0.0000E+00 0.0000E+00 0.0000E+00 
+ Enter Tmin Tmax Amin Amax-> INPUT>     0 0.0000E+00 0.0000E+00 0.0000E+00 0.0000E+00 
+ Enter Tmin Tmax Amin Amax-> INPUT>        13.7500      0.0000    134.9700    101.0000
+ Enter Tmin Tmax Amin Amax-> INPUT>        -7.8160      2.7735      1.0000    104.0000
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>       -23.7100      2.6250      0.0000    204.0000
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>        22.3980    447.9100     -5.9552      4.0000
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>  Q PRM=147 PP=45923/24916(45923)  NP=21571/12693(2
+   Q P was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   10 0.30000E+01 0.20000E+01 0.00000E+00-0.64444E+
+    10 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>     -0.24574E+05 0.23686E+05 0.00000E+00-0.69396E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   20 0.30000E+01 0.20000E+01 0.00000E+00 0.00000E+
+    20 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   50 0.10000E+01 0.20000E+01 0.00000E+00-0.31476E+
+    50 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>     -0.67145E+04 0.73793E+04 0.00000E+00 0.77242E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   11 0.10000E+01 0.10000E+01 0.20000E+01 0.34661E+
+    11 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>      0.12449E+04-0.22977E+04 0.00000E+00 0.13960E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   21 0.10000E+01 0.10000E+01 0.20000E+01 0.16054E+
+    21 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>      0.21385E+04-0.77688E+04 0.82551E+04 0.99417E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>  121-0.67001E+00 0.11460E+01 0.20824E+00 0.00000E+
+   121 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   31 0.10000E+01 0.20000E+01 0.20000E+01-0.25181E+
+    31 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>     -0.11112E+04 0.00000E+00 0.00000E+00 0.83121E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   41 0.10000E+01 0.20000E+01 0.20000E+01 0.37011E+
+    41 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>      0.12699E+03 0.00000E+00 0.00000E+00 0.00000E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   51 0.10000E+01 0.20000E+01 0.20000E+01-0.88676E+
+    51 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>     -0.19108E+05 0.58413E+05-0.60280E+05-0.10678E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   12 0.20000E+01 0.00000E+00 0.00000E+00 0.12454E+
+    12 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>     -0.26626E+04 0.53620E+04-0.30110E+04 0.87744E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>  112 0.49756E-01-0.15155E+01 0.00000E+00 0.26550E+
+   112 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   22 0.20000E+01 0.20000E+01 0.20000E+01 0.88651E+
+    22 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>      0.33250E+04-0.32906E+04 0.00000E+00 0.00000E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   32 0.20000E+01 0.10000E+01 0.00000E+00 0.17379E+
+    32 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>     -0.18545E+03 0.52516E+03 0.00000E+00 0.59885E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>  132-0.40996E+00 0.00000E+00 0.00000E+00 0.00000E+
+   132 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   42 0.20000E+01 0.10000E+01 0.00000E+00 0.44687E+
+    42 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   52 0.20000E+01 0.10000E+01 0.00000E+00 0.55195E+
+    52 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>      0.16515E+03 0.00000E+00 0.00000E+00 0.15186E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>  152 0.42505E+00-0.10375E+01-0.14038E+00 0.00000E+
+   152 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   13 0.30000E+01 0.30000E+01 0.20000E+01 0.53821E+
+    13 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   23 0.30000E+01 0.10000E+01 0.00000E+00 0.26190E+
+    23 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>      0.22084E+04-0.98623E+04 0.14556E+05 0.11400E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>  123 0.58064E+00 0.18019E+01-0.38450E-01-0.74620E+
+   123 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   33 0.30000E+01 0.30000E+01 0.20000E+01 0.43877E+
+    33 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>      0.00000E+00 0.00000E+00 0.00000E+00 0.14979E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   43 0.30000E+01 0.30000E+01 0.20000E+01-0.25588E+
+    43 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>     -0.64958E+03 0.00000E+00 0.00000E+00 0.00000E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   53 0.30000E+01 0.30000E+01 0.20000E+01-0.34232E+
+    53 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>      0.00000E+00 0.00000E+00 0.00000E+00-0.85544E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   14 0.40000E+01 0.20000E+01 0.00000E+00 0.22099E+
+    14 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>      0.00000E+00 0.00000E+00 0.00000E+00 0.49395E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>  114 0.15338E+00-0.11886E+01 0.00000E+00 0.00000E+
+   114 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   24 0.40000E+01 0.40000E+01 0.20000E+01 0.10118E+
+    24 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>      0.14353E+04 0.00000E+00 0.00000E+00 0.00000E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   34 0.40000E+01 0.30000E+01 0.00000E+00 0.14621E+
+    34 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>     -0.36851E+03 0.00000E+00 0.00000E+00 0.46535E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   44 0.40000E+01 0.30000E+01 0.00000E+00-0.99767E+
+    44 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>      0.16566E+04-0.82736E+04 0.96087E+04 0.00000E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   54 0.40000E+01 0.30000E+01 0.00000E+00 0.22996E+
+    54 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>      0.00000E+00 0.00000E+00 0.00000E+00 0.14731E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>  154-0.38371E-01 0.00000E+00 0.00000E+00 0.00000E+
+   154 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   15 0.50000E+01 0.50000E+01 0.20000E+01 0.28584E+
+    15 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   25 0.50000E+01 0.30000E+01 0.00000E+00 0.68717E+
+    25 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>      0.00000E+00 0.00000E+00 0.00000E+00 0.84686E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   35 0.50000E+01 0.50000E+01 0.10000E+01 0.22805E+
+    35 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   45 0.50000E+01 0.50000E+01 0.10000E+01-0.37128E+
+    45 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   55 0.50000E+01 0.50000E+01 0.10000E+01-0.11538E+
+    55 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   16 0.60000E+01 0.40000E+01 0.00000E+00-0.14110E+
+    16 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>      0.00000E+00 0.00000E+00 0.00000E+00 0.22278E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>  116 0.18745E+00 0.00000E+00 0.00000E+00 0.00000E+
+   116 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   26 0.60000E+01 0.60000E+01 0.20000E+01 0.61346E+
+    26 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   36 0.60000E+01 0.50000E+01 0.00000E+00-0.74627E+
+    36 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>     -0.87291E+03 0.00000E+00 0.00000E+00 0.22718E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>  136-0.39359E-01 0.00000E+00 0.00000E+00 0.00000E+
+   136 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   46 0.60000E+01 0.50000E+01 0.00000E+00-0.46961E+
+    46 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   56 0.60000E+01 0.50000E+01 0.00000E+00 0.17398E+
+    56 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>      0.00000E+00 0.00000E+00 0.00000E+00 0.36426E-
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>   27 0.70000E+01 0.50000E+01 0.00000E+00 0.57063E+
+    27 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>      0.00000E+00 0.00000E+00 0.00000E+00 0.67549E+
+       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>  127 0.27363E-02 0.00000E+00 0.00000E+00 0.00000E+
+   127 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT>  Q PRM=147 PP=45923/24916(45923)  NP=21571/12693(2
+   Q P was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT> Z 3 .1 1000 0 Q                                   
+  Z 3  was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> INPUT> GO62                                              

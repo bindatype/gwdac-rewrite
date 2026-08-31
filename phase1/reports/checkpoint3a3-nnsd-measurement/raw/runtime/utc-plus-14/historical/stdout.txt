@@ -1,0 +1,118 @@
+
+ Welcome to SAID64, the 64-bit version of SAID.
+ Several new features have been added. The mail back
+ option, "go9" has been improved, for example.
+
+ Note! 
+ SAID data file assignments can be changed at any time
+ by entering "GO250"
+ RETURN for non-graphics
+ "TDL" to set PLOT time delay
+ or enter TERMINAL type (XW, TK41, or ?) ->
+ New contour plotter. Enter CONP or "GO60" to see.
+ Try the "GO55" alternative to "GO5"; gives Chi2 summary
+ The experimental data file is
+ NN091 Nucleon-Nucleon 05/09 Arndt(NIJM) 12/03/11                
+
+ CAUTION! do NOT use any solution outside its range of
+ validity. Extrapolation properties are generally BAD!
+
+ To change to an ALTERNATE data file enter "SWAP"
+
+ RETURN to continue ->  Your solution is
+  SP07 0-3.0 GEV PP=44463/24916 NP=21496/12693 RAA (147)  5/03/07  3
+ RETURN (or "GON") to continue -> CAUTION!! do NOT use this solution outside its range of
+ validity. Extrapolation properties tend to be VERY poor.
+ An ALTERNATE solution can be obtained via "GO51"
+ It can be used for comparison plots or in the 
+ CONTOUR/3-D plotter.
+
+  Enter ? if you need instructions 
+ Reaction no-  1(PP  ) 2(NP  ) 3(NP1 ) 4(NP0 )
+ Enter reaction no -> Reaction no-  1(PP  ) 2(NP  ) 3(NP1 ) 4(NP0 )
+ Enter reaction no -> Special "GO" commands in Data-Base plotter are:
+ "GO11" will return to these instructions
+ "GO12" Reentry of kinematic domain ( Tmin,Tmax,Amin,Amax)
+ "GO13" Specify observables (EG DSG,P,..) to be plotted
+ Any other "GO" will return to the main program
+ Enter beginning year( eg 1977), A minus year will divide 
+ the data at (-) that year (eg -1978)-> Enter final year(eg 1980)-> Data used is from    0 to    0
+ Enter reaction (PP,NP,NN)-> Enter Tmin Tmax Amin Amax-> Enter Tmin Tmax Amin Amax-> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  1 -> Input Error, Re-enter starting with variable  2 -> Enter Tmin Tmax Amin Amax-> Enter Tmin Tmax Amin Amax-> Enter Tmin Tmax Amin Amax-> Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->   Q P was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    10 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    20 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    50 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    11 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    21 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->   121 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    31 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    41 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    51 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    12 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->   112 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    22 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    32 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->   132 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    42 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    52 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->   152 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    13 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    23 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->   123 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    33 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    43 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    53 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    14 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->   114 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    24 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    34 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    44 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    54 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->   154 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    15 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    25 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    35 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    45 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    55 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    16 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->   116 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    26 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    36 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->   136 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    46 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    56 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->    27 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->       was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->   127 was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->   Q P was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)->  Z 3  was not found in list
+ Next observable? -ALL(or BIN) to enter by numbers)-> Messages can be sent to: 
+ mparis@gwu.edu or rworkman@gwu.edu
+ Thanks for using SAID
+ The SAID files can be retrieved through MAIL
+ by entering "M". Enter "M" or RETURN(to skip)->

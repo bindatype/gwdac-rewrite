@@ -1,0 +1,530 @@
+nn.f:2733:17:
+
+ 2687 |       CALL DATA1(IA,1,M)
+      |                 2
+......
+ 2733 |       CALL DATA1(BTV,1,M)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+nn.f:1562:17:
+
+ 1562 |       CALL DATA1(NIT,6,MTRN)
+      |                 1
+......
+ 2687 |       CALL DATA1(IA,1,M)
+      |                 2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+nn.f:1156:17:
+
+ 1156 |       CALL DATA1(NIT,4,MTRN)
+      |                 1
+......
+ 2687 |       CALL DATA1(IA,1,M)
+      |                 2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+nn.f:3632:17:
+
+ 1127 |       CALL DATA3(AMIN,1,DA,1,AMAX,1,MTRN)
+      |                 2
+......
+ 3632 |       CALL DATA3(NY1,1,NYI,1,NYF,1,M)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+nn.f:3632:23:
+
+ 1127 |       CALL DATA3(AMIN,1,DA,1,AMAX,1,MTRN)
+      |                        2
+......
+ 3632 |       CALL DATA3(NY1,1,NYI,1,NYF,1,M)
+      |                       1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+nn.f:3632:29:
+
+ 1127 |       CALL DATA3(AMIN,1,DA,1,AMAX,1,MTRN)
+      |                             2
+......
+ 3632 |       CALL DATA3(NY1,1,NYI,1,NYF,1,M)
+      |                             1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+nn.f:3678:17:
+
+ 2687 |       CALL DATA1(IA,1,M)
+      |                 2
+......
+ 3678 |       CALL DATA1(ITZ,56,M)
+      |                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+nn.f:1449:16:
+
+ 1449 |       CALL XCHG(IH,TYPE(IT))
+      |                1
+......
+ 1499 |       CALL XCHG(HFIX,4HTLAB)
+      |                2
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+nn.f:1449:19:
+
+ 1449 |       CALL XCHG(IH,TYPE(IT))
+      |                   1
+......
+ 1499 |       CALL XCHG(HFIX,4HTLAB)
+      |                     2
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/HOLLERITH).
+nn.f:2436:17:
+
+ 2436 |       CALL DATA1(MSG,-24,MTRN)
+      |                 1
+......
+ 2687 |       CALL DATA1(IA,1,M)
+      |                 2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+nn.f:2492:41:
+
+ 2492 |    74 CALL NNRDX(8,T,ITX,IPX,NDX,ZX,ZERR,INPT,MMO,MMY,XEX,M)
+      |                                         1
+......
+ 3711 |    10 CALL NNRDX(8,T,IT,IP,ND,ZX,ZERR,DTTL,MMO,MMY,DUM,M)
+      |                                      2   
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+nn.f:2587:28:
+
+ 2550 |       CALL SYMBOL(-.6,-.2,.1,TTL,0.,9)
+      |                             2
+......
+ 2587 |       CALL SYMBOL(6.,4.1,.1,'  DATA',0.,6)
+      |                            1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(6)/REAL(4)).
+nn.f:3228:53:
+
+ 2550 |       CALL SYMBOL(-.6,-.2,.1,TTL,0.,9)
+      |                             2                        
+......
+ 3228 |       IF(NCUR.GT.0) CALL SYMBOL(FASE(L,N),6.3,Y-0.15,0.15,0.0)
+      |                                                     1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn.f:3237:30:
+
+ 3180 |       IF(NCURS.LT.0) CALL ASYMB(4HSGMB,-.7,3.2,.2,90.)
+      |                                2
+......
+ 3237 |       IF(IC.EQ.76) CALL ASYMB(FASE(L,N),X-1.,Y-1.,HC,0.)
+      |                              1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/HOLLERITH).
+nn.f:4384:17:
+
+ 1508 |       CALL DATA2(Z,1,XMAX,1,MTRN)
+      |                 2
+......
+ 4384 |       CALL DATA2(NAZ,1,NEZ,1,MTRN)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+nn.f:4384:23:
+
+ 1508 |       CALL DATA2(Z,1,XMAX,1,MTRN)
+      |                     2  
+......
+ 4384 |       CALL DATA2(NAZ,1,NEZ,1,MTRN)
+      |                       1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+nn.f:597:17:
+
+  597 |       CALL DATA1(MSG,-24,MTRN)
+      |                 1
+......
+ 2687 |       CALL DATA1(IA,1,M)
+      |                 2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+nn.f:883:44:
+
+  883 |       IF(IDV.EQ.5) CALL SYMBOL(2.0,-0.3,0.2,HIND,0.0,4)
+      |                                            1
+......
+ 2550 |       CALL SYMBOL(-.6,-.2,.1,TTL,0.,9)
+      |                             2               
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:3308:8:
+
+ 3307 |       DO 51 J=1,30
+      |                                                                        2
+ 3308 |    51 P(J,N,L)=0.0
+      |        1
+Warning: Array reference at (1) out of bounds (30 > 20) in loop beginning at (2)
+nn1.f:5315:17:
+
+ 5291 |       CALL DATA1(TADD,1,MTRN)
+      |                 2
+......
+ 5315 |       CALL DATA1(IP,1,MTRN)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+nn1.f:1457:17:
+
+ 1457 |       CALL DATA1(TITLE,-184,M)
+      |                 1
+......
+ 5291 |       CALL DATA1(TADD,1,MTRN)
+      |                 2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+nn1.f:1536:17:
+
+ 1536 |       CALL DATA1(ERMTX,40,M)
+      |                 1
+......
+ 5291 |       CALL DATA1(TADD,1,MTRN)
+      |                 2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+nn1.f:1555:39:
+
+ 1555 |       IF(TITLE(1).EQ.HNA96) CALL DATA1(DUM,-184,M)
+      |                                       1
+......
+ 5291 |       CALL DATA1(TADD,1,MTRN)
+      |                 2                      
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+nn1.f:1563:17:
+
+ 1563 |       CALL DATA1(ERMTX,1000,MTRN)
+      |                 1
+......
+ 5291 |       CALL DATA1(TADD,1,MTRN)
+      |                 2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+nn1.f:1588:17:
+
+ 1588 |       CALL DATA1(TITLE,-184,M)
+      |                 1
+......
+ 5291 |       CALL DATA1(TADD,1,MTRN)
+      |                 2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+nn1.f:1595:17:
+
+ 1595 |       CALL DATA1(ERMTX,3,M)
+      |                 1
+......
+ 5291 |       CALL DATA1(TADD,1,MTRN)
+      |                 2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+nn1.f:1608:17:
+
+ 1569 |       CALL DATA2(NJ,1,DPZ,30,MTRN)
+      |                 2
+......
+ 1608 |       CALL DATA2(Z,1,DDP,20,M)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+nn1.f:1672:17:
+
+ 1672 |    25 CALL DATA1(ERMTX,3300,MTRN)
+      |                 1
+......
+ 5291 |       CALL DATA1(TADD,1,MTRN)
+      |                 2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+nn1.f:1766:22:
+
+ 1569 |       CALL DATA2(NJ,1,DPZ,30,MTRN)
+      |                      2
+......
+ 1766 |       CALL DATA2(ZR,1,ZI,1,MTRN)
+      |                      1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:1786:41:
+
+ 1786 |       IF(TITLE(1).EQ.H) CALL NNOBEC(NBOS,PBOS,TITLE,MTRN)
+      |                                         1
+Warning: Actual argument contains too few elements for dummy argument 'pbos' (36/100) at (1)
+nn1.f:4581:31:
+
+ 4558 |       CALL SYMBOL(0.9,Y+1.5,0.15,TTL,90.0,4)
+      |                                 2
+......
+ 4581 |       CALL SYMBOL(3.35,1.0,0.3,'#w',0.0,2)
+      |                               1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (CHARACTER(2)/REAL(4)).
+nn1.f:4157:17:
+
+ 1482 |       CALL DATA4(NFORM,1,BTX,6,KFORM,1,BTP,6,MTRN)
+      |                 2
+......
+ 4157 |       CALL DATA4(G2,1,AMIN,1,XMAX,1,XERMX,1,NGO)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+nn1.f:4157:22:
+
+ 1482 |       CALL DATA4(NFORM,1,BTX,6,KFORM,1,BTP,6,MTRN)
+      |                         2
+......
+ 4157 |       CALL DATA4(G2,1,AMIN,1,XMAX,1,XERMX,1,NGO)
+      |                      1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:4157:29:
+
+ 1482 |       CALL DATA4(NFORM,1,BTX,6,KFORM,1,BTP,6,MTRN)
+      |                               2
+......
+ 4157 |       CALL DATA4(G2,1,AMIN,1,XMAX,1,XERMX,1,NGO)
+      |                             1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+nn1.f:4157:36:
+
+ 1482 |       CALL DATA4(NFORM,1,BTX,6,KFORM,1,BTP,6,MTRN)
+      |                                       2
+......
+ 4157 |       CALL DATA4(G2,1,AMIN,1,XMAX,1,XERMX,1,NGO)
+      |                                    1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:6187:24:
+
+ 5321 |       CALL XCHG(HHH,4HPP  )
+      |                    2    
+......
+ 6187 |       CALL XCHG(TYPE(I),ITASG(2*I-1))
+      |                        1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/HOLLERITH).
+nn1.f:3752:17:
+
+ 3752 |       CALL DATA5(IT,1,IS,1,G2,1,W,1,FG,1,MTRN)
+      |                 1
+......
+ 5359 |       CALL DATA5(ECNST,1,EPCT,1,XERR,1,ERE,1,ERA,1,MTRN)
+      |                 2
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+nn1.f:3752:22:
+
+ 3752 |       CALL DATA5(IT,1,IS,1,G2,1,W,1,FG,1,MTRN)
+      |                      1
+......
+ 5359 |       CALL DATA5(ECNST,1,EPCT,1,XERR,1,ERE,1,ERA,1,MTRN)
+      |                         2
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+nn1.f:3262:28:
+
+ 2153 |    54 CALL KTOT(D,R,NP)
+      |                2            
+......
+ 3262 |       IF(KF.EQ.1) CALL KTOT(TR,TI,1)
+      |                            1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:3262:31:
+
+ 2153 |    54 CALL KTOT(D,R,NP)
+      |                  2             
+......
+ 3262 |       IF(KF.EQ.1) CALL KTOT(TR,TI,1)
+      |                               1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:3263:28:
+
+ 2315 |       CALL DTOT(D,R,NN)
+      |                2            
+......
+ 3263 |       IF(KF.EQ.2) CALL DTOT(TR,TI,1)
+      |                            1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:3263:31:
+
+ 2315 |       CALL DTOT(D,R,NN)
+      |                  2             
+......
+ 3263 |       IF(KF.EQ.2) CALL DTOT(TR,TI,1)
+      |                               1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:3275:28:
+
+ 2316 |       IF(KFORM.EQ.1) CALL TTOK(D,R,NN)
+      |                               2
+......
+ 3275 |       IF(KF.EQ.1) CALL TTOK(TR,TI,1)
+      |                            1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:3275:31:
+
+ 2316 |       IF(KFORM.EQ.1) CALL TTOK(D,R,NN)
+      |                                 2
+......
+ 3275 |       IF(KF.EQ.1) CALL TTOK(TR,TI,1)
+      |                               1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:3276:28:
+
+ 1914 |       CALL TTOD(D,R,NM)
+      |                2            
+......
+ 3276 |       IF(KF.EQ.2) CALL TTOD(TR,TI,1)
+      |                            1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:3276:31:
+
+ 1914 |       CALL TTOD(D,R,NM)
+      |                  2             
+......
+ 3276 |       IF(KF.EQ.2) CALL TTOD(TR,TI,1)
+      |                               1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:96:17:
+
+   96 |       CALL DATA1(HA,-104,M)
+      |                 1
+......
+ 5291 |       CALL DATA1(TADD,1,MTRN)
+      |                 2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+nn1.f:184:16:
+
+  184 |       CALL XCHG(K,H)
+      |                1
+......
+ 5321 |       CALL XCHG(HHH,4HPP  )
+      |                2
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+nn1.f:720:23:
+
+  720 |       CALL DATA2(DLM,1,DLP,1,MTRN)
+      |                       1
+......
+ 1569 |       CALL DATA2(NJ,1,DPZ,30,MTRN)
+      |                      2 
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:729:29:
+
+  729 |       IF(IH.LE.3) CALL ASYMB(FASE(LL,NN),2.0,4.2,0.2,0.0)
+      |                             1
+......
+ 4354 |       CALL ASYMB(4HACM ,3.6,5.6,0.2,0.0)
+      |                 2            
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/HOLLERITH).
+nn1.f:3825:24:
+
+ 1569 |       CALL DATA2(NJ,1,DPZ,30,MTRN)
+      |                      2  
+......
+ 3825 |       CALL DATA2(EMIN,1,EMAX,1,MTRN)
+      |                        1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:3879:23:
+
+ 1569 |       CALL DATA2(NJ,1,DPZ,30,MTRN)
+      |                      2 
+......
+ 3879 |       CALL DATA2(NYI,1,NYF,1,MTRN)
+      |                       1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+nn1.f:3887:17:
+
+ 3887 |       CALL DATA1(WORK,-24,MTRN)
+      |                 1
+......
+ 5291 |       CALL DATA1(TADD,1,MTRN)
+      |                 2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+nn1.f:3954:72:
+
+ 3954 |       CALL NNPRFD(T,IP,IT,INPT(1),INPT(2),NIJM)
+      |                                                                        1
+Warning: Type mismatch in argument 'sr1' at (1); passed INTEGER(4) to REAL(4)
+nn1.f:3954:72:
+
+ 3954 |       CALL NNPRFD(T,IP,IT,INPT(1),INPT(2),NIJM)
+      |                                                                        1
+Warning: Type mismatch in argument 'sr2' at (1); passed INTEGER(4) to REAL(4)
+nn1.f:4087:72:
+
+ 4087 |       CALL CHEWG2(T,NAX,ZERR,XEX,WORK,Z,INPT)
+      |                                                                        1
+Warning: Type mismatch in argument 'ref' at (1); passed INTEGER(4) to REAL(4)
+nn1.f:4745:21:
+
+ 1482 |       CALL DATA4(NFORM,1,BTX,6,KFORM,1,BTP,6,MTRN)
+      |                         2
+......
+ 4745 |       CALL DATA4(T,1,NA,1,XERR,1,ZX,1,M)
+      |                     1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (INTEGER(4)/REAL(4)).
+nn1.f:4745:33:
+
+ 1482 |       CALL DATA4(NFORM,1,BTX,6,KFORM,1,BTP,6,MTRN)
+      |                                       2
+......
+ 4745 |       CALL DATA4(T,1,NA,1,XERR,1,ZX,1,M)
+      |                                 1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:4756:17:
+
+ 4756 |       CALL DATA1(XEX,NN,M)
+      |                 1
+......
+ 5291 |       CALL DATA1(TADD,1,MTRN)
+      |                 2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+nn1.f:4834:24:
+
+ 1482 |       CALL DATA4(NFORM,1,BTX,6,KFORM,1,BTP,6,MTRN)
+      |                         2
+......
+ 4834 |       CALL DATA4(AMIN,1,DA,1,AMAX,1,ERRC,1,MTRN)
+      |                        1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:4834:36:
+
+ 1482 |       CALL DATA4(NFORM,1,BTX,6,KFORM,1,BTP,6,MTRN)
+      |                                       2
+......
+ 4834 |       CALL DATA4(AMIN,1,DA,1,AMAX,1,ERRC,1,MTRN)
+      |                                    1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:5531:24:
+
+ 1482 |       CALL DATA4(NFORM,1,BTX,6,KFORM,1,BTP,6,MTRN)
+      |                         2
+......
+ 5531 |       CALL DATA4(TMIN,1,TMAX,1,AMIN,1,AMAX,1,M)
+      |                        1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:5531:38:
+
+ 1482 |       CALL DATA4(NFORM,1,BTX,6,KFORM,1,BTP,6,MTRN)
+      |                                       2
+......
+ 5531 |       CALL DATA4(TMIN,1,TMAX,1,AMIN,1,AMAX,1,M)
+      |                                      1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (rank-1 and scalar)
+nn1.f:5587:43:
+
+ 3925 |     1 CALL NNRDX(NDTP,T,IT,IP,NDX,ZX,ZERR,INPT,MMO,MMY,XEX,M)
+      |                                               2
+......
+ 5587 |    31 CALL NNRDX(8,T,IT,IP,ND,ZX,ZERR,INPT,ZMO,ZYR,DUM,M)
+      |                                           1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+nn1.f:5587:47:
+
+ 3925 |     1 CALL NNRDX(NDTP,T,IT,IP,NDX,ZX,ZERR,INPT,MMO,MMY,XEX,M)
+      |                                                   2
+......
+ 5587 |    31 CALL NNRDX(8,T,IT,IP,ND,ZX,ZERR,INPT,ZMO,ZYR,DUM,M)
+      |                                               1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+nnu.f:1594:17:
+
+ 1585 |       CALL DATA1(NRL,1,M)
+      |                 2
+......
+ 1594 |       CALL DATA1(PHRNG,1,M)
+      |                 1
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/INTEGER(4)).
+nnu.f:2073:31:
+
+ 2073 |       CALL GETBOS(E,938.9,JJ,1,PB,ALFA)
+      |                               1
+Warning: Actual argument contains too few elements for dummy argument 'pbos' (4/24) at (1)
+nnu.f:1950:30:
+
+ 1950 |       CALL DELER(E,WNUC,0,DEL,AS,RS,0.,0.)
+      |                              1
+Warning: Rank mismatch in argument 'a' at (1) (scalar and rank-1)
+nnu.f:1950:33:
+
+ 1950 |       CALL DELER(E,WNUC,0,DEL,AS,RS,0.,0.)
+      |                                 1
+Warning: Rank mismatch in argument 'r' at (1) (scalar and rank-1)

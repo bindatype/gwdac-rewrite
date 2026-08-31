@@ -1,0 +1,14 @@
+/home/arndt64/sdat/nndat.dat
+/home/arndt64/sdat/nnmsg.dat
+/home/arndt64/sdat/nnses.dat
+/home/arndt64/sdat/nnsol.dat
+/home/arndt64/sdat/secpr.dat
+NEWDAT.DAT
+NNAMP.DAT
+NNPRFD.DAT
+NNSOL.USR
+SAID.DS
+SAID.LOG
+SAID.PCT
+SAID.TMP
+fort.7

@@ -1,0 +1,14 @@
+open	fort.7
+open	NNAMP.DAT
+open	NNPRFD.DAT
+open	NNSOL.USR
+open	/workspace/arndt64/sdat/nnmsg.dat
+open	/workspace/arndt64/sdat/nndat.dat
+open	/workspace/arndt64/sdat/nnsol.dat
+open	/workspace/arndt64/sdat/nnses.dat
+open	SAID.TMP
+open	SAID.PCT
+open	SAID.DS
+open	NEWDAT.DAT
+open	/workspace/arndt64/sdat/secpr.dat
+open	SAID.LOG

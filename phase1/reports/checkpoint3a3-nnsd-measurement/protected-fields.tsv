@@ -1,0 +1,16 @@
+class	artifact_or_source	evidence	result
+request_input	/workspace/arndt64/nn/NNF.INP	pre/post SHA-256	exact
+request_input	/workspace/arndt64/nn/NNAMP.DAT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/nn/NNPRFD.DAT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/nn/NNSOL.USR	pre/post SHA-256	exact
+request_input	/workspace/arndt64/nn/SAID.DS	pre/post SHA-256	exact
+request_input	/workspace/arndt64/nn/NEWDAT.DAT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/nnmsg.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/nndat.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/nnsol.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/nnses.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/secpr.dat	pre/post SHA-256	exact
+request_input	raw/runtime/*/{historical,modern}/input.txt	four-package direct hash comparison	exact
+sanctioned_environment_relation	raw/runtime/*/{historical,modern}/stdout.txt	strict historical/modern field inventory	exact
+retained_output	raw/runtime/*/{historical,modern}/*	strict cross-context field inventories	date_fields_and_hashes_only
+retained_artifact	raw/build-{a,b}/artifact/nnsd	Build A/B direct SHA-256	exact
