@@ -1,0 +1,10 @@
+artifact	field_selector	class	observed_count	evidence	result
+raw/build-{a,b}/build/manifest.txt	binary SHA-256 record path: state/build-f6c81d01a1fe.<suffix>/eprsd	execution_metadata	1	Build A/B direct diff	measured_volatile
+runtime-historical-SAID.LOG-date-fields.tsv	changed date fields	execution_metadata	1	strict cross-context field inventory	measured_volatile
+runtime-historical-SAID.TMP-date-fields.tsv	changed date fields	execution_metadata	2	strict cross-context field inventory	measured_volatile
+runtime-historical-stdout.txt-date-fields.tsv	changed date fields	execution_metadata	2	strict cross-context field inventory	measured_volatile
+runtime-modern-SAID.LOG-date-fields.tsv	changed date fields	execution_metadata	1	strict cross-context field inventory	measured_volatile
+runtime-modern-SAID.TMP-date-fields.tsv	changed date fields	execution_metadata	2	strict cross-context field inventory	measured_volatile
+runtime-modern-stdout.txt-date-fields.tsv	changed date fields	execution_metadata	2	strict cross-context field inventory	measured_volatile
+runtime-historical-manifest.txt-hash-fields.tsv	changed artifact hashes	execution_metadata	3	hash-bound cross-context field inventory	measured_volatile
+runtime-modern-manifest.txt-hash-fields.tsv	changed artifact hashes	execution_metadata	3	hash-bound cross-context field inventory	measured_volatile

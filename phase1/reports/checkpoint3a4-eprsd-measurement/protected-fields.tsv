@@ -1,0 +1,42 @@
+class	artifact_or_source	evidence	result
+request_input	/workspace/arndt64/pr/epr/EPRF.INP	pre/post SHA-256	exact
+request_input	/workspace/arndt64/pr/epr/EPNEW.DAT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/pr/epr/PRSEA.DAT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/pr/epr/EPRSOL.USR	pre/post SHA-256	exact
+request_input	/workspace/arndt64/pr/epr/SAID.DS	pre/post SHA-256	exact
+request_input	/workspace/arndt64/pr/epr/NEWDAT.DAT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/prpna.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/eprsol.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/prses.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/ka84.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/prmsg.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/prpi0p.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/prpi+n.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/prpi-p.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/prpi0n.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/eppi0p.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/eppi+n.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/eppi-p.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/eppi0n.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/CLASPWC.DAT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/CLASGWC.DAT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/eprsq2sm08.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/piN_2500.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/CLAS4065.DAT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/HLEEMP.DAT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/DMTMP.DAT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/rescoupl.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/rfdampsm08.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/rescouplqsm08.dat	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/M05I.DAT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/M03I.DAT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/M07I.DAT	pre/post SHA-256	exact
+request_input	/workspace/arndt64/sdat/secpr.dat	pre/post SHA-256	exact
+request_input	raw/runtime/*/{historical,modern}/input.txt	four-package direct hash comparison	exact
+sanctioned_environment_relation	raw/runtime/*/{historical,modern}/stdout.txt	strict historical/modern field inventory	exact
+retained_output	raw/runtime/*/{historical,modern}/*	strict cross-context field inventories	date_fields_and_hashes_only
+scientific_identity	runtime-historical-SAID.TMP-date-fields.tsv	1 unchanged date-shaped fields	exact
+scientific_identity	runtime-historical-stdout.txt-date-fields.tsv	1 unchanged date-shaped fields	exact
+scientific_identity	runtime-modern-SAID.TMP-date-fields.tsv	1 unchanged date-shaped fields	exact
+scientific_identity	runtime-modern-stdout.txt-date-fields.tsv	1 unchanged date-shaped fields	exact
+retained_artifact	raw/build-{a,b}/artifact/eprsd	Build A/B direct SHA-256	exact
