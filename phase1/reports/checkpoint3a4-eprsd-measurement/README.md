@@ -23,5 +23,10 @@ execution metadata; the executable and all other build files were exact.
 Each historical/modern stdout pair was exact. Cross-context differences were confined to measured execution-date fields and the directly bound hashes of those artifacts; unchanged date-shaped fields remain protected scientific identity. Protected inputs were byte-identical before
 and after execution.
 
+The four protected `8/08/07` solution-date occurrences produce explicit
+`scientific_identity` rows because their containing `SAID.TMP` and `stdout.txt`
+files vary across contexts. Protected-row totals are structural ledger counts,
+not comparative measures of protection strength.
+
 This is a 3A measurement result, not a canonicalizer, Checkpoint 3B acceptance,
 physics approval, or Gate 1 registration of this package.
