@@ -9,8 +9,11 @@ module cm12_request_kernel
         cm12_domain_error, cm12_evaluate_dsg, cm12_kinematics, cm12_solution, &
         cm12_solution_background, cm12_solution_is_loaded, &
         cm12_solution_multipole, cm12_accumulate_multipole
-    use cm12_background_seam, only: cm12_evaluate_background
-    use cm12_non_cm12_seam, only: cm12_prepare_non_cm12_multipoles
+    use cm12_background_seam, only: &
+        cm12_evaluate_background, cm12_evaluate_initial_amplitudes
+    use cm12_non_cm12_seam, only: &
+        cm12_background_grid_state, cm12_hadronic_trace, &
+        cm12_prepare_non_cm12_multipoles
     implicit none
     private
 
@@ -46,17 +49,23 @@ module cm12_request_kernel
     end type cm12_request_result
 
     public :: cm12_prepare_legacy_background
+    public :: cm12_prepare_legacy_angle_background
+    public :: cm12_background_grid_state
     public :: cm12_evaluate_request
 
 contains
 
     subroutine cm12_prepare_legacy_background( &
-        solution, request, background, status, message)
+        solution, request, background, status, message, &
+        hadronic_trace, hadronic_trace_count, grid_state)
         type(cm12_solution), intent(in) :: solution
         type(cm12_request), intent(in) :: request
         type(cm12_prepared_background), intent(out) :: background
         integer, intent(out) :: status
         character(len=*), intent(out) :: message
+        type(cm12_hadronic_trace), intent(out), optional :: hadronic_trace(:)
+        integer, intent(out), optional :: hadronic_trace_count
+        type(cm12_background_grid_state), intent(inout), optional :: grid_state
 
         type(cm12_background_constants) :: constants
         type(cm12_kinematics) :: kinematics
@@ -81,9 +90,29 @@ contains
         if (status /= cm12_ok) return
         call cm12_prepare_non_cm12_multipoles( &
             solution, request%reaction, kinematics, &
-            background%opec_multipoles, &
-            background%non_cm12_multipoles, status, message)
+            background%born_multipoles, background%opec_multipoles, &
+            background%non_cm12_multipoles, status, message, &
+            hadronic_trace, hadronic_trace_count, grid_state)
     end subroutine cm12_prepare_legacy_background
+
+    subroutine cm12_prepare_legacy_angle_background( &
+        solution, request, background, status, message)
+        type(cm12_solution), intent(in) :: solution
+        type(cm12_request), intent(in) :: request
+        type(cm12_prepared_background), intent(inout) :: background
+        integer, intent(out) :: status
+        character(len=*), intent(out) :: message
+
+        type(cm12_background_constants) :: constants
+
+        call cm12_solution_background( &
+            solution, constants, status, message)
+        if (status /= cm12_ok) return
+        call cm12_evaluate_initial_amplitudes( &
+            constants, request%photon_lab_energy_mev, &
+            request%angle_cm_deg, request%reaction, &
+            background%initial_amplitudes, status, message)
+    end subroutine cm12_prepare_legacy_angle_background
 
     pure subroutine cm12_evaluate_request( &
         solution, dataset, request, background, result, status, message)

@@ -64,7 +64,26 @@
        if(mjl.ne.999) go to 92
        WRITE(*,225) nl,nfg(n,ll),n,ll,wcm,terx,teix,ter,tei
    225 format(' mrs=',4i3,f8.2,4f9.4)
-@@ -7971,18 +7997,28 @@
+@@ -2519,6 +2545,7 @@
+       IF(NNF.EQ.5) NEO=4
+       IF(NEO.GT.0) ZR=ZR*QK**NEO
+       IF(NEO.GT.0) ZB=ZB*QK**NEO
++      CM12ZB=ZB
+       BRN=EMPI(MM,JJ,LL)
+       IF(LL.LT.LBMAX) BRN=0.0
+       ZB=ZB+BRN
+@@ -2530,6 +2557,10 @@
+       ZB=ZB*ZZ**(LL-1)
+    20 DER=ZB*(1.0-TEI)+ZR*TER
+       DEI=ZB*TER+ZR*TEI
++      IF(CM12DIAG.EQ.1.AND.IR.EQ.2.AND.MM.EQ.1.AND.JJ.EQ.1
++     C .AND.LL.EQ.5.AND.NROT.EQ.2.AND.NNF.EQ.5)
++     C WRITE(*,9018) Z,QB,QK,ZR,CM12ZB,BRN,TER,TEI,DER,DEI
++ 9018 FORMAT('CM12DIAG PRDLT FIELDS',10(1X,ES24.16E3))
+       ROT=TEI-TER**2-TEI**2
+       IF(ROT.LE.0.0) GO TO 98
+       IF(NROT.NE.2.AND.NROT.NE.3) GO TO 1
+@@ -7971,18 +8001,28 @@
        SUBROUTINE PNMOD(E,N,LL,TR,TI)
  C encode PiN amplitudes for(eg) RESONANT forms ...
        COMMON/PGLOB/PG(20,4,8),NFG(4,8)

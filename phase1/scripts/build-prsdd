@@ -144,6 +144,7 @@ if [[ -n "${cm12_seam_root}" ]]; then
         cm12_kernel
         cm12_solution
         cm12_background_seam
+        cm12_prbas_dispatch
         cm12_non_cm12_seam
         cm12_request_kernel
         cm12_legacy_context
@@ -154,7 +155,8 @@ if [[ -n "${cm12_seam_root}" ]]; then
     cp \
         "${source_root}/said/"{prsd,prsd2,pru,pwnam}.f \
         "${cm12_seam_root}/"{cm12_kernel,cm12_solution}.f90 \
-        "${cm12_seam_root}/"{cm12_background_seam,cm12_non_cm12_seam}.f90 \
+        "${cm12_seam_root}/"{cm12_background_seam,cm12_prbas_dispatch}.f90 \
+        "${cm12_seam_root}/cm12_non_cm12_seam.f90" \
         "${cm12_seam_root}/cm12_request_kernel.f90" \
         "${cm12_seam_root}/"{cm12_legacy_context,cmmwp_seam}.f90 \
         "${cm12_seam_root}/"{cm12_prda_probs_seam,cm12_prbas_seam}.f90 \

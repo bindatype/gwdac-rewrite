@@ -1,0 +1,13 @@
+outputs_commit=22493c500c5d84b6ffb2453f834edeced8442071
+compose_project=gwdac-prbas-sp00-full-corpus
+fixtures=24
+typed_records=288
+command_failures=0
+fixture_failures=3
+oracle_failures=0
+candidate_failures=3
+candidate_required=1
+seam_engine=seam
+request_probe_mismatch_allowed=0
+gate_table_sha256=ed52a19b86a28663e5955b49d37311512675e2f93ab2a9a3da834098813c6224
+result=fail

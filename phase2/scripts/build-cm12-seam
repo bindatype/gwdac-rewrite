@@ -8,6 +8,7 @@ readonly report_root="${PHASE2_REPORT_ROOT:-${phase2_root}/reports}"
 readonly state_root="${PHASE2_STATE_ROOT:-/workspace/phase2/reproducible}"
 readonly kernel_root="${phase2_root}/kernel"
 readonly build_report_root="${report_root}/cm12-seam-build"
+readonly prbas_report_root="${report_root}/cm12-prbas-focused-candidate"
 readonly commit="$(git -C "${source_root}" rev-parse HEAD)"
 readonly short_commit="${commit:0:12}"
 readonly artifact_root="${state_root}/artifacts/${short_commit}"
@@ -19,6 +20,7 @@ readonly kcm_root="${CM12_KCM_ROOT:-${source_root}/said/KCM.100330}"
 readonly solution_file="${CM12_SOLUTION_FILE:-${source_root}/sdat/prsol.dat}"
 readonly solution_sha256="${CM12_SOLUTION_SHA256:-dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522}"
 readonly skip_prsdd_build="${CM12_SKIP_PRSD_BUILD:-0}"
+readonly skip_request_probe="${CM12_SKIP_REQUEST_PROBE:-0}"
 readonly allow_request_probe_mismatch="${CM12_ALLOW_REQUEST_PROBE_MISMATCH:-0}"
 
 if [[ "${allow_request_probe_mismatch}" != 0 && \
@@ -26,9 +28,14 @@ if [[ "${allow_request_probe_mismatch}" != 0 && \
     printf 'CM12_ALLOW_REQUEST_PROBE_MISMATCH must be 0 or 1\n' >&2
     exit 2
 fi
+if [[ "${skip_request_probe}" != 0 && "${skip_request_probe}" != 1 ]]; then
+    printf 'CM12_SKIP_REQUEST_PROBE must be 0 or 1\n' >&2
+    exit 2
+fi
 
 mkdir -p \
     "${build_report_root}" \
+    "${prbas_report_root}" \
     "${probe_build_root}" \
     "${parity_build_root}" \
     "${artifact_root}"
@@ -157,6 +164,14 @@ gfortran \
     -fno-second-underscore \
     -J "${parity_build_root}" \
     -I "${parity_build_root}" \
+    -c "${kernel_root}/cm12_prbas_dispatch.f90" \
+    -o "${parity_build_root}/cm12_prbas_dispatch.o"
+gfortran \
+    -O1 \
+    -std=f2008 \
+    -fno-second-underscore \
+    -J "${parity_build_root}" \
+    -I "${parity_build_root}" \
     -c "${kernel_root}/cm12_non_cm12_seam.f90" \
     -o "${parity_build_root}/cm12_non_cm12_seam.o"
 gfortran \
@@ -235,7 +250,7 @@ cp "${source_root}/said/pru.f" "${legacy_split_root}/"
 ) >"${legacy_split_root}/fsplit.log" 2>&1
 
 for legacy_name in \
-    addres addres2 eta33 gpiff hbas hopec imjl pnsm05 prborn prepv prkin \
+    addres addres2 dtromb eta33 gpiff hbas hopec imjl pnsm05 pntest prborn prepv prkin \
     prnpol promega propec prrho tmcm; do
     gfortran \
         -O1 \
@@ -358,6 +373,7 @@ gfortran \
     "${parity_build_root}/cm12_kernel.o" \
     "${parity_build_root}/cm12_solution.o" \
     "${parity_build_root}/cm12_background_seam.o" \
+    "${parity_build_root}/cm12_prbas_dispatch.o" \
     "${parity_build_root}/cm12_non_cm12_seam.o" \
     "${parity_build_root}/cm12_request_kernel.o" \
     "${legacy_split_root}/addres.o" \
@@ -365,12 +381,14 @@ gfortran \
     "${legacy_split_root}/alg.o" \
     "${legacy_split_root}/cmfn.o" \
     "${legacy_split_root}/cmsinv.o" \
+    "${legacy_split_root}/dtromb.o" \
     "${legacy_split_root}/eta33.o" \
     "${legacy_split_root}/gpiff.o" \
     "${legacy_split_root}/hopec.o" \
     "${legacy_split_root}/imjl.o" \
     "${legacy_split_root}/mcmcv.o" \
     "${legacy_split_root}/pnsm05.o" \
+    "${legacy_split_root}/pntest.o" \
     "${legacy_split_root}/prborn.o" \
     "${legacy_split_root}/prepv.o" \
     "${legacy_split_root}/prkin.o" \
@@ -382,10 +400,14 @@ gfortran \
     "${legacy_split_root}/sqz.o" \
     "${legacy_split_root}/tmcm.o" \
     "${parity_build_root}/cm12_request_probe.o"
-request_probe_status=0
-"${artifact_root}/cm12-request-probe" \
-    "${solution_file}" "${solution_sha256}" "${kcm_root}" \
-    >"${report_root}/cm12-request-orchestration.tsv" || request_probe_status=$?
+request_probe_status=125
+if [[ "${skip_request_probe}" == 0 ]]; then
+    request_probe_status=0
+    "${artifact_root}/cm12-request-probe" \
+        "${solution_file}" "${solution_sha256}" "${kcm_root}" \
+        >"${report_root}/cm12-request-orchestration.tsv" || \
+        request_probe_status=$?
+fi
 if [[ "${request_probe_status}" -eq 0 ]]; then
     awk -F '\t' '
         NR > 1 && $1 == "request" && ($3 != 0 || $4 != 40) { exit 1 }
@@ -402,6 +424,9 @@ if [[ "${request_probe_status}" -eq 0 ]]; then
 elif [[ "${allow_request_probe_mismatch}" == 1 && \
     "${request_probe_status}" -eq 6 ]]; then
     printf 'Request probe retained known diagnostic mismatch (exit 6)\n' >&2
+elif [[ "${skip_request_probe}" == 1 && \
+    "${request_probe_status}" -eq 125 ]]; then
+    printf 'Request probe skipped for focused PRBAS validation\n' >&2
 else
     exit "${request_probe_status}"
 fi
@@ -419,6 +444,7 @@ gfortran \
     "${parity_build_root}/cm12_kernel.o" \
     "${parity_build_root}/cm12_solution.o" \
     "${parity_build_root}/cm12_background_seam.o" \
+    "${parity_build_root}/cm12_prbas_dispatch.o" \
     "${parity_build_root}/cm12_non_cm12_seam.o" \
     "${parity_build_root}/cm12_request_kernel.o" \
     "${legacy_split_root}/addres.o" \
@@ -426,12 +452,14 @@ gfortran \
     "${legacy_split_root}/alg.o" \
     "${legacy_split_root}/cmfn.o" \
     "${legacy_split_root}/cmsinv.o" \
+    "${legacy_split_root}/dtromb.o" \
     "${legacy_split_root}/eta33.o" \
     "${legacy_split_root}/gpiff.o" \
     "${legacy_split_root}/hopec.o" \
     "${legacy_split_root}/imjl.o" \
     "${legacy_split_root}/mcmcv.o" \
     "${legacy_split_root}/pnsm05.o" \
+    "${legacy_split_root}/pntest.o" \
     "${legacy_split_root}/prborn.o" \
     "${legacy_split_root}/prepv.o" \
     "${legacy_split_root}/prkin.o" \
@@ -443,6 +471,168 @@ gfortran \
     "${legacy_split_root}/sqz.o" \
     "${legacy_split_root}/tmcm.o" \
     "${parity_build_root}/cm12_form_diagnostic_probe.o"
+
+gfortran \
+    -O1 \
+    -std=f2008 \
+    -fno-second-underscore \
+    -J "${parity_build_root}" \
+    -I "${parity_build_root}" \
+    -c "${kernel_root}/cm12_prbas_dispatch_probe.f90" \
+    -o "${parity_build_root}/cm12_prbas_dispatch_probe.o"
+gfortran \
+    -o "${artifact_root}/cm12-prbas-dispatch-probe" \
+    "${parity_build_root}/cm12_kernel.o" \
+    "${parity_build_root}/cm12_solution.o" \
+    "${parity_build_root}/cm12_background_seam.o" \
+    "${parity_build_root}/cm12_prbas_dispatch.o" \
+    "${parity_build_root}/cm12_non_cm12_seam.o" \
+    "${parity_build_root}/cm12_request_kernel.o" \
+    "${legacy_split_root}/addres.o" \
+    "${legacy_split_root}/addres2.o" \
+    "${legacy_split_root}/alg.o" \
+    "${legacy_split_root}/cmfn.o" \
+    "${legacy_split_root}/cmsinv.o" \
+    "${legacy_split_root}/dtromb.o" \
+    "${legacy_split_root}/eta33.o" \
+    "${legacy_split_root}/gpiff.o" \
+    "${legacy_split_root}/hopec.o" \
+    "${legacy_split_root}/imjl.o" \
+    "${legacy_split_root}/mcmcv.o" \
+    "${legacy_split_root}/pnsm05.o" \
+    "${legacy_split_root}/pntest.o" \
+    "${legacy_split_root}/prborn.o" \
+    "${legacy_split_root}/prepv.o" \
+    "${legacy_split_root}/prkin.o" \
+    "${legacy_split_root}/prnpol.o" \
+    "${legacy_split_root}/promega.o" \
+    "${legacy_split_root}/propec.o" \
+    "${legacy_split_root}/prrho.o" \
+    "${legacy_split_root}/qjofx.o" \
+    "${legacy_split_root}/sqz.o" \
+    "${legacy_split_root}/tmcm.o" \
+    "${parity_build_root}/cm12_prbas_dispatch_probe.o"
+
+gfortran \
+    -O1 \
+    -std=f2008 \
+    -fno-second-underscore \
+    -J "${parity_build_root}" \
+    -I "${parity_build_root}" \
+    -c "${kernel_root}/cm12_prbas_contract_probe.f90" \
+    -o "${parity_build_root}/cm12_prbas_contract_probe.o"
+gfortran \
+    -o "${artifact_root}/cm12-prbas-contract-probe" \
+    "${parity_build_root}/cm12_kernel.o" \
+    "${parity_build_root}/cm12_solution.o" \
+    "${parity_build_root}/cm12_background_seam.o" \
+    "${parity_build_root}/cm12_prbas_dispatch.o" \
+    "${parity_build_root}/cm12_non_cm12_seam.o" \
+    "${parity_build_root}/cm12_request_kernel.o" \
+    "${legacy_split_root}/addres.o" \
+    "${legacy_split_root}/addres2.o" \
+    "${legacy_split_root}/alg.o" \
+    "${legacy_split_root}/cmfn.o" \
+    "${legacy_split_root}/cmsinv.o" \
+    "${legacy_split_root}/dtromb.o" \
+    "${legacy_split_root}/eta33.o" \
+    "${legacy_split_root}/gpiff.o" \
+    "${legacy_split_root}/hopec.o" \
+    "${legacy_split_root}/imjl.o" \
+    "${legacy_split_root}/mcmcv.o" \
+    "${legacy_split_root}/pnsm05.o" \
+    "${legacy_split_root}/pntest.o" \
+    "${legacy_split_root}/prborn.o" \
+    "${legacy_split_root}/prepv.o" \
+    "${legacy_split_root}/prkin.o" \
+    "${legacy_split_root}/prnpol.o" \
+    "${legacy_split_root}/promega.o" \
+    "${legacy_split_root}/propec.o" \
+    "${legacy_split_root}/prrho.o" \
+    "${legacy_split_root}/qjofx.o" \
+    "${legacy_split_root}/sqz.o" \
+    "${legacy_split_root}/tmcm.o" \
+    "${parity_build_root}/cm12_prbas_contract_probe.o"
+
+gfortran \
+    -O1 \
+    -std=f2008 \
+    -fno-second-underscore \
+    -J "${parity_build_root}" \
+    -I "${parity_build_root}" \
+    -c "${kernel_root}/cm12_prdlt_field_probe.f90" \
+    -o "${parity_build_root}/cm12_prdlt_field_probe.o"
+gfortran \
+    -o "${artifact_root}/cm12-prdlt-field-probe" \
+    "${parity_build_root}/cm12_kernel.o" \
+    "${parity_build_root}/cm12_solution.o" \
+    "${parity_build_root}/cm12_background_seam.o" \
+    "${parity_build_root}/cm12_prbas_dispatch.o" \
+    "${parity_build_root}/cm12_non_cm12_seam.o" \
+    "${parity_build_root}/cm12_request_kernel.o" \
+    "${legacy_split_root}/addres.o" \
+    "${legacy_split_root}/addres2.o" \
+    "${legacy_split_root}/alg.o" \
+    "${legacy_split_root}/cmfn.o" \
+    "${legacy_split_root}/cmsinv.o" \
+    "${legacy_split_root}/dtromb.o" \
+    "${legacy_split_root}/eta33.o" \
+    "${legacy_split_root}/gpiff.o" \
+    "${legacy_split_root}/hopec.o" \
+    "${legacy_split_root}/imjl.o" \
+    "${legacy_split_root}/mcmcv.o" \
+    "${legacy_split_root}/pnsm05.o" \
+    "${legacy_split_root}/pntest.o" \
+    "${legacy_split_root}/prborn.o" \
+    "${legacy_split_root}/prepv.o" \
+    "${legacy_split_root}/prkin.o" \
+    "${legacy_split_root}/prnpol.o" \
+    "${legacy_split_root}/promega.o" \
+    "${legacy_split_root}/propec.o" \
+    "${legacy_split_root}/prrho.o" \
+    "${legacy_split_root}/qjofx.o" \
+    "${legacy_split_root}/sqz.o" \
+    "${legacy_split_root}/tmcm.o" \
+    "${parity_build_root}/cm12_prdlt_field_probe.o"
+
+"${artifact_root}/cm12-prbas-dispatch-probe" \
+    "${solution_file}" "${solution_sha256}" \
+    "${report_root}/hadronic-pipeline-diagnostic/legacy-pipeline-trace.tsv" \
+    >"${prbas_report_root}/hadronic-dispatch.tsv"
+awk -F '\t' '
+    NR > 1 && $11 != "T" { exit 1 }
+    END { if (NR != 19) exit 1 }
+' "${prbas_report_root}/hadronic-dispatch.tsv"
+
+"${artifact_root}/cm12-prbas-contract-probe" \
+    "${solution_file}" "${solution_sha256}" \
+    >"${prbas_report_root}/negative-contracts.tsv"
+awk -F '\t' '
+    NR == 1 && $1 == "contract" && $2 == "status" && $3 == "message" { next }
+    NR == 2 && $1 == "non_printable_title" && $2 == 1 && \
+        $3 == "frozen hadronic formula returned a non-printable title" { next }
+    NR == 3 && $1 == "initialize_grid" && $2 == 0 && $3 == "<empty>" { next }
+    NR == 4 && $1 == "reaction_mismatch" && $2 == 1 && \
+        $3 == "background grid state provenance does not match request" { next }
+    NR == 5 && $1 == "original_reaction_reuse" && $2 == 0 && \
+        $3 == "<empty>" { next }
+    { exit 1 }
+    END { if (NR != 5) exit 1 }
+' "${prbas_report_root}/negative-contracts.tsv"
+
+"${artifact_root}/cm12-form-diagnostic-probe" \
+    "${solution_file}" "${solution_sha256}" "${kcm_root}" \
+    "${report_root}/cm12-form-diagnostic/legacy-form-trace.tsv" \
+    "${report_root}/cm12-form-diagnostic/legacy-target-summary.tsv" \
+    '0.2036E+01' >"${prbas_report_root}/form-contributions.tsv"
+grep -Fq 'exact_candidate_deltas=40' \
+    "${prbas_report_root}/form-contributions.tsv"
+grep -Fq 'candidate_amplitudes_exact=T' \
+    "${prbas_report_root}/form-contributions.tsv"
+grep -Fq 'candidate_dsg_exact=T' \
+    "${prbas_report_root}/form-contributions.tsv"
+grep -Fq 'request_result_exact=T' \
+    "${prbas_report_root}/form-contributions.tsv"
 
 if nm "${artifact_root}/prsdd-headless" |
     grep -Eq '[[:space:]](ys_|gettm_|mjl2cpw_|kos_)$'; then
@@ -466,9 +656,12 @@ fi
         "${artifact_root}/cm12-pure-kernel-probe" \
         "${artifact_root}/cm12-request-probe" \
         "${artifact_root}/cm12-form-diagnostic-probe" \
+        "${artifact_root}/cm12-prbas-dispatch-probe" \
+        "${artifact_root}/cm12-prbas-contract-probe" \
         "${kernel_root}/cm12_kernel.f90" \
         "${kernel_root}/cm12_solution.f90" \
         "${kernel_root}/cm12_background_seam.f90" \
+        "${kernel_root}/cm12_prbas_dispatch.f90" \
         "${kernel_root}/cm12_non_cm12_seam.f90" \
         "${kernel_root}/cm12_request_kernel.f90" \
         "${kernel_root}/cm12_legacy_context.f90" \
@@ -478,6 +671,8 @@ fi
         "${kernel_root}/cm12_request_probe.f90" \
         "${kernel_root}/cm12_pure_kernel_probe.f90" \
         "${kernel_root}/cm12_form_diagnostic_probe.f90" \
+        "${kernel_root}/cm12_prbas_dispatch_probe.f90" \
+        "${kernel_root}/cm12_prbas_contract_probe.f90" \
         "${kernel_root}/cm12_prsd_pure.patch" \
         "${report_root}/cm12-dataset-loader.tsv" \
         "${report_root}/cm12-dataset-rejection.txt" \
@@ -487,7 +682,12 @@ fi
         "${report_root}/cm12-scalar-parity.tsv" \
         "${report_root}/cm12-layer-parity.tsv" \
         "${report_root}/cm12-pure-kernel-parity.tsv" \
-        "${report_root}/cm12-request-orchestration.tsv"
+        "${prbas_report_root}/hadronic-dispatch.tsv" \
+        "${prbas_report_root}/negative-contracts.tsv" \
+        "${prbas_report_root}/form-contributions.tsv"
+    if [[ "${request_probe_status}" -eq 0 ]]; then
+        sha256sum "${report_root}/cm12-request-orchestration.tsv"
+    fi
     printf 'removed_legacy_symbols=ys_,gettm_,mjl2cpw_,kos_\n'
     printf 'pure_valid_domain_symbols=prda_,probs_\n'
     printf 'legacy_nonfinite_fallback_symbols=prda_legacy_,probs_legacy_\n'
@@ -496,6 +696,7 @@ fi
     printf 'request_probe_exit=%s\n' "${request_probe_status}"
     printf 'request_probe_mismatch_allowed=%s\n' \
         "${allow_request_probe_mismatch}"
+    printf 'request_probe_skipped=%s\n' "${skip_request_probe}"
 } >"${report_root}/cm12-seam-build-manifest.txt"
 
 printf 'Built CM12 seam: %s\n' "${artifact_root}/prsdd-headless"
@@ -507,5 +708,15 @@ printf 'Validated pure layers: %s\n' \
     "${report_root}/cm12-layer-parity.tsv"
 printf 'Validated pure PRDA/DSG kernels: %s\n' \
     "${report_root}/cm12-pure-kernel-parity.tsv"
-printf 'Validated pure request orchestration: %s\n' \
-    "${report_root}/cm12-request-orchestration.tsv"
+if [[ "${request_probe_status}" -eq 0 ]]; then
+    printf 'Validated pure request orchestration: %s\n' \
+        "${report_root}/cm12-request-orchestration.tsv"
+else
+    printf 'Pure request orchestration probe skipped for focused validation\n'
+fi
+printf 'Validated focused PRBAS dispatch: %s\n' \
+    "${prbas_report_root}/hadronic-dispatch.tsv"
+printf 'Validated PRBAS negative contracts: %s\n' \
+    "${prbas_report_root}/negative-contracts.tsv"
+printf 'Validated focused PRBAS contributions: %s\n' \
+    "${prbas_report_root}/form-contributions.tsv"

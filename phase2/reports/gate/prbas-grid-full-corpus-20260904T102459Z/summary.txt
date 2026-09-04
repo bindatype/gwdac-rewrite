@@ -1,0 +1,13 @@
+outputs_commit=22493c500c5d84b6ffb2453f834edeced8442071
+compose_project=gwdac-prbas-grid-full-20260904
+fixtures=24
+typed_records=288
+command_failures=0
+fixture_failures=0
+oracle_failures=0
+candidate_failures=0
+candidate_required=1
+seam_engine=seam
+request_probe_mismatch_allowed=0
+gate_table_sha256=a36cec23cbf1a0055f8525b5e818f662bd38430dd657c33b826fdf1cce854098
+result=pass

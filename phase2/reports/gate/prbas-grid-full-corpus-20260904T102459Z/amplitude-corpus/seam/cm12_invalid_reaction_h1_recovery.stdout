@@ -1,0 +1,94 @@
+
+ Welcome to SAID64, the 64-bit version of SAID.
+ Several new features have been added. The mail back
+ option, "go9" has been improved, for example.
+
+ Note! 
+ SAID data file assignments can be changed at any time
+ by entering "GO250"
+ RETURN for non-graphics
+ "TDL" to set PLOT time delay
+ or enter TERMINAL type (XW, TK41, or ?) ->
+ You are using the single meson photoproduction code
+ from SAID64. This code contains the new, as of March 2011,
+ Chew-Mandelstam parametrization form. It is
+ unitary at the two-body level, and uses the hadronic
+ amplitudes determined in fits to pi-N elastic and the
+ pi-N -> eta-N reaction. The formalism is described in
+ Phys. Rev. C 82, 035202 (2010).
+
+ Access this solution after loading the default solution
+ by using: go2, v, fa10
+ (As always, case does not matter in SAID.)
+
+ RETURN to continue ->
+ New contour plotter- Enter CONP or "GO60" to view
+ Note new "GO55" Chi2 summary option(alternate to "GO5")
+ "GO56" Summarize fits compared to Single-Energy fits
+ "GO29" to do your own resonance fit
+ "GO28" get decay amplitudes(A1/2,A3/2) from GW solns
+ "GO57" Compare MULTIPOLES for different solutions 6/05
+ "GO58" another "Compare MULTIPOLES"
+ "GO59" Print/Plot amplitudes (H, F, A) vs E, S, A, t..
+ "GO7" then "Go27" to PLOT PiN amplitudes for any solution
+ The experimental data file is
+ PR094  Photo-prod          07/09 Arndt  08/18/14                
+
+ CAUTION! do NOT use any solution outside its range of
+ validity. Extrapolation properties are generally BAD!
+
+ Eg(photon energy) thresholds are:  
+ pion=  145. eta=   707. kaon=   912. MeV
+ Kindly work ABOVE these energies to avoid nonsense.
+ Enter "E" here to set up for eta photoproduction
+ Enter "P" here to set up for etaprime photoproduction
+ Enter "L" here to set up for k-Lambda photoproduction
+ Enter "S" here to set up for k-Sigma photoproduction
+ Enter "B" here to switch to "Benchmark" PR data
+
+ RETURN to continue -> g2, w1, w2, r1, r2= 13.75 22.50  0.00  0.00  0.00   
+  Solution:
+  CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    9/ 4/26  
+  "GO22" -punch params
+ An "alternative" solution can be defined with a "GO51"
+ RETURN to continue ->
+  Enter first four letters of the desired solution
+ "SES " will set up a "single-energy" soln with DIAGONAL ErrM
+ "G2  " will allow change in BORN terms
+ Enter OWN to input a solution -Return to see soln file -> g2, w1, w2, r1, r2= 13.75 22.50  0.00  0.00  0.00   
+  Solution:
+  CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    9/ 4/26  
+  "GO22" -punch params
+ An "alternative" solution can be defined with a "GO51"
+ RETURN to continue -> Reaction no-  1(PI0P) 2(PI+N) 3(PI-P) 4(PI0N)
+ Enter reaction no -> Reaction no-  1(PI0P) 2(PI+N) 3(PI-P) 4(PI0N)
+ Enter reaction no ->
+ Note: TOTAL cross-section MUST be done at 0 deg
+ Ind Var? A(Acm),C(CosA),E(Elab), or W(Wcm) -> (Min Inc Max) for Acm  ? GO9 to quit ->  Fixed variable? E(Elab), or W(Wcm) -> Value of Elab ? ->  You are set to calculate PI+N production at Elab = 1000.000
+  Acm  goes from   10.000 to  170.000 in increments of   20.000
+  Enter N to change, -GO9 to quit -> Enter Y(or M) for Multipoles at Elab= 1000.00 MeV->
+  Enter observable (or MULT), -Return for choices -> Choices are:
+ 1- VPI&SU helicity amplitudes (from Walker)           
+ 2- CGLN "F" amplitudes;  Chew, PR106, 1345(1957)      
+ 3- CGLN "A"s in 1/GeV**n units n=2,4,3,3 for A1,A2,.. 
+ -1 or -2 will give amplitudes in 10**-3/mu units
+ Enter choice (1, 2, or 3) ->
+  CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    9
+    VPI&SU helicity amplitudes (from Walker)           mFm 
+   PI+N  Scattering Amplitudes    Elab= 1000.00
+   Acm     A1(Re,Im)         A2(Re,Im)         A3(Re,Im)         A4(Re,Im)
+    10.0    -2.06   9.68     -29.51 -17.14      12.36   1.26       3.21   1.11  
+    30.0    -2.71  23.49     -13.69 -14.87      26.28   9.76       6.51   2.96  
+    50.0    -2.81  24.15      -9.46 -10.67      21.64  19.70       7.78   3.98  
+    70.0    -5.15  12.15      -3.42  -5.46      11.49  22.72       6.10   4.47  
+    90.0   -10.22  -4.52       2.77  -0.81       1.49  15.64       2.76   5.33  
+   110.0   -14.38 -15.80       5.22   1.88      -4.88   2.63       0.36   7.64  
+   130.0   -13.38 -16.23       3.37   2.37      -6.79  -8.32       0.39  11.76  
+   150.0    -7.16  -8.55       0.27   1.56      -5.13 -11.01       2.72  16.62  
+   170.0    -0.98  -1.13      -0.53   0.50      -1.80  -4.91       5.39  19.98  
+
+  Enter observable (or MULT), -Return for choices -> Messages can be sent to: 
+ mparis@gwu.edu or rworkman@gwu.edu
+ Thanks for using SAID
+ The SAID files can be retrieved through MAIL
+ by entering "M". Enter "M" or RETURN(to skip)->

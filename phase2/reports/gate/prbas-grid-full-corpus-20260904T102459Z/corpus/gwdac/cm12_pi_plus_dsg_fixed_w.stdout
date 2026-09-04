@@ -1,0 +1,98 @@
+
+ Welcome to SAID64, the 64-bit version of SAID.
+ Several new features have been added. The mail back
+ option, "go9" has been improved, for example.
+
+ Note! 
+ SAID data file assignments can be changed at any time
+ by entering "GO250"
+ RETURN for non-graphics
+ "TDL" to set PLOT time delay
+ or enter TERMINAL type (XW, TK41, or ?) ->
+ You are using the single meson photoproduction code
+ from SAID64. This code contains the new, as of March 2011,
+ Chew-Mandelstam parametrization form. It is
+ unitary at the two-body level, and uses the hadronic
+ amplitudes determined in fits to pi-N elastic and the
+ pi-N -> eta-N reaction. The formalism is described in
+ Phys. Rev. C 82, 035202 (2010).
+
+ Access this solution after loading the default solution
+ by using: go2, v, fa10
+ (As always, case does not matter in SAID.)
+
+ RETURN to continue ->
+ New contour plotter- Enter CONP or "GO60" to view
+ Note new "GO55" Chi2 summary option(alternate to "GO5")
+ "GO56" Summarize fits compared to Single-Energy fits
+ "GO29" to do your own resonance fit
+ "GO28" get decay amplitudes(A1/2,A3/2) from GW solns
+ "GO57" Compare MULTIPOLES for different solutions 6/05
+ "GO58" another "Compare MULTIPOLES"
+ "GO59" Print/Plot amplitudes (H, F, A) vs E, S, A, t..
+ "GO7" then "Go27" to PLOT PiN amplitudes for any solution
+ The experimental data file is
+ PR094  Photo-prod          07/09 Arndt  08/18/14                
+
+ CAUTION! do NOT use any solution outside its range of
+ validity. Extrapolation properties are generally BAD!
+
+ Eg(photon energy) thresholds are:  
+ pion=  145. eta=   707. kaon=   912. MeV
+ Kindly work ABOVE these energies to avoid nonsense.
+ Enter "E" here to set up for eta photoproduction
+ Enter "P" here to set up for etaprime photoproduction
+ Enter "L" here to set up for k-Lambda photoproduction
+ Enter "S" here to set up for k-Sigma photoproduction
+ Enter "B" here to switch to "Benchmark" PR data
+
+ RETURN to continue -> g2, w1, w2, r1, r2= 13.75 22.50  0.00  0.00  0.00   
+  Solution:
+  CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    9/ 4/26  
+  "GO22" -punch params
+ An "alternative" solution can be defined with a "GO51"
+ RETURN to continue ->
+  Enter first four letters of the desired solution
+ "SES " will set up a "single-energy" soln with DIAGONAL ErrM
+ "G2  " will allow change in BORN terms
+ Enter OWN to input a solution -Return to see soln file -> g2, w1, w2, r1, r2= 13.75 22.50  0.00  0.00  0.00   
+  Solution:
+  CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    9/ 4/26  
+  "GO22" -punch params
+ An "alternative" solution can be defined with a "GO51"
+ RETURN to continue -> Reaction no-  1(PI0P) 2(PI+N) 3(PI-P) 4(PI0N)
+ Enter reaction no ->
+ Note: TOTAL cross-section MUST be done at 0 deg
+ Ind Var? A(Acm),C(CosA),E(Elab), or W(Wcm) -> (Min Inc Max) for Acm  ? GO9 to quit ->  Fixed variable? E(Elab), or W(Wcm) -> Value of Wcm  ? ->  You are set to calculate PI+N production at Wcm  = 1600.000
+  Acm  goes from    0.000 to  180.000 in increments of   30.000
+  Enter N to change, -GO9 to quit ->
+Thresholds=  144.76  151.65  148.43  144.74
+ Enter Y(or M) for Multipoles at Wcm = 1600.00 MeV->
+  Enter observable (or MULT), -Return for choices ->
+ WEB
+
+  CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    9/ 4/26  
+     PI+N  DSG  AT Wcm  =  1600.00       9/ 4/26  
+     Acm          Obs,Err             (Alab, DSGlab) 
+     0.000  0.1582E+02  0.0000E+00    0.00  0.4711E+02
+    30.000  0.8091E+01  0.0000E+00   17.64  0.2204E+02
+    60.000  0.4770E+01  0.0000E+00   36.92  0.9958E+01
+    90.000  0.2215E+01  0.0000E+00   59.89  0.2986E+01
+   120.000  0.3144E+01  0.0000E+00   89.54  0.2386E+01
+   150.000  0.2585E+01  0.0000E+00  129.52  0.1094E+01
+   180.000  0.2461E+01  0.0000E+00  180.00  0.7884E+00
+  To see exp data enter a range(min max) for Wcm  ->
+ WEB
+
+ Once a PLOT is displayed you can enter:
+ "PLOT" to replot/rescale the picture
+ "SWAP" to PLOT the "alternate" solution (defined by "GO51")
+ "MEAS" to measure points with the graphics CURSOR(stroke "M")
+ "CHAN" to change a partial-wave and replot
+ "OBS " to plot another observable on the same plot
+  Enter PLOT to generate a picture ->
+  Enter observable (or MULT), -Return for choices -> Messages can be sent to: 
+ mparis@gwu.edu or rworkman@gwu.edu
+ Thanks for using SAID
+ The SAID files can be retrieved through MAIL
+ by entering "M". Enter "M" or RETURN(to skip)->

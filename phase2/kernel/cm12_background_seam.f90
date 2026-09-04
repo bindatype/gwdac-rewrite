@@ -21,6 +21,7 @@ module cm12_background_seam
 
     public :: cm12_evaluate_born_multipoles
     public :: cm12_evaluate_background
+    public :: cm12_evaluate_initial_amplitudes
 
     interface
         subroutine prborn(energy, multipoles, form)
@@ -93,8 +94,6 @@ contains
         integer, intent(out) :: status
         character(len=*), intent(out) :: message
 
-        real(real32) :: legacy_amplitudes(4)
-
         initial_amplitudes = cmplx(0.0_real32, 0.0_real32, kind=real32)
         if (reaction < 1 .or. reaction > 4) then
             born_multipoles = 0.0_real32
@@ -117,6 +116,50 @@ contains
             constants, photon_lab_energy_mev, born_multipoles, &
             opec_multipoles, status, message)
         if (status /= cm12_ok) return
+        call cm12_evaluate_initial_amplitudes( &
+            constants, photon_lab_energy_mev, angle_cm_deg, reaction, &
+            initial_amplitudes, status, message)
+    end subroutine cm12_evaluate_background
+
+    subroutine cm12_evaluate_initial_amplitudes( &
+        constants, photon_lab_energy_mev, angle_cm_deg, reaction, &
+        initial_amplitudes, status, message)
+        type(cm12_background_constants), intent(in) :: constants
+        real(real32), intent(in) :: photon_lab_energy_mev
+        real(real32), intent(in) :: angle_cm_deg
+        integer, intent(in) :: reaction
+        complex(real32), intent(out) :: initial_amplitudes(4)
+        integer, intent(out) :: status
+        character(len=*), intent(out) :: message
+
+        real(real32) :: legacy_amplitudes(4)
+
+        initial_amplitudes = cmplx(0.0_real32, 0.0_real32, kind=real32)
+        if (reaction < 1 .or. reaction > 4) then
+            status = cm12_invalid_argument
+            message = 'background pion reaction must be in 1..4'
+            return
+        end if
+        if ( &
+            .not. ieee_is_finite(photon_lab_energy_mev) .or. &
+            photon_lab_energy_mev <= 0.0_real32) then
+            status = cm12_invalid_argument
+            message = 'background energy must be finite and positive'
+            return
+        end if
+        if ( &
+            .not. ieee_is_finite(angle_cm_deg) .or. &
+            angle_cm_deg < 0.0_real32 .or. angle_cm_deg > 180.0_real32) then
+            status = cm12_invalid_argument
+            message = 'background angle must be in 0..180 degrees'
+            return
+        end if
+        if (.not. valid_constants(constants)) then
+            status = cm12_invalid_argument
+            message = 'Born/background constants must be finite'
+            return
+        end if
+
         call set_legacy_constants(constants)
         call hopec( &
             photon_lab_energy_mev, angle_cm_deg, reaction, &
@@ -125,7 +168,7 @@ contains
             legacy_amplitudes, 0.0_real32, kind=real32)
         status = cm12_ok
         message = ''
-    end subroutine cm12_evaluate_background
+    end subroutine cm12_evaluate_initial_amplitudes
 
     subroutine set_legacy_constants(constants)
         type(cm12_background_constants), intent(in) :: constants

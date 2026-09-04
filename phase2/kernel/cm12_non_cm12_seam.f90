@@ -2,8 +2,13 @@ module cm12_non_cm12_seam
     use, intrinsic :: iso_fortran_env, only: real32
     use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     use cm12_kernel, only: cm12_invalid_argument, cm12_ok
+    use cm12_prbas_dispatch, only: &
+        cm12_begin_prbas_dispatch, cm12_next_prbas_dispatch, &
+        cm12_prbas_dispatch_event, cm12_prbas_dispatch_state, &
+        cm12_record_prbas_formula_title
     use cm12_solution_kernel, only: &
-        cm12_kinematics, cm12_solution, cm12_solution_multipole
+        cm12_kinematics, cm12_solution, cm12_solution_multipole, &
+        cm12_solution_summary
     implicit none
     private
 
@@ -11,18 +16,51 @@ module cm12_non_cm12_seam
     integer, parameter :: branch_count = 2
     integer, parameter :: partial_wave_count = 6
     integer, parameter :: parameter_count = 25
+    character(len=4), parameter :: pntest_formula_title = 'SP00'
+
+    integer, parameter, public :: cm12_max_hadronic_trace = &
+        family_count * branch_count * partial_wave_count
+
+    type, public :: cm12_prdlt_field_trace
+        real(real32) :: z = 0.0_real32
+        real(real32) :: qb = 0.0_real32
+        real(real32) :: qk = 0.0_real32
+        real(real32) :: zr = 0.0_real32
+        real(real32) :: zb = 0.0_real32
+        real(real32) :: brn = 0.0_real32
+        real(real32) :: ter = 0.0_real32
+        real(real32) :: tei = 0.0_real32
+        real(real32) :: der = 0.0_real32
+        real(real32) :: dei = 0.0_real32
+    end type cm12_prdlt_field_trace
+
+    type, public :: cm12_hadronic_trace
+        type(cm12_prbas_dispatch_event) :: dispatch
+        type(cm12_prdlt_field_trace) :: form
+        character(len=4) :: formula_title = ''
+        real(real32) :: hadronic_real = 0.0_real32
+        real(real32) :: hadronic_imag = 0.0_real32
+    end type cm12_hadronic_trace
+
+    type, public :: cm12_background_grid_state
+        private
+        logical :: initialized = .false.
+        integer :: reaction = 0
+        character(len=64) :: solution_sha256 = ''
+        type(cm12_prbas_dispatch_state) :: dispatch
+    end type cm12_background_grid_state
 
     public :: cm12_prepare_non_cm12_multipoles
 
     interface
-        subroutine pnsm05(energy, reaction, real_part, imag_part, title)
+        subroutine pntest(energy, reaction, real_part, imag_part, title)
             import real32
             real(real32), intent(in) :: energy
             integer, intent(in) :: reaction
             real(real32), intent(out) :: real_part(4, 8)
             real(real32), intent(out) :: imag_part(4, 8)
-            integer, intent(out) :: title(18)
-        end subroutine pnsm05
+            integer, intent(inout) :: title(13)
+        end subroutine pntest
 
         subroutine qjofx(values, argument, maximum_l)
             import real32
@@ -35,28 +73,53 @@ module cm12_non_cm12_seam
 contains
 
     subroutine cm12_prepare_non_cm12_multipoles( &
-        solution, reaction, kinematics, opec_multipoles, multipoles, &
-        status, message)
+        solution, reaction, kinematics, born_multipoles, opec_multipoles, &
+        multipoles, status, message, trace, trace_count, grid_state)
         type(cm12_solution), intent(in) :: solution
         integer, intent(in) :: reaction
         type(cm12_kinematics), intent(in) :: kinematics
+        real(real32), intent(in) :: born_multipoles( &
+            family_count, branch_count, partial_wave_count)
         real(real32), intent(in) :: opec_multipoles( &
             family_count, branch_count, partial_wave_count)
         complex(real32), intent(out) :: multipoles( &
             family_count, branch_count, partial_wave_count)
         integer, intent(out) :: status
         character(len=*), intent(out) :: message
+        type(cm12_hadronic_trace), intent(out), optional :: trace(:)
+        integer, intent(out), optional :: trace_count
+        type(cm12_background_grid_state), intent(inout), optional :: grid_state
 
         real(real32) :: pion_real(4, 8)
         real(real32) :: pion_imag(4, 8)
         real(real32) :: parameters(parameter_count)
-        integer :: pion_title(18)
+        real(real32) :: formula_energy
+        real(real32) :: formula_born_multipole
+        integer :: pion_title(13)
         integer :: family
         integer :: branch
         integer :: orbital_l
         integer :: form_selector
+        integer :: explicit_records
+        integer :: max_partial_wave
+        integer :: current_trace_count
+        character(len=4) :: formula_title
+        character(len=4) :: solution_identifier
+        character(len=64) :: source_sha256
+        character(len=72) :: solution_title
+        character(len=1024) :: source_path
+        type(cm12_prbas_dispatch_event) :: dispatch
+        type(cm12_prbas_dispatch_state) :: dispatch_state
+        type(cm12_prbas_dispatch_state) :: next_dispatch_state
+        type(cm12_prdlt_field_trace) :: form_trace
 
         multipoles = cmplx(0.0_real32, 0.0_real32, kind=real32)
+        pion_real = 0.0_real32
+        pion_imag = 0.0_real32
+        pion_title = 0
+        current_trace_count = 0
+        if (present(trace)) trace = cm12_hadronic_trace()
+        if (present(trace_count)) trace_count = 0
         if (reaction < 1 .or. reaction > 4) then
             status = cm12_invalid_argument
             message = 'non-CM12 preparation requires pion reaction 1..4'
@@ -74,11 +137,30 @@ contains
             return
         end if
 
-        ! Frozen SM05 remains an explicit hidden-state boundary: PNSM05
-        ! caches its last energy internally but receives all physics inputs.
-        call pnsm05( &
-            kinematics%final_meson_energy_mev, 0, &
-            pion_real, pion_imag, pion_title)
+        call cm12_solution_summary( &
+            solution, solution_identifier, solution_title, source_path, &
+            source_sha256, explicit_records, max_partial_wave)
+        if (present(grid_state)) then
+            if (grid_state%initialized) then
+                if ( &
+                    grid_state%reaction /= reaction .or. &
+                    grid_state%solution_sha256 /= source_sha256) then
+                    status = cm12_invalid_argument
+                    message = &
+                        'background grid state provenance does not match request'
+                    return
+                end if
+                dispatch_state = grid_state%dispatch
+            else
+                call cm12_begin_prbas_dispatch( &
+                    solution_title, dispatch_state, status, message)
+                if (status /= cm12_ok) return
+            end if
+        else
+            call cm12_begin_prbas_dispatch( &
+                solution_title, dispatch_state, status, message)
+            if (status /= cm12_ok) return
+        end if
 
         do family = 1, family_count
             do branch = 1, branch_count
@@ -97,32 +179,93 @@ contains
                         message = 'unsupported retained non-CM12 form'
                         return
                     end if
+                    current_trace_count = current_trace_count + 1
+                    call cm12_next_prbas_dispatch( &
+                        dispatch_state, family, branch, orbital_l, &
+                        form_selector, kinematics%final_meson_energy_mev, &
+                        dispatch, next_dispatch_state, status, message)
+                    if (status /= cm12_ok) return
+                    dispatch_state = next_dispatch_state
+                    formula_title = ''
+                    if (dispatch%dispatch) then
+                        formula_energy = dispatch%effective_energy_mev
+                        ! PNTEST retains an internal cache; that frozen formula
+                        ! state is the remaining hidden boundary at this seam.
+                        pion_title = 0
+                        pion_title(1) = transfer( &
+                            pntest_formula_title, pion_title(1))
+                        call pntest( &
+                            formula_energy, 0, pion_real, pion_imag, pion_title)
+                        formula_title = transfer(pion_title(1), formula_title)
+                        call cm12_record_prbas_formula_title( &
+                            dispatch_state, formula_title, next_dispatch_state, &
+                            status, message)
+                        if (status /= cm12_ok) return
+                        dispatch_state = next_dispatch_state
+                    else
+                        pion_real = 0.0_real32
+                        pion_imag = 0.0_real32
+                    end if
+                    formula_born_multipole = &
+                        born_multipoles(family, branch, orbital_l + 1)
+                    if (.not. dispatch%dispatch) then
+                        formula_born_multipole = 0.0_real32
+                    end if
                     call evaluate_legacy_form( &
                         form_selector, parameters, family, branch, &
-                        orbital_l, kinematics, &
+                        orbital_l, dispatch%pre_reset_energy_mev, &
+                        dispatch%input_energy_mev, kinematics, &
+                        formula_born_multipole, &
                         opec_multipoles(family, branch, orbital_l + 1), &
                         pion_real, pion_imag, &
-                        multipoles(family, branch, orbital_l + 1))
+                        multipoles(family, branch, orbital_l + 1), form_trace)
+                    if (present(trace)) then
+                        if (current_trace_count > size(trace)) then
+                            status = cm12_invalid_argument
+                            message = 'hadronic trace buffer is too small'
+                            return
+                        end if
+                        trace(current_trace_count)%dispatch = dispatch
+                        trace(current_trace_count)%form = form_trace
+                        trace(current_trace_count)%formula_title = formula_title
+                        trace(current_trace_count)%hadronic_real = pion_real( &
+                            dispatch%state_index, dispatch%legacy_l)
+                        trace(current_trace_count)%hadronic_imag = pion_imag( &
+                            dispatch%state_index, dispatch%legacy_l)
+                    end if
                 end do
             end do
         end do
+        if (present(grid_state)) then
+            grid_state%initialized = .true.
+            grid_state%reaction = reaction
+            grid_state%solution_sha256 = source_sha256
+            grid_state%dispatch = dispatch_state
+        end if
+        if (present(trace_count)) trace_count = current_trace_count
         status = cm12_ok
         message = ''
     end subroutine cm12_prepare_non_cm12_multipoles
 
     subroutine evaluate_legacy_form( &
-        form_selector, parameters, family, branch, orbital_l, kinematics, &
-        opec_multipole, pion_real, pion_imag, adjusted_multipole)
+        form_selector, parameters, family, branch, orbital_l, &
+        pre_reset_pion_lab_energy, pion_lab_energy, kinematics, &
+        born_multipole, opec_multipole, pion_real, pion_imag, &
+        adjusted_multipole, field_trace)
         integer, intent(in) :: form_selector
         real(real32), intent(in) :: parameters(parameter_count)
         integer, intent(in) :: family
         integer, intent(in) :: branch
         integer, intent(in) :: orbital_l
+        real(real32), intent(in) :: pre_reset_pion_lab_energy
+        real(real32), intent(in) :: pion_lab_energy
         type(cm12_kinematics), intent(in) :: kinematics
+        real(real32), intent(in) :: born_multipole
         real(real32), intent(in) :: opec_multipole
         real(real32), intent(in) :: pion_real(4, 8)
         real(real32), intent(in) :: pion_imag(4, 8)
         complex(real32), intent(out) :: adjusted_multipole
+        type(cm12_prdlt_field_trace), intent(out) :: field_trace
 
         real(real32), parameter :: expansion_pion_mass = 135.04_real32
         real(real32), parameter :: charged_pion_mass = 139.65_real32
@@ -130,7 +273,6 @@ contains
         real(real32), parameter :: degrees_to_radians = 0.0174532_real32
 
         real(real32) :: q_values(10)
-        real(real32) :: pion_lab_energy
         real(real32) :: virtual_pion_momentum
         real(real32) :: momentum_ratio
         real(real32) :: expansion
@@ -154,6 +296,8 @@ contains
         integer :: legacy_l
         integer :: extra_power
 
+        field_trace = cm12_prdlt_field_trace()
+
         legacy_l = orbital_l + 1
         pion_state = branch
         if (family <= 2) pion_state = pion_state + 2
@@ -162,10 +306,10 @@ contains
 
         base_form = mod(form_selector, 10)
         rotation_form = form_selector / 10
-        pion_lab_energy = kinematics%final_meson_energy_mev
-        expansion = pion_lab_energy / expansion_pion_mass
+        expansion = pre_reset_pion_lab_energy / expansion_pion_mass
         if (base_form > 4) then
-            expansion = pion_lab_energy / (800.0_real32 + pion_lab_energy)
+            expansion = pre_reset_pion_lab_energy / &
+                (800.0_real32 + pre_reset_pion_lab_energy)
         end if
         virtual_pion_momentum = proton_mass * sqrt( &
             pion_lab_energy * &
@@ -174,16 +318,22 @@ contains
                 2.0_real32 * proton_mass * pion_lab_energy))
         momentum_ratio = &
             virtual_pion_momentum / kinematics%photon_cm_momentum_mev
+        field_trace%z = expansion
+        field_trace%qb = virtual_pion_momentum
+        field_trace%qk = momentum_ratio
 
-        polynomial_rescattering = expansion * ( &
-            parameters(6) + expansion * ( &
-                parameters(7) + expansion * parameters(8)))
-        polynomial_rescattering = &
-            (polynomial_rescattering + parameters(5)) * &
-            expansion_pion_mass / virtual_pion_momentum
-        if (legacy_l > 1) then
-            polynomial_rescattering = polynomial_rescattering * &
-                (1.0_real32 / momentum_ratio) ** (legacy_l - 1)
+        polynomial_rescattering = 0.0_real32
+        if (virtual_pion_momentum > 0.0_real32) then
+            polynomial_rescattering = expansion * ( &
+                parameters(6) + expansion * ( &
+                    parameters(7) + expansion * parameters(8)))
+            polynomial_rescattering = &
+                (polynomial_rescattering + parameters(5)) * &
+                expansion_pion_mass / virtual_pion_momentum
+            if (legacy_l > 1) then
+                polynomial_rescattering = polynomial_rescattering * &
+                    (1.0_real32 / momentum_ratio) ** (legacy_l - 1)
+            end if
         end if
 
         if (base_form <= 2) then
@@ -219,13 +369,20 @@ contains
             polynomial_real = polynomial_real * scale
         end if
 
-        polynomial_real = polynomial_real + opec_multipole
+        field_trace%zr = polynomial_rescattering
+        field_trace%zb = polynomial_real
+        field_trace%brn = born_multipole
+        field_trace%ter = hadronic_real
+        field_trace%tei = hadronic_imag
+        polynomial_real = polynomial_real + born_multipole
         real_part = &
             polynomial_real * (1.0_real32 - hadronic_imag) + &
             polynomial_rescattering * hadronic_real
         imag_part = &
             polynomial_real * hadronic_real + &
             polynomial_rescattering * hadronic_imag
+        field_trace%der = real_part
+        field_trace%dei = imag_part
 
         rotation = &
             hadronic_imag - hadronic_real ** 2 - hadronic_imag ** 2

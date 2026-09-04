@@ -1,0 +1,10 @@
+section	case	exact
+prda	1	T
+prda	2	T
+prda	3	T
+prda	4	T
+prda	5	T
+prda	6	T
+dsg	formula	T
+dsg	threshold-rejection	T
+dsg	invalid-domain	T

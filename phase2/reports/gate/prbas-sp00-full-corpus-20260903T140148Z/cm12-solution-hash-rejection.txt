@@ -1,0 +1,3 @@
+STOP 1
+status=5
+message=CM12 solution SHA-256 does not match expected provenance

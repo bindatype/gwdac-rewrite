@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root=/workspace/arndt64
+readonly report_root=/phase2/reports/cm12-prbas-grid-state-candidate
+readonly fixture_root=/phase2/reports/cm12-prbas-sweep-state-diagnostic
+readonly state_root=/workspace/phase2/sweep-state-diagnostic
+readonly executable=/workspace/phase2/reproducible/artifacts/f6c81d01a1fe/prsdd-headless
+readonly fixture="${fixture_root}/two-point-dsg.in"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly data_root="${source_root}/sdat"
+readonly solution_file="${data_root}/prsol.dat"
+readonly solution_sha256=dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522
+
+mkdir -p "${state_root}/runs"
+run_root="$(mktemp -d "${state_root}/runs/candidate.XXXXXX")"
+readonly run_root
+cp -a "${source_root}/pr" "${run_root}/pr"
+rm -f \
+    "${run_root}/pr/SAID.TMP" \
+    "${run_root}/pr/SAID.PCT" \
+    "${run_root}/pr/SAID.LOG" \
+    "${run_root}/pr/SAID.PS" \
+    "${run_root}/pr/fort.3" \
+    "${run_root}/pr/fort.7"
+ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+ln -s "${data_root}" "${run_root}/sdat"
+
+status=0
+(
+    cd "${run_root}/pr"
+    timeout 120 env \
+        CM12_KCM_ROOT="${kcm_root}" \
+        CM12_SOLUTION_FILE="${solution_file}" \
+        CM12_SOLUTION_SHA256="${solution_sha256}" \
+        CM12_SOLUTION_ID=CM12 \
+        SAID_DATA_ROOT="${data_root}" \
+        "${executable}" \
+        <"${fixture}" \
+        >"${report_root}/candidate.stdout" \
+        2>"${report_root}/candidate.stderr"
+) || status=$?
+printf '%s\n' "${status}" >"${report_root}/candidate.exit"
+test "${status}" -eq 0
+test ! -s "${report_root}/candidate.stderr"

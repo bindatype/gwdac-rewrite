@@ -5,8 +5,10 @@ subroutine prbas
     use cm12_solution_kernel, only: &
         cm12_calculate_kinematics, cm12_kinematics, cm12_solution
     use cm12_request_kernel, only: &
-        cm12_evaluate_request, cm12_prepare_legacy_background, &
-        cm12_prepared_background, cm12_request, cm12_request_result
+        cm12_background_grid_state, cm12_evaluate_request, &
+        cm12_prepare_legacy_angle_background, &
+        cm12_prepare_legacy_background, cm12_prepared_background, &
+        cm12_request, cm12_request_result
     use cm12_legacy_context, only: legacy_cm12_objects
     implicit none
 
@@ -83,6 +85,7 @@ subroutine prbas
     type(cm12_solution), pointer :: solution
     type(cm12_request) :: request
     type(cm12_prepared_background) :: background
+    type(cm12_background_grid_state) :: grid_state
     type(cm12_request_result) :: result
     type(cm12_kinematics) :: validation_kinematics
     character(len=512) :: message
@@ -132,16 +135,28 @@ subroutine prbas
     result_index = 1
     do energy_index = 1, ne
         ie = energy_index
+        request = cm12_request( &
+            reaction=ir, photon_lab_energy_mev=e(energy_index), &
+            angle_cm_deg=a(1))
+        call cm12_prepare_legacy_background( &
+            solution, request, background, status, message, &
+            grid_state=grid_state)
+        if (status /= cm12_ok) then
+            call prbas_legacy
+            return
+        end if
         do angle_index = 1, na
             ia = angle_index
             request = cm12_request( &
                 reaction=ir, photon_lab_energy_mev=e(energy_index), &
                 angle_cm_deg=a(angle_index))
-            call cm12_prepare_legacy_background( &
-                solution, request, background, status, message)
-            if (status /= cm12_ok) then
-                call prbas_legacy
-                return
+            if (angle_index > 1) then
+                call cm12_prepare_legacy_angle_background( &
+                    solution, request, background, status, message)
+                if (status /= cm12_ok) then
+                    call prbas_legacy
+                    return
+                end if
             end if
             call cm12_evaluate_request( &
                 solution, dataset, request, background, result, &

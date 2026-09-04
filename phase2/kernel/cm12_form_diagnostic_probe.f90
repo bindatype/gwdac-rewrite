@@ -64,6 +64,8 @@ program cm12_form_diagnostic_probe
     real(real32) :: legacy_row_delta_imag(amplitude_count)
     real(real32) :: replay_delta_real(amplitude_count)
     real(real32) :: replay_delta_imag(amplitude_count)
+    real(real32) :: candidate_delta_real(amplitude_count)
+    real(real32) :: candidate_delta_imag(amplitude_count)
     integer :: unit
     integer :: ios
     integer :: status
@@ -79,12 +81,17 @@ program cm12_form_diagnostic_probe
     integer :: exact_cm12_multipoles
     integer :: exact_non_cm12_multipoles
     integer :: exact_replayed_deltas
+    integer :: exact_candidate_deltas
     logical :: applicable
     logical :: multipole_exact
     logical :: delta_exact
+    logical :: candidate_delta_exact
     logical :: initial_exact
     logical :: full_amplitudes_exact
     logical :: full_dsg_exact
+    logical :: candidate_amplitudes_exact
+    logical :: candidate_dsg_exact
+    logical :: request_result_exact
 
     if (command_argument_count() /= 6) then
         write(*, '(a)') &
@@ -170,6 +177,7 @@ program cm12_form_diagnostic_probe
     exact_cm12_multipoles = 0
     exact_non_cm12_multipoles = 0
     exact_replayed_deltas = 0
+    exact_candidate_deltas = 0
 
     write(*, '(a)') &
         'family' // achar(9) // 'branch' // achar(9) // 'orbital_l' // &
@@ -177,7 +185,8 @@ program cm12_form_diagnostic_probe
         achar(9) // 'disposition' // achar(9) // 'legacy_real' // &
         achar(9) // 'legacy_imag' // achar(9) // 'kernel_real' // &
         achar(9) // 'kernel_imag' // achar(9) // 'multipole_exact' // &
-        achar(9) // 'delta_exact'
+        achar(9) // 'replay_delta_exact' // achar(9) // &
+        'candidate_delta_exact'
     do family = 1, family_count
         do branch = 1, branch_count
             do orbital_l = 0, partial_wave_count - 1
@@ -202,6 +211,7 @@ program cm12_form_diagnostic_probe
 
                 multipole_exact = .true.
                 delta_exact = .true.
+                candidate_delta_exact = .true.
                 scalar_multipole = cmplx( &
                     0.0_real32, 0.0_real32, kind=real32)
                 adjusted_multipole = scalar_multipole
@@ -256,13 +266,6 @@ program cm12_form_diagnostic_probe
                             exact_cm12_multipoles = &
                                 exact_cm12_multipoles + 1
                         end if
-                        call cm12_accumulate_multipole( &
-                            solution, reaction, angle_cm_deg, family, &
-                            branch, orbital_l, adjusted_multipole, &
-                            candidate_amplitudes, next_amplitudes, &
-                            status, message)
-                        if (status /= cm12_ok) stop 15
-                        candidate_amplitudes = next_amplitudes
                         disposition = 'kernel-applied'
                     else
                         adjusted_multipole = &
@@ -276,9 +279,37 @@ program cm12_form_diagnostic_probe
                         end if
                         disposition = 'prepared'
                     end if
+                    if (.not. multipole_exact) then
+                        write(*, '(a,3(i0,a),i0)') &
+                            'first_divergence=', family, '/', branch, '/', &
+                            orbital_l, '/multipole selector=', form_selector
+                        stop 19
+                    end if
+                    before_amplitudes = candidate_amplitudes
+                    call cm12_accumulate_multipole( &
+                        solution, reaction, angle_cm_deg, family, branch, &
+                        orbital_l, adjusted_multipole, candidate_amplitudes, &
+                        next_amplitudes, status, message)
+                    if (status /= cm12_ok) stop 15
+                    candidate_amplitudes = next_amplitudes
+                    candidate_delta_real = real( &
+                        candidate_amplitudes - before_amplitudes, kind=real32)
+                    candidate_delta_imag = aimag( &
+                        candidate_amplitudes - before_amplitudes)
+                    candidate_delta_exact = &
+                        all(candidate_delta_real == legacy_row_delta_real) .and. &
+                        all(candidate_delta_imag == legacy_row_delta_imag)
+                    if (.not. candidate_delta_exact) then
+                        write(*, '(a,3(i0,a),i0)') &
+                            'first_divergence=', family, '/', branch, '/', &
+                            orbital_l, '/contribution selector=', form_selector
+                        stop 20
+                    end if
+                    exact_candidate_deltas = exact_candidate_deltas + 1
                 end if
 
-                write(*, '(3(i0,a),i0,a,a,a,a,a,4(es16.8,a),l1,a,l1)') &
+                write(*, &
+                    '(3(i0,a),i0,a,a,a,a,a,4(es16.8,a),l1,a,l1,a,l1)') &
                     family, achar(9), branch, achar(9), orbital_l, achar(9), &
                     form_selector, achar(9), trim(classification), achar(9), &
                     trim(disposition), achar(9), &
@@ -286,7 +317,8 @@ program cm12_form_diagnostic_probe
                     legacy_imag(family, branch, orbital_l + 1), achar(9), &
                     real(adjusted_multipole, kind=real32), achar(9), &
                     aimag(adjusted_multipole), achar(9), &
-                    multipole_exact, achar(9), delta_exact
+                    multipole_exact, achar(9), delta_exact, achar(9), &
+                    candidate_delta_exact
             end do
         end do
     end do
@@ -307,6 +339,10 @@ program cm12_form_diagnostic_probe
     if (status /= cm12_ok) stop 18
 
     full_amplitudes_exact = all(full_amplitudes == legacy_final)
+    candidate_amplitudes_exact = all(candidate_amplitudes == legacy_final)
+    request_result_exact = &
+        current_result%evaluated_multipoles == 40 .and. &
+        all(current_result%amplitudes_mfm == legacy_final)
     write(replayed_dsg_display, '(e11.4)') full_dsg
     write(candidate_dsg_display, '(e11.4)') candidate_dsg
     write(current_dsg_display, '(e11.4)') &
@@ -314,6 +350,13 @@ program cm12_form_diagnostic_probe
     full_dsg_exact = &
         trim(adjustl(replayed_dsg_display)) == &
         trim(adjustl(oracle_dsg_display))
+    candidate_dsg_exact = &
+        candidate_dsg == full_dsg .and. &
+        current_result%dsg_microbarn_per_sr == full_dsg .and. &
+        trim(adjustl(candidate_dsg_display)) == &
+            trim(adjustl(oracle_dsg_display)) .and. &
+        trim(adjustl(current_dsg_display)) == &
+            trim(adjustl(oracle_dsg_display))
     write(*, '(a)') 'SUMMARY'
     write(*, '(a,i0)') 'active_forms=', active_forms
     write(*, '(a,i0)') 'cm12_forms=', cm12_forms
@@ -326,9 +369,15 @@ program cm12_form_diagnostic_probe
         'exact_non_cm12_multipoles=', exact_non_cm12_multipoles
     write(*, '(a,i0)') &
         'exact_replayed_deltas=', exact_replayed_deltas
+    write(*, '(a,i0)') &
+        'exact_candidate_deltas=', exact_candidate_deltas
     write(*, '(a,l1)') 'initial_exact=', initial_exact
     write(*, '(a,l1)') 'full_amplitudes_exact=', full_amplitudes_exact
     write(*, '(a,l1)') 'full_dsg_exact=', full_dsg_exact
+    write(*, '(a,l1)') &
+        'candidate_amplitudes_exact=', candidate_amplitudes_exact
+    write(*, '(a,l1)') 'candidate_dsg_exact=', candidate_dsg_exact
+    write(*, '(a,l1)') 'request_result_exact=', request_result_exact
     write(*, '(a,8(es16.8,1x))') &
         'legacy_amplitudes=', &
         (real(legacy_final(family), kind=real32), &
@@ -338,7 +387,7 @@ program cm12_form_diagnostic_probe
         (real(full_amplitudes(family), kind=real32), &
             aimag(full_amplitudes(family)), family=1, amplitude_count)
     write(*, '(a,8(es16.8,1x))') &
-        'legacy_order_1xx_amplitudes=', &
+        'candidate_all_form_amplitudes=', &
         (real(candidate_amplitudes(family), kind=real32), &
             aimag(candidate_amplitudes(family)), &
             family=1, amplitude_count)
@@ -352,9 +401,9 @@ program cm12_form_diagnostic_probe
     write(*, '(a,es16.8)') 'replayed_all_dsg=', full_dsg
     write(*, '(a,a)') &
         'replayed_all_dsg_display=', trim(adjustl(replayed_dsg_display))
-    write(*, '(a,es16.8)') 'legacy_order_1xx_dsg=', candidate_dsg
+    write(*, '(a,es16.8)') 'candidate_all_form_dsg=', candidate_dsg
     write(*, '(a,a)') &
-        'legacy_order_1xx_dsg_display=', &
+        'candidate_all_form_dsg_display=', &
         trim(adjustl(candidate_dsg_display))
     write(*, '(a,es16.8)') &
         'candidate_request_dsg=', &
@@ -362,4 +411,19 @@ program cm12_form_diagnostic_probe
     write(*, '(a,a)') &
         'candidate_request_dsg_display=', &
         trim(adjustl(current_dsg_display))
+    if ( &
+        active_forms /= 60 .or. &
+        cm12_forms /= 34 .or. &
+        non_cm12_forms /= 26 .or. &
+        applicable_non_cm12_forms /= 18 .or. &
+        exact_cm12_multipoles /= 22 .or. &
+        exact_non_cm12_multipoles /= 18 .or. &
+        exact_replayed_deltas /= 40 .or. &
+        exact_candidate_deltas /= 40 .or. &
+        .not. initial_exact .or. &
+        .not. full_amplitudes_exact .or. &
+        .not. full_dsg_exact .or. &
+        .not. candidate_amplitudes_exact .or. &
+        .not. candidate_dsg_exact .or. &
+        .not. request_result_exact) stop 21
 end program cm12_form_diagnostic_probe

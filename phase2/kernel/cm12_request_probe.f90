@@ -1,5 +1,5 @@
 program cm12_request_probe
-    use, intrinsic :: iso_fortran_env, only: real32
+    use, intrinsic :: iso_fortran_env, only: error_unit, real32
     use cm12_kernel, only: &
         cm12_dataset, cm12_invalid_argument, cm12_ok, load_cm12_dataset
     use cm12_solution_kernel, only: &
@@ -63,7 +63,12 @@ program cm12_request_probe
             angle_cm_deg=angles(case_index))
         call cm12_prepare_legacy_background( &
             solution, request, background, status, message)
-        if (status /= cm12_ok) stop 3
+        if (status /= cm12_ok) then
+            write(error_unit, '(a,i0,a,i0,a,a)') &
+                'background_failure case=', case_index, &
+                ' status=', status, ' message=', trim(message)
+            stop 3
+        end if
         call cm12_evaluate_request( &
             solution, dataset, request, background, result, &
             status, message)

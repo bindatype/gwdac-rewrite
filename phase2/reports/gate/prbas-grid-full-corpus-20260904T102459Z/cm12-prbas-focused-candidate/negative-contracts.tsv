@@ -1,0 +1,5 @@
+contract	status	message
+non_printable_title	1	frozen hadronic formula returned a non-printable title
+initialize_grid	0	<empty>
+reaction_mismatch	1	background grid state provenance does not match request
+original_reaction_reuse	0	<empty>

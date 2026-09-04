@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly report_root="${PHASE2_REPORT_ROOT:-${phase2_root}/reports}"
+readonly state_root="${PHASE2_STATE_ROOT:-/workspace/phase2/reproducible}"
+readonly output_root="${report_root}/cm12-prbas-focused-candidate"
+readonly commit="$(git -C "${source_root}" rev-parse HEAD)"
+readonly artifact_root="${state_root}/artifacts/${commit:0:12}"
+readonly solution="${source_root}/sdat/prsol.dat"
+readonly solution_sha256="dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522"
+readonly fixture="${phase2_root}/fixtures/amplitudes/decks/cm12_pi_plus_h1_single_point.in"
+readonly frozen_stdout="${output_root}/selector25-frozen.stdout"
+readonly frozen_fields="${output_root}/selector25-frozen-fields.tsv"
+readonly translated_fields="${output_root}/selector25-translated-fields.tsv"
+readonly comparison="${output_root}/selector25-field-comparison.tsv"
+readonly run_root="$(mktemp -d /workspace/phase2/prdlt-fields.XXXXXX)"
+
+mkdir -p "${output_root}"
+cp -a "${source_root}/pr" "${run_root}/pr"
+ln -sfn "${source_root}/said/KCM.100330" "${run_root}/pr/KCM"
+ln -s "${source_root}/sdat" "${run_root}/sdat"
+(
+    cd "${run_root}/pr"
+    env \
+        CM12_FORCE_LEGACY_PRBAS=1 \
+        CM12_KCM_ROOT="${source_root}/said/KCM.100330" \
+        CM12_SOLUTION_FILE="${solution}" \
+        CM12_SOLUTION_SHA256="${solution_sha256}" \
+        CM12_SOLUTION_ID=CM12 \
+        SAID_DATA_ROOT="${source_root}/sdat" \
+        "${artifact_root}/prsdd-headless" <"${fixture}"
+) >"${frozen_stdout}" 2>"${output_root}/selector25-frozen.stderr"
+test ! -s "${output_root}/selector25-frozen.stderr"
+test "$(grep -c '^CM12DIAG PRDLT FIELDS' "${frozen_stdout}")" -eq 1
+
+awk '
+    BEGIN { OFS = "\t" }
+    /^CM12DIAG PRDLT FIELDS/ {
+        for (field = 4; field <= 13; field++) {
+            printf "%s%s", $field, (field == 13 ? ORS : OFS)
+        }
+    }
+' "${frozen_stdout}" >"${frozen_fields}"
+(
+    cd "${source_root}/said"
+    "${artifact_root}/cm12-prdlt-field-probe" \
+        "${solution}" "${solution_sha256}"
+) >"${translated_fields}"
+
+awk -F '\t' '
+    BEGIN {
+        OFS = "\t"
+        count = 10
+        name[1] = "Z"; name[2] = "QB"; name[3] = "QK"
+        name[4] = "ZR"; name[5] = "ZB"; name[6] = "BRN"
+        name[7] = "TER"; name[8] = "TEI"
+        name[9] = "DER"; name[10] = "DEI"
+        print "field", "frozen", "translated", "exact"
+    }
+    NR == FNR {
+        for (field = 1; field <= count; field++) frozen[field] = $field
+        next
+    }
+    {
+        for (field = 1; field <= count; field++) {
+            exact = (($field + 0) == (frozen[field] + 0) ? "T" : "F")
+            print name[field], frozen[field], $field, exact
+            if (exact == "F") exit
+        }
+    }
+' "${frozen_fields}" "${translated_fields}" >"${comparison}"
+
+test "$(($(wc -l <"${comparison}") - 1))" -ge 1
+printf 'Selector-25 field comparison: %s\n' "${comparison}"

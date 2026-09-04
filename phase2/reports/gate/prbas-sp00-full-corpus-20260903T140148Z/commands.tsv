@@ -1,0 +1,15 @@
+step	status
+compose-build	pass
+compose-up	pass
+bootstrap-repos	pass
+verify-environment	pass
+build-modern	pass
+build-candidate	pass
+dsg-modern	pass
+amplitude-modern	pass
+dsg-seam	pass
+amplitude-seam	pass
+dsg-arndt64	pass
+amplitude-arndt64	pass
+dsg-gwdac	pass
+amplitude-gwdac	pass
