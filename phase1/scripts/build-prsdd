@@ -13,6 +13,7 @@ readonly prrdx_patch_mode="${PRRDX_PATCH_MODE:-apply}"
 readonly prrdx_diagnostic_patch="${PRRDX_DIAGNOSTIC_PATCH:-}"
 readonly saidopen_patch="${phase1_root}/patches/saidopen-portable-data-root.patch"
 readonly cm12_seam_root="${CM12_SEAM_ROOT:-}"
+readonly cm12_prbas_diagnostic_patch="${CM12_PRBAS_DIAGNOSTIC_PATCH:-}"
 
 readonly commit="$(git -C "${source_root}" rev-parse HEAD)"
 readonly short_commit="$(git -C "${source_root}" rev-parse --short=12 HEAD)"
@@ -207,6 +208,14 @@ if [[ -n "${cm12_seam_root}" ]]; then
         -p1 \
         -i "${cm12_seam_root}/cm12_prsd_pipeline_trace.patch" \
         >>"${core_log}" 2>&1
+    if [[ -n "${cm12_prbas_diagnostic_patch}" ]]; then
+        patch \
+            --fuzz=0 \
+            -d "${core_root}" \
+            -p1 \
+            -i "${cm12_prbas_diagnostic_patch}" \
+            >>"${core_log}" 2>&1
+    fi
 fi
 
 for name in "${free_core_names[@]}"; do
@@ -363,6 +372,11 @@ done
         sha256sum \
             "${cm12_seam_root}/cm12_prsd_hadronic_trace.patch" \
             "${cm12_seam_root}/cm12_prsd_pipeline_trace.patch"
+        if [[ -n "${cm12_prbas_diagnostic_patch}" ]]; then
+            printf 'cm12_prbas_diagnostic_patch=%s\n' \
+                "${cm12_prbas_diagnostic_patch}"
+            sha256sum "${cm12_prbas_diagnostic_patch}"
+        fi
     fi
     if [[ "${build_variant}" == "cm12-immutable-seam" ]]; then
         sha256sum \

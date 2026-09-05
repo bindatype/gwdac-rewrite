@@ -1,0 +1,105 @@
+--- a/cm12_prbas_seam.f90
++++ b/cm12_prbas_seam.f90
+@@ -12,0 +13,2 @@
++    use cm12_non_cm12_seam, only: &
++        cm12_hadronic_trace, cm12_max_hadronic_trace
+@@ -83,0 +86,15 @@
++    real(real32) :: gom1
++    real(real32) :: gom2
++    real(real32) :: goms
++    real(real32) :: gpi2
++    real(real32) :: gp1
++    real(real32) :: gp2
++    integer :: irct
++    real(real32) :: bcoff
++    integer :: iprk
++    real(real32) :: pg(20, 4, 8)
++    integer :: nfg(4, 8)
++    common /gomega/ gom1, gom2, goms, gpi2, gp1, gp2, irct, bcoff
++    common /prkc/ iprk
++    common /pglob/ pg, nfg
++
+@@ -90,0 +108,2 @@
++    type(cm12_hadronic_trace) :: &
++        hadronic_trace(cm12_max_hadronic_trace)
+@@ -97,0 +117,4 @@
++    integer :: hadronic_trace_count
++    integer, save :: diagnostic_call_count = 0
++    integer :: nfg_nonzero
++    integer :: pg_nonzero
+@@ -133,0 +157,4 @@
++    diagnostic_call_count = diagnostic_call_count + 1
++    nfg_nonzero = count(nfg /= 0)
++    pg_nonzero = count(pg /= 0.0_real32)
++
+@@ -142,0 +170,2 @@
++            hadronic_trace=hadronic_trace, &
++            hadronic_trace_count=hadronic_trace_count, &
+@@ -147,0 +177,6 @@
++        call write_ambient_trace( &
++            diagnostic_call_count, energy_index, nfg_nonzero, pg_nonzero)
++        do k = 1, hadronic_trace_count
++            call write_hadronic_trace( &
++                diagnostic_call_count, energy_index, k, hadronic_trace(k))
++        end do
+@@ -190,0 +226,60 @@
++    subroutine write_ambient_trace( &
++        call_index, current_energy_index, nonzero_nfg, nonzero_pg)
++        integer, intent(in) :: call_index
++        integer, intent(in) :: current_energy_index
++        integer, intent(in) :: nonzero_nfg
++        integer, intent(in) :: nonzero_pg
++        character(len=4) :: solution_word
++        character(len=4) :: selector_word
++        character(len=4) :: formula_word
++
++        solution_word = transfer(title(1), solution_word)
++        selector_word = transfer(title(15), selector_word)
++        formula_word = transfer(ttli(1), formula_word)
++        write(*, '(A,1X,12(I0,1X),2(ES25.16E3,1X),3(A4,1X))') &
++            'CM12TYPED BEGIN', call_index, current_energy_index, ne, na, &
++            ir, ir0, nnbt, it, nnl, iprk, nonzero_nfg, nonzero_pg, &
++            bcoff, pem(25, 6, 2, 6), trace_title_token(solution_word), &
++            trace_title_token(selector_word), trace_title_token(formula_word)
++    end subroutine write_ambient_trace
++
++    subroutine write_hadronic_trace( &
++        call_index, current_energy_index, row_index, trace)
++        integer, intent(in) :: call_index
++        integer, intent(in) :: current_energy_index
++        integer, intent(in) :: row_index
++        type(cm12_hadronic_trace), intent(in) :: trace
++
++        write(*, '(A,1X,9(I0,1X),L1,1X,I0,1X,3(A4,1X),' // &
++            '16(ES25.16E3,1X))') &
++            'CM12TYPED ROW', call_index, current_energy_index, row_index, &
++            trace%dispatch%family, trace%dispatch%branch, &
++            trace%dispatch%orbital_l, trace%dispatch%legacy_l, &
++            trace%dispatch%state_index, trace%dispatch%form_selector, &
++            trace%dispatch%dispatch, trace%dispatch%dispatch_branch, &
++            trace_title_token(trace%formula_title), &
++            trace_title_token(trace%dispatch%dispatch_title), &
++            trace_title_token(trace%dispatch%previous_title), &
++            trace%dispatch%pre_reset_energy_mev, &
++            trace%dispatch%input_energy_mev, &
++            trace%dispatch%effective_energy_mev, &
++            trace%dispatch%dither_before_mev, trace%form%z, &
++            trace%form%qb, trace%form%qk, trace%form%zr, trace%form%zb, &
++            trace%form%brn, trace%form%ter, trace%form%tei, &
++            trace%form%der, trace%form%dei, trace%hadronic_real, &
++            trace%hadronic_imag
++    end subroutine write_hadronic_trace
++
++    function trace_title_token(title_value) result(token)
++        character(len=4), intent(in) :: title_value
++        character(len=4) :: token
++        integer :: character_index
++
++        token = title_value
++        do character_index = 1, len(token)
++            if (token(character_index:character_index) == ' ') then
++                token(character_index:character_index) = '_'
++            end if
++        end do
++    end function trace_title_token
++
