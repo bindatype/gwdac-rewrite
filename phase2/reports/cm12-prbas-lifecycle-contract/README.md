@@ -69,7 +69,7 @@ remaining hidden eligibility and lifecycle boundaries.
 
 The ordinary build is unchanged unless the opt-in diagnostic patch is named.
 The diagnostic executable was built from archived source
-`f6c81d01a1fe4446d5ae291e15432cd58a884c30`; its SHA-256 is
+`f6c81d01a1fe8b007c247acc2213f821a62dc4f2`; its SHA-256 is
 `f3802c9e657bbbee0015acfe0a7fdd2eb7141ca45030f3ba0cd8910d0fc52a5c`.
 
 After building with `CM12_PRBAS_DIAGNOSTIC_PATCH` set to

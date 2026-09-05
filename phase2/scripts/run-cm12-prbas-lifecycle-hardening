@@ -1,0 +1,238 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly state_root="${PRBAS_HARDENING_STATE_ROOT:-/workspace/phase2/prbas-lifecycle-hardening}"
+readonly report_root="${PRBAS_HARDENING_REPORT_ROOT:-${state_root}/capture}"
+readonly executable="${PRBAS_UNPATCHED_BINARY:?set PRBAS_UNPATCHED_BINARY to an uninstrumented headless executable}"
+readonly product_commit="${PRBAS_PRODUCT_COMMIT:?set PRBAS_PRODUCT_COMMIT to the exact support commit}"
+readonly lifecycle_root="${phase2_root}/reports/cm12-prbas-lifecycle-contract"
+readonly prior_capture="${lifecycle_root}/capture"
+readonly fixture_root="${phase2_root}/fixtures/prbas-lifecycle"
+readonly live_fixture="${phase1_root}/fixtures/go3pr2-production-adapter/live.in"
+readonly comparator="${phase2_root}/scripts/compare-cm12-prbas-live-lifecycle.awk"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly data_root="${source_root}/sdat"
+readonly solution_file="${data_root}/prsol.dat"
+readonly solution_sha256=dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-240}"
+
+if [[ -e "${report_root}" ]]; then
+    printf 'Hardening report root already exists: %s\n' "${report_root}" >&2
+    exit 2
+fi
+mkdir -p "${report_root}" "${state_root}/runs"
+test -x "${executable}"
+test -f "${live_fixture}"
+test -f "${comparator}"
+if grep -aFq 'CM12TYPED BEGIN' "${executable}"; then
+    printf 'PRBAS_UNPATCHED_BINARY contains lifecycle instrumentation\n' >&2
+    exit 2
+fi
+(
+    cd "${prior_capture}"
+    sha256sum -c manifest.sha256
+) >/dev/null
+(
+    cd "${fixture_root}"
+    sha256sum -c manifest.sha256
+) >/dev/null
+
+run_case() {
+    local label="$1"
+    local force_legacy="$2"
+    local run_root
+    local status
+    local -a environment
+
+    run_root="$(mktemp -d "${state_root}/runs/${label}.XXXXXX")"
+    cp -a "${source_root}/pr" "${run_root}/pr"
+    rm -f \
+        "${run_root}/pr/SAID.TMP" \
+        "${run_root}/pr/SAID.PCT" \
+        "${run_root}/pr/SAID.LOG" \
+        "${run_root}/pr/SAID.PS" \
+        "${run_root}/pr/fort.3" \
+        "${run_root}/pr/fort.7"
+    ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+    ln -s "${data_root}" "${run_root}/sdat"
+
+    environment=(
+        "CM12_KCM_ROOT=${kcm_root}"
+        "CM12_SOLUTION_FILE=${solution_file}"
+        "CM12_SOLUTION_SHA256=${solution_sha256}"
+        "CM12_SOLUTION_ID=CM12"
+        "SAID_DATA_ROOT=${data_root}"
+        "TZ=America/New_York"
+    )
+    if [[ "${force_legacy}" == yes ]]; then
+        environment+=("CM12_FORCE_LEGACY_PRBAS=1")
+    fi
+
+    set +e
+    (
+        cd "${run_root}/pr"
+        timeout "${timeout_seconds}" env -u CM12_PRBAS_MODE \
+            "${environment[@]}" "${executable}" <"${live_fixture}" \
+            >"${report_root}/${label}.stdout" \
+            2>"${report_root}/${label}.stderr"
+    )
+    status=$?
+    set -e
+    printf '%s\n' "${status}" >"${report_root}/${label}.exit"
+    test "${status}" -eq 0
+}
+
+extract_scientific() {
+    local input="$1"
+    local selection="$2"
+    local output="$3"
+
+    awk -v selection="${selection}" '
+        BEGIN { OFS = "\t" }
+        index($0, "WEB") { section++ }
+        NF == 5 && $1 ~ /^[+-]?[0-9]+\.[0-9]+$/ &&
+            $2 ~ /^[+-]?0\.[0-9]+E[+-][0-9]+$/ &&
+            $3 ~ /^[+-]?0\.[0-9]+E[+-][0-9]+$/ &&
+            $4 ~ /^[+-]?[0-9]+\.[0-9]+([Ee][+-]?[0-9]+)?$/ &&
+            $5 ~ /^[+-]?0\.[0-9]+E[+-][0-9]+$/ {
+            if (selection == "go5" && section == 1) {
+                if (!header++) print "row", "angle", "predicted_obs", \
+                    "measured_obs", "error", "dchi"
+                print ++row, $1, $2, $3, $4, $5
+            }
+            if (selection == "go3" && section > 1) {
+                if (!header++) print "row", "section", "angle", \
+                    "obs", "error", "lab_angle", "lab_dsg"
+                print ++row, section, $1, $2, $3, $4, $5
+            }
+        }
+    ' "${input}" >"${output}"
+}
+
+run_case unpatched-typed-live no
+run_case unpatched-legacy-live yes
+
+for label in unpatched-typed-live unpatched-legacy-live; do
+    extract_scientific \
+        "${report_root}/${label}.stdout" go5 \
+        "${report_root}/${label}-go5.tsv"
+    extract_scientific \
+        "${report_root}/${label}.stdout" go3 \
+        "${report_root}/${label}-go3.tsv"
+done
+
+test "$(($(wc -l <"${report_root}/unpatched-typed-live-go5.tsv") - 1))" -eq 1533
+test "$(($(wc -l <"${report_root}/unpatched-legacy-live-go5.tsv") - 1))" -eq 1533
+test "$(($(wc -l <"${report_root}/unpatched-typed-live-go3.tsv") - 1))" -eq 1
+test "$(($(wc -l <"${report_root}/unpatched-legacy-live-go3.tsv") - 1))" -eq 1
+
+cmp "${report_root}/unpatched-typed-live-go5.tsv" \
+    "${prior_capture}/typed-live-go5.tsv"
+cmp "${report_root}/unpatched-legacy-live-go5.tsv" \
+    "${prior_capture}/legacy-live-go5.tsv"
+cmp "${report_root}/unpatched-typed-live-go3.tsv" \
+    "${prior_capture}/typed-live-go3.tsv"
+cmp "${report_root}/unpatched-legacy-live-go3.tsv" \
+    "${prior_capture}/legacy-live-go3.tsv"
+
+awk -F '\t' 'NR == 1 || $1 == 1' \
+    "${prior_capture}/legacy-reload-trace.tsv" \
+    >"${report_root}/legacy-reload-sequence-1.tsv"
+awk -F '\t' 'NR == 1 || $1 == 2' \
+    "${prior_capture}/legacy-reload-trace.tsv" \
+    >"${report_root}/legacy-reload-sequence-2.tsv"
+awk -f "${comparator}" \
+    "${prior_capture}/typed-live-trace.tsv" \
+    "${report_root}/legacy-reload-sequence-1.tsv" \
+    >"${report_root}/cold-lifecycle-comparison.tsv"
+awk -f "${comparator}" \
+    "${prior_capture}/typed-live-trace.tsv" \
+    "${report_root}/legacy-reload-sequence-2.tsv" \
+    >"${report_root}/primed-lifecycle-comparison.tsv"
+
+paste \
+    "${report_root}/unpatched-typed-live-go5.tsv" \
+    "${report_root}/unpatched-legacy-live-go5.tsv" |
+    awk -F '\t' '
+        BEGIN { OFS = "\t" }
+        NR == 1 {
+            print "row", "angle_equal", "predicted_equal", \
+                "measured_equal", "error_equal", "dchi_equal", "exact"
+            next
+        }
+        {
+            angle = ($2 == $8 ? "yes" : "no")
+            predicted = ($3 == $9 ? "yes" : "no")
+            measured = ($4 == $10 ? "yes" : "no")
+            error = ($5 == $11 ? "yes" : "no")
+            dchi = ($6 == $12 ? "yes" : "no")
+            exact = (angle == "yes" && predicted == "yes" && \
+                measured == "yes" && error == "yes" && \
+                dchi == "yes" ? "yes" : "no")
+            print $1, angle, predicted, measured, error, dchi, exact
+        }
+    ' >"${report_root}/unpatched-go5-comparison.tsv"
+
+readonly cold_exact="$(awk -F '\t' 'NR > 1 && $25 == "yes" { n++ } END { print n + 0 }' \
+    "${report_root}/cold-lifecycle-comparison.tsv")"
+readonly primed_exact="$(awk -F '\t' 'NR > 1 && $25 == "yes" { n++ } END { print n + 0 }' \
+    "${report_root}/primed-lifecycle-comparison.tsv")"
+readonly go5_exact="$(awk -F '\t' 'NR > 1 && $7 == "yes" { n++ } END { print n + 0 }' \
+    "${report_root}/unpatched-go5-comparison.tsv")"
+readonly typed_go3="$(awk -F '\t' 'NR == 2 { print $4 }' \
+    "${report_root}/unpatched-typed-live-go3.tsv")"
+readonly legacy_go3="$(awk -F '\t' 'NR == 2 { print $4 }' \
+    "${report_root}/unpatched-legacy-live-go3.tsv")"
+readonly cold_first="$(awk -F '\t' 'NR > 1 && $25 == "no" { print $1 ":" $26; exit }' \
+    "${report_root}/cold-lifecycle-comparison.tsv")"
+readonly primed_first="$(awk -F '\t' 'NR > 1 && $25 == "no" { print $1 ":" $26; exit }' \
+    "${report_root}/primed-lifecycle-comparison.tsv")"
+
+{
+    printf 'metric\tobserved\treference\tclassification\n'
+    printf 'cold_lifecycle_exact_rows\t%s\t26\tCAPTURED\n' "${cold_exact}"
+    printf 'cold_lifecycle_first_difference\t%s\tnone\tCAPTURED\n' "${cold_first}"
+    printf 'primed_lifecycle_exact_rows\t%s\t26\tCAPTURED\n' "${primed_exact}"
+    printf 'primed_lifecycle_first_difference\t%s\tnone\tCAPTURED\n' "${primed_first}"
+    printf 'unpatched_typed_go5_vs_instrumented\texact\texact\tPASS\n'
+    printf 'unpatched_legacy_go5_vs_instrumented\texact\texact\tPASS\n'
+    printf 'unpatched_typed_go3_vs_instrumented\texact\texact\tPASS\n'
+    printf 'unpatched_legacy_go3_vs_instrumented\texact\texact\tPASS\n'
+    printf 'unpatched_typed_vs_legacy_go5_exact_rows\t%s\t1533\tCAPTURED\n' "${go5_exact}"
+    printf 'unpatched_typed_go3\t%s\t%s\tCAPTURED\n' "${typed_go3}" "${legacy_go3}"
+    printf 'hardening_validation\tPASS\tPASS\tPASS\n'
+} >"${report_root}/summary.tsv"
+
+{
+    printf 'evidence_label=captured/reference-candidate\n'
+    printf 'product_support_commit=%s\n' "${product_commit}"
+    printf 'archived_source_commit=%s\n' "$(git -C "${source_root}" rev-parse HEAD)"
+    printf 'unpatched_executable_sha256=%s\n' "$(sha256sum "${executable}" | awk '{print $1}')"
+    printf 'live_fixture_sha256=%s\n' "$(sha256sum "${live_fixture}" | awk '{print $1}')"
+    printf 'reload_fixture_sha256=%s\n' "$(sha256sum "${fixture_root}/reload.in" | awk '{print $1}')"
+    printf 'prior_capture_manifest_sha256=%s\n' "$(sha256sum "${prior_capture}/manifest.sha256" | awk '{print $1}')"
+    printf 'solution_sha256=%s\n' "$(sha256sum "${solution_file}" | awk '{print $1}')"
+    printf 'timezone=America/New_York\n'
+    . /etc/os-release
+    printf 'container_os=%s\n' "${PRETTY_NAME}"
+} >"${report_root}/run-context.txt"
+
+gzip -n -f \
+    "${report_root}/unpatched-typed-live.stdout" \
+    "${report_root}/unpatched-legacy-live.stdout"
+(
+    cd "${report_root}"
+    find . -maxdepth 1 -type f ! -name manifest.sha256 -print0 |
+        sort -z |
+        xargs -0 sha256sum >manifest.sha256
+)
+
+printf 'PRBAS lifecycle hardening validation: PASS\n'
+printf 'Cold exact rows: %s/26; first difference: %s\n' \
+    "${cold_exact}" "${cold_first}"
+printf 'Primed exact rows: %s/26; first difference: %s\n' \
+    "${primed_exact}" "${primed_first}"
+printf 'Evidence: %s\n' "${report_root}"

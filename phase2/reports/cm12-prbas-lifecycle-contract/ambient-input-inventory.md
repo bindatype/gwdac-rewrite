@@ -14,12 +14,14 @@ not change eligibility or claim physics approval.
 | `/PRSC/ PEM(25,6,2,6)` (`KILL`) | Available through immutable parameters but used as an ambient sentinel by legacy PRBAS | Capture; determine whether an explicit eligibility assertion is required |
 | `/GOMEGA/ GOM1..GP2`, `IRCT` | Loaded into immutable solution background and passed to pure Born/background calculations | Modeled, provenance-checked solution input |
 | `/GOMEGA/ BCOFF` | Typed dispatch owns a local `background_reset_pending`; legacy `PRDLT` compares ambient `BCOFF` with saved `BCOFFM` | Unmodeled lifecycle input and leading ownership hypothesis; capture only in Checkpoint A |
-| `/PRKC/ IPRK` | Not checked or modeled by typed formula evaluation; legacy branches on `IPRK=1` | Unmodeled eligibility input; canonical CM12 value must be captured before acceptance |
+| `/PRKC/ IPRK` | Not checked or modeled by typed formula evaluation; legacy changes momentum scaling at `prsd.f:2501` and `prsd.f:2527` when `IPRK=1` | Unmodeled eligibility input; captured canonical value is `0`, and unsupported values must be rejected or modeled before acceptance |
 | `/PGLOB/ PG`, `NFG` | Not modeled by typed formula evaluation; legacy `ADDRESK` can modify `TER`/`TEI` | Unmodeled eligibility input; capture nonzero counts before acceptance |
 | Saved `PRDLT` state (`EPIM`, `BCOFFM`, `QB`, related cache) | Replaced incompletely by local typed grid state; frozen formula routines retain their own caches | Hidden lifecycle boundary; the same-process second-`go2` capture tests reload behavior without correcting it |
+| `PNPWI` `PNMOD` short-circuit | The typed path calls the retained `PNTEST` formula directly and does not model `PNMOD` state | Unmodeled formula-owned control path; the retained CM12 contract must exclude or explicitly reject a nonzero `PNMOD` override |
+| `PNPWI` energy early return and clamp | Typed dispatch rejects nonpositive energy and has no separate `0 < E < 2 MeV` clamp; legacy returns early at `E <= 0` and clamps positive values below 2 MeV | Outside the captured 849.957 MeV path; require an explicit eligibility boundary rather than infer parity |
 
 Source basis: archived `said/prsd.f` routines `PRBAS`, `PRSOL`, and `PRDLT` at
-source commit `f6c81d01a1fe4446d5ae291e15432cd58a884c30`. Runtime observations produced
+source commit `f6c81d01a1fe8b007c247acc2213f821a62dc4f2`. Runtime observations produced
 by this checkpoint are **captured**, not oracles.
 
 The final retained `live.in` typed entry captured `IR=2`, `IR0=0`, `NNBT=0`,

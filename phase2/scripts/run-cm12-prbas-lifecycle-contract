@@ -8,7 +8,8 @@ readonly state_root="${PRBAS_LIFECYCLE_STATE_ROOT:-/workspace/phase2/prbas-lifec
 readonly report_root="${PRBAS_LIFECYCLE_REPORT_ROOT:-${phase2_root}/reports/cm12-prbas-lifecycle-contract/capture}"
 readonly executable="${PRBAS_LIFECYCLE_BINARY:?set PRBAS_LIFECYCLE_BINARY to the diagnostic headless executable}"
 readonly live_fixture="${phase1_root}/fixtures/go3pr2-production-adapter/live.in"
-readonly reload_fixture="${phase2_root}/reports/cm12-prbas-lifecycle-contract/reload.in"
+readonly lifecycle_fixture_root="${phase2_root}/fixtures/prbas-lifecycle"
+readonly reload_fixture="${lifecycle_fixture_root}/reload.in"
 readonly website_comparison="${phase1_root}/reports/go3pr2-adapter-diagnostic/comparison.tsv"
 readonly typed_parser="${phase2_root}/scripts/parse-cm12-typed-lifecycle.awk"
 readonly legacy_parser="${phase2_root}/scripts/parse-cm12-legacy-lifecycle.awk"
@@ -24,6 +25,10 @@ test -x "${executable}"
 test -f "${live_fixture}"
 test -f "${reload_fixture}"
 test -f "${website_comparison}"
+(
+    cd "${lifecycle_fixture_root}"
+    sha256sum -c manifest.sha256
+) >/dev/null
 
 run_case() {
     local label="$1"

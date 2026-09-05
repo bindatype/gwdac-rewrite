@@ -5,6 +5,7 @@ BEGIN {
 function normalized_title(value, result) {
     result = value
     gsub(/_+$/, "", result)
+    if (result == "BLANK") result = ""
     if (result == "" || result == "NA") return result
     return result
 }
@@ -55,6 +56,22 @@ FNR == 1 {
     else if ($9 != typed_selector[row]) first_field = "form_selector"
     else if ($10 != typed_pre_reset[row]) first_field = "pre_reset_energy"
     else if ($12 != typed_dispatch[row]) first_field = "dispatch"
+    else if ($12 == "F" && typed_dispatch_branch[row] != 0) \
+        first_field = "suppressed_dispatch_branch"
+    else if ($12 == "F" && typed_title[row] != "") \
+        first_field = "suppressed_dispatch_title"
+    else if ($12 == "F" && typed_previous[row] != "") \
+        first_field = "suppressed_previous_title"
+    else if ($12 == "F" && typed_input[row] != 0) \
+        first_field = "suppressed_input_energy"
+    else if ($12 == "F" && typed_effective[row] != 0) \
+        first_field = "suppressed_effective_energy"
+    else if ($12 == "F" && typed_dither[row] != 0) \
+        first_field = "suppressed_dither"
+    else if ($12 == "F" && typed_hadronic_real[row] != 0) \
+        first_field = "suppressed_hadronic_real"
+    else if ($12 == "F" && typed_hadronic_imag[row] != 0) \
+        first_field = "suppressed_hadronic_imag"
     else if ($12 == "T" && $13 != typed_dispatch_branch[row]) \
         first_field = "dispatch_branch"
     else if ($12 == "T" && legacy_title != typed_title[row]) \
