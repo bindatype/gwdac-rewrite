@@ -65,6 +65,24 @@ entries, `BCOFF=0`, `KILL=0`, and title words `CM12`, `M05`, `M05`. The full
 ambient inventory distinguishes modeled, provenance-checked inputs from
 remaining hidden eligibility and lifecycle boundaries.
 
+## Contract Hardening
+
+The 2026-09-05 hardening evidence under `hardening/` preserves this capture
+directory byte-for-byte and adds two protections before an ownership
+correction is attempted:
+
+- cold typed versus cold legacy is recorded as 25/26 field-exact, with the
+  genuine row-1 `pre_reset_energy`/`EPX` difference retained rather than
+  normalized away; and
+- typed versus primed legacy is recorded separately as 0/26 field-exact, so a
+  future correction must preserve both cold and primed behavior instead of
+  tuning only the primed aggregate.
+
+The hardening package also records a fresh ordinary, uninstrumented build and
+proves that its typed and forced-legacy GO5/GO3 scientific tables are each
+exact against their instrumented counterparts. See `hardening/README.md` for
+the evidence paths, hashes, and reproduction commands.
+
 ## Reproduction
 
 The ordinary build is unchanged unless the opt-in diagnostic patch is named.
