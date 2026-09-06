@@ -180,7 +180,7 @@ readonly primed_first="$(awk -F '\t' 'NR > 1 && $27 == "no" { print $1 ":" $28; 
 test "${cold_exact}" -eq 26
 test -z "${cold_first}"
 test "${primed_exact}" -eq 0
-test "${primed_first}" = "1:dispatch"
+test "${primed_first}" = "1:post_reset_energy"
 
 extract_go3 \
     "${report_root}/typed-cold.stdout" no \
@@ -207,7 +207,7 @@ readonly legacy_primed_go3="$(awk -F '\t' 'NR == 3 { print $4 }' \
     printf 'cold_aligned_first_difference\tnone\tnone\tPASS\n'
     printf 'primed_aligned_exact_rows\t%s\t0\tEXPECTED_RED_BASELINE\n' \
         "${primed_exact}"
-    printf 'primed_aligned_first_difference\t%s\t1:dispatch\tEXPECTED_RED_BASELINE\n' \
+    printf 'primed_aligned_first_difference\t%s\t1:post_reset_energy\tEXPECTED_RED_BASELINE\n' \
         "${primed_first}"
     printf 'typed_cold_go3\t%s\t%s\tPASS\n' "${typed_go3}" "${legacy_cold_go3}"
     printf 'forced_legacy_primed_go3\t%s\t%s\tCAPTURED\n' \
