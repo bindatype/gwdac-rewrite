@@ -8,18 +8,10 @@
          real(real32) :: input_energy_mev = 0.0_real32
          real(real32) :: effective_energy_mev = 0.0_real32
          real(real32) :: dither_before_mev = 0.0_real32
-@@ -96,7 +97,8 @@
-         if (family <= 2) event%state_index = event%state_index + 2
-         event%form_selector = form_selector
-         event%pre_reset_energy_mev = input_energy_mev
+@@ -98,0 +100 @@
 +        event%post_reset_energy_mev = input_energy_mev
--
-         if (state%background_reset_pending) then
+@@ -100,0 +103 @@
 +            event%post_reset_energy_mev = 0.0_real32
-             next_state%background_reset_pending = .false.
-             status = cm12_ok
-             status = cm12_ok
-             message = ''
 --- a/prsd.f
 +++ b/prsd.f
 @@ -2431,6 +2431,7 @@
