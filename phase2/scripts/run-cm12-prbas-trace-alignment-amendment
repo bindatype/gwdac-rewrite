@@ -1,0 +1,254 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly state_root="${PRBAS_TRACE_ALIGNMENT_STATE_ROOT:-/workspace/phase2/prbas-trace-alignment}"
+readonly report_root="${PRBAS_TRACE_ALIGNMENT_REPORT_ROOT:-${phase2_root}/reports/cm12-prbas-lifecycle-contract/trace-alignment/capture}"
+readonly executable="${PRBAS_TRACE_ALIGNMENT_BINARY:?set PRBAS_TRACE_ALIGNMENT_BINARY to the aligned diagnostic executable}"
+readonly support_commit="${PRBAS_TRACE_ALIGNMENT_SUPPORT_COMMIT:?set PRBAS_TRACE_ALIGNMENT_SUPPORT_COMMIT to the exact support commit}"
+readonly lifecycle_root="${phase2_root}/reports/cm12-prbas-lifecycle-contract"
+readonly prior_capture="${lifecycle_root}/capture"
+readonly hardening_root="${lifecycle_root}/hardening"
+readonly live_fixture="${phase1_root}/fixtures/go3pr2-production-adapter/live.in"
+readonly fixture_root="${phase2_root}/fixtures/prbas-lifecycle"
+readonly reload_fixture="${fixture_root}/reload.in"
+readonly typed_parser="${phase2_root}/scripts/parse-cm12-typed-lifecycle-aligned.awk"
+readonly legacy_parser="${phase2_root}/scripts/parse-cm12-legacy-lifecycle-aligned.awk"
+readonly comparator="${phase2_root}/scripts/compare-cm12-prbas-lifecycle-aligned.awk"
+readonly diagnostic_patch="${phase2_root}/kernel/cm12_prbas_lifecycle_trace.patch"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly data_root="${source_root}/sdat"
+readonly solution_file="${data_root}/prsol.dat"
+readonly solution_sha256=dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522
+readonly prior_capture_manifest_sha256=cf39c9f12a567a2b34b2aaa34d7a5e1d612343208bae4ab5d2e819cb7ffac7af
+readonly prior_package_manifest_sha256=29e13f2048841d86b4839101819eac3d04ac973e27aff516278c8f1d99d5e4f8
+readonly hardening_capture_manifest_sha256=02b8695d264bcdcf73009c9ced0b4a5659bb2caa4ed4607213bc2bc713eb567d
+readonly hardening_package_manifest_sha256=72107850ed4b46f4550ff967f2862dc855277967a875d060167535e3cde290e7
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-240}"
+
+if [[ -e "${report_root}" ]]; then
+    printf 'Trace-alignment report root already exists: %s\n' "${report_root}" >&2
+    exit 2
+fi
+mkdir -p "${report_root}" "${state_root}/runs"
+test -x "${executable}"
+test -f "${live_fixture}"
+test -f "${reload_fixture}"
+test -f "${typed_parser}"
+test -f "${legacy_parser}"
+test -f "${comparator}"
+test -f "${diagnostic_patch}"
+
+test "$(sha256sum "${prior_capture}/manifest.sha256" | awk '{print $1}')" = \
+    "${prior_capture_manifest_sha256}"
+test "$(sha256sum "${lifecycle_root}/manifest.sha256" | awk '{print $1}')" = \
+    "${prior_package_manifest_sha256}"
+test "$(sha256sum "${hardening_root}/capture/manifest.sha256" | awk '{print $1}')" = \
+    "${hardening_capture_manifest_sha256}"
+test "$(sha256sum "${hardening_root}/manifest.sha256" | awk '{print $1}')" = \
+    "${hardening_package_manifest_sha256}"
+(
+    cd "${prior_capture}"
+    sha256sum -c manifest.sha256
+) >/dev/null
+(
+    cd "${hardening_root}/capture"
+    sha256sum -c manifest.sha256
+) >/dev/null
+(
+    cd "${hardening_root}"
+    sha256sum -c manifest.sha256
+) >/dev/null
+(
+    cd "${fixture_root}"
+    sha256sum -c manifest.sha256
+) >/dev/null
+
+run_case() {
+    local label="$1"
+    local fixture="$2"
+    local force_legacy="$3"
+    local run_root
+    local status
+    local -a environment
+
+    run_root="$(mktemp -d "${state_root}/runs/${label}.XXXXXX")"
+    cp -a "${source_root}/pr" "${run_root}/pr"
+    rm -f \
+        "${run_root}/pr/SAID.TMP" \
+        "${run_root}/pr/SAID.PCT" \
+        "${run_root}/pr/SAID.LOG" \
+        "${run_root}/pr/SAID.PS" \
+        "${run_root}/pr/fort.3" \
+        "${run_root}/pr/fort.7"
+    ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+    ln -s "${data_root}" "${run_root}/sdat"
+
+    environment=(
+        "CM12_KCM_ROOT=${kcm_root}"
+        "CM12_SOLUTION_FILE=${solution_file}"
+        "CM12_SOLUTION_SHA256=${solution_sha256}"
+        "CM12_SOLUTION_ID=CM12"
+        "SAID_DATA_ROOT=${data_root}"
+        "TZ=America/New_York"
+    )
+    if [[ "${force_legacy}" == yes ]]; then
+        environment+=("CM12_FORCE_LEGACY_PRBAS=1")
+    fi
+
+    set +e
+    (
+        cd "${run_root}/pr"
+        timeout "${timeout_seconds}" env -u CM12_PRBAS_MODE \
+            "${environment[@]}" "${executable}" <"${fixture}" \
+            >"${report_root}/${label}.stdout" \
+            2>"${report_root}/${label}.stderr"
+    )
+    status=$?
+    set -e
+    printf '%s\n' "${status}" >"${report_root}/${label}.exit"
+    test "${status}" -eq 0
+}
+
+extract_go3() {
+    local input="$1"
+    local include_all="$2"
+    local output="$3"
+
+    awk -v include_all="${include_all}" '
+        BEGIN { OFS = "\t" }
+        index($0, "WEB") { section++ }
+        NF == 5 && $1 ~ /^[+-]?[0-9]+\.[0-9]+$/ &&
+            $2 ~ /^[+-]?0\.[0-9]+E[+-][0-9]+$/ &&
+            $3 ~ /^[+-]?0\.[0-9]+E[+-][0-9]+$/ &&
+            $4 ~ /^[+-]?[0-9]+\.[0-9]+([Ee][+-]?[0-9]+)?$/ &&
+            $5 ~ /^[+-]?0\.[0-9]+E[+-][0-9]+$/ {
+            if (include_all == "yes" || section > 1) {
+                if (!header++) print "row", "section", "angle", \
+                    "obs", "error", "lab_angle", "lab_dsg"
+                print ++row, section, $1, $2, $3, $4, $5
+            }
+        }
+    ' "${input}" >"${output}"
+}
+
+run_case typed-cold "${live_fixture}" no
+run_case forced-legacy-reload "${reload_fixture}" yes
+
+awk -f "${typed_parser}" "${report_root}/typed-cold.stdout" \
+    >"${report_root}/typed-cold-trace-all.tsv"
+readonly typed_call="$(awk -F '\t' 'NR > 1 { value=$1 } END { print value }' \
+    "${report_root}/typed-cold-trace-all.tsv")"
+awk -F '\t' -v call_id="${typed_call}" 'NR == 1 || $1 == call_id' \
+    "${report_root}/typed-cold-trace-all.tsv" \
+    >"${report_root}/typed-cold-trace.tsv"
+awk -f "${legacy_parser}" "${report_root}/forced-legacy-reload.stdout" \
+    >"${report_root}/forced-legacy-reload-trace.tsv"
+
+test "$(($(wc -l <"${report_root}/typed-cold-trace.tsv") - 1))" -eq 26
+test "$(($(wc -l <"${report_root}/forced-legacy-reload-trace.tsv") - 1))" -eq 52
+
+awk -F '\t' 'NR == 1 || $1 == 1' \
+    "${report_root}/forced-legacy-reload-trace.tsv" \
+    >"${report_root}/forced-legacy-cold-trace.tsv"
+awk -F '\t' 'NR == 1 || $1 == 2' \
+    "${report_root}/forced-legacy-reload-trace.tsv" \
+    >"${report_root}/forced-legacy-primed-trace.tsv"
+awk -f "${comparator}" \
+    "${report_root}/typed-cold-trace.tsv" \
+    "${report_root}/forced-legacy-cold-trace.tsv" \
+    >"${report_root}/cold-aligned-comparison.tsv"
+awk -f "${comparator}" \
+    "${report_root}/typed-cold-trace.tsv" \
+    "${report_root}/forced-legacy-primed-trace.tsv" \
+    >"${report_root}/primed-aligned-comparison.tsv"
+
+test "$(($(wc -l <"${report_root}/cold-aligned-comparison.tsv") - 1))" -eq 26
+test "$(($(wc -l <"${report_root}/primed-aligned-comparison.tsv") - 1))" -eq 26
+
+readonly cold_exact="$(awk -F '\t' 'NR > 1 && $27 == "yes" { n++ } END { print n + 0 }' \
+    "${report_root}/cold-aligned-comparison.tsv")"
+readonly primed_exact="$(awk -F '\t' 'NR > 1 && $27 == "yes" { n++ } END { print n + 0 }' \
+    "${report_root}/primed-aligned-comparison.tsv")"
+readonly cold_first="$(awk -F '\t' 'NR > 1 && $27 == "no" { print $1 ":" $28; exit }' \
+    "${report_root}/cold-aligned-comparison.tsv")"
+readonly primed_first="$(awk -F '\t' 'NR > 1 && $27 == "no" { print $1 ":" $28; exit }' \
+    "${report_root}/primed-aligned-comparison.tsv")"
+
+test "${cold_exact}" -eq 26
+test -z "${cold_first}"
+test "${primed_exact}" -eq 0
+test "${primed_first}" = "1:dispatch"
+
+extract_go3 \
+    "${report_root}/typed-cold.stdout" no \
+    "${report_root}/typed-cold-go3.tsv"
+extract_go3 \
+    "${report_root}/forced-legacy-reload.stdout" yes \
+    "${report_root}/forced-legacy-reload-go3.tsv"
+test "$(($(wc -l <"${report_root}/typed-cold-go3.tsv") - 1))" -eq 1
+test "$(($(wc -l <"${report_root}/forced-legacy-reload-go3.tsv") - 1))" -eq 2
+cmp "${report_root}/typed-cold-go3.tsv" "${prior_capture}/typed-live-go3.tsv"
+cmp "${report_root}/forced-legacy-reload-go3.tsv" \
+    "${prior_capture}/legacy-reload-go3.tsv"
+
+readonly typed_go3="$(awk -F '\t' 'NR == 2 { print $4 }' \
+    "${report_root}/typed-cold-go3.tsv")"
+readonly legacy_cold_go3="$(awk -F '\t' 'NR == 2 { print $4 }' \
+    "${report_root}/forced-legacy-reload-go3.tsv")"
+readonly legacy_primed_go3="$(awk -F '\t' 'NR == 3 { print $4 }' \
+    "${report_root}/forced-legacy-reload-go3.tsv")"
+
+{
+    printf 'metric\tobserved\treference\tclassification\n'
+    printf 'cold_aligned_exact_rows\t%s\t26\tPASS\n' "${cold_exact}"
+    printf 'cold_aligned_first_difference\tnone\tnone\tPASS\n'
+    printf 'primed_aligned_exact_rows\t%s\t0\tEXPECTED_RED_BASELINE\n' \
+        "${primed_exact}"
+    printf 'primed_aligned_first_difference\t%s\t1:dispatch\tEXPECTED_RED_BASELINE\n' \
+        "${primed_first}"
+    printf 'typed_cold_go3\t%s\t%s\tPASS\n' "${typed_go3}" "${legacy_cold_go3}"
+    printf 'forced_legacy_primed_go3\t%s\t%s\tCAPTURED\n' \
+        "${legacy_primed_go3}" "${typed_go3}"
+    printf 'trace_alignment_validation\tPASS\tPASS\tPASS\n'
+} >"${report_root}/summary.tsv"
+
+{
+    printf 'evidence_label=captured/reference-candidate\n'
+    printf 'support_commit=%s\n' "${support_commit}"
+    printf 'archived_source_commit=%s\n' "$(git -C "${source_root}" rev-parse HEAD)"
+    printf 'diagnostic_executable_sha256=%s\n' "$(sha256sum "${executable}" | awk '{print $1}')"
+    printf 'diagnostic_patch_sha256=%s\n' "$(sha256sum "${diagnostic_patch}" | awk '{print $1}')"
+    printf 'typed_parser_sha256=%s\n' "$(sha256sum "${typed_parser}" | awk '{print $1}')"
+    printf 'legacy_parser_sha256=%s\n' "$(sha256sum "${legacy_parser}" | awk '{print $1}')"
+    printf 'comparator_sha256=%s\n' "$(sha256sum "${comparator}" | awk '{print $1}')"
+    printf 'live_fixture_sha256=%s\n' "$(sha256sum "${live_fixture}" | awk '{print $1}')"
+    printf 'reload_fixture_sha256=%s\n' "$(sha256sum "${reload_fixture}" | awk '{print $1}')"
+    printf 'solution_sha256=%s\n' "$(sha256sum "${solution_file}" | awk '{print $1}')"
+    printf 'prior_capture_manifest_sha256=%s\n' "${prior_capture_manifest_sha256}"
+    printf 'prior_package_manifest_sha256=%s\n' "${prior_package_manifest_sha256}"
+    printf 'hardening_capture_manifest_sha256=%s\n' "${hardening_capture_manifest_sha256}"
+    printf 'hardening_package_manifest_sha256=%s\n' "${hardening_package_manifest_sha256}"
+    printf 'typed_cold_call=%s\n' "${typed_call}"
+    printf 'timezone=America/New_York\n'
+    . /etc/os-release
+    printf 'container_os=%s\n' "${PRETTY_NAME}"
+} >"${report_root}/run-context.txt"
+
+gzip -n -f \
+    "${report_root}/typed-cold.stdout" \
+    "${report_root}/forced-legacy-reload.stdout"
+(
+    cd "${report_root}"
+    find . -maxdepth 1 -type f ! -name manifest.sha256 -print0 |
+        sort -z |
+        xargs -0 sha256sum >manifest.sha256
+)
+
+printf 'PRBAS trace-alignment amendment: PASS\n'
+printf 'Cold aligned rows: %s/26\n' "${cold_exact}"
+printf 'Primed aligned rows: %s/26; first difference: %s\n' \
+    "${primed_exact}" "${primed_first}"
+printf 'Evidence: %s\n' "${report_root}"

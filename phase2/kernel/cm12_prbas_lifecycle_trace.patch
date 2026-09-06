@@ -1,3 +1,54 @@
+--- a/cm12_prbas_dispatch.f90
++++ b/cm12_prbas_dispatch.f90
+@@ -26,6 +26,7 @@
+         character(len=4) :: dispatch_title = ''
+         character(len=4) :: previous_title = ''
+         real(real32) :: pre_reset_energy_mev = 0.0_real32
++        real(real32) :: post_reset_energy_mev = 0.0_real32
+         real(real32) :: input_energy_mev = 0.0_real32
+         real(real32) :: effective_energy_mev = 0.0_real32
+         real(real32) :: dither_before_mev = 0.0_real32
+@@ -96,7 +97,8 @@
+         if (family <= 2) event%state_index = event%state_index + 2
+         event%form_selector = form_selector
+         event%pre_reset_energy_mev = input_energy_mev
++        event%post_reset_energy_mev = input_energy_mev
+-
+         if (state%background_reset_pending) then
++            event%post_reset_energy_mev = 0.0_real32
+             next_state%background_reset_pending = .false.
+             status = cm12_ok
+             status = cm12_ok
+             message = ''
+--- a/prsd.f
++++ b/prsd.f
+@@ -2431,6 +2431,7 @@
+       IF(H.EQ.HBORN.OR.H.EQ.HBRNX) NROT=0
+       NNF=NNF-10*NROT
+       EPX=EPI(IE)
++      CM12EPXPRE=EPX
+       Z=EPX/WPI
+       IF(NNF.GT.4) Z=EPX/(800.0+EPX)
+       IF(BCOFF.NE.BCOFFM) EPX=0.0
+@@ -2465,7 +2466,8 @@
+          CM12MM=MM
+          CM12JJ=JJ
+          CM12LL=LL
+-         WRITE(*,9014) CM12ROW,MM,JJ,LL,NROT,NNF,N,EPX,EPXX
++         WRITE(*,9014) CM12ROW,MM,JJ,LL,NROT,NNF,N,
++     C    CM12EPXPRE,EPX,EPXX
+       ENDIF
+       CALL PNPWI(N,LL-1,EPXX,TER,TEI,TTLI)
+       IF(NL.EQ.41) CALL GETP33(EPX,IR,PEM(16,2,2,2),TER,TEI)
+@@ -2482,7 +2484,7 @@
+      C WRITE(*,9013) MM,JJ,LL,NROT,NNF,N,
+      C EPX,EPXX,TER,TEI,QCM(IE),ZKCM(IE)
+  9013 FORMAT('CM12DIAG HADRONIC',6(1X,I4),6(1X,ES24.16E3))
+- 9014 FORMAT('CM12DIAG PRDLT',7(1X,I4),2(1X,ES24.16E3))
++ 9014 FORMAT('CM12DIAG PRDLT',7(1X,I4),3(1X,ES24.16E3))
+  9015 FORMAT('CM12DIAG ADDRESK PRE',6(1X,I4),5(1X,ES24.16E3))
+  9016 FORMAT('CM12DIAG ADDRESK POST',6(1X,I4),5(1X,ES24.16E3))
+       if(mjl.ne.999) go to 92
 --- a/cm12_prbas_seam.f90
 +++ b/cm12_prbas_seam.f90
 @@ -12,0 +13,2 @@
@@ -71,7 +122,7 @@
 +        type(cm12_hadronic_trace), intent(in) :: trace
 +
 +        write(*, '(A,1X,9(I0,1X),L1,1X,I0,1X,3(A4,1X),' // &
-+            '16(ES25.16E3,1X))') &
++            '17(ES25.16E3,1X))') &
 +            'CM12TYPED ROW', call_index, current_energy_index, row_index, &
 +            trace%dispatch%family, trace%dispatch%branch, &
 +            trace%dispatch%orbital_l, trace%dispatch%legacy_l, &
@@ -81,6 +132,7 @@
 +            trace_title_token(trace%dispatch%dispatch_title), &
 +            trace_title_token(trace%dispatch%previous_title), &
 +            trace%dispatch%pre_reset_energy_mev, &
++            trace%dispatch%post_reset_energy_mev, &
 +            trace%dispatch%input_energy_mev, &
 +            trace%dispatch%effective_energy_mev, &
 +            trace%dispatch%dither_before_mev, trace%form%z, &
