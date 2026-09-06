@@ -1,0 +1,9 @@
+contract	status	message
+ambient_supported	0	<empty>
+ambient_it_rejected	1	typed PRBAS requires retained IT=1
+ambient_nnl_rejected	1	typed PRBAS requires retained NNL=6
+ambient_iprk_rejected	1	typed PRBAS does not support IPRK scaling
+ambient_bcoff_rejected	1	typed PRBAS requires retained BCOFF=0
+ambient_kill_rejected	1	typed PRBAS requires retained KILL=0
+ambient_nfg_rejected	1	typed PRBAS does not support PNMOD overrides
+ambient_pg_rejected	1	typed PRBAS does not support PGLOB parameters

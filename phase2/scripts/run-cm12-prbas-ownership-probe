@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly state_root="${PRBAS_OWNERSHIP_STATE_ROOT:-/workspace/phase2/prbas-ownership-probe}"
+readonly report_root="${PRBAS_OWNERSHIP_REPORT_ROOT:-${state_root}/capture}"
+readonly executable="${PRBAS_OWNERSHIP_BINARY:?set PRBAS_OWNERSHIP_BINARY to the candidate executable}"
+readonly fixture="${phase2_root}/fixtures/prbas-lifecycle/reload.in"
+readonly reference="${phase2_root}/reports/cm12-prbas-lifecycle-contract/capture/legacy-reload-go3.tsv"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly data_root="${source_root}/sdat"
+readonly solution_file="${data_root}/prsol.dat"
+readonly solution_sha256=dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-120}"
+
+if [[ -e "${report_root}" ]]; then
+    printf 'Ownership-probe report root already exists: %s\n' \
+        "${report_root}" >&2
+    exit 2
+fi
+mkdir -p "${report_root}" "${state_root}/runs"
+test -x "${executable}"
+test -f "${fixture}"
+test -f "${reference}"
+
+run_case() {
+    local label="$1"
+    local force_legacy="$2"
+    local run_root
+    local status
+    local -a environment
+
+    run_root="$(mktemp -d "${state_root}/runs/${label}.XXXXXX")"
+    cp -a "${source_root}/pr" "${run_root}/pr"
+    rm -f \
+        "${run_root}/pr/SAID.TMP" \
+        "${run_root}/pr/SAID.PCT" \
+        "${run_root}/pr/SAID.LOG" \
+        "${run_root}/pr/SAID.PS" \
+        "${run_root}/pr/fort.3" \
+        "${run_root}/pr/fort.7"
+    ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+    ln -s "${data_root}" "${run_root}/sdat"
+
+    environment=(
+        "CM12_KCM_ROOT=${kcm_root}"
+        "CM12_SOLUTION_FILE=${solution_file}"
+        "CM12_SOLUTION_SHA256=${solution_sha256}"
+        "CM12_SOLUTION_ID=CM12"
+        "SAID_DATA_ROOT=${data_root}"
+        "TZ=America/New_York"
+    )
+    if [[ "${force_legacy}" == yes ]]; then
+        environment+=("CM12_FORCE_LEGACY_PRBAS=1")
+    fi
+
+    set +e
+    (
+        cd "${run_root}/pr"
+        timeout "${timeout_seconds}" env -u CM12_PRBAS_MODE \
+            "${environment[@]}" "${executable}" <"${fixture}" \
+            >"${report_root}/${label}.stdout" \
+            2>"${report_root}/${label}.stderr"
+    )
+    status=$?
+    set -e
+    printf '%s\n' "${status}" >"${report_root}/${label}.exit"
+    test "${status}" -eq 0
+}
+
+extract_go3() {
+    local input="$1"
+    local output="$2"
+
+    awk '
+        BEGIN {
+            OFS = "\t"
+            print "row", "section", "angle", "obs", "error", \
+                "lab_angle", "lab_dsg"
+        }
+        index($0, "WEB") { section++ }
+        NF == 5 && $1 ~ /^[+-]?[0-9]+\.[0-9]+$/ &&
+            $2 ~ /^[+-]?0\.[0-9]+E[+-][0-9]+$/ &&
+            $3 ~ /^[+-]?0\.[0-9]+E[+-][0-9]+$/ &&
+            $4 ~ /^[+-]?[0-9]+\.[0-9]+([Ee][+-]?[0-9]+)?$/ &&
+            $5 ~ /^[+-]?0\.[0-9]+E[+-][0-9]+$/ {
+            print ++row, section, $1, $2, $3, $4, $5
+        }
+    ' "${input}" >"${output}"
+}
+
+run_case typed-reload no
+run_case forced-legacy-reload yes
+extract_go3 \
+    "${report_root}/typed-reload.stdout" \
+    "${report_root}/typed-reload-go3.tsv"
+extract_go3 \
+    "${report_root}/forced-legacy-reload.stdout" \
+    "${report_root}/forced-legacy-reload-go3.tsv"
+
+test "$(($(wc -l <"${report_root}/typed-reload-go3.tsv") - 1))" -eq 2
+test "$(($(wc -l <"${report_root}/forced-legacy-reload-go3.tsv") - 1))" -eq 2
+cmp "${report_root}/typed-reload-go3.tsv" \
+    "${report_root}/forced-legacy-reload-go3.tsv"
+cmp "${report_root}/typed-reload-go3.tsv" "${reference}"
+
+printf 'CM12 PRBAS ownership probe: PASS\n'
+printf 'Typed and forced-legacy reload rows: 2/2 exact\n'
+printf 'Evidence: %s\n' "${report_root}"

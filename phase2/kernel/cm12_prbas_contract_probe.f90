@@ -2,8 +2,10 @@ program cm12_prbas_contract_probe
     use, intrinsic :: iso_fortran_env, only: real32
     use cm12_kernel, only: cm12_invalid_argument, cm12_ok
     use cm12_prbas_dispatch, only: &
-        cm12_begin_prbas_dispatch, cm12_prbas_dispatch_state, &
-        cm12_record_prbas_formula_title
+        cm12_begin_prbas_dispatch, cm12_load_prbas_solution_selector, &
+        cm12_next_prbas_dispatch, cm12_prbas_dispatch_event, &
+        cm12_prbas_dispatch_state, cm12_record_prbas_formula_title, &
+        cm12_validate_prbas_ambient
     use cm12_request_kernel, only: &
         cm12_background_grid_state, cm12_prepare_legacy_background, &
         cm12_prepared_background, cm12_request
@@ -13,6 +15,7 @@ program cm12_prbas_contract_probe
     type(cm12_background_grid_state) :: grid_state
     type(cm12_prbas_dispatch_state) :: dispatch_state
     type(cm12_prbas_dispatch_state) :: next_dispatch_state
+    type(cm12_prbas_dispatch_event) :: dispatch_event
     type(cm12_prepared_background) :: background
     type(cm12_request) :: request
     type(cm12_solution) :: solution
@@ -21,6 +24,8 @@ program cm12_prbas_contract_probe
     character(len=72) :: solution_title
     character(len=64) :: solution_sha256
     character(len=4) :: invalid_formula_title
+    integer :: nfg(4, 8)
+    real(real32) :: pg(20, 4, 8)
     integer :: status
 
     if (command_argument_count() /= 2) then
@@ -51,6 +56,97 @@ program cm12_prbas_contract_probe
     call require_result( &
         'non_printable_title', status, message, cm12_invalid_argument, &
         'frozen hadronic formula returned a non-printable title')
+
+    nfg = 0
+    pg = 0.0_real32
+    call cm12_validate_prbas_ambient( &
+        1, 6, 0, 0.0_real32, 0.0_real32, nfg, pg, status, message)
+    call require_result('ambient_supported', status, message, cm12_ok, '')
+    call cm12_validate_prbas_ambient( &
+        100, 6, 0, 0.0_real32, 0.0_real32, nfg, pg, status, message)
+    call require_result( &
+        'ambient_it_rejected', status, message, cm12_invalid_argument, &
+        'typed PRBAS requires retained IT=1')
+    call cm12_validate_prbas_ambient( &
+        1, 5, 0, 0.0_real32, 0.0_real32, nfg, pg, status, message)
+    call require_result( &
+        'ambient_nnl_rejected', status, message, cm12_invalid_argument, &
+        'typed PRBAS requires retained NNL=6')
+    call cm12_validate_prbas_ambient( &
+        1, 6, 1, 0.0_real32, 0.0_real32, nfg, pg, status, message)
+    call require_result( &
+        'ambient_iprk_rejected', status, message, cm12_invalid_argument, &
+        'typed PRBAS does not support IPRK scaling')
+    call cm12_validate_prbas_ambient( &
+        1, 6, 0, 1.0_real32, 0.0_real32, nfg, pg, status, message)
+    call require_result( &
+        'ambient_bcoff_rejected', status, message, cm12_invalid_argument, &
+        'typed PRBAS requires retained BCOFF=0')
+    call cm12_validate_prbas_ambient( &
+        1, 6, 0, 0.0_real32, 1.0_real32, nfg, pg, status, message)
+    call require_result( &
+        'ambient_kill_rejected', status, message, cm12_invalid_argument, &
+        'typed PRBAS requires retained KILL=0')
+    nfg(1, 1) = 1
+    call cm12_validate_prbas_ambient( &
+        1, 6, 0, 0.0_real32, 0.0_real32, nfg, pg, status, message)
+    call require_result( &
+        'ambient_nfg_rejected', status, message, cm12_invalid_argument, &
+        'typed PRBAS does not support PNMOD overrides')
+    nfg = 0
+    pg(1, 1, 1) = 1.0_real32
+    call cm12_validate_prbas_ambient( &
+        1, 6, 0, 0.0_real32, 0.0_real32, nfg, pg, status, message)
+    call require_result( &
+        'ambient_pg_rejected', status, message, cm12_invalid_argument, &
+        'typed PRBAS does not support PGLOB parameters')
+
+    solution_title = ''
+    solution_title(57:60) = 'M05 '
+    call cm12_begin_prbas_dispatch( &
+        solution_title, dispatch_state, status, message)
+    if (status /= cm12_ok) stop 8
+    call cm12_next_prbas_dispatch( &
+        dispatch_state, 1, 1, 4, 25, 849.9572_real32, dispatch_event, &
+        next_dispatch_state, status, message)
+    if (status /= cm12_ok .or. dispatch_event%dispatch) stop 9
+    dispatch_state = next_dispatch_state
+    call cm12_next_prbas_dispatch( &
+        dispatch_state, 1, 1, 5, 25, 849.9572_real32, dispatch_event, &
+        next_dispatch_state, status, message)
+    if (status /= cm12_ok .or. .not. dispatch_event%dispatch) stop 10
+    call cm12_record_prbas_formula_title( &
+        next_dispatch_state, 'SP00', dispatch_state, status, message)
+    if (status /= cm12_ok) stop 11
+    call cm12_next_prbas_dispatch( &
+        dispatch_state, 1, 2, 1, 21, 849.9572_real32, dispatch_event, &
+        next_dispatch_state, status, message)
+    if (status /= cm12_ok .or. .not. dispatch_event%dispatch) stop 12
+    call cm12_record_prbas_formula_title( &
+        next_dispatch_state, 'SP00', dispatch_state, status, message)
+    if (status /= cm12_ok) stop 13
+    if ( &
+        dispatch_state%background_reset_pending .or. &
+        dispatch_state%current_title /= 'SP00' .or. &
+        dispatch_state%previous_title /= 'SP00' .or. &
+        dispatch_state%next_dither_mev /= 0.001_real32) stop 14
+    call require_result( &
+        'process_state_survives_request', status, message, cm12_ok, '')
+    call cm12_load_prbas_solution_selector( &
+        dispatch_state, 'M05 ', next_dispatch_state, status, message)
+    if (status /= cm12_ok) stop 15
+    dispatch_state = next_dispatch_state
+    call cm12_next_prbas_dispatch( &
+        dispatch_state, 1, 1, 4, 25, 849.9572_real32, dispatch_event, &
+        next_dispatch_state, status, message)
+    if ( &
+        status /= cm12_ok .or. .not. dispatch_event%dispatch .or. &
+        dispatch_event%dispatch_title /= 'M05 ' .or. &
+        dispatch_event%previous_title /= 'SP00' .or. &
+        dispatch_event%effective_energy_mev /= &
+            849.9572_real32 + 0.001_real32) stop 16
+    call require_result( &
+        'solution_reload_preserves_process', status, message, cm12_ok, '')
 
     request = cm12_request( &
         reaction=2, photon_lab_energy_mev=200.0_real32, &

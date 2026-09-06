@@ -2,6 +2,7 @@ subroutine prbas
     use, intrinsic :: iso_fortran_env, only: real32
     use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     use cm12_kernel, only: cm12_dataset, cm12_ok
+    use cm12_prbas_dispatch, only: cm12_validate_prbas_ambient
     use cm12_solution_kernel, only: &
         cm12_calculate_kinematics, cm12_kinematics, cm12_solution
     use cm12_request_kernel, only: &
@@ -9,7 +10,9 @@ subroutine prbas
         cm12_prepare_legacy_angle_background, &
         cm12_prepare_legacy_background, cm12_prepared_background, &
         cm12_request, cm12_request_result
-    use cm12_legacy_context, only: legacy_cm12_objects
+    use cm12_legacy_context, only: &
+        legacy_cm12_objects, legacy_cm12_prbas_begin, &
+        legacy_cm12_prbas_commit
     implicit none
 
     integer :: mtrn
@@ -72,6 +75,17 @@ subroutine prbas
     real(real32) :: dei
     real(real32) :: dpz(99)
     real(real32) :: obsprd
+    real(real32) :: gom1
+    real(real32) :: gom2
+    real(real32) :: goms
+    real(real32) :: gpi2
+    real(real32) :: gp1
+    real(real32) :: gp2
+    integer :: irct
+    real(real32) :: bcoff
+    integer :: iprk
+    real(real32) :: pg(20, 4, 8)
+    integer :: nfg(4, 8)
 
     common /prsc/ &
         mtrn, ir, mm, jj, ll, nn, ne, na, ie, ia, ii, nnbt, it, nprm, &
@@ -80,6 +94,9 @@ subroutine prbas
         dum, a, obsx, err, tex, obs, dobs, xex, nbt, cis, ch, hdat, &
         ir0, thtx, ninc, nincmx, nnl, nmttl, nittl, der, dei, dpz, &
         obsprd
+    common /gomega/ gom1, gom2, goms, gpi2, gp1, gp2, irct, bcoff
+    common /prkc/ iprk
+    common /pglob/ pg, nfg
 
     type(cm12_dataset), pointer :: dataset
     type(cm12_solution), pointer :: solution
@@ -132,6 +149,11 @@ subroutine prbas
     end if
 
     call legacy_cm12_objects(dataset, solution)
+    call legacy_cm12_prbas_begin(ir, grid_state, status, message)
+    if (status /= cm12_ok) then
+        call prbas_legacy
+        return
+    end if
     result_index = 1
     do energy_index = 1, ne
         ie = energy_index
@@ -142,8 +164,8 @@ subroutine prbas
             solution, request, background, status, message, &
             grid_state=grid_state)
         if (status /= cm12_ok) then
-            call prbas_legacy
-            return
+            call stop_after_typed_failure( &
+                'background preparation', message)
         end if
         do angle_index = 1, na
             ia = angle_index
@@ -154,16 +176,15 @@ subroutine prbas
                 call cm12_prepare_legacy_angle_background( &
                     solution, request, background, status, message)
                 if (status /= cm12_ok) then
-                    call prbas_legacy
-                    return
+                    call stop_after_typed_failure( &
+                        'angle background preparation', message)
                 end if
             end if
             call cm12_evaluate_request( &
                 solution, dataset, request, background, result, &
                 status, message)
             if (status /= cm12_ok) then
-                call prbas_legacy
-                return
+                call stop_after_typed_failure('request evaluation', message)
             end if
 
             ethr = result%kinematics%threshold_lab_energy_mev
@@ -184,6 +205,10 @@ subroutine prbas
             result_index = result_index + 1
         end do
     end do
+    call legacy_cm12_prbas_commit(grid_state, status, message)
+    if (status /= cm12_ok) then
+        call stop_after_typed_failure('process-state commit', message)
+    end if
     ii = result_index
 
 contains
@@ -193,10 +218,15 @@ contains
         integer :: angle
 
         retained_request_is_valid = .false.
+        if (transfer(title(1), '    ') /= 'CM12') return
         if (ir0 /= 0 .or. ir < 1 .or. ir > 4) return
         if (nnbt /= 0) return
         if (ne < 1 .or. ne > 70 .or. na < 1 .or. na > 99) return
         if (ne * na > 70) return
+        call cm12_validate_prbas_ambient( &
+            it, nnl, iprk, bcoff, pem(25, 6, 2, 6), nfg, pg, &
+            status, message)
+        if (status /= cm12_ok) return
         do energy = 1, ne
             if ( &
                 .not. ieee_is_finite(e(energy)) .or. &
@@ -207,6 +237,9 @@ contains
             if ( &
                 e(energy) <= &
                 validation_kinematics%threshold_lab_energy_mev) return
+            if ( &
+                validation_kinematics%final_meson_energy_mev < &
+                2.0_real32) return
         end do
         do angle = 1, na
             if ( &
@@ -216,5 +249,15 @@ contains
         end do
         retained_request_is_valid = .true.
     end function retained_request_is_valid
+
+    subroutine stop_after_typed_failure(operation, failure_message)
+        character(len=*), intent(in) :: operation
+        character(len=*), intent(in) :: failure_message
+
+        write(*, '(a)') &
+            'Typed CM12 PRBAS ' // trim(operation) // &
+            ' failed after dispatch began: ' // trim(failure_message)
+        error stop 9
+    end subroutine stop_after_typed_failure
 
 end subroutine prbas

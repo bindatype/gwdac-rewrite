@@ -19,6 +19,7 @@ readonly legacy_prsd_root="${parity_build_root}/legacy-prsd"
 readonly kcm_root="${CM12_KCM_ROOT:-${source_root}/said/KCM.100330}"
 readonly solution_file="${CM12_SOLUTION_FILE:-${source_root}/sdat/prsol.dat}"
 readonly solution_sha256="${CM12_SOLUTION_SHA256:-dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522}"
+readonly pre_dispatch_fixture="${phase2_root}/fixtures/prbas-lifecycle/pre-dispatch-eligibility.tsv"
 readonly skip_prsdd_build="${CM12_SKIP_PRSD_BUILD:-0}"
 readonly skip_request_probe="${CM12_SKIP_REQUEST_PROBE:-0}"
 readonly allow_request_probe_mismatch="${CM12_ALLOW_REQUEST_PROBE_MISMATCH:-0}"
@@ -611,14 +612,38 @@ awk -F '\t' '
     NR == 1 && $1 == "contract" && $2 == "status" && $3 == "message" { next }
     NR == 2 && $1 == "non_printable_title" && $2 == 1 && \
         $3 == "frozen hadronic formula returned a non-printable title" { next }
-    NR == 3 && $1 == "initialize_grid" && $2 == 0 && $3 == "<empty>" { next }
-    NR == 4 && $1 == "reaction_mismatch" && $2 == 1 && \
+    NR == 3 && $1 == "ambient_supported" && $2 == 0 && $3 == "<empty>" { next }
+    NR == 4 && $1 == "ambient_it_rejected" && $2 == 1 && \
+        $3 == "typed PRBAS requires retained IT=1" { next }
+    NR == 5 && $1 == "ambient_nnl_rejected" && $2 == 1 && \
+        $3 == "typed PRBAS requires retained NNL=6" { next }
+    NR == 6 && $1 == "ambient_iprk_rejected" && $2 == 1 && \
+        $3 == "typed PRBAS does not support IPRK scaling" { next }
+    NR == 7 && $1 == "ambient_bcoff_rejected" && $2 == 1 && \
+        $3 == "typed PRBAS requires retained BCOFF=0" { next }
+    NR == 8 && $1 == "ambient_kill_rejected" && $2 == 1 && \
+        $3 == "typed PRBAS requires retained KILL=0" { next }
+    NR == 9 && $1 == "ambient_nfg_rejected" && $2 == 1 && \
+        $3 == "typed PRBAS does not support PNMOD overrides" { next }
+    NR == 10 && $1 == "ambient_pg_rejected" && $2 == 1 && \
+        $3 == "typed PRBAS does not support PGLOB parameters" { next }
+    NR == 11 && $1 == "process_state_survives_request" && $2 == 0 && \
+        $3 == "<empty>" { next }
+    NR == 12 && $1 == "solution_reload_preserves_process" && $2 == 0 && \
+        $3 == "<empty>" { next }
+    NR == 13 && $1 == "initialize_grid" && $2 == 0 && $3 == "<empty>" { next }
+    NR == 14 && $1 == "reaction_mismatch" && $2 == 1 && \
         $3 == "background grid state provenance does not match request" { next }
-    NR == 5 && $1 == "original_reaction_reuse" && $2 == 0 && \
+    NR == 15 && $1 == "original_reaction_reuse" && $2 == 0 && \
         $3 == "<empty>" { next }
     { exit 1 }
-    END { if (NR != 5) exit 1 }
+    END { if (NR != 15) exit 1 }
 ' "${prbas_report_root}/negative-contracts.tsv"
+awk -F '\t' 'NR == 1 || $1 ~ /^ambient_/' \
+    "${prbas_report_root}/negative-contracts.tsv" \
+    >"${probe_build_root}/pre-dispatch-eligibility.tsv"
+cmp "${pre_dispatch_fixture}" \
+    "${probe_build_root}/pre-dispatch-eligibility.tsv"
 
 "${artifact_root}/cm12-form-diagnostic-probe" \
     "${solution_file}" "${solution_sha256}" "${kcm_root}" \
@@ -674,6 +699,7 @@ fi
         "${kernel_root}/cm12_prbas_dispatch_probe.f90" \
         "${kernel_root}/cm12_prbas_contract_probe.f90" \
         "${kernel_root}/cm12_prsd_pure.patch" \
+        "${pre_dispatch_fixture}" \
         "${report_root}/cm12-dataset-loader.tsv" \
         "${report_root}/cm12-dataset-rejection.txt" \
         "${report_root}/cm12-solution-loader.tsv" \

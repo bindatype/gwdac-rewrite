@@ -32,8 +32,11 @@ module cm12_prbas_dispatch
     end type cm12_prbas_dispatch_event
 
     public :: cm12_begin_prbas_dispatch
+    public :: cm12_initialize_prbas_process
+    public :: cm12_load_prbas_solution_selector
     public :: cm12_next_prbas_dispatch
     public :: cm12_record_prbas_formula_title
+    public :: cm12_validate_prbas_ambient
 
 contains
 
@@ -44,21 +47,103 @@ contains
         integer, intent(out) :: status
         character(len=*), intent(out) :: message
 
-        state = cm12_prbas_dispatch_state()
+        type(cm12_prbas_dispatch_state) :: initialized_state
+
+        call cm12_initialize_prbas_process(initialized_state)
         if (len(solution_title) < 60) then
+            state = initialized_state
             status = cm12_invalid_argument
             message = 'CM12 title does not contain the hadronic selector'
             return
         end if
-        state%current_title = solution_title(57:60)
-        if (len_trim(state%current_title) == 0) then
+        call cm12_load_prbas_solution_selector( &
+            initialized_state, solution_title(57:60), state, status, message)
+    end subroutine cm12_begin_prbas_dispatch
+
+    pure subroutine cm12_initialize_prbas_process(state)
+        type(cm12_prbas_dispatch_state), intent(out) :: state
+
+        state = cm12_prbas_dispatch_state()
+    end subroutine cm12_initialize_prbas_process
+
+    pure subroutine cm12_load_prbas_solution_selector( &
+        state, solution_selector, next_state, status, message)
+        type(cm12_prbas_dispatch_state), intent(in) :: state
+        character(len=*), intent(in) :: solution_selector
+        type(cm12_prbas_dispatch_state), intent(out) :: next_state
+        integer, intent(out) :: status
+        character(len=*), intent(out) :: message
+
+        next_state = state
+        if (len(solution_selector) < 4) then
             status = cm12_invalid_argument
-            message = 'CM12 hadronic selector is empty'
+            message = 'CM12 hadronic selector is incomplete'
+            return
+        end if
+        if ( &
+            solution_selector(1:4) /= 'M05 ' .and. &
+            solution_selector(1:4) /= 'SP00') then
+            status = cm12_invalid_argument
+            message = 'unsupported CM12 hadronic dispatch title'
+            return
+        end if
+        next_state%current_title = solution_selector(1:4)
+        status = cm12_ok
+        message = ''
+    end subroutine cm12_load_prbas_solution_selector
+
+    pure subroutine cm12_validate_prbas_ambient( &
+        it, nnl, iprk, bcoff, kill, nfg, pg, status, message)
+        integer, intent(in) :: it
+        integer, intent(in) :: nnl
+        integer, intent(in) :: iprk
+        real(real32), intent(in) :: bcoff
+        real(real32), intent(in) :: kill
+        integer, intent(in) :: nfg(:, :)
+        real(real32), intent(in) :: pg(:, :, :)
+        integer, intent(out) :: status
+        character(len=*), intent(out) :: message
+
+        if (it /= 1) then
+            status = cm12_invalid_argument
+            message = 'typed PRBAS requires retained IT=1'
+            return
+        end if
+        if (nnl /= 6) then
+            status = cm12_invalid_argument
+            message = 'typed PRBAS requires retained NNL=6'
+            return
+        end if
+        if (iprk /= 0) then
+            status = cm12_invalid_argument
+            message = 'typed PRBAS does not support IPRK scaling'
+            return
+        end if
+        if (.not. ieee_is_finite(bcoff) .or. bcoff /= 0.0_real32) then
+            status = cm12_invalid_argument
+            message = 'typed PRBAS requires retained BCOFF=0'
+            return
+        end if
+        if (.not. ieee_is_finite(kill) .or. kill /= 0.0_real32) then
+            status = cm12_invalid_argument
+            message = 'typed PRBAS requires retained KILL=0'
+            return
+        end if
+        if (any(nfg /= 0)) then
+            status = cm12_invalid_argument
+            message = 'typed PRBAS does not support PNMOD overrides'
+            return
+        end if
+        if ( &
+            any(.not. ieee_is_finite(pg)) .or. &
+            any(pg /= 0.0_real32)) then
+            status = cm12_invalid_argument
+            message = 'typed PRBAS does not support PGLOB parameters'
             return
         end if
         status = cm12_ok
         message = ''
-    end subroutine cm12_begin_prbas_dispatch
+    end subroutine cm12_validate_prbas_ambient
 
     pure subroutine cm12_next_prbas_dispatch( &
         state, family, branch, orbital_l, form_selector, input_energy_mev, &
