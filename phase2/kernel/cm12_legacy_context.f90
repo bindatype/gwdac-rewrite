@@ -5,8 +5,8 @@ module cm12_legacy_context
         cm12_background_grid_state, cm12_begin_background_grid, &
         cm12_finish_background_grid
     use cm12_prbas_dispatch, only: &
-        cm12_initialize_prbas_process, cm12_load_prbas_solution_selector, &
-        cm12_prbas_dispatch_state
+        cm12_initialize_prbas_process, cm12_invalidate_prbas_process, &
+        cm12_load_prbas_solution_selector, cm12_prbas_dispatch_state
     use cm12_solution_kernel, only: &
         cm12_solution, cm12_solution_summary, load_cm12_solution
     implicit none
@@ -29,6 +29,7 @@ module cm12_legacy_context
     public :: legacy_cm12_objects
     public :: legacy_cm12_prbas_begin
     public :: legacy_cm12_prbas_commit
+    public :: legacy_cm12_prbas_invalidate
     public :: legacy_cm12_prbas_solution_loaded
     public :: legacy_cm12_solution
 
@@ -70,6 +71,17 @@ contains
         prbas_loaded_solution_selector = solution_selector(1:4)
         prbas_solution_observed = .true.
     end subroutine legacy_cm12_prbas_solution_loaded
+
+    subroutine legacy_cm12_prbas_invalidate()
+        type(cm12_prbas_dispatch_state) :: next_state
+
+        if (.not. prbas_process_initialized) then
+            call cm12_initialize_prbas_process(prbas_process_state)
+            prbas_process_initialized = .true.
+        end if
+        call cm12_invalidate_prbas_process(prbas_process_state, next_state)
+        prbas_process_state = next_state
+    end subroutine legacy_cm12_prbas_invalidate
 
     subroutine legacy_cm12_prbas_begin( &
         reaction, grid_state, status, message)

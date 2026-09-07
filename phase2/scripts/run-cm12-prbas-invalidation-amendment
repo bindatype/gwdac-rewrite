@@ -1,0 +1,443 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly state_root="${PRBAS_INVALIDATION_STATE_ROOT:-/workspace/phase2/prbas-invalidation-amendment}"
+readonly report_root="${PRBAS_INVALIDATION_REPORT_ROOT:-${state_root}/capture}"
+readonly executable="${PRBAS_INVALIDATION_BINARY:?set PRBAS_INVALIDATION_BINARY to the ordinary candidate executable}"
+readonly route_executable="${PRBAS_INVALIDATION_ROUTE_BINARY:?set PRBAS_INVALIDATION_ROUTE_BINARY to the route-instrumented candidate executable}"
+readonly trace_executable="${PRBAS_INVALIDATION_TRACE_BINARY:?set PRBAS_INVALIDATION_TRACE_BINARY to the lifecycle-trace candidate executable}"
+readonly build_root="${PRBAS_INVALIDATION_BUILD_ROOT:?set PRBAS_INVALIDATION_BUILD_ROOT to the ordinary phase1 build root}"
+readonly contract_report="${PRBAS_INVALIDATION_CONTRACT_REPORT:?set PRBAS_INVALIDATION_CONTRACT_REPORT to process-invalidation.tsv from the focused build}"
+readonly clamp_report="${PRBAS_INVALIDATION_CLAMP_REPORT:?set PRBAS_INVALIDATION_CLAMP_REPORT to dispatch-clamp.tsv from the focused build}"
+readonly product_commit="${PRBAS_INVALIDATION_PRODUCT_COMMIT:?set PRBAS_INVALIDATION_PRODUCT_COMMIT to the exact support commit}"
+readonly fixture_root="${phase2_root}/fixtures/prbas-lifecycle"
+readonly mixed_fixture="${fixture_root}/fallback-reentry.in"
+readonly invalid_title_fixture="${fixture_root}/invalid-title.in"
+readonly invalidation_contract="${fixture_root}/process-invalidation.tsv"
+readonly clamp_contract="${fixture_root}/dispatch-clamp.tsv"
+readonly invalid_title_stub="${phase2_root}/kernel/cm12_invalid_title_pntest_stub.c"
+readonly route_patch="${phase2_root}/kernel/cm12_prbas_invalidation_route.patch"
+readonly trace_patch="${phase2_root}/kernel/cm12_prbas_lifecycle_trace.patch"
+readonly typed_parser="${phase2_root}/scripts/parse-cm12-typed-lifecycle-aligned.awk"
+readonly legacy_parser="${phase2_root}/scripts/parse-cm12-legacy-lifecycle-aligned.awk"
+readonly trace_comparator="${phase2_root}/scripts/compare-cm12-prbas-lifecycle-aligned.awk"
+readonly live_fixture="${phase1_root}/fixtures/go3pr2-production-adapter/live.in"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly data_root="${source_root}/sdat"
+readonly solution_file="${data_root}/prsol.dat"
+readonly solution_sha256=dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-300}"
+readonly invalid_title_build_root="${state_root}/invalid-title-build"
+readonly invalid_title_binary="${invalid_title_build_root}/prsdd-headless-invalid-title"
+readonly expected_live_typed_entries=133
+readonly expected_mixed_scientific_rows=3069
+readonly expected_pre_invalidation_typed_entries=134
+
+if [[ -e "${report_root}" ]]; then
+    printf 'Invalidation-amendment report root already exists: %s\n' \
+        "${report_root}" >&2
+    exit 2
+fi
+mkdir -p "${report_root}" "${state_root}/runs" "${invalid_title_build_root}"
+test -x "${executable}"
+test -x "${route_executable}"
+test -x "${trace_executable}"
+grep -aFq 'CM12INVALIDATION TYPED ENTRY' "${route_executable}"
+grep -aFq 'CM12TYPED BEGIN' "${trace_executable}"
+if grep -aFq 'CM12INVALIDATION TYPED ENTRY' "${executable}" || \
+    grep -aFq 'CM12TYPED BEGIN' "${executable}"; then
+    printf 'Ordinary candidate contains focused instrumentation\n' >&2
+    exit 1
+fi
+test -f "${build_root}/core/cm12_non_cm12_seam.o"
+test -f "${build_root}/gplot-headless.o"
+test -f "${build_root}/libxz.a"
+test -f "${build_root}/saidopen.a"
+test -f "${contract_report}"
+test -f "${clamp_report}"
+test -f "${mixed_fixture}"
+test -f "${invalid_title_fixture}"
+test -f "${invalid_title_stub}"
+test -f "${live_fixture}"
+test -f "${typed_parser}"
+test -f "${legacy_parser}"
+test -f "${trace_comparator}"
+(
+    cd "${fixture_root}"
+    sha256sum -c manifest.sha256
+) >/dev/null
+cmp "${invalidation_contract}" "${contract_report}"
+cmp "${clamp_contract}" "${clamp_report}"
+
+run_case() {
+    local label="$1"
+    local binary="$2"
+    local fixture="$3"
+    local force_legacy="$4"
+    local run_root
+    local status
+    local -a environment
+
+    run_root="$(mktemp -d "${state_root}/runs/${label}.XXXXXX")"
+    cp -a "${source_root}/pr" "${run_root}/pr"
+    rm -f \
+        "${run_root}/pr/SAID.TMP" \
+        "${run_root}/pr/SAID.PCT" \
+        "${run_root}/pr/SAID.LOG" \
+        "${run_root}/pr/SAID.PS" \
+        "${run_root}/pr/fort.3" \
+        "${run_root}/pr/fort.7"
+    ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+    ln -s "${data_root}" "${run_root}/sdat"
+
+    environment=(
+        "CM12_KCM_ROOT=${kcm_root}"
+        "CM12_SOLUTION_FILE=${solution_file}"
+        "CM12_SOLUTION_SHA256=${solution_sha256}"
+        "CM12_SOLUTION_ID=CM12"
+        "SAID_DATA_ROOT=${data_root}"
+        "TZ=America/New_York"
+    )
+    if [[ "${force_legacy}" == yes ]]; then
+        environment+=("CM12_FORCE_LEGACY_PRBAS=1")
+    fi
+
+    set +e
+    (
+        cd "${run_root}/pr"
+        timeout "${timeout_seconds}" env -u CM12_PRBAS_MODE \
+            "${environment[@]}" "${binary}" <"${fixture}" \
+            >"${report_root}/${label}.stdout" \
+            2>"${report_root}/${label}.stderr"
+    )
+    status=$?
+    set -e
+    printf '%s\n' "${status}" >"${report_root}/${label}.exit"
+}
+
+extract_scientific() {
+    local input="$1"
+    local output="$2"
+
+    awk '
+        BEGIN {
+            OFS = "\t"
+            print "row", "section", "angle", "field_2", "field_3", \
+                "field_4", "field_5"
+        }
+        index($0, "WEB") { section++ }
+        NF == 5 && $1 ~ /^[+-]?[0-9]+\.[0-9]+$/ &&
+            $2 ~ /^[+-]?0\.[0-9]+E[+-][0-9]+$/ &&
+            $3 ~ /^[+-]?0\.[0-9]+E[+-][0-9]+$/ &&
+            ($4 == "NaN" || $4 ~ /^[+-]?[0-9]+\.[0-9]+([Ee][+-]?[0-9]+)?$/) &&
+            ($5 == "NaN" || $5 ~ /^[+-]?0\.[0-9]+E[+-][0-9]+$/) {
+            print ++row, section, $1, $2, $3, $4, $5
+        }
+    ' "${input}" >"${output}"
+}
+
+compare_scientific() {
+    local candidate="$1"
+    local reference="$2"
+    local output="$3"
+
+    paste "${candidate}" "${reference}" |
+        awk -F '\t' '
+            BEGIN { OFS = "\t" }
+            NR == 1 {
+                print "row", "section_equal", "angle_equal", \
+                    "field_2_equal", "field_3_equal", "field_4_equal", \
+                    "field_5_equal", "exact", "first_field"
+                next
+            }
+            {
+                section = ($2 == $9 ? "yes" : "no")
+                angle = ($3 == $10 ? "yes" : "no")
+                field_2 = ($4 == $11 ? "yes" : "no")
+                field_3 = ($5 == $12 ? "yes" : "no")
+                field_4 = ($6 == $13 ? "yes" : "no")
+                field_5 = ($7 == $14 ? "yes" : "no")
+                first = "NA"
+                if (section == "no") first = "section"
+                else if (angle == "no") first = "angle"
+                else if (field_2 == "no") first = "field_2"
+                else if (field_3 == "no") first = "field_3"
+                else if (field_4 == "no") first = "field_4"
+                else if (field_5 == "no") first = "field_5"
+                exact = (first == "NA" ? "yes" : "no")
+                print $1, section, angle, field_2, field_3, field_4, \
+                    field_5, exact, first
+            }
+        ' >"${output}"
+}
+
+extract_route_events() {
+    local input="$1"
+    local output="$2"
+
+    awk '
+        BEGIN {
+            OFS = "\t"
+            print "event", "route", "after_first_legacy", "detail"
+        }
+        index($0, "CM12INVALIDATION TYPED ENTRY") {
+            print ++event, "typed", (legacy_seen ? "yes" : "no"), $NF
+        }
+        index($0, "CM12INVALIDATION LEGACY REQUEST") {
+            legacy_seen = 1
+            print ++event, "legacy_request", "yes", $0
+        }
+        index($0, "CM12INVALIDATION LEGACY BEGIN") {
+            legacy_seen = 1
+            print ++event, "legacy_begin", "yes", $0
+        }
+    ' "${input}" >"${output}"
+}
+
+run_case candidate-mixed "${executable}" "${mixed_fixture}" no
+run_case forced-legacy-mixed "${executable}" "${mixed_fixture}" yes
+run_case route-mixed "${route_executable}" "${mixed_fixture}" no
+run_case route-live "${route_executable}" "${live_fixture}" no
+run_case trace-live-typed "${trace_executable}" "${live_fixture}" no
+run_case trace-live-legacy "${trace_executable}" "${live_fixture}" yes
+
+for result in \
+    candidate-mixed forced-legacy-mixed route-mixed route-live \
+    trace-live-typed trace-live-legacy; do
+    test "$(cat "${report_root}/${result}.exit")" -eq 0
+done
+
+extract_scientific \
+    "${report_root}/candidate-mixed.stdout" \
+    "${report_root}/candidate-mixed-scientific.tsv"
+extract_scientific \
+    "${report_root}/forced-legacy-mixed.stdout" \
+    "${report_root}/forced-legacy-mixed-scientific.tsv"
+extract_scientific \
+    "${report_root}/route-mixed.stdout" \
+    "${report_root}/route-mixed-scientific.tsv"
+compare_scientific \
+    "${report_root}/candidate-mixed-scientific.tsv" \
+    "${report_root}/forced-legacy-mixed-scientific.tsv" \
+    "${report_root}/candidate-vs-legacy-scientific.tsv"
+compare_scientific \
+    "${report_root}/route-mixed-scientific.tsv" \
+    "${report_root}/candidate-mixed-scientific.tsv" \
+    "${report_root}/route-vs-candidate-scientific.tsv"
+
+readonly candidate_scientific_rows="$(($(wc -l <"${report_root}/candidate-mixed-scientific.tsv") - 1))"
+readonly legacy_scientific_rows="$(($(wc -l <"${report_root}/forced-legacy-mixed-scientific.tsv") - 1))"
+readonly route_scientific_rows="$(($(wc -l <"${report_root}/route-mixed-scientific.tsv") - 1))"
+readonly candidate_exact_rows="$(awk -F '\t' \
+    'NR > 1 && $8 == "yes" { n++ } END { print n + 0 }' \
+    "${report_root}/candidate-vs-legacy-scientific.tsv")"
+readonly route_exact_rows="$(awk -F '\t' \
+    'NR > 1 && $8 == "yes" { n++ } END { print n + 0 }' \
+    "${report_root}/route-vs-candidate-scientific.tsv")"
+
+extract_route_events \
+    "${report_root}/route-mixed.stdout" \
+    "${report_root}/mixed-route-events.tsv"
+readonly mixed_typed_entries="$(awk -F '\t' \
+    'NR > 1 && $2 == "typed" { n++ } END { print n + 0 }' \
+    "${report_root}/mixed-route-events.tsv")"
+readonly mixed_legacy_requests="$(awk -F '\t' \
+    'NR > 1 && $2 == "legacy_request" { n++ } END { print n + 0 }' \
+    "${report_root}/mixed-route-events.tsv")"
+readonly mixed_legacy_begins="$(awk -F '\t' \
+    'NR > 1 && $2 == "legacy_begin" { n++ } END { print n + 0 }' \
+    "${report_root}/mixed-route-events.tsv")"
+readonly mixed_typed_after_legacy="$(awk -F '\t' \
+    'NR > 1 && $2 == "typed" && $3 == "yes" { n++ } END { print n + 0 }' \
+    "${report_root}/mixed-route-events.tsv")"
+
+extract_route_events \
+    "${report_root}/route-live.stdout" \
+    "${report_root}/live-route-events.tsv"
+readonly live_typed_entries="$(awk -F '\t' \
+    'NR > 1 && $2 == "typed" { n++ } END { print n + 0 }' \
+    "${report_root}/live-route-events.tsv")"
+readonly live_legacy_entries="$(awk -F '\t' \
+    'NR > 1 && $2 ~ /^legacy_/ { n++ } END { print n + 0 }' \
+    "${report_root}/live-route-events.tsv")"
+
+awk -f "${typed_parser}" "${report_root}/trace-live-typed.stdout" \
+    >"${report_root}/trace-live-typed-all.tsv"
+awk -f "${legacy_parser}" "${report_root}/trace-live-legacy.stdout" \
+    >"${report_root}/trace-live-legacy-all.tsv"
+awk -F '\t' 'NR == 1 || $1 == 1' \
+    "${report_root}/trace-live-typed-all.tsv" \
+    >"${report_root}/low-energy-typed-trace.tsv"
+awk -F '\t' 'NR == 1 || $1 == 1' \
+    "${report_root}/trace-live-legacy-all.tsv" \
+    >"${report_root}/low-energy-legacy-trace.tsv"
+awk -f "${trace_comparator}" \
+    "${report_root}/low-energy-typed-trace.tsv" \
+    "${report_root}/low-energy-legacy-trace.tsv" \
+    >"${report_root}/low-energy-trace-comparison.tsv"
+test "$(($(wc -l <"${report_root}/low-energy-typed-trace.tsv") - 1))" -eq 26
+test "$(($(wc -l <"${report_root}/low-energy-legacy-trace.tsv") - 1))" -eq 26
+readonly low_energy_exact_rows="$(awk -F '\t' \
+    'NR > 1 && $27 == "yes" { n++ } END { print n + 0 }' \
+    "${report_root}/low-energy-trace-comparison.tsv")"
+readonly first_low_energy_mev="$(awk -F '\t' 'NR == 2 { print $15 }' \
+    "${report_root}/low-energy-typed-trace.tsv")"
+readonly first_energy_below_clamp="$(awk -v value="${first_low_energy_mev}" \
+    'BEGIN { print (value + 0 < 2.0 ? "yes" : "no") }')"
+
+gcc -O1 -std=c11 -Wall -Wextra -Werror \
+    -c "${invalid_title_stub}" \
+    -o "${invalid_title_build_root}/cm12_invalid_title_pntest_stub.o"
+gfortran \
+    -O1 \
+    -fno-second-underscore \
+    -Wl,--wrap=pntest_ \
+    -o "${invalid_title_binary}" \
+    "${build_root}/core/"*.o \
+    "${invalid_title_build_root}/cm12_invalid_title_pntest_stub.o" \
+    "${build_root}/gplot-headless.o" \
+    "${build_root}/libxz.a" \
+    "${build_root}/saidopen.a" \
+    -lm
+nm "${invalid_title_binary}" \
+    >"${report_root}/invalid-title-binary-symbols.txt"
+grep -Fq ' __wrap_pntest_' \
+    "${report_root}/invalid-title-binary-symbols.txt"
+nm "${executable}" >"${report_root}/ordinary-binary-symbols.txt"
+if grep -Fq ' __wrap_pntest_' "${report_root}/ordinary-binary-symbols.txt"; then
+    printf 'Ordinary candidate unexpectedly contains the invalid-title wrapper\n' >&2
+    exit 1
+fi
+
+run_case invalid-title "${invalid_title_binary}" \
+    "${invalid_title_fixture}" no
+readonly invalid_title_exit="$(cat "${report_root}/invalid-title.exit")"
+grep -Fq \
+    'Typed CM12 PRBAS background preparation failed after dispatch began: frozen hadronic formula returned a non-printable title' \
+    "${report_root}/invalid-title.stdout"
+grep -Fq 'ERROR STOP 9' "${report_root}/invalid-title.stderr"
+
+cp "${contract_report}" "${report_root}/process-invalidation.tsv"
+cp "${clamp_report}" "${report_root}/dispatch-clamp.tsv"
+
+amendment_status=PASS
+if [[ "${candidate_scientific_rows}" -ne "${expected_mixed_scientific_rows}" || \
+    "${legacy_scientific_rows}" -ne "${expected_mixed_scientific_rows}" || \
+    "${route_scientific_rows}" -ne "${expected_mixed_scientific_rows}" || \
+    "${candidate_exact_rows}" -ne "${expected_mixed_scientific_rows}" || \
+    "${route_exact_rows}" -ne "${expected_mixed_scientific_rows}" || \
+    "${mixed_typed_entries}" -ne "${expected_pre_invalidation_typed_entries}" || \
+    "${mixed_legacy_requests}" -lt 1 || \
+    "${mixed_legacy_begins}" -lt 1 || \
+    "${mixed_typed_after_legacy}" -ne 0 || \
+    "${live_typed_entries}" -ne "${expected_live_typed_entries}" || \
+    "${live_legacy_entries}" -ne 0 || \
+    "${low_energy_exact_rows}" -ne 26 || \
+    "${first_energy_below_clamp}" != yes || \
+    "${invalid_title_exit}" -ne 9 ]]; then
+    amendment_status=FAIL
+fi
+readonly amendment_status
+
+{
+    printf 'metric\tobserved\treference\tclassification\n'
+    printf 'process_invalidation_contract\texact\texact\tPASS\n'
+    printf 'dispatch_clamp_contract\texact\texact\tPASS\n'
+    printf 'live_typed_entries\t%s\t133\t%s\n' \
+        "${live_typed_entries}" "$([[ "${live_typed_entries}" -eq 133 ]] && printf PASS || printf FAIL)"
+    printf 'live_legacy_entries\t%s\t0\t%s\n' \
+        "${live_legacy_entries}" "$([[ "${live_legacy_entries}" -eq 0 ]] && printf PASS || printf FAIL)"
+    printf 'low_energy_trace_exact_rows\t%s\t26\t%s\n' \
+        "${low_energy_exact_rows}" "$([[ "${low_energy_exact_rows}" -eq 26 ]] && printf PASS || printf FAIL)"
+    printf 'first_trace_pre_reset_energy_mev\t%s\tbelow_2.0\t%s\n' \
+        "${first_low_energy_mev}" "$([[ "${first_energy_below_clamp}" == yes ]] && printf PASS || printf FAIL)"
+    printf 'mixed_scientific_rows\t%s\t3069\t%s\n' \
+        "${candidate_scientific_rows}" "$([[ "${candidate_scientific_rows}" -eq 3069 ]] && printf PASS || printf FAIL)"
+    printf 'mixed_candidate_legacy_exact_rows\t%s\t3069\t%s\n' \
+        "${candidate_exact_rows}" "$([[ "${candidate_exact_rows}" -eq 3069 ]] && printf PASS || printf FAIL)"
+    printf 'mixed_route_candidate_exact_rows\t%s\t3069\t%s\n' \
+        "${route_exact_rows}" "$([[ "${route_exact_rows}" -eq 3069 ]] && printf PASS || printf FAIL)"
+    printf 'mixed_typed_entries_before_invalidation\t%s\t134\t%s\n' \
+        "${mixed_typed_entries}" "$([[ "${mixed_typed_entries}" -eq 134 ]] && printf PASS || printf FAIL)"
+    printf 'mixed_legacy_request_entries\t%s\tat_least_1\t%s\n' \
+        "${mixed_legacy_requests}" "$([[ "${mixed_legacy_requests}" -ge 1 ]] && printf PASS || printf FAIL)"
+    printf 'mixed_invalidated_begin_entries\t%s\tat_least_1\t%s\n' \
+        "${mixed_legacy_begins}" "$([[ "${mixed_legacy_begins}" -ge 1 ]] && printf PASS || printf FAIL)"
+    printf 'mixed_typed_entries_after_legacy\t%s\t0\t%s\n' \
+        "${mixed_typed_after_legacy}" "$([[ "${mixed_typed_after_legacy}" -eq 0 ]] && printf PASS || printf FAIL)"
+    printf 'invalid_title_exit\t%s\t9\t%s\n' \
+        "${invalid_title_exit}" "$([[ "${invalid_title_exit}" -eq 9 ]] && printf PASS || printf FAIL)"
+    printf 'ordinary_binary_has_test_wrapper\tno\tno\tPASS\n'
+    printf 'amendment_focused_validation\t%s\tPASS\t%s\n' \
+        "${amendment_status}" "${amendment_status}"
+} >"${report_root}/summary.tsv"
+
+{
+    printf 'evidence_label=captured/reference-candidate\n'
+    printf 'product_support_commit=%s\n' "${product_commit}"
+    printf 'archived_source_commit=%s\n' \
+        "$(git -C "${source_root}" rev-parse HEAD)"
+    printf 'ordinary_executable_sha256=%s\n' \
+        "$(sha256sum "${executable}" | awk '{print $1}')"
+    printf 'route_executable_sha256=%s\n' \
+        "$(sha256sum "${route_executable}" | awk '{print $1}')"
+    printf 'trace_executable_sha256=%s\n' \
+        "$(sha256sum "${trace_executable}" | awk '{print $1}')"
+    printf 'invalid_title_executable_sha256=%s\n' \
+        "$(sha256sum "${invalid_title_binary}" | awk '{print $1}')"
+    printf 'live_fixture_sha256=%s\n' \
+        "$(sha256sum "${live_fixture}" | awk '{print $1}')"
+    printf 'fallback_reentry_fixture_sha256=%s\n' \
+        "$(sha256sum "${mixed_fixture}" | awk '{print $1}')"
+    printf 'invalid_title_fixture_sha256=%s\n' \
+        "$(sha256sum "${invalid_title_fixture}" | awk '{print $1}')"
+    printf 'process_invalidation_contract_sha256=%s\n' \
+        "$(sha256sum "${invalidation_contract}" | awk '{print $1}')"
+    printf 'dispatch_clamp_contract_sha256=%s\n' \
+        "$(sha256sum "${clamp_contract}" | awk '{print $1}')"
+    printf 'route_patch_sha256=%s\n' \
+        "$(sha256sum "${route_patch}" | awk '{print $1}')"
+    printf 'trace_patch_sha256=%s\n' \
+        "$(sha256sum "${trace_patch}" | awk '{print $1}')"
+    printf 'invalid_title_stub_sha256=%s\n' \
+        "$(sha256sum "${invalid_title_stub}" | awk '{print $1}')"
+    printf 'runner_sha256=%s\n' \
+        "$(sha256sum "${phase2_root}/scripts/run-cm12-prbas-invalidation-amendment" | awk '{print $1}')"
+    printf 'timezone=America/New_York\n'
+    . /etc/os-release
+    printf 'container_os=%s\n' "${PRETTY_NAME}"
+} >"${report_root}/run-context.txt"
+
+gzip -n -f \
+    "${report_root}/candidate-mixed.stdout" \
+    "${report_root}/forced-legacy-mixed.stdout" \
+    "${report_root}/route-mixed.stdout" \
+    "${report_root}/route-live.stdout" \
+    "${report_root}/trace-live-typed.stdout" \
+    "${report_root}/trace-live-legacy.stdout" \
+    "${report_root}/invalid-title.stdout"
+(
+    cd "${report_root}"
+    find . -maxdepth 1 -type f ! -name manifest.sha256 -print0 |
+        sort -z |
+        xargs -0 sha256sum >manifest.sha256
+)
+
+printf 'CM12 PRBAS invalidation amendment: %s\n' "${amendment_status}"
+printf 'Retained live route census: %s typed / %s legacy\n' \
+    "${live_typed_entries}" "${live_legacy_entries}"
+printf 'Low-energy trace rows: %s/26 exact\n' "${low_energy_exact_rows}"
+printf 'Mixed scientific rows: %s/%s exact\n' \
+    "${candidate_exact_rows}" "${candidate_scientific_rows}"
+printf 'Typed entries after first legacy route: %s\n' \
+    "${mixed_typed_after_legacy}"
+printf 'Invalid-title test-only executable exit: %s\n' \
+    "${invalid_title_exit}"
+printf 'Evidence: %s\n' "${report_root}"
+
+if [[ "${amendment_status}" != PASS ]]; then
+    exit 1
+fi

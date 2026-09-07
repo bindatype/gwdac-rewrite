@@ -1,0 +1,63 @@
+Q
+Q
+Q
+go2
+CM12
+Q
+go5
+100 -200
+1
+DSG
+Q
+go3
+2
+A
+90 1 90
+E
+1000
+Q
+Q
+DSG
+995 1005
+Q
+PLOT
+Q
+go2
+CM12
+Q
+go5
+100 -200
+1
+DSG
+Q
+go3
+2
+A
+90 1 90
+E
+100
+Q
+Q
+DSG
+95 105
+Q
+PLOT
+Q
+go3
+2
+A
+90 1 90
+E
+1000
+Q
+Q
+DSG
+995 1005
+Q
+PLOT
+Q
+GO99
+C
+Y
+
+qt

@@ -104,6 +104,11 @@ contains
             message = 'background grid requires a loaded solution'
             return
         end if
+        if (.not. dispatch_state%typed_process_valid) then
+            status = cm12_invalid_argument
+            message = 'typed PRBAS process state is invalidated'
+            return
+        end if
         grid_state%initialized = .true.
         grid_state%reaction = reaction
         grid_state%solution_sha256 = source_sha256

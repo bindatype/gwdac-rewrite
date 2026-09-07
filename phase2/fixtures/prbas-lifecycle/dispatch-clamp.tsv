@@ -1,0 +1,5 @@
+contract	status	message
+dispatch_below_clamp	0	input=1.5000 dither=0.0010 effective=2.0000
+dispatch_at_clamp	0	input=2.0000 dither=none effective=2.0000
+dispatch_above_clamp	0	input=2.5000 dither=none effective=2.5000
+dispatch_dither_then_clamp	0	input=1.9995 dither=-0.0010 effective=2.0000

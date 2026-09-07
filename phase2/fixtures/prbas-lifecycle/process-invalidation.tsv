@@ -1,0 +1,4 @@
+contract	status	message
+process_state_invalidated	0	<empty>
+solution_reload_preserves_invalidation	0	<empty>
+invalidated_grid_rejected	1	typed PRBAS process state is invalidated

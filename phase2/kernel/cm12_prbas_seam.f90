@@ -12,7 +12,7 @@ subroutine prbas
         cm12_request, cm12_request_result
     use cm12_legacy_context, only: &
         legacy_cm12_objects, legacy_cm12_prbas_begin, &
-        legacy_cm12_prbas_commit
+        legacy_cm12_prbas_commit, legacy_cm12_prbas_invalidate
     implicit none
 
     integer :: mtrn
@@ -130,7 +130,7 @@ subroutine prbas
         diagnostic_status == 0 .and. diagnostic_length > 0 .and. &
         diagnostic_value(1:1) == '1') then
         cm12_diagnostic = 1
-        call prbas_legacy
+        call fallback_to_legacy
         return
     end if
     mode_value = ''
@@ -140,18 +140,18 @@ subroutine prbas
     if ( &
         mode_status == 0 .and. mode_length > 0 .and. &
         trim(mode_value) == 'legacy') then
-        call prbas_legacy
+        call fallback_to_legacy
         return
     end if
     if (.not. retained_request_is_valid()) then
-        call prbas_legacy
+        call fallback_to_legacy
         return
     end if
 
     call legacy_cm12_objects(dataset, solution)
     call legacy_cm12_prbas_begin(ir, grid_state, status, message)
     if (status /= cm12_ok) then
-        call prbas_legacy
+        call fallback_to_legacy
         return
     end if
     result_index = 1
@@ -216,6 +216,8 @@ contains
     logical function retained_request_is_valid()
         integer :: energy
         integer :: angle
+        integer :: validation_status
+        character(len=512) :: validation_message
 
         retained_request_is_valid = .false.
         if (transfer(title(1), '    ') /= 'CM12') return
@@ -225,21 +227,19 @@ contains
         if (ne * na > 70) return
         call cm12_validate_prbas_ambient( &
             it, nnl, iprk, bcoff, pem(25, 6, 2, 6), nfg, pg, &
-            status, message)
-        if (status /= cm12_ok) return
+            validation_status, validation_message)
+        if (validation_status /= cm12_ok) return
         do energy = 1, ne
             if ( &
                 .not. ieee_is_finite(e(energy)) .or. &
                 e(energy) <= 0.0_real32) return
             call cm12_calculate_kinematics( &
-                ir, e(energy), validation_kinematics, status, message)
-            if (status /= cm12_ok) return
+                ir, e(energy), validation_kinematics, &
+                validation_status, validation_message)
+            if (validation_status /= cm12_ok) return
             if ( &
                 e(energy) <= &
                 validation_kinematics%threshold_lab_energy_mev) return
-            if ( &
-                validation_kinematics%final_meson_energy_mev < &
-                2.0_real32) return
         end do
         do angle = 1, na
             if ( &
@@ -249,6 +249,11 @@ contains
         end do
         retained_request_is_valid = .true.
     end function retained_request_is_valid
+
+    subroutine fallback_to_legacy()
+        call legacy_cm12_prbas_invalidate
+        call prbas_legacy
+    end subroutine fallback_to_legacy
 
     subroutine stop_after_typed_failure(operation, failure_message)
         character(len=*), intent(in) :: operation

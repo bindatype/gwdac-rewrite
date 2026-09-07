@@ -8,6 +8,7 @@ module cm12_prbas_dispatch
     integer, parameter, public :: cm12_pntest_branch = 7
 
     type, public :: cm12_prbas_dispatch_state
+        logical :: typed_process_valid = .true.
         logical :: background_reset_pending = .true.
         character(len=4) :: current_title = ''
         character(len=4) :: previous_title = ''
@@ -33,6 +34,7 @@ module cm12_prbas_dispatch
 
     public :: cm12_begin_prbas_dispatch
     public :: cm12_initialize_prbas_process
+    public :: cm12_invalidate_prbas_process
     public :: cm12_load_prbas_solution_selector
     public :: cm12_next_prbas_dispatch
     public :: cm12_record_prbas_formula_title
@@ -65,6 +67,14 @@ contains
 
         state = cm12_prbas_dispatch_state()
     end subroutine cm12_initialize_prbas_process
+
+    pure subroutine cm12_invalidate_prbas_process(state, next_state)
+        type(cm12_prbas_dispatch_state), intent(in) :: state
+        type(cm12_prbas_dispatch_state), intent(out) :: next_state
+
+        next_state = state
+        next_state%typed_process_valid = .false.
+    end subroutine cm12_invalidate_prbas_process
 
     pure subroutine cm12_load_prbas_solution_selector( &
         state, solution_selector, next_state, status, message)
@@ -209,6 +219,9 @@ contains
                 input_energy_mev + state%next_dither_mev
             next_state%next_dither_mev = -state%next_dither_mev
             next_state%previous_title = state%current_title
+        end if
+        if (event%effective_energy_mev < 2.0_real32) then
+            event%effective_energy_mev = 2.0_real32
         end if
 
         status = cm12_ok

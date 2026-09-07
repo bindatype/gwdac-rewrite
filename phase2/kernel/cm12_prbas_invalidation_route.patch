@@ -1,0 +1,29 @@
+--- a/cm12_prbas_seam.f90
++++ b/cm12_prbas_seam.f90
+@@ -116,6 +116,7 @@
+     integer :: diagnostic_status
+     character(len=8) :: diagnostic_value
+     integer :: mode_length
++    integer, save :: invalidation_diagnostic_entry_count = 0
+     integer :: mode_status
+     character(len=16) :: mode_value
+     external :: prbas_legacy
+@@ -146,3 +147,6 @@
+     if (.not. retained_request_is_valid()) then
++        write(*, '(a,1x,a4,7(1x,i0),1x,es16.8)') &
++            'CM12INVALIDATION LEGACY REQUEST', &
++            transfer(title(1), '    '), ir0, ir, nnbt, ne, na, it, nnl, e(1)
+         call fallback_to_legacy
+         return
+@@ -153,5 +157,11 @@
+     if (status /= cm12_ok) then
++        write(*, '(a,1x,i0,1x,a)') &
++            'CM12INVALIDATION LEGACY BEGIN', status, trim(message)
+         call fallback_to_legacy
+         return
+     end if
++    invalidation_diagnostic_entry_count = &
++        invalidation_diagnostic_entry_count + 1
++    write(*, '(a,1x,i0)') 'CM12INVALIDATION TYPED ENTRY', &
++        invalidation_diagnostic_entry_count
+     result_index = 1

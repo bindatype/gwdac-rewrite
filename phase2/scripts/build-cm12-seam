@@ -20,6 +20,14 @@ readonly kcm_root="${CM12_KCM_ROOT:-${source_root}/said/KCM.100330}"
 readonly solution_file="${CM12_SOLUTION_FILE:-${source_root}/sdat/prsol.dat}"
 readonly solution_sha256="${CM12_SOLUTION_SHA256:-dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522}"
 readonly pre_dispatch_fixture="${phase2_root}/fixtures/prbas-lifecycle/pre-dispatch-eligibility.tsv"
+readonly dispatch_clamp_fixture="${phase2_root}/fixtures/prbas-lifecycle/dispatch-clamp.tsv"
+readonly process_invalidation_fixture="${phase2_root}/fixtures/prbas-lifecycle/process-invalidation.tsv"
+readonly fallback_reentry_fixture="${phase2_root}/fixtures/prbas-lifecycle/fallback-reentry.in"
+readonly invalid_title_fixture="${phase2_root}/fixtures/prbas-lifecycle/invalid-title.in"
+readonly invalid_title_stub="${kernel_root}/cm12_invalid_title_pntest_stub.c"
+readonly invalidation_route_patch="${kernel_root}/cm12_prbas_invalidation_route.patch"
+readonly lifecycle_trace_patch="${kernel_root}/cm12_prbas_lifecycle_trace.patch"
+readonly invalidation_runner="${phase2_root}/scripts/run-cm12-prbas-invalidation-amendment"
 readonly skip_prsdd_build="${CM12_SKIP_PRSD_BUILD:-0}"
 readonly skip_request_probe="${CM12_SKIP_REQUEST_PROBE:-0}"
 readonly allow_request_probe_mismatch="${CM12_ALLOW_REQUEST_PROBE_MISMATCH:-0}"
@@ -631,19 +639,48 @@ awk -F '\t' '
         $3 == "<empty>" { next }
     NR == 12 && $1 == "solution_reload_preserves_process" && $2 == 0 && \
         $3 == "<empty>" { next }
-    NR == 13 && $1 == "initialize_grid" && $2 == 0 && $3 == "<empty>" { next }
-    NR == 14 && $1 == "reaction_mismatch" && $2 == 1 && \
-        $3 == "background grid state provenance does not match request" { next }
-    NR == 15 && $1 == "original_reaction_reuse" && $2 == 0 && \
+    NR == 13 && $1 == "process_state_invalidated" && $2 == 0 && \
         $3 == "<empty>" { next }
+    NR == 14 && $1 == "solution_reload_preserves_invalidation" && \
+        $2 == 0 && $3 == "<empty>" { next }
+    NR == 15 && $1 == "invalidated_grid_rejected" && $2 == 1 && \
+        $3 == "typed PRBAS process state is invalidated" { next }
+    NR == 16 && $1 == "initialize_grid" && $2 == 0 && $3 == "<empty>" { next }
+    NR == 17 && $1 == "reaction_mismatch" && $2 == 1 && \
+        $3 == "background grid state provenance does not match request" { next }
+    NR == 18 && $1 == "original_reaction_reuse" && $2 == 0 && \
+        $3 == "<empty>" { next }
+    NR == 19 && $1 == "dispatch_below_clamp" && $2 == 0 && \
+        $3 == "input=1.5000 dither=0.0010 effective=2.0000" { next }
+    NR == 20 && $1 == "dispatch_at_clamp" && $2 == 0 && \
+        $3 == "input=2.0000 dither=none effective=2.0000" { next }
+    NR == 21 && $1 == "dispatch_above_clamp" && $2 == 0 && \
+        $3 == "input=2.5000 dither=none effective=2.5000" { next }
+    NR == 22 && $1 == "dispatch_dither_then_clamp" && $2 == 0 && \
+        $3 == "input=1.9995 dither=-0.0010 effective=2.0000" { next }
     { exit 1 }
-    END { if (NR != 15) exit 1 }
+    END { if (NR != 22) exit 1 }
 ' "${prbas_report_root}/negative-contracts.tsv"
 awk -F '\t' 'NR == 1 || $1 ~ /^ambient_/' \
     "${prbas_report_root}/negative-contracts.tsv" \
     >"${probe_build_root}/pre-dispatch-eligibility.tsv"
 cmp "${pre_dispatch_fixture}" \
     "${probe_build_root}/pre-dispatch-eligibility.tsv"
+awk -F '\t' '
+    NR == 1 || $1 ~ /^dispatch_.*clamp$/
+' "${prbas_report_root}/negative-contracts.tsv" \
+    >"${probe_build_root}/dispatch-clamp.tsv"
+cmp "${dispatch_clamp_fixture}" \
+    "${probe_build_root}/dispatch-clamp.tsv"
+awk -F '\t' '
+    NR == 1 ||
+    $1 == "process_state_invalidated" ||
+    $1 == "solution_reload_preserves_invalidation" ||
+    $1 == "invalidated_grid_rejected"
+' "${prbas_report_root}/negative-contracts.tsv" \
+    >"${probe_build_root}/process-invalidation.tsv"
+cmp "${process_invalidation_fixture}" \
+    "${probe_build_root}/process-invalidation.tsv"
 
 "${artifact_root}/cm12-form-diagnostic-probe" \
     "${solution_file}" "${solution_sha256}" "${kcm_root}" \
@@ -699,7 +736,15 @@ fi
         "${kernel_root}/cm12_prbas_dispatch_probe.f90" \
         "${kernel_root}/cm12_prbas_contract_probe.f90" \
         "${kernel_root}/cm12_prsd_pure.patch" \
+        "${invalidation_route_patch}" \
+        "${lifecycle_trace_patch}" \
+        "${invalid_title_stub}" \
+        "${invalidation_runner}" \
         "${pre_dispatch_fixture}" \
+        "${dispatch_clamp_fixture}" \
+        "${process_invalidation_fixture}" \
+        "${fallback_reentry_fixture}" \
+        "${invalid_title_fixture}" \
         "${report_root}/cm12-dataset-loader.tsv" \
         "${report_root}/cm12-dataset-rejection.txt" \
         "${report_root}/cm12-solution-loader.tsv" \

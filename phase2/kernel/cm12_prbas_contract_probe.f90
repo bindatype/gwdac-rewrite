@@ -3,12 +3,14 @@ program cm12_prbas_contract_probe
     use cm12_kernel, only: cm12_invalid_argument, cm12_ok
     use cm12_prbas_dispatch, only: &
         cm12_begin_prbas_dispatch, cm12_load_prbas_solution_selector, &
+        cm12_invalidate_prbas_process, &
         cm12_next_prbas_dispatch, cm12_prbas_dispatch_event, &
         cm12_prbas_dispatch_state, cm12_record_prbas_formula_title, &
         cm12_validate_prbas_ambient
     use cm12_request_kernel, only: &
         cm12_background_grid_state, cm12_prepare_legacy_background, &
         cm12_prepared_background, cm12_request
+    use cm12_non_cm12_seam, only: cm12_begin_background_grid
     use cm12_solution_kernel, only: cm12_solution, load_cm12_solution
     implicit none
 
@@ -148,6 +150,27 @@ program cm12_prbas_contract_probe
     call require_result( &
         'solution_reload_preserves_process', status, message, cm12_ok, '')
 
+    call cm12_invalidate_prbas_process( &
+        dispatch_state, next_dispatch_state)
+    if (next_dispatch_state%typed_process_valid) stop 17
+    status = cm12_ok
+    message = ''
+    call require_result( &
+        'process_state_invalidated', status, message, cm12_ok, '')
+    dispatch_state = next_dispatch_state
+    call cm12_load_prbas_solution_selector( &
+        dispatch_state, 'M05 ', next_dispatch_state, status, message)
+    if (status /= cm12_ok .or. next_dispatch_state%typed_process_valid) stop 18
+    call require_result( &
+        'solution_reload_preserves_invalidation', &
+        status, message, cm12_ok, '')
+    dispatch_state = next_dispatch_state
+    call cm12_begin_background_grid( &
+        solution, 2, dispatch_state, grid_state, status, message)
+    call require_result( &
+        'invalidated_grid_rejected', status, message, cm12_invalid_argument, &
+        'typed PRBAS process state is invalidated')
+
     request = cm12_request( &
         reaction=2, photon_lab_energy_mev=200.0_real32, &
         angle_cm_deg=90.0_real32)
@@ -168,6 +191,74 @@ program cm12_prbas_contract_probe
         solution, request, background, status, message, grid_state=grid_state)
     call require_result( &
         'original_reaction_reuse', status, message, cm12_ok, '')
+
+    solution_title = ''
+    solution_title(57:60) = 'M05 '
+    call cm12_begin_prbas_dispatch( &
+        solution_title, dispatch_state, status, message)
+    if (status /= cm12_ok) stop 19
+    call cm12_next_prbas_dispatch( &
+        dispatch_state, 1, 1, 4, 25, 1.5_real32, dispatch_event, &
+        next_dispatch_state, status, message)
+    if (status /= cm12_ok .or. dispatch_event%dispatch) stop 20
+    dispatch_state = next_dispatch_state
+    call cm12_next_prbas_dispatch( &
+        dispatch_state, 1, 1, 5, 25, 1.5_real32, dispatch_event, &
+        next_dispatch_state, status, message)
+    if ( &
+        status /= cm12_ok .or. .not. dispatch_event%dispatch .or. &
+        dispatch_event%effective_energy_mev /= 2.0_real32 .or. &
+        dispatch_event%dither_before_mev /= 0.001_real32 .or. &
+        next_dispatch_state%next_dither_mev /= -0.001_real32) stop 21
+    message = 'input=1.5000 dither=0.0010 effective=2.0000'
+    call require_result( &
+        'dispatch_below_clamp', status, message, cm12_ok, &
+        'input=1.5000 dither=0.0010 effective=2.0000')
+
+    call cm12_record_prbas_formula_title( &
+        next_dispatch_state, 'M05 ', dispatch_state, status, message)
+    if (status /= cm12_ok) stop 22
+    call cm12_next_prbas_dispatch( &
+        dispatch_state, 1, 2, 1, 21, 2.0_real32, dispatch_event, &
+        next_dispatch_state, status, message)
+    if ( &
+        status /= cm12_ok .or. .not. dispatch_event%dispatch .or. &
+        dispatch_event%effective_energy_mev /= 2.0_real32 .or. &
+        dispatch_event%dither_before_mev /= -0.001_real32 .or. &
+        next_dispatch_state%next_dither_mev /= -0.001_real32) stop 23
+    message = 'input=2.0000 dither=none effective=2.0000'
+    call require_result( &
+        'dispatch_at_clamp', status, message, cm12_ok, &
+        'input=2.0000 dither=none effective=2.0000')
+
+    dispatch_state = next_dispatch_state
+    call cm12_next_prbas_dispatch( &
+        dispatch_state, 1, 2, 2, 21, 2.5_real32, dispatch_event, &
+        next_dispatch_state, status, message)
+    if ( &
+        status /= cm12_ok .or. .not. dispatch_event%dispatch .or. &
+        dispatch_event%effective_energy_mev /= 2.5_real32 .or. &
+        next_dispatch_state%next_dither_mev /= -0.001_real32) stop 24
+    message = 'input=2.5000 dither=none effective=2.5000'
+    call require_result( &
+        'dispatch_above_clamp', status, message, cm12_ok, &
+        'input=2.5000 dither=none effective=2.5000')
+
+    call cm12_load_prbas_solution_selector( &
+        next_dispatch_state, 'SP00', dispatch_state, status, message)
+    if (status /= cm12_ok) stop 25
+    call cm12_next_prbas_dispatch( &
+        dispatch_state, 1, 2, 3, 21, 1.9995_real32, dispatch_event, &
+        next_dispatch_state, status, message)
+    if ( &
+        status /= cm12_ok .or. .not. dispatch_event%dispatch .or. &
+        dispatch_event%effective_energy_mev /= 2.0_real32 .or. &
+        dispatch_event%dither_before_mev /= -0.001_real32 .or. &
+        next_dispatch_state%next_dither_mev /= 0.001_real32) stop 26
+    message = 'input=1.9995 dither=-0.0010 effective=2.0000'
+    call require_result( &
+        'dispatch_dither_then_clamp', status, message, cm12_ok, &
+        'input=1.9995 dither=-0.0010 effective=2.0000')
 
 contains
 
