@@ -191,7 +191,36 @@ extract_marker 'CM12DIAG ACCUM' 31 "${accumulation_header}" \
 extract_marker 'CM12TYPED FINAL' 17 "${final_header}" \
     "${report_root}/typed.stdout" "${report_root}/typed-final.tsv"
 extract_marker 'CM12DIAG RESULT' 17 "${final_header}" \
-    "${report_root}/forced-legacy.stdout" "${report_root}/forced-legacy-final.tsv"
+    "${report_root}/forced-legacy.stdout" \
+    "${report_root}/forced-legacy-final-all.tsv"
+
+# The retained caller invokes PROBS a second time while formatting each block.
+# Preserve every trace row, audit the duplicate, and compare one result per key.
+awk -F '\t' -v OFS='\t' \
+    -v canonical="${report_root}/forced-legacy-final.tsv" \
+    -v duplicates="${report_root}/forced-legacy-final-duplicates.tsv" '
+    NR == 1 {
+        print $0 > canonical
+        print "call_id", "energy_index", "angle_index", "reaction", \
+            "occurrence", "exact_duplicate" > duplicates
+        next
+    }
+    {
+        key = $1 SUBSEP $2 SUBSEP $3 SUBSEP $4
+        occurrence[key]++
+        if (occurrence[key] == 1) {
+            retained[key] = $0
+            print $0 >> canonical
+        } else {
+            exact = ("x" retained[key] == "x" $0 ? "yes" : "no")
+            print $1, $2, $3, $4, occurrence[key], exact >> duplicates
+        }
+    }
+    END {
+        close(canonical)
+        close(duplicates)
+    }
+' "${report_root}/forced-legacy-final-all.tsv"
 
 awk -F '\t' 'BEGIN { OFS = "\t" } NR == 1 || $6 != 0' \
     "${report_root}/typed-grid.tsv" >"${report_root}/typed-active-grid.tsv"
@@ -398,11 +427,36 @@ readonly typed_go5_rows="$(($(wc -l <"${report_root}/typed-go5.tsv") - 1))"
 readonly forced_go5_rows="$(($(wc -l <"${report_root}/forced-legacy-go5.tsv") - 1))"
 readonly typed_calls="$(awk -F '\t' 'NR > 1 { seen[$1] = 1 } END { for (key in seen) n++; print n + 0 }' "${report_root}/typed-grid.tsv")"
 readonly forced_calls="$(awk -F '\t' 'NR > 1 { seen[$1] = 1 } END { for (key in seen) n++; print n + 0 }' "${report_root}/forced-legacy-grid.tsv")"
+readonly typed_final_rows="$(($(wc -l <"${report_root}/typed-final.tsv") - 1))"
+readonly forced_final_rows="$(($(wc -l <"${report_root}/forced-legacy-final.tsv") - 1))"
+readonly forced_final_all_rows="$(($(wc -l <"${report_root}/forced-legacy-final-all.tsv") - 1))"
+readonly forced_final_duplicates="$(($(wc -l <"${report_root}/forced-legacy-final-duplicates.tsv") - 1))"
+readonly forced_final_inexact_duplicates="$(awk -F '\t' 'NR > 1 && $6 != "yes" { n++ } END { print n + 0 }' "${report_root}/forced-legacy-final-duplicates.tsv")"
+
+{
+    printf 'metric\tobserved\texpected\tclassification\n'
+    printf 'forced_legacy_all_result_rows\t%s\t3068\t%s\n' \
+        "${forced_final_all_rows}" \
+        "$([[ "${forced_final_all_rows}" -eq 3068 ]] && printf PASS || printf FAIL)"
+    printf 'forced_legacy_canonical_result_rows\t%s\t1534\t%s\n' \
+        "${forced_final_rows}" \
+        "$([[ "${forced_final_rows}" -eq 1534 ]] && printf PASS || printf FAIL)"
+    printf 'forced_legacy_duplicate_rows\t%s\t1534\t%s\n' \
+        "${forced_final_duplicates}" \
+        "$([[ "${forced_final_duplicates}" -eq 1534 ]] && printf PASS || printf FAIL)"
+    printf 'forced_legacy_inexact_duplicates\t%s\t0\t%s\n' \
+        "${forced_final_inexact_duplicates}" \
+        "$([[ "${forced_final_inexact_duplicates}" -eq 0 ]] && printf PASS || printf FAIL)"
+} >"${report_root}/forced-legacy-final-duplicate-summary.tsv"
 
 structural_status=PASS
 if [[ "${typed_exit}" -ne 0 || "${forced_exit}" -ne 0 || \
     "${typed_go5_rows}" -ne 1533 || "${forced_go5_rows}" -ne 1533 || \
-    "${typed_calls}" -ne 133 || "${forced_calls}" -ne 133 ]]; then
+    "${typed_calls}" -ne 133 || "${forced_calls}" -ne 133 || \
+    "${typed_final_rows}" -ne 1534 || "${forced_final_rows}" -ne 1534 || \
+    "${forced_final_all_rows}" -ne 3068 || \
+    "${forced_final_duplicates}" -ne 1534 || \
+    "${forced_final_inexact_duplicates}" -ne 0 ]]; then
     structural_status=FAIL
 fi
 while IFS=$'\t' read -r boundary typed_rows reference_rows missing_rows \
@@ -444,6 +498,7 @@ done
     printf 'timezone=America/New_York\n'
     printf 'comparison_order=retained_execution_order_no_sorting\n'
     printf 'inactive_grid_slots=retained_for_context_not_behavioral_gate\n'
+    printf 'forced_legacy_result_duplicates=retained_and_exactness_audited\n'
     . /etc/os-release
     printf 'container_os=%s\n' "${PRETTY_NAME}"
 } >"${report_root}/run-context.txt"
@@ -456,7 +511,7 @@ gzip -n -f "${report_root}/typed.stdout" "${report_root}/forced-legacy.stdout"
 )
 
 printf 'Structural validation: %s\n' "${structural_status}"
-column -t -s $'\t' "${report_root}/boundary-summary.tsv"
+cat "${report_root}/boundary-summary.tsv"
 if [[ "${structural_status}" != PASS ]]; then
     exit 1
 fi
