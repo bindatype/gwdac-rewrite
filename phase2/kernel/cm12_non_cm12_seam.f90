@@ -160,6 +160,8 @@ contains
             parameter_count, family_count, branch_count, partial_wave_count)
         real(real32) :: formula_energy
         real(real32) :: formula_born_multipole
+        real(real32) :: hadronic_real
+        real(real32) :: hadronic_imag
         integer :: pion_title(13)
         integer :: family
         integer :: branch
@@ -284,6 +286,8 @@ contains
                     if (status /= cm12_ok) return
                     dispatch_state = next_dispatch_state
                     formula_title = ''
+                    hadronic_real = 0.0_real32
+                    hadronic_imag = 0.0_real32
                     if (dispatch%dispatch) then
                         formula_energy = dispatch%effective_energy_mev
                         ! PNTEST retains an internal cache; that frozen formula
@@ -293,19 +297,19 @@ contains
                             pntest_formula_title, pion_title(1))
                         call pntest( &
                             formula_energy, 0, pion_real, pion_imag, pion_title)
+                        hadronic_real = pion_real( &
+                            dispatch%state_index, dispatch%legacy_l)
+                        hadronic_imag = pion_imag( &
+                            dispatch%state_index, dispatch%legacy_l)
                         call cm12_apply_pnpwi_threshold_rescaling( &
                             dispatch%input_energy_mev, dispatch%orbital_l, &
-                            pion_real(dispatch%state_index, dispatch%legacy_l), &
-                            pion_imag(dispatch%state_index, dispatch%legacy_l))
+                            hadronic_real, hadronic_imag)
                         formula_title = transfer(pion_title(1), formula_title)
                         call cm12_record_prbas_formula_title( &
                             dispatch_state, formula_title, next_dispatch_state, &
                             status, message)
                         if (status /= cm12_ok) return
                         dispatch_state = next_dispatch_state
-                    else
-                        pion_real = 0.0_real32
-                        pion_imag = 0.0_real32
                     end if
                     formula_born_multipole = &
                         born_multipoles(family, branch, orbital_l + 1)
@@ -315,21 +319,18 @@ contains
                     call evaluate_legacy_form( &
                         form_selector, &
                         parameters_grid(:, family, branch, orbital_l + 1), &
-                        family, branch, &
                         orbital_l, dispatch%pre_reset_energy_mev, &
                         dispatch%input_energy_mev, kinematics, &
                         formula_born_multipole, &
                         opec_multipoles(family, branch, orbital_l + 1), &
-                        pion_real, pion_imag, &
+                        hadronic_real, hadronic_imag, &
                         multipoles(family, branch, orbital_l + 1), form_trace)
                     if (present(trace)) then
                         trace(current_trace_count)%dispatch = dispatch
                         trace(current_trace_count)%form = form_trace
                         trace(current_trace_count)%formula_title = formula_title
-                        trace(current_trace_count)%hadronic_real = pion_real( &
-                            dispatch%state_index, dispatch%legacy_l)
-                        trace(current_trace_count)%hadronic_imag = pion_imag( &
-                            dispatch%state_index, dispatch%legacy_l)
+                        trace(current_trace_count)%hadronic_real = hadronic_real
+                        trace(current_trace_count)%hadronic_imag = hadronic_imag
                     end if
                 end do
             end do
@@ -346,22 +347,20 @@ contains
     end subroutine cm12_prepare_non_cm12_multipoles
 
     subroutine evaluate_legacy_form( &
-        form_selector, parameters, family, branch, orbital_l, &
+        form_selector, parameters, orbital_l, &
         pre_reset_pion_lab_energy, pion_lab_energy, kinematics, &
-        born_multipole, opec_multipole, pion_real, pion_imag, &
+        born_multipole, opec_multipole, hadronic_real, hadronic_imag, &
         adjusted_multipole, field_trace)
         integer, intent(in) :: form_selector
         real(real32), intent(in) :: parameters(parameter_count)
-        integer, intent(in) :: family
-        integer, intent(in) :: branch
         integer, intent(in) :: orbital_l
         real(real32), intent(in) :: pre_reset_pion_lab_energy
         real(real32), intent(in) :: pion_lab_energy
         type(cm12_kinematics), intent(in) :: kinematics
         real(real32), intent(in) :: born_multipole
         real(real32), intent(in) :: opec_multipole
-        real(real32), intent(in) :: pion_real(4, 8)
-        real(real32), intent(in) :: pion_imag(4, 8)
+        real(real32), intent(in) :: hadronic_real
+        real(real32), intent(in) :: hadronic_imag
         complex(real32), intent(out) :: adjusted_multipole
         type(cm12_prdlt_field_trace), intent(out) :: field_trace
 
@@ -386,21 +385,14 @@ contains
         real(real32) :: phase
         real(real32) :: cosine
         real(real32) :: sine
-        real(real32) :: hadronic_real
-        real(real32) :: hadronic_imag
         integer :: base_form
         integer :: rotation_form
-        integer :: pion_state
         integer :: legacy_l
         integer :: extra_power
 
         field_trace = cm12_prdlt_field_trace()
 
         legacy_l = orbital_l + 1
-        pion_state = branch
-        if (family <= 2) pion_state = pion_state + 2
-        hadronic_real = pion_real(pion_state, legacy_l)
-        hadronic_imag = pion_imag(pion_state, legacy_l)
 
         base_form = mod(form_selector, 10)
         rotation_form = form_selector / 10
