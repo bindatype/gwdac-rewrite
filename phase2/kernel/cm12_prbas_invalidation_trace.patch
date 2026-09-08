@@ -1,13 +1,13 @@
 --- a/cm12_prbas_dispatch.f90
 +++ b/cm12_prbas_dispatch.f90
-@@ -27,6 +27,7 @@
+@@ -27,5 +27,6 @@
          character(len=4) :: previous_title = ''
          real(real32) :: pre_reset_energy_mev = 0.0_real32
 +        real(real32) :: post_reset_energy_mev = 0.0_real32
          real(real32) :: input_energy_mev = 0.0_real32
          real(real32) :: effective_energy_mev = 0.0_real32
          real(real32) :: dither_before_mev = 0.0_real32
-@@ -191,6 +192,7 @@
+@@ -191,5 +192,6 @@
          event = cm12_prbas_dispatch_event()
          next_state = state
 +        event%post_reset_energy_mev = input_energy_mev
