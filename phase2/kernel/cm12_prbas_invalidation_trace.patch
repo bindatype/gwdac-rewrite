@@ -16,7 +16,13 @@
        Z=EPX/WPI
        IF(NNF.GT.4) Z=EPX/(800.0+EPX)
        IF(BCOFF.NE.BCOFFM) EPX=0.0
-@@ -2465,7 +2466,8 @@
+@@ -2461,12 +2462,13 @@
+       NL=10*N+LL-1
+       CM12ACTIVE=0
+-      IF(CM12DIAG.EQ.1.AND.IR.EQ.2) THEN
++      IF(CM12DIAG.EQ.1) THEN
+          CM12ACTIVE=1
+          CM12ROW=CM12ROW+1
           CM12MM=MM
           CM12JJ=JJ
           CM12LL=LL

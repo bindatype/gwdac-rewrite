@@ -1,0 +1,172 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly state_root="${PRBAS_LOW_ENERGY_STATE_ROOT:-/workspace/phase2/prbas-low-energy-same-call}"
+readonly report_root="${PRBAS_LOW_ENERGY_REPORT_ROOT:-${state_root}/capture}"
+readonly executable="${PRBAS_LOW_ENERGY_BINARY:?set PRBAS_LOW_ENERGY_BINARY to the trace executable}"
+readonly product_commit="${PRBAS_LOW_ENERGY_PRODUCT_COMMIT:?set PRBAS_LOW_ENERGY_PRODUCT_COMMIT to the support commit}"
+readonly typed_parser="${phase2_root}/scripts/parse-cm12-typed-lifecycle-aligned.awk"
+readonly legacy_parser="${phase2_root}/scripts/parse-cm12-legacy-lifecycle-aligned.awk"
+readonly comparator="${phase2_root}/scripts/compare-cm12-prbas-lifecycle-aligned.awk"
+readonly trace_patch="${phase2_root}/kernel/cm12_prbas_invalidation_trace.patch"
+readonly fixture="${phase1_root}/fixtures/go3pr2-production-adapter/live.in"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly data_root="${source_root}/sdat"
+readonly solution_file="${data_root}/prsol.dat"
+readonly solution_sha256=dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-300}"
+
+if [[ -e "${report_root}" ]]; then
+    printf 'Low-energy report root already exists: %s\n' "${report_root}" >&2
+    exit 2
+fi
+mkdir -p "${report_root}" "${state_root}/runs"
+test -x "${executable}"
+test -f "${typed_parser}"
+test -f "${legacy_parser}"
+test -f "${comparator}"
+test -f "${trace_patch}"
+test -f "${fixture}"
+
+run_case() {
+    local label="$1"
+    local force_legacy="$2"
+    local run_root
+    local status
+    local -a environment
+
+    run_root="$(mktemp -d "${state_root}/runs/${label}.XXXXXX")"
+    cp -a "${source_root}/pr" "${run_root}/pr"
+    rm -f \
+        "${run_root}/pr/SAID.TMP" \
+        "${run_root}/pr/SAID.PCT" \
+        "${run_root}/pr/SAID.LOG" \
+        "${run_root}/pr/SAID.PS" \
+        "${run_root}/pr/fort.3" \
+        "${run_root}/pr/fort.7"
+    ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+    ln -s "${data_root}" "${run_root}/sdat"
+
+    environment=(
+        "CM12_KCM_ROOT=${kcm_root}"
+        "CM12_SOLUTION_FILE=${solution_file}"
+        "CM12_SOLUTION_SHA256=${solution_sha256}"
+        "CM12_SOLUTION_ID=CM12"
+        "SAID_DATA_ROOT=${data_root}"
+        "TZ=America/New_York"
+    )
+    if [[ "${force_legacy}" == yes ]]; then
+        environment+=("CM12_FORCE_LEGACY_PRBAS=1")
+    fi
+
+    set +e
+    (
+        cd "${run_root}/pr"
+        timeout "${timeout_seconds}" env -u CM12_PRBAS_MODE \
+            "${environment[@]}" "${executable}" <"${fixture}" \
+            >"${report_root}/${label}.stdout" \
+            2>"${report_root}/${label}.stderr"
+    )
+    status=$?
+    set -e
+    printf '%s\n' "${status}" >"${report_root}/${label}.exit"
+}
+
+run_case typed no
+run_case forced-legacy yes
+
+awk -f "${typed_parser}" "${report_root}/typed.stdout" \
+    >"${report_root}/typed-all.tsv"
+awk -f "${legacy_parser}" "${report_root}/forced-legacy.stdout" \
+    >"${report_root}/forced-legacy-all.tsv"
+
+awk -F '\t' 'NR == 1 || $1 == 1' "${report_root}/typed-all.tsv" \
+    >"${report_root}/typed-call-1.tsv"
+awk -F '\t' 'NR == 1 || $1 == 1' "${report_root}/forced-legacy-all.tsv" \
+    >"${report_root}/forced-legacy-call-1.tsv"
+awk -f "${comparator}" \
+    "${report_root}/typed-call-1.tsv" \
+    "${report_root}/forced-legacy-call-1.tsv" \
+    >"${report_root}/call-1-comparison.tsv"
+
+readonly typed_exit="$(cat "${report_root}/typed.exit")"
+readonly legacy_exit="$(cat "${report_root}/forced-legacy.exit")"
+readonly typed_calls="$(awk -F '\t' 'NR > 1 { seen[$1] = 1 } END { for (key in seen) count++; print count + 0 }' "${report_root}/typed-all.tsv")"
+readonly legacy_calls="$(awk -F '\t' 'NR > 1 { seen[$1] = 1 } END { for (key in seen) count++; print count + 0 }' "${report_root}/forced-legacy-all.tsv")"
+readonly typed_rows="$(($(wc -l <"${report_root}/typed-call-1.tsv") - 1))"
+readonly legacy_rows="$(($(wc -l <"${report_root}/forced-legacy-call-1.tsv") - 1))"
+readonly exact_rows="$(awk -F '\t' 'NR > 1 && $27 == "yes" { count++ } END { print count + 0 }' "${report_root}/call-1-comparison.tsv")"
+readonly typed_pre_reset="$(awk -F '\t' 'NR == 2 { print $15 }' "${report_root}/typed-call-1.tsv")"
+readonly legacy_pre_reset="$(awk -F '\t' 'NR == 2 { print $10 }' "${report_root}/forced-legacy-call-1.tsv")"
+readonly typed_effective="$(awk -F '\t' 'NR == 3 { print $18 }' "${report_root}/typed-call-1.tsv")"
+readonly legacy_effective="$(awk -F '\t' 'NR == 3 { print $17 }' "${report_root}/forced-legacy-call-1.tsv")"
+
+structural_status=PASS
+if [[ "${typed_exit}" -ne 0 || "${legacy_exit}" -ne 0 || \
+    "${typed_calls}" -ne 133 || "${legacy_calls}" -ne 133 || \
+    "${typed_rows}" -ne 26 || "${legacy_rows}" -ne 26 ]]; then
+    structural_status=FAIL
+fi
+readonly structural_status
+
+comparison_status=DIFFERENT
+if [[ "${exact_rows}" -eq 26 ]]; then
+    comparison_status=EXACT
+fi
+readonly comparison_status
+
+{
+    printf 'metric\tobserved\treference\tclassification\n'
+    printf 'typed_exit\t%s\t0\t%s\n' "${typed_exit}" "$([[ "${typed_exit}" -eq 0 ]] && printf PASS || printf FAIL)"
+    printf 'forced_legacy_exit\t%s\t0\t%s\n' "${legacy_exit}" "$([[ "${legacy_exit}" -eq 0 ]] && printf PASS || printf FAIL)"
+    printf 'typed_trace_calls\t%s\t133\t%s\n' "${typed_calls}" "$([[ "${typed_calls}" -eq 133 ]] && printf PASS || printf FAIL)"
+    printf 'forced_legacy_trace_calls\t%s\t133\t%s\n' "${legacy_calls}" "$([[ "${legacy_calls}" -eq 133 ]] && printf PASS || printf FAIL)"
+    printf 'typed_call_1_rows\t%s\t26\t%s\n' "${typed_rows}" "$([[ "${typed_rows}" -eq 26 ]] && printf PASS || printf FAIL)"
+    printf 'forced_legacy_call_1_rows\t%s\t26\t%s\n' "${legacy_rows}" "$([[ "${legacy_rows}" -eq 26 ]] && printf PASS || printf FAIL)"
+    printf 'typed_call_1_pre_reset_energy_mev\t%s\t%s\tCAPTURED\n' "${typed_pre_reset}" "${legacy_pre_reset}"
+    printf 'forced_legacy_call_1_pre_reset_energy_mev\t%s\t%s\tCAPTURED\n' "${legacy_pre_reset}" "${typed_pre_reset}"
+    printf 'typed_call_1_dispatched_effective_energy_mev\t%s\t%s\tCAPTURED\n' "${typed_effective}" "${legacy_effective}"
+    printf 'forced_legacy_call_1_dispatched_effective_energy_mev\t%s\t%s\tCAPTURED\n' "${legacy_effective}" "${typed_effective}"
+    printf 'call_1_exact_rows\t%s\t26\t%s\n' "${exact_rows}" "${comparison_status}"
+    printf 'structural_validation\t%s\tPASS\t%s\n' "${structural_status}" "${structural_status}"
+} >"${report_root}/summary.tsv"
+
+{
+    printf 'first_field\trows\n'
+    awk -F '\t' 'NR > 1 && $27 == "no" { count[$28]++ } END { for (key in count) print key "\t" count[key] }' \
+        "${report_root}/call-1-comparison.tsv" | sort
+} >"${report_root}/difference-counts.tsv"
+
+{
+    printf 'evidence_label=captured/reference-candidate-diagnostic\n'
+    printf 'product_support_commit=%s\n' "${product_commit}"
+    printf 'archived_source_commit=%s\n' "$(git -C "${source_root}" rev-parse HEAD)"
+    printf 'executable_sha256=%s\n' "$(sha256sum "${executable}" | awk '{print $1}')"
+    printf 'fixture_sha256=%s\n' "$(sha256sum "${fixture}" | awk '{print $1}')"
+    printf 'trace_patch_sha256=%s\n' "$(sha256sum "${trace_patch}" | awk '{print $1}')"
+    printf 'runner_sha256=%s\n' "$(sha256sum "${phase2_root}/scripts/run-cm12-prbas-low-energy-same-call" | awk '{print $1}')"
+    printf 'timezone=America/New_York\n'
+    . /etc/os-release
+    printf 'container_os=%s\n' "${PRETTY_NAME}"
+} >"${report_root}/run-context.txt"
+
+gzip -n -f "${report_root}/typed.stdout" "${report_root}/forced-legacy.stdout"
+(
+    cd "${report_root}"
+    find . -maxdepth 1 -type f ! -name manifest.sha256 -print0 | \
+        sort -z | xargs -0 sha256sum >manifest.sha256
+)
+
+printf 'Same-call structural validation: %s\n' "${structural_status}"
+printf 'Call 1 exact rows: %s/26 (%s)\n' "${exact_rows}" "${comparison_status}"
+printf 'Typed/legacy trace calls: %s/%s\n' "${typed_calls}" "${legacy_calls}"
+printf 'Typed/legacy pre-reset energy: %s/%s MeV\n' \
+    "${typed_pre_reset}" "${legacy_pre_reset}"
+printf 'Evidence: %s\n' "${report_root}"
+
+if [[ "${structural_status}" != PASS ]]; then
+    exit 1
+fi

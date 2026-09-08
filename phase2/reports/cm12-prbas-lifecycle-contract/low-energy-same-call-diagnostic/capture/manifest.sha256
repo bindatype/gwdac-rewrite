@@ -1,0 +1,14 @@
+063929e19d89b65cdfe4e1a695782e3958369350c3b56f11eac910c328eff4bf  ./call-1-comparison.tsv
+b49c86ab6c43dcebc14610b605c879269f45f7b7f7af249cd903c1ad1b9013ae  ./difference-counts.tsv
+a9d1d1b2a5520eb812d5f5a57b5a1e558f06cab3205ef725f258aa7f6eea8161  ./forced-legacy-all.tsv
+dd9ccf532c9cff00a4267de9ef8aecbb27039cf6d872aedd28ad7770a26af9fc  ./forced-legacy-call-1.tsv
+9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  ./forced-legacy.exit
+cde5e7d17e64813704a51a756095eaf585d28601c664fa68a1f27038b6399fcc  ./forced-legacy.stderr
+c2992289dfdc8e9543fd1291d38c760f9d99299dfee5b5d0c217acd2ddef3854  ./forced-legacy.stdout.gz
+1ef7cfa79d6ebbee3a8f676450f8f02fe76dd6b54b750babc121ae32efc88c0d  ./run-context.txt
+0e84f86f27763a7ef729fd97c80722c2f5dbc555c41f289aa72e04b23d3182a7  ./summary.tsv
+ab519a79e94a1e8b445536cdba7a58e321cf77a154668cf134051edcd9822d19  ./typed-all.tsv
+0a81d095ff356e7f583c3b5870318e4314ad01172f5f3c6d0f3f8673717a213c  ./typed-call-1.tsv
+9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  ./typed.exit
+cde5e7d17e64813704a51a756095eaf585d28601c664fa68a1f27038b6399fcc  ./typed.stderr
+b18c2ffde7c82de590a15a8e65e204617f57534d73cdc280d128ac52e614c86b  ./typed.stdout.gz
