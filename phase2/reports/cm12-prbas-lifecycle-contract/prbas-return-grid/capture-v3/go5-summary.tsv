@@ -1,0 +1,2 @@
+boundary	typed_rows	forced_legacy_rows	missing_forced_legacy_rows	extra_forced_legacy_rows	key_fields	key_exact	metadata_fields	metadata_exact	value_fields	value_exact	first_difference
+go5	1533	1533	0	0	1533	1533	1533	1533	6132	5923	row=1,field=predicted_obs,kind=value,typed=0.14356E-03,forced_legacy=0.14353E-03

@@ -1,0 +1,2 @@
+boundary	typed_rows	forced_legacy_rows	missing_forced_legacy_rows	extra_forced_legacy_rows	key_fields	key_exact	metadata_fields	metadata_exact	value_fields	value_exact	first_difference
+final	1534	1534	0	0	4602	4602	1534	1534	16874	7533	row=1,field=a1_real,kind=value,typed=1.6423363983631134E-001,forced_legacy=1.6424684226512909E-001

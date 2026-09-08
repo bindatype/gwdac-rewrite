@@ -1,0 +1,2 @@
+boundary	typed_rows	forced_legacy_rows	missing_forced_legacy_rows	extra_forced_legacy_rows	key_fields	key_exact	metadata_fields	metadata_exact	value_fields	value_exact	first_difference
+full_grid	9576	9576	0	0	47880	47880	9576	9576	28728	17741	row=3,field=multipole_real,kind=value,typed=-2.0869076251983643E-003,forced_legacy=-3.6126498132944107E-002

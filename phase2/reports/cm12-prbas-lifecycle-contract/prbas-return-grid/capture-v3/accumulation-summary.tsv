@@ -1,0 +1,2 @@
+boundary	typed_rows	forced_legacy_rows	missing_forced_legacy_rows	extra_forced_legacy_rows	key_fields	key_exact	metadata_fields	metadata_exact	value_fields	value_exact	first_difference
+accumulation	61360	61360	0	0	306800	306800	245440	245440	1227200	565252	row=1,field=multipole_real,kind=value,typed=-2.0869076251983643E-003,forced_legacy=-2.0802021026611328E-003

@@ -1,0 +1,5 @@
+metric	observed	expected	classification
+forced_legacy_all_result_rows	3068	3068	PASS
+forced_legacy_canonical_result_rows	1534	1534	PASS
+forced_legacy_duplicate_rows	1534	1534	PASS
+forced_legacy_inexact_duplicates	0	0	PASS
