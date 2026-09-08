@@ -3,7 +3,8 @@ module cm12_non_cm12_seam
     use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     use cm12_kernel, only: cm12_invalid_argument, cm12_ok
     use cm12_prbas_dispatch, only: &
-        cm12_begin_prbas_dispatch, cm12_next_prbas_dispatch, &
+        cm12_apply_pnpwi_threshold_rescaling, cm12_begin_prbas_dispatch, &
+        cm12_next_prbas_dispatch, &
         cm12_prbas_dispatch_event, cm12_prbas_dispatch_state, &
         cm12_record_prbas_formula_title
     use cm12_solution_kernel, only: &
@@ -292,6 +293,10 @@ contains
                             pntest_formula_title, pion_title(1))
                         call pntest( &
                             formula_energy, 0, pion_real, pion_imag, pion_title)
+                        call cm12_apply_pnpwi_threshold_rescaling( &
+                            dispatch%input_energy_mev, dispatch%orbital_l, &
+                            pion_real(dispatch%state_index, dispatch%legacy_l), &
+                            pion_imag(dispatch%state_index, dispatch%legacy_l))
                         formula_title = transfer(pion_title(1), formula_title)
                         call cm12_record_prbas_formula_title( &
                             dispatch_state, formula_title, next_dispatch_state, &

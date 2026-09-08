@@ -33,6 +33,7 @@ module cm12_prbas_dispatch
     end type cm12_prbas_dispatch_event
 
     public :: cm12_begin_prbas_dispatch
+    public :: cm12_apply_pnpwi_threshold_rescaling
     public :: cm12_initialize_prbas_process
     public :: cm12_invalidate_prbas_process
     public :: cm12_load_prbas_solution_selector
@@ -41,6 +42,24 @@ module cm12_prbas_dispatch
     public :: cm12_validate_prbas_ambient
 
 contains
+
+    pure subroutine cm12_apply_pnpwi_threshold_rescaling( &
+        input_energy_mev, orbital_l, hadronic_real, hadronic_imag)
+        real(real32), intent(in) :: input_energy_mev
+        integer, intent(in) :: orbital_l
+        real(real32), intent(inout) :: hadronic_real
+        real(real32), intent(inout) :: hadronic_imag
+
+        real(real32) :: energy_ratio
+
+        if (input_energy_mev >= 2.0_real32) return
+        energy_ratio = input_energy_mev / 2.0_real32
+        hadronic_real = hadronic_real * sqrt(energy_ratio)
+        hadronic_imag = hadronic_imag * energy_ratio
+        if (orbital_l == 0) return
+        hadronic_real = hadronic_real * energy_ratio ** orbital_l
+        hadronic_imag = hadronic_imag * energy_ratio ** (2 * orbital_l)
+    end subroutine cm12_apply_pnpwi_threshold_rescaling
 
     pure subroutine cm12_begin_prbas_dispatch( &
         solution_title, state, status, message)
