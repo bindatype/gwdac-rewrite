@@ -1,0 +1,460 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly candidate_root="${GWDAC_CANDIDATE_ROOT:?set GWDAC_CANDIDATE_ROOT to the mounted candidate checkout}"
+readonly state_root="${PRBAS_RETURN_GRID_STATE_ROOT:-/workspace/phase2/prbas-return-grid}"
+readonly report_root="${PRBAS_RETURN_GRID_REPORT_ROOT:-${phase2_root}/reports/cm12-prbas-lifecycle-contract/prbas-return-grid/capture}"
+readonly base_patch="${phase2_root}/kernel/cm12_prbas_invalidation_trace.patch"
+readonly selector_patch="${phase2_root}/kernel/cm12_prbas_prdlt_all_forms_trace.patch"
+readonly grid_patch="${phase2_root}/kernel/cm12_prbas_return_grid_trace.patch"
+readonly combined_patch="${state_root}/cm12_prbas_return_grid_combined.patch"
+readonly fixture="${phase1_root}/fixtures/go3pr2-production-adapter/live.in"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly data_root="${source_root}/sdat"
+readonly solution_file="${data_root}/prsol.dat"
+readonly solution_sha256=dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-300}"
+readonly candidate_head="$(git -c safe.directory='*' -C "${candidate_root}" rev-parse HEAD)"
+readonly product_change_commit="$(git -c safe.directory='*' -C "${candidate_root}" log -1 --format=%H -- \
+    phase2/kernel/cm12_kernel.f90 \
+    phase2/kernel/cm12_solution.f90 \
+    phase2/kernel/cm12_background_seam.f90 \
+    phase2/kernel/cm12_prbas_dispatch.f90 \
+    phase2/kernel/cm12_non_cm12_seam.f90 \
+    phase2/kernel/cm12_request_kernel.f90 \
+    phase2/kernel/cm12_legacy_context.f90 \
+    phase2/kernel/cmmwp_seam.f90 \
+    phase2/kernel/cm12_prda_probs_seam.f90 \
+    phase2/kernel/cm12_prbas_seam.f90)"
+readonly diagnostic_change_commit="$(git -c safe.directory='*' -C "${candidate_root}" log -1 --format=%H -- \
+    phase2/kernel/cm12_prbas_invalidation_trace.patch \
+    phase2/kernel/cm12_prbas_prdlt_all_forms_trace.patch \
+    phase2/kernel/cm12_prbas_return_grid_trace.patch \
+    phase2/scripts/run-cm12-prbas-return-grid-diagnostic)"
+readonly short_source_commit="$(git -C "${source_root}" rev-parse --short=12 HEAD)"
+readonly build_state_root="${state_root}/build"
+readonly build_report_root="${state_root}/build-report"
+readonly executable="${build_state_root}/artifacts/${short_source_commit}/prsdd-headless"
+
+if [[ -n "$(git -c safe.directory='*' -C "${candidate_root}" status --porcelain --untracked-files=all)" ]]; then
+    printf 'Candidate checkout is not clean: %s\n' "${candidate_root}" >&2
+    exit 2
+fi
+if [[ -e "${report_root}" ]]; then
+    printf 'PRBAS return-grid report root already exists: %s\n' "${report_root}" >&2
+    exit 2
+fi
+mkdir -p "${report_root}" "${state_root}/runs" "${build_report_root}"
+test -f "${base_patch}"
+test -f "${selector_patch}"
+test -f "${grid_patch}"
+test -f "${fixture}"
+
+readonly -a seam_sources=(
+    cm12_kernel.f90
+    cm12_solution.f90
+    cm12_background_seam.f90
+    cm12_prbas_dispatch.f90
+    cm12_non_cm12_seam.f90
+    cm12_request_kernel.f90
+    cm12_legacy_context.f90
+    cmmwp_seam.f90
+    cm12_prda_probs_seam.f90
+    cm12_prbas_seam.f90
+)
+for seam_source in "${seam_sources[@]}"; do
+    cmp \
+        "${candidate_root}/phase2/kernel/${seam_source}" \
+        "${phase2_root}/kernel/${seam_source}"
+done
+for diagnostic_file in \
+    phase2/kernel/cm12_prbas_invalidation_trace.patch \
+    phase2/kernel/cm12_prbas_prdlt_all_forms_trace.patch \
+    phase2/kernel/cm12_prbas_return_grid_trace.patch \
+    phase2/scripts/run-cm12-prbas-return-grid-diagnostic; do
+    cmp "${candidate_root}/${diagnostic_file}" "${phase2_root}/${diagnostic_file}"
+done
+cmp \
+    "${candidate_root}/phase1/scripts/build-prsdd" \
+    "${phase1_root}/scripts/build-prsdd"
+
+cat "${base_patch}" "${selector_patch}" "${grid_patch}" >"${combined_patch}"
+CM12_SEAM_ROOT="${phase2_root}/kernel" \
+CM12_PRBAS_DIAGNOSTIC_PATCH="${combined_patch}" \
+PHASE1_STATE_ROOT="${build_state_root}" \
+PHASE1_REPORT_ROOT="${build_report_root}" \
+    bash "${phase1_root}/scripts/build-prsdd"
+test -x "${executable}"
+for marker in \
+    'CM12TYPED GRID' \
+    'CM12TYPED ACCUM' \
+    'CM12TYPED FINAL' \
+    'CM12DIAG GRID' \
+    'CM12DIAG ACCUM' \
+    'CM12DIAG RESULT'; do
+    grep -aFq "${marker}" "${executable}"
+done
+
+run_case() {
+    local label="$1"
+    local force_legacy="$2"
+    local run_root
+    local status
+    local -a environment
+
+    run_root="$(mktemp -d "${state_root}/runs/${label}.XXXXXX")"
+    cp -a "${source_root}/pr" "${run_root}/pr"
+    rm -f \
+        "${run_root}/pr/SAID.TMP" \
+        "${run_root}/pr/SAID.PCT" \
+        "${run_root}/pr/SAID.LOG" \
+        "${run_root}/pr/SAID.PS" \
+        "${run_root}/pr/fort.3" \
+        "${run_root}/pr/fort.7"
+    ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+    ln -s "${data_root}" "${run_root}/sdat"
+
+    environment=(
+        "CM12_KCM_ROOT=${kcm_root}"
+        "CM12_SOLUTION_FILE=${solution_file}"
+        "CM12_SOLUTION_SHA256=${solution_sha256}"
+        "CM12_SOLUTION_ID=CM12"
+        "SAID_DATA_ROOT=${data_root}"
+        "TZ=America/New_York"
+    )
+    if [[ "${force_legacy}" == yes ]]; then
+        environment+=("CM12_FORCE_LEGACY_PRBAS=1")
+    fi
+
+    set +e
+    (
+        cd "${run_root}/pr"
+        timeout "${timeout_seconds}" env -u CM12_PRBAS_MODE \
+            "${environment[@]}" "${executable}" <"${fixture}" \
+            >"${report_root}/${label}.stdout" \
+            2>"${report_root}/${label}.stderr"
+    )
+    status=$?
+    set -e
+    printf '%s\n' "${status}" >"${report_root}/${label}.exit"
+}
+
+run_case typed no
+run_case forced-legacy yes
+test "$(cat "${report_root}/typed.exit")" -eq 0
+test "$(cat "${report_root}/forced-legacy.exit")" -eq 0
+
+extract_marker() {
+    local marker="$1"
+    local expected_fields="$2"
+    local header="$3"
+    local input="$4"
+    local output="$5"
+
+    awk -v marker="${marker}" -v expected="${expected_fields}" \
+        -v header="${header}" '
+        BEGIN {
+            OFS = "\t"
+            print header
+        }
+        index($0, marker) {
+            start = index($0, marker)
+            count = split(substr($0, start), item)
+            if (count != expected) {
+                print "unexpected " marker " field count: " count > "/dev/stderr"
+                exit 2
+            }
+            for (column = 3; column <= count; column++) {
+                printf "%s%s", item[column], (column == count ? ORS : OFS)
+            }
+        }
+    ' "${input}" >"${output}"
+}
+
+readonly grid_header='call_id\tenergy_index\tfamily\tbranch\tlegacy_l\tform_selector\tenergy_mev\tmultipole_real\tmultipole_imag'
+readonly accumulation_header='call_id\tenergy_index\tangle_index\treaction\ttrace_index\tfamily\tbranch\tlegacy_l\tform_selector\tenergy_mev\tangle_cm_deg\tmultipole_real\tmultipole_imag\ta1_before_real\ta1_before_imag\ta2_before_real\ta2_before_imag\ta3_before_real\ta3_before_imag\ta4_before_real\ta4_before_imag\ta1_after_real\ta1_after_imag\ta2_after_real\ta2_after_imag\ta3_after_real\ta3_after_imag\ta4_after_real\ta4_after_imag'
+readonly final_header='call_id\tenergy_index\tangle_index\treaction\tenergy_mev\tangle_cm_deg\ta1_real\ta1_imag\ta2_real\ta2_imag\ta3_real\ta3_imag\ta4_real\ta4_imag\tdsg'
+
+extract_marker 'CM12TYPED GRID' 11 "${grid_header}" \
+    "${report_root}/typed.stdout" "${report_root}/typed-grid.tsv"
+extract_marker 'CM12DIAG GRID' 11 "${grid_header}" \
+    "${report_root}/forced-legacy.stdout" "${report_root}/forced-legacy-grid.tsv"
+extract_marker 'CM12TYPED ACCUM' 31 "${accumulation_header}" \
+    "${report_root}/typed.stdout" "${report_root}/typed-accumulation.tsv"
+extract_marker 'CM12DIAG ACCUM' 31 "${accumulation_header}" \
+    "${report_root}/forced-legacy.stdout" "${report_root}/forced-legacy-accumulation.tsv"
+extract_marker 'CM12TYPED FINAL' 17 "${final_header}" \
+    "${report_root}/typed.stdout" "${report_root}/typed-final.tsv"
+extract_marker 'CM12DIAG RESULT' 17 "${final_header}" \
+    "${report_root}/forced-legacy.stdout" "${report_root}/forced-legacy-final.tsv"
+
+awk -F '\t' 'BEGIN { OFS = "\t" } NR == 1 || $6 != 0' \
+    "${report_root}/typed-grid.tsv" >"${report_root}/typed-active-grid.tsv"
+awk -F '\t' 'BEGIN { OFS = "\t" } NR == 1 || $6 != 0' \
+    "${report_root}/forced-legacy-grid.tsv" \
+    >"${report_root}/forced-legacy-active-grid.tsv"
+
+compare_streams() {
+    local boundary="$1"
+    local key_end="$2"
+    local metadata_end="$3"
+    local value_end="$4"
+    local typed="$5"
+    local reference="$6"
+    local differences="$7"
+    local metrics="$8"
+
+    awk -F '\t' -v OFS='\t' -v boundary="${boundary}" \
+        -v key_end="${key_end}" -v metadata_end="${metadata_end}" \
+        -v value_end="${value_end}" -v reference="${reference}" \
+        -v differences="${differences}" -v metrics="${metrics}" '
+        function remember_first(row, field, typed_value, reference_value, kind) {
+            if (first_difference == "") {
+                first_difference = "row=" row ",field=" field \
+                    ",kind=" kind ",typed=" typed_value \
+                    ",forced_legacy=" reference_value
+            }
+        }
+        BEGIN {
+            reference_status = getline reference_header < reference
+            if (reference_status <= 0) {
+                print "missing reference header for " boundary > "/dev/stderr"
+                exit 2
+            }
+            print "boundary", "row", "category", "field", \
+                "typed", "forced_legacy" > differences
+        }
+        NR == 1 {
+            typed_header = $0
+            typed_fields = split(typed_header, typed_name, FS)
+            reference_fields = split(reference_header, reference_name, FS)
+            if (typed_fields != value_end || reference_fields != value_end || \
+                typed_header != reference_header) {
+                print "header mismatch for " boundary > "/dev/stderr"
+                exit 2
+            }
+            next
+        }
+        {
+            typed_rows++
+            reference_status = getline reference_line < reference
+            if (reference_status <= 0) {
+                missing_reference++
+                print boundary, typed_rows, "structure", "missing_row", \
+                    $0, "<missing>" >> differences
+                remember_first(typed_rows, "missing_row", $0, "<missing>", \
+                    "structure")
+                next
+            }
+            reference_rows++
+            split(reference_line, reference_value, FS)
+            for (column = 1; column <= value_end; column++) {
+                if (column <= key_end) {
+                    category = "key"
+                    key_fields++
+                } else if (column <= metadata_end) {
+                    category = "metadata"
+                    metadata_fields++
+                } else {
+                    category = "value"
+                    value_fields++
+                }
+                if ("x" $column == "x" reference_value[column]) {
+                    if (category == "key") key_exact++
+                    else if (category == "metadata") metadata_exact++
+                    else value_exact++
+                } else {
+                    print boundary, typed_rows, category, typed_name[column], \
+                        $column, reference_value[column] >> differences
+                    remember_first(typed_rows, typed_name[column], $column, \
+                        reference_value[column], category)
+                }
+            }
+        }
+        END {
+            while ((getline reference_line < reference) > 0) {
+                reference_rows++
+                extra_reference++
+                print boundary, reference_rows, "structure", "extra_row", \
+                    "<missing>", reference_line >> differences
+                remember_first(reference_rows, "extra_row", "<missing>", \
+                    reference_line, "structure")
+            }
+            close(reference)
+            close(differences)
+            if (first_difference == "") first_difference = "none"
+            print "boundary", "typed_rows", "forced_legacy_rows", \
+                "missing_forced_legacy_rows", "extra_forced_legacy_rows", \
+                "key_fields", "key_exact", "metadata_fields", \
+                "metadata_exact", "value_fields", "value_exact", \
+                "first_difference" > metrics
+            print boundary, typed_rows + 0, reference_rows + 0, \
+                missing_reference + 0, extra_reference + 0, \
+                key_fields + 0, key_exact + 0, metadata_fields + 0, \
+                metadata_exact + 0, value_fields + 0, value_exact + 0, \
+                first_difference >> metrics
+            close(metrics)
+        }
+    ' "${typed}"
+}
+
+compare_streams full_grid 5 6 9 \
+    "${report_root}/typed-grid.tsv" \
+    "${report_root}/forced-legacy-grid.tsv" \
+    "${report_root}/full-grid-differences.tsv" \
+    "${report_root}/full-grid-summary.tsv"
+compare_streams active_grid 5 6 9 \
+    "${report_root}/typed-active-grid.tsv" \
+    "${report_root}/forced-legacy-active-grid.tsv" \
+    "${report_root}/active-grid-differences.tsv" \
+    "${report_root}/active-grid-summary.tsv"
+compare_streams accumulation 5 9 29 \
+    "${report_root}/typed-accumulation.tsv" \
+    "${report_root}/forced-legacy-accumulation.tsv" \
+    "${report_root}/accumulation-differences.tsv" \
+    "${report_root}/accumulation-summary.tsv"
+compare_streams final 3 4 15 \
+    "${report_root}/typed-final.tsv" \
+    "${report_root}/forced-legacy-final.tsv" \
+    "${report_root}/final-differences.tsv" \
+    "${report_root}/final-summary.tsv"
+
+extract_go5() {
+    local input="$1"
+    local output="$2"
+    awk '
+        BEGIN {
+            OFS = "\t"
+            print "row", "angle", "predicted_obs", "measured_obs", \
+                "error", "dchi"
+        }
+        index($0, "WEB") { section++ }
+        section == 1 && NF == 5 && $1 ~ /^[+-]?[0-9]+\.[0-9]+$/ &&
+            $2 ~ /^[+-]?0\.[0-9]+E[+-][0-9]+$/ {
+            print ++row, $1, $2, $3, $4, $5
+        }
+    ' "${input}" >"${output}"
+}
+extract_go5 "${report_root}/typed.stdout" "${report_root}/typed-go5.tsv"
+extract_go5 "${report_root}/forced-legacy.stdout" \
+    "${report_root}/forced-legacy-go5.tsv"
+compare_streams go5 1 2 6 \
+    "${report_root}/typed-go5.tsv" \
+    "${report_root}/forced-legacy-go5.tsv" \
+    "${report_root}/go5-differences.tsv" \
+    "${report_root}/go5-summary.tsv"
+
+{
+    head -n 1 "${report_root}/full-grid-summary.tsv"
+    tail -n 1 "${report_root}/full-grid-summary.tsv"
+    tail -n 1 "${report_root}/active-grid-summary.tsv"
+    tail -n 1 "${report_root}/accumulation-summary.tsv"
+    tail -n 1 "${report_root}/final-summary.tsv"
+    tail -n 1 "${report_root}/go5-summary.tsv"
+} >"${report_root}/boundary-summary.tsv"
+
+awk -F '\t' '
+    BEGIN {
+        OFS = "\t"
+        print "boundary", "call_id", "energy_index", "energy_mev", \
+            "angle_rows", "difference_fields"
+    }
+    FNR == NR {
+        if (FNR == 1) next
+        key = $1 SUBSEP $2
+        row_key[++source_row] = key
+        if (!(key in observed)) {
+            observed[key] = ++key_count
+            ordered_key[key_count] = key
+            call_id[key] = $1
+            energy_index[key] = $2
+            energy[key] = $5
+        }
+        angle_rows[key]++
+        next
+    }
+    FNR > 1 {
+        key = row_key[$2]
+        difference_fields[key]++
+    }
+    END {
+        for (position = 1; position <= key_count; position++) {
+            key = ordered_key[position]
+            print "final", call_id[key], energy_index[key], energy[key], \
+                angle_rows[key], difference_fields[key] + 0
+        }
+    }
+' "${report_root}/typed-final.tsv" "${report_root}/final-differences.tsv" \
+    >"${report_root}/per-energy-difference-summary.tsv"
+
+readonly typed_exit="$(cat "${report_root}/typed.exit")"
+readonly forced_exit="$(cat "${report_root}/forced-legacy.exit")"
+readonly typed_go5_rows="$(($(wc -l <"${report_root}/typed-go5.tsv") - 1))"
+readonly forced_go5_rows="$(($(wc -l <"${report_root}/forced-legacy-go5.tsv") - 1))"
+readonly typed_calls="$(awk -F '\t' 'NR > 1 { seen[$1] = 1 } END { for (key in seen) n++; print n + 0 }' "${report_root}/typed-grid.tsv")"
+readonly forced_calls="$(awk -F '\t' 'NR > 1 { seen[$1] = 1 } END { for (key in seen) n++; print n + 0 }' "${report_root}/forced-legacy-grid.tsv")"
+
+structural_status=PASS
+if [[ "${typed_exit}" -ne 0 || "${forced_exit}" -ne 0 || \
+    "${typed_go5_rows}" -ne 1533 || "${forced_go5_rows}" -ne 1533 || \
+    "${typed_calls}" -ne 133 || "${forced_calls}" -ne 133 ]]; then
+    structural_status=FAIL
+fi
+while IFS=$'\t' read -r boundary typed_rows reference_rows missing_rows \
+    extra_rows key_fields key_exact metadata_fields metadata_exact \
+    value_fields value_exact first_difference; do
+    if [[ "${boundary}" == boundary ]]; then
+        continue
+    fi
+    if [[ "${typed_rows}" -ne "${reference_rows}" || \
+        "${missing_rows}" -ne 0 || "${extra_rows}" -ne 0 || \
+        "${key_fields}" -ne "${key_exact}" || \
+        "${metadata_fields}" -ne "${metadata_exact}" ]]; then
+        structural_status=FAIL
+    fi
+done <"${report_root}/boundary-summary.tsv"
+readonly structural_status
+
+cp "${combined_patch}" "${report_root}/combined-diagnostic.patch"
+cp "${build_report_root}/build-manifest.txt" "${report_root}/build-manifest.txt"
+for log in fsplit local-libraries-build prsdd-core-build gplot-build prsdd-link prsdd-headless-build; do
+    gzip -n -c "${build_report_root}/${log}.log" \
+        >"${report_root}/${log}.log.gz"
+done
+
+{
+    printf 'evidence_label=captured/reference-candidate-diagnostic\n'
+    printf 'candidate_head=%s\n' "${candidate_head}"
+    printf 'product_change_commit=%s\n' "${product_change_commit}"
+    printf 'diagnostic_change_commit=%s\n' "${diagnostic_change_commit}"
+    printf 'candidate_clean_at_start=yes\n'
+    printf 'archived_source_commit=%s\n' "$(git -C "${source_root}" rev-parse HEAD)"
+    printf 'fixture_sha256=%s\n' "$(sha256sum "${fixture}" | awk '{print $1}')"
+    printf 'executable_sha256=%s\n' "$(sha256sum "${executable}" | awk '{print $1}')"
+    printf 'base_patch_sha256=%s\n' "$(sha256sum "${base_patch}" | awk '{print $1}')"
+    printf 'selector_patch_sha256=%s\n' "$(sha256sum "${selector_patch}" | awk '{print $1}')"
+    printf 'grid_patch_sha256=%s\n' "$(sha256sum "${grid_patch}" | awk '{print $1}')"
+    printf 'combined_patch_sha256=%s\n' "$(sha256sum "${combined_patch}" | awk '{print $1}')"
+    printf 'runner_sha256=%s\n' "$(sha256sum "${phase2_root}/scripts/run-cm12-prbas-return-grid-diagnostic" | awk '{print $1}')"
+    printf 'timezone=America/New_York\n'
+    printf 'comparison_order=retained_execution_order_no_sorting\n'
+    printf 'inactive_grid_slots=retained_for_context_not_behavioral_gate\n'
+    . /etc/os-release
+    printf 'container_os=%s\n' "${PRETTY_NAME}"
+} >"${report_root}/run-context.txt"
+
+gzip -n -f "${report_root}/typed.stdout" "${report_root}/forced-legacy.stdout"
+(
+    cd "${report_root}"
+    find . -maxdepth 1 -type f ! -name manifest.sha256 -print0 | \
+        sort -z | xargs -0 sha256sum >manifest.sha256
+)
+
+printf 'Structural validation: %s\n' "${structural_status}"
+column -t -s $'\t' "${report_root}/boundary-summary.tsv"
+if [[ "${structural_status}" != PASS ]]; then
+    exit 1
+fi
