@@ -18,9 +18,9 @@
          if (state%background_reset_pending) then
              next_state%background_reset_pending = .false.
 +            event%post_reset_energy_mev = 0.0_real32
-         status = cm12_ok
-         message = ''
-         return
+             status = cm12_ok
+             message = ''
+             return
 --- a/prsd.f
 +++ b/prsd.f
 @@ -2431,6 +2431,7 @@
