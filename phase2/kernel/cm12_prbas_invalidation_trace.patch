@@ -1,11 +1,26 @@
 --- a/cm12_prbas_dispatch.f90
 +++ b/cm12_prbas_dispatch.f90
-@@ -29,0 +30 @@
+@@ -27,6 +27,7 @@
+         character(len=4) :: previous_title = ''
+         real(real32) :: pre_reset_energy_mev = 0.0_real32
 +        real(real32) :: post_reset_energy_mev = 0.0_real32
-@@ -193,0 +195 @@
+         real(real32) :: input_energy_mev = 0.0_real32
+         real(real32) :: effective_energy_mev = 0.0_real32
+         real(real32) :: dither_before_mev = 0.0_real32
+@@ -191,6 +192,7 @@
+         event = cm12_prbas_dispatch_event()
+         next_state = state
 +        event%post_reset_energy_mev = input_energy_mev
-@@ -196,0 +199 @@
+         if ( &
+             family < 1 .or. family > 6 .or. &
+             branch < 1 .or. branch > 2 .or. &
+@@ -214,5 +216,6 @@
+         if (state%background_reset_pending) then
+             next_state%background_reset_pending = .false.
 +            event%post_reset_energy_mev = 0.0_real32
+         status = cm12_ok
+         message = ''
+         return
 --- a/prsd.f
 +++ b/prsd.f
 @@ -2431,6 +2431,7 @@
