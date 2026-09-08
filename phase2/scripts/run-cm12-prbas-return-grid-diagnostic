@@ -75,7 +75,9 @@ for diagnostic_file in \
     phase2/kernel/cm12_prbas_prdlt_all_forms_trace.patch \
     phase2/kernel/cm12_prbas_return_grid_trace.patch \
     phase2/scripts/run-cm12-prbas-return-grid-diagnostic; do
-    cmp "${candidate_root}/${diagnostic_file}" "${phase2_root}/${diagnostic_file}"
+    cmp \
+        "${candidate_root}/${diagnostic_file}" \
+        "${phase2_root}/${diagnostic_file#phase2/}"
 done
 cmp \
     "${candidate_root}/phase1/scripts/build-prsdd" \
