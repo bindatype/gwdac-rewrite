@@ -1,0 +1,425 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly candidate_root="${GWDAC_CANDIDATE_ROOT:?set GWDAC_CANDIDATE_ROOT to the mounted candidate checkout}"
+readonly state_root="${PRDLT_ALL_FORM_STATE_ROOT:-/workspace/phase2/prdlt-all-form}"
+readonly report_root="${PRDLT_ALL_FORM_REPORT_ROOT:-${phase2_root}/reports/cm12-prbas-lifecycle-contract/prdlt-all-form-diagnostic/capture}"
+readonly base_patch="${phase2_root}/kernel/cm12_prbas_invalidation_trace.patch"
+readonly selector_patch="${phase2_root}/kernel/cm12_prbas_prdlt_all_forms_trace.patch"
+readonly combined_patch="${state_root}/cm12_prbas_prdlt_all_forms_combined.patch"
+readonly fixture="${phase1_root}/fixtures/go3pr2-production-adapter/live.in"
+readonly typed_parser="${phase2_root}/scripts/parse-cm12-typed-lifecycle-aligned.awk"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly data_root="${source_root}/sdat"
+readonly solution_file="${data_root}/prsol.dat"
+readonly solution_sha256=dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-300}"
+readonly candidate_head="$(git -c safe.directory='*' -C "${candidate_root}" rev-parse HEAD)"
+readonly product_change_commit="$(git -c safe.directory='*' -C "${candidate_root}" log -1 --format=%H -- \
+    phase2/kernel/cm12_kernel.f90 \
+    phase2/kernel/cm12_solution.f90 \
+    phase2/kernel/cm12_background_seam.f90 \
+    phase2/kernel/cm12_prbas_dispatch.f90 \
+    phase2/kernel/cm12_non_cm12_seam.f90 \
+    phase2/kernel/cm12_request_kernel.f90 \
+    phase2/kernel/cm12_legacy_context.f90 \
+    phase2/kernel/cmmwp_seam.f90 \
+    phase2/kernel/cm12_prda_probs_seam.f90 \
+    phase2/kernel/cm12_prbas_seam.f90)"
+readonly diagnostic_change_commit="$(git -c safe.directory='*' -C "${candidate_root}" log -1 --format=%H -- \
+    phase2/kernel/cm12_prbas_invalidation_trace.patch \
+    phase2/kernel/cm12_prbas_prdlt_all_forms_trace.patch \
+    phase2/scripts/parse-cm12-typed-lifecycle-aligned.awk \
+    phase2/scripts/run-cm12-prbas-prdlt-all-forms)"
+readonly short_source_commit="$(git -C "${source_root}" rev-parse --short=12 HEAD)"
+readonly build_state_root="${state_root}/build"
+readonly build_report_root="${state_root}/build-report"
+readonly executable="${build_state_root}/artifacts/${short_source_commit}/prsdd-headless"
+
+if [[ -n "$(git -c safe.directory='*' -C "${candidate_root}" status --porcelain --untracked-files=all)" ]]; then
+    printf 'Candidate checkout is not clean: %s\n' "${candidate_root}" >&2
+    exit 2
+fi
+if [[ -e "${report_root}" ]]; then
+    printf 'PRDLT all-form report root already exists: %s\n' "${report_root}" >&2
+    exit 2
+fi
+mkdir -p "${report_root}" "${state_root}/runs" "${build_report_root}"
+test -f "${base_patch}"
+test -f "${selector_patch}"
+test -f "${fixture}"
+test -f "${typed_parser}"
+
+readonly -a seam_sources=(
+    cm12_kernel.f90
+    cm12_solution.f90
+    cm12_background_seam.f90
+    cm12_prbas_dispatch.f90
+    cm12_non_cm12_seam.f90
+    cm12_request_kernel.f90
+    cm12_legacy_context.f90
+    cmmwp_seam.f90
+    cm12_prda_probs_seam.f90
+    cm12_prbas_seam.f90
+)
+for seam_source in "${seam_sources[@]}"; do
+    cmp \
+        "${candidate_root}/phase2/kernel/${seam_source}" \
+        "${phase2_root}/kernel/${seam_source}"
+done
+cmp \
+    "${candidate_root}/phase1/scripts/build-prsdd" \
+    "${phase1_root}/scripts/build-prsdd"
+cmp \
+    "${candidate_root}/phase2/scripts/run-cm12-prbas-prdlt-all-forms" \
+    "${phase2_root}/scripts/run-cm12-prbas-prdlt-all-forms"
+cmp \
+    "${candidate_root}/phase2/scripts/parse-cm12-typed-lifecycle-aligned.awk" \
+    "${typed_parser}"
+cmp \
+    "${candidate_root}/phase2/kernel/cm12_prbas_invalidation_trace.patch" \
+    "${base_patch}"
+cmp \
+    "${candidate_root}/phase2/kernel/cm12_prbas_prdlt_all_forms_trace.patch" \
+    "${selector_patch}"
+
+cat "${base_patch}" "${selector_patch}" >"${combined_patch}"
+CM12_SEAM_ROOT="${phase2_root}/kernel" \
+CM12_PRBAS_DIAGNOSTIC_PATCH="${combined_patch}" \
+PHASE1_STATE_ROOT="${build_state_root}" \
+PHASE1_REPORT_ROOT="${build_report_root}" \
+    bash "${phase1_root}/scripts/build-prsdd"
+test -x "${executable}"
+grep -aFq 'CM12DIAG PRDLT FIELDS' "${executable}"
+grep -aFq 'CM12TYPED ROW' "${executable}"
+
+run_case() {
+    local label="$1"
+    local force_legacy="$2"
+    local run_root
+    local status
+    local -a environment
+
+    run_root="$(mktemp -d "${state_root}/runs/${label}.XXXXXX")"
+    cp -a "${source_root}/pr" "${run_root}/pr"
+    rm -f \
+        "${run_root}/pr/SAID.TMP" \
+        "${run_root}/pr/SAID.PCT" \
+        "${run_root}/pr/SAID.LOG" \
+        "${run_root}/pr/SAID.PS" \
+        "${run_root}/pr/fort.3" \
+        "${run_root}/pr/fort.7"
+    ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+    ln -s "${data_root}" "${run_root}/sdat"
+
+    environment=(
+        "CM12_KCM_ROOT=${kcm_root}"
+        "CM12_SOLUTION_FILE=${solution_file}"
+        "CM12_SOLUTION_SHA256=${solution_sha256}"
+        "CM12_SOLUTION_ID=CM12"
+        "SAID_DATA_ROOT=${data_root}"
+        "TZ=America/New_York"
+    )
+    if [[ "${force_legacy}" == yes ]]; then
+        environment+=("CM12_FORCE_LEGACY_PRBAS=1")
+    fi
+
+    set +e
+    (
+        cd "${run_root}/pr"
+        timeout "${timeout_seconds}" env -u CM12_PRBAS_MODE \
+            "${environment[@]}" "${executable}" <"${fixture}" \
+            >"${report_root}/${label}.stdout" \
+            2>"${report_root}/${label}.stderr"
+    )
+    status=$?
+    set -e
+    printf '%s\n' "${status}" >"${report_root}/${label}.exit"
+}
+
+run_case typed no
+run_case forced-legacy yes
+test "$(cat "${report_root}/typed.exit")" -eq 0
+test "$(cat "${report_root}/forced-legacy.exit")" -eq 0
+
+awk -f "${typed_parser}" "${report_root}/typed.stdout" \
+    >"${report_root}/typed-all.tsv"
+
+awk '
+    BEGIN {
+        OFS = "\t"
+        print "call_id", "row_id", "family", "branch", "legacy_l", \
+            "rotation_form", "base_form", "state_index", "form_selector", \
+            "z", "qb", "qk", "zr", "zb", "born", "ter", "tei", \
+            "der", "dei"
+    }
+    index($0, "CM12DIAG PRDLT") && \
+        !index($0, "CM12DIAG PRDLT FIELDS") {
+        start = index($0, "CM12DIAG PRDLT")
+        count = split(substr($0, start), item)
+        if (count != 12) {
+            print "unexpected CM12DIAG PRDLT field count: " count > "/dev/stderr"
+            exit 2
+        }
+        row = item[3]
+        if (row == 1) call++
+        family = item[4]
+        branch = item[5]
+        legacy_l = item[6]
+        rotation_form = item[7]
+        base_form = item[8]
+        state_index = item[9]
+        next
+    }
+    index($0, "CM12DIAG PRDLT FIELDS") {
+        start = index($0, "CM12DIAG PRDLT FIELDS")
+        count = split(substr($0, start), item)
+        if (count != 13) {
+            print "unexpected PRDLT FIELDS count: " count > "/dev/stderr"
+            exit 2
+        }
+        print call, row, family, branch, legacy_l, rotation_form, base_form, \
+            state_index, 10 * rotation_form + base_form, item[4], item[5], \
+            item[6], item[7], item[8], item[9], item[10], item[11], \
+            item[12], item[13]
+    }
+' "${report_root}/forced-legacy.stdout" \
+    >"${report_root}/forced-legacy-fields-all.tsv"
+
+awk -F '\t' '
+    BEGIN {
+        OFS = "\t"
+        print "row_id", "family", "branch", "legacy_l", "state_index", \
+            "form_selector", "dispatch", "field", "value"
+        name[20] = "z"; name[21] = "qb"; name[22] = "qk"
+        name[23] = "zr"; name[24] = "zb"; name[25] = "born"
+        name[26] = "ter"; name[27] = "tei"; name[28] = "der"
+        name[29] = "dei"
+    }
+    NR > 1 && $1 == 1 {
+        for (column = 20; column <= 29; column++) {
+            print $3, $4, $5, $7, $8, $9, $10, name[column], $column
+        }
+    }
+' "${report_root}/typed-all.tsv" \
+    >"${report_root}/typed-call-1-fields.tsv"
+
+awk -F '\t' '
+    BEGIN {
+        OFS = "\t"
+        print "row_id", "family", "branch", "legacy_l", "state_index", \
+            "form_selector", "field", "value"
+        name[10] = "z"; name[11] = "qb"; name[12] = "qk"
+        name[13] = "zr"; name[14] = "zb"; name[15] = "born"
+        name[16] = "ter"; name[17] = "tei"; name[18] = "der"
+        name[19] = "dei"
+    }
+    NR > 1 && $1 == 1 {
+        for (column = 10; column <= 19; column++) {
+            print $2, $3, $4, $5, $8, $9, name[column], $column
+        }
+    }
+' "${report_root}/forced-legacy-fields-all.tsv" \
+    >"${report_root}/forced-legacy-call-1-fields.tsv"
+
+awk -F '\t' '
+    BEGIN {
+        OFS = "\t"
+        print "row_id", "family", "branch", "legacy_l", "state_index", \
+            "form_selector", "dispatch", "field", "typed", \
+            "forced_legacy", "metadata_exact", "value_exact"
+    }
+    NR == FNR {
+        if (FNR == 1) next
+        key = $1 SUBSEP $8
+        typed_family[key] = $2
+        typed_branch[key] = $3
+        typed_l[key] = $4
+        typed_state[key] = $5
+        typed_selector[key] = $6
+        typed_dispatch[key] = $7
+        typed_value[key] = $9
+        next
+    }
+    FNR == 1 { next }
+    {
+        key = $1 SUBSEP $7
+        metadata_exact = (typed_family[key] == $2 && \
+            typed_branch[key] == $3 && typed_l[key] == $4 && \
+            typed_state[key] == $5 && typed_selector[key] == $6 ? \
+            "yes" : "no")
+        value_exact = ("x" typed_value[key] == "x" $8 ? "yes" : "no")
+        print $1, $2, $3, $4, $5, $6, typed_dispatch[key], $7, \
+            typed_value[key], $8, metadata_exact, value_exact
+    }
+' "${report_root}/typed-call-1-fields.tsv" \
+    "${report_root}/forced-legacy-call-1-fields.tsv" \
+    >"${report_root}/call-1-field-comparison.tsv"
+
+awk -F '\t' '
+    BEGIN {
+        OFS = "\t"
+        print "row_id", "family", "branch", "legacy_l", "state_index", \
+            "form_selector", "dispatch", "exact_fields", \
+            "first_difference", "classification"
+    }
+    NR > 1 {
+        row = $1
+        family[row] = $2
+        branch[row] = $3
+        legacy_l[row] = $4
+        state[row] = $5
+        selector[row] = $6
+        dispatch[row] = $7
+        if ($11 == "yes" && $12 == "yes") exact[row]++
+        else if (!(row in first)) first[row] = \
+            ($11 == "no" ? "metadata:" $8 : $8)
+        if (row > maximum) maximum = row
+    }
+    END {
+        for (row = 1; row <= maximum; row++) {
+            first_value = (row in first ? first[row] : "none")
+            classification = (exact[row] == 10 ? "EXACT" : "DIFFERENT")
+            print row, family[row], branch[row], legacy_l[row], state[row], \
+                selector[row], dispatch[row], exact[row] + 0, first_value, \
+                classification
+        }
+    }
+' "${report_root}/call-1-field-comparison.tsv" \
+    >"${report_root}/per-form-summary.tsv"
+
+awk -F '\t' 'NR == 1 || $1 == 3 || $1 == 8' \
+    "${report_root}/call-1-field-comparison.tsv" \
+    >"${report_root}/priority-form-comparison.tsv"
+
+extract_go5() {
+    local input="$1"
+    local output="$2"
+    awk '
+        BEGIN {
+            OFS = "\t"
+            print "row", "angle", "predicted_obs", "measured_obs", \
+                "error", "dchi"
+        }
+        index($0, "WEB") { section++ }
+        section == 1 && NF == 5 && $1 ~ /^[+-]?[0-9]+\.[0-9]+$/ &&
+            $2 ~ /^[+-]?0\.[0-9]+E[+-][0-9]+$/ {
+            print ++row, $1, $2, $3, $4, $5
+        }
+    ' "${input}" >"${output}"
+}
+extract_go5 "${report_root}/typed.stdout" "${report_root}/typed-go5.tsv"
+extract_go5 \
+    "${report_root}/forced-legacy.stdout" \
+    "${report_root}/forced-legacy-go5.tsv"
+go5_exact=no
+if cmp -s "${report_root}/typed-go5.tsv" "${report_root}/forced-legacy-go5.tsv"; then
+    go5_exact=yes
+fi
+readonly go5_exact
+{
+    printf 'path\trow\tangle\tpredicted_obs\tmeasured_obs\terror\tdchi\n'
+    awk -F '\t' 'NR == 2 { print "typed\t" $0 }' \
+        "${report_root}/typed-go5.tsv"
+    awk -F '\t' 'NR == 2 { print "forced-legacy\t" $0 }' \
+        "${report_root}/forced-legacy-go5.tsv"
+} >"${report_root}/first-go5-row.tsv"
+
+readonly typed_exit="$(cat "${report_root}/typed.exit")"
+readonly legacy_exit="$(cat "${report_root}/forced-legacy.exit")"
+readonly typed_calls="$(awk -F '\t' 'NR > 1 { seen[$1] = 1 } END { for (key in seen) n++; print n + 0 }' "${report_root}/typed-all.tsv")"
+readonly typed_trace_rows="$(($(wc -l <"${report_root}/typed-all.tsv") - 1))"
+readonly legacy_field_rows="$(($(wc -l <"${report_root}/forced-legacy-fields-all.tsv") - 1))"
+readonly typed_call_1_fields="$(($(wc -l <"${report_root}/typed-call-1-fields.tsv") - 1))"
+readonly legacy_call_1_fields="$(($(wc -l <"${report_root}/forced-legacy-call-1-fields.tsv") - 1))"
+readonly comparison_rows="$(($(wc -l <"${report_root}/call-1-field-comparison.tsv") - 1))"
+readonly metadata_exact="$(awk -F '\t' 'NR > 1 && $11 == "yes" { n++ } END { print n + 0 }' "${report_root}/call-1-field-comparison.tsv")"
+readonly value_exact="$(awk -F '\t' 'NR > 1 && $12 == "yes" { n++ } END { print n + 0 }' "${report_root}/call-1-field-comparison.tsv")"
+readonly exact_forms="$(awk -F '\t' 'NR > 1 && $10 == "EXACT" { n++ } END { print n + 0 }' "${report_root}/per-form-summary.tsv")"
+readonly first_difference="$(awk -F '\t' 'NR > 1 && $12 == "no" { print "row=" $1 ",field=" $8; exit }' "${report_root}/call-1-field-comparison.tsv")"
+readonly typed_go5_rows="$(($(wc -l <"${report_root}/typed-go5.tsv") - 1))"
+readonly legacy_go5_rows="$(($(wc -l <"${report_root}/forced-legacy-go5.tsv") - 1))"
+
+structural_status=PASS
+if [[ "${typed_exit}" -ne 0 || "${legacy_exit}" -ne 0 || \
+    "${typed_calls}" -ne 133 || "${typed_trace_rows}" -ne 3458 || \
+    "${legacy_field_rows}" -ne 3432 || \
+    "${typed_call_1_fields}" -ne 260 || \
+    "${legacy_call_1_fields}" -ne 260 || \
+    "${comparison_rows}" -ne 260 || "${metadata_exact}" -ne 260 || \
+    "${typed_go5_rows}" -ne 1533 || "${legacy_go5_rows}" -ne 1533 ]]; then
+    structural_status=FAIL
+fi
+readonly structural_status
+
+{
+    printf 'metric\tobserved\treference\tclassification\n'
+    printf 'typed_exit\t%s\t0\t%s\n' "${typed_exit}" "$([[ "${typed_exit}" -eq 0 ]] && printf PASS || printf FAIL)"
+    printf 'forced_legacy_exit\t%s\t0\t%s\n' "${legacy_exit}" "$([[ "${legacy_exit}" -eq 0 ]] && printf PASS || printf FAIL)"
+    printf 'typed_trace_calls\t%s\t133\t%s\n' "${typed_calls}" "$([[ "${typed_calls}" -eq 133 ]] && printf PASS || printf FAIL)"
+    printf 'typed_trace_rows\t%s\t3458\t%s\n' "${typed_trace_rows}" "$([[ "${typed_trace_rows}" -eq 3458 ]] && printf PASS || printf FAIL)"
+    printf 'forced_legacy_go5_field_rows\t%s\t3432\t%s\n' "${legacy_field_rows}" "$([[ "${legacy_field_rows}" -eq 3432 ]] && printf PASS || printf FAIL)"
+    printf 'call_1_compared_fields\t%s\t260\t%s\n' "${comparison_rows}" "$([[ "${comparison_rows}" -eq 260 ]] && printf PASS || printf FAIL)"
+    printf 'call_1_metadata_exact\t%s\t260\t%s\n' "${metadata_exact}" "$([[ "${metadata_exact}" -eq 260 ]] && printf PASS || printf FAIL)"
+    printf 'call_1_value_exact\t%s\t260\tCAPTURED\n' "${value_exact}"
+    printf 'call_1_exact_forms\t%s\t26\tCAPTURED\n' "${exact_forms}"
+    printf 'first_value_difference\t%s\tnone\tCAPTURED\n' "${first_difference:-none}"
+    printf 'typed_go5_rows\t%s\t1533\t%s\n' "${typed_go5_rows}" "$([[ "${typed_go5_rows}" -eq 1533 ]] && printf PASS || printf FAIL)"
+    printf 'forced_legacy_go5_rows\t%s\t1533\t%s\n' "${legacy_go5_rows}" "$([[ "${legacy_go5_rows}" -eq 1533 ]] && printf PASS || printf FAIL)"
+    printf 'go5_full_corpus_exact\t%s\tyes\tCAPTURED\n' "${go5_exact}"
+    printf 'structural_validation\t%s\tPASS\t%s\n' "${structural_status}" "${structural_status}"
+} >"${report_root}/summary.tsv"
+
+cp "${combined_patch}" "${report_root}/combined-diagnostic.patch"
+cp "${build_report_root}/build-manifest.txt" "${report_root}/build-manifest.txt"
+for log in fsplit local-libraries-build prsdd-core-build gplot-build prsdd-link prsdd-headless-build; do
+    gzip -n -c "${build_report_root}/${log}.log" \
+        >"${report_root}/${log}.log.gz"
+done
+
+{
+    printf 'evidence_label=captured/reference-candidate-diagnostic\n'
+    printf 'candidate_head=%s\n' "${candidate_head}"
+    printf 'product_change_commit=%s\n' "${product_change_commit}"
+    printf 'diagnostic_change_commit=%s\n' "${diagnostic_change_commit}"
+    printf 'candidate_clean_at_start=yes\n'
+    printf 'archived_source_commit=%s\n' "$(git -C "${source_root}" rev-parse HEAD)"
+    printf 'target_call_id=1\n'
+    printf 'target_forms=all_26_in_legacy_family_branch_orbital_l_order\n'
+    printf 'priority_rows=3,8\n'
+    printf 'executable_sha256=%s\n' "$(sha256sum "${executable}" | awk '{print $1}')"
+    printf 'fixture_sha256=%s\n' "$(sha256sum "${fixture}" | awk '{print $1}')"
+    printf 'base_patch_sha256=%s\n' "$(sha256sum "${base_patch}" | awk '{print $1}')"
+    printf 'selector_patch_sha256=%s\n' "$(sha256sum "${selector_patch}" | awk '{print $1}')"
+    printf 'combined_patch_sha256=%s\n' "$(sha256sum "${combined_patch}" | awk '{print $1}')"
+    printf 'runner_sha256=%s\n' "$(sha256sum "${phase2_root}/scripts/run-cm12-prbas-prdlt-all-forms" | awk '{print $1}')"
+    for seam_source in "${seam_sources[@]}"; do
+        printf 'seam_source_sha256[%s]=%s\n' \
+            "${seam_source}" \
+            "$(sha256sum "${phase2_root}/kernel/${seam_source}" | awk '{print $1}')"
+    done
+    printf 'timezone=America/New_York\n'
+    . /etc/os-release
+    printf 'container_os=%s\n' "${PRETTY_NAME}"
+} >"${report_root}/run-context.txt"
+
+gzip -n -f "${report_root}/typed.stdout" "${report_root}/forced-legacy.stdout"
+(
+    cd "${report_root}"
+    find . -maxdepth 1 -type f ! -name manifest.sha256 -print0 | \
+        sort -z | xargs -0 sha256sum >manifest.sha256
+)
+
+printf 'Structural validation: %s\n' "${structural_status}"
+printf 'Call-1 fields exact: %s/260; exact forms: %s/26; first difference: %s\n' \
+    "${value_exact}" "${exact_forms}" "${first_difference:-none}"
+printf 'Full GO5 corpus exact: %s (%s typed rows; %s forced-legacy rows)\n' \
+    "${go5_exact}" "${typed_go5_rows}" "${legacy_go5_rows}"
+printf 'Evidence: %s\n' "${report_root}"
+
+if [[ "${structural_status}" != PASS ]]; then
+    exit 1
+fi
