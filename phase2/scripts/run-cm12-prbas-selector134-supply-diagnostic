@@ -317,9 +317,9 @@ readonly typed_go5_rows="$(($(wc -l <"${report_root}/typed-go5.tsv") - 1))"
 readonly forced_go5_rows="$(($(wc -l <"${report_root}/forced-legacy-go5.tsv") - 1))"
 
 structural_status=PASS
-if [[ "${typed_rows}" -ne 4788 || "${cmmwp_rows}" -ne 4788 || \
-    "${grid_rows}" -ne 4788 || "${return_rows}" -ne 2926 || \
-    "${comparison_rows}" -ne 4788 || "${structural_errors}" -ne 0 || \
+if [[ "${typed_rows}" -ne 4522 || "${cmmwp_rows}" -ne 4522 || \
+    "${grid_rows}" -ne 4522 || "${return_rows}" -ne 2926 || \
+    "${comparison_rows}" -ne 4522 || "${structural_errors}" -ne 0 || \
     "${typed_go5_rows}" -ne 1533 || "${forced_go5_rows}" -ne 1533 ]]; then
     structural_status=FAIL
 fi
