@@ -1,0 +1,763 @@
+--- a/cm12_prbas_dispatch.f90
++++ b/cm12_prbas_dispatch.f90
+@@ -27,5 +27,6 @@
+         character(len=4) :: previous_title = ''
+         real(real32) :: pre_reset_energy_mev = 0.0_real32
++        real(real32) :: post_reset_energy_mev = 0.0_real32
+         real(real32) :: input_energy_mev = 0.0_real32
+         real(real32) :: effective_energy_mev = 0.0_real32
+         real(real32) :: dither_before_mev = 0.0_real32
+@@ -191,5 +192,6 @@
+         event = cm12_prbas_dispatch_event()
+         next_state = state
++        event%post_reset_energy_mev = input_energy_mev
+         if ( &
+             family < 1 .or. family > 6 .or. &
+             branch < 1 .or. branch > 2 .or. &
+@@ -214,5 +216,6 @@
+         if (state%background_reset_pending) then
+             next_state%background_reset_pending = .false.
++            event%post_reset_energy_mev = 0.0_real32
+             status = cm12_ok
+             message = ''
+             return
+--- a/prsd.f
++++ b/prsd.f
+@@ -2431,6 +2431,7 @@
+       IF(H.EQ.HBORN.OR.H.EQ.HBRNX) NROT=0
+       NNF=NNF-10*NROT
+       EPX=EPI(IE)
++      CM12EPXPRE=EPX
+       Z=EPX/WPI
+       IF(NNF.GT.4) Z=EPX/(800.0+EPX)
+       IF(BCOFF.NE.BCOFFM) EPX=0.0
+@@ -2461,12 +2462,13 @@
+       NL=10*N+LL-1
+       CM12ACTIVE=0
+-      IF(CM12DIAG.EQ.1.AND.IR.EQ.2) THEN
++      IF(CM12DIAG.EQ.1) THEN
+          CM12ACTIVE=1
+          CM12ROW=CM12ROW+1
+          CM12MM=MM
+          CM12JJ=JJ
+          CM12LL=LL
+-         WRITE(*,9014) CM12ROW,MM,JJ,LL,NROT,NNF,N,EPX,EPXX
++         WRITE(*,9014) CM12ROW,MM,JJ,LL,NROT,NNF,N,
++     C    CM12EPXPRE,EPX,EPXX
+       ENDIF
+       CALL PNPWI(N,LL-1,EPXX,TER,TEI,TTLI)
+       IF(NL.EQ.41) CALL GETP33(EPX,IR,PEM(16,2,2,2),TER,TEI)
+@@ -2482,7 +2484,7 @@
+      C WRITE(*,9013) MM,JJ,LL,NROT,NNF,N,
+      C EPX,EPXX,TER,TEI,QCM(IE),ZKCM(IE)
+  9013 FORMAT('CM12DIAG HADRONIC',6(1X,I4),6(1X,ES24.16E3))
+- 9014 FORMAT('CM12DIAG PRDLT',7(1X,I4),2(1X,ES24.16E3))
++ 9014 FORMAT('CM12DIAG PRDLT',7(1X,I4),3(1X,ES24.16E3))
+  9015 FORMAT('CM12DIAG ADDRESK PRE',6(1X,I4),5(1X,ES24.16E3))
+  9016 FORMAT('CM12DIAG ADDRESK POST',6(1X,I4),5(1X,ES24.16E3))
+       if(mjl.ne.999) go to 92
+--- a/cm12_prbas_seam.f90
++++ b/cm12_prbas_seam.f90
+@@ -12,0 +13,2 @@
++    use cm12_non_cm12_seam, only: &
++        cm12_hadronic_trace, cm12_max_hadronic_trace
+@@ -105,0 +108,2 @@
++    type(cm12_hadronic_trace) :: &
++        hadronic_trace(cm12_max_hadronic_trace)
+@@ -111,0 +116,4 @@
++    integer :: hadronic_trace_count
++    integer, save :: diagnostic_call_count = 0
++    integer :: nfg_nonzero
++    integer :: pg_nonzero
+@@ -156,0 +165,3 @@
++    diagnostic_call_count = diagnostic_call_count + 1
++    nfg_nonzero = count(nfg /= 0)
++    pg_nonzero = count(pg /= 0.0_real32)
+@@ -164,0 +176,2 @@
++            hadronic_trace=hadronic_trace, &
++            hadronic_trace_count=hadronic_trace_count, &
+@@ -169,0 +183,6 @@
++        call write_ambient_trace( &
++            diagnostic_call_count, energy_index, nfg_nonzero, pg_nonzero)
++        do k = 1, hadronic_trace_count
++            call write_hadronic_trace( &
++                diagnostic_call_count, energy_index, k, hadronic_trace(k))
++        end do
+@@ -214,0 +234,27 @@
++
++    subroutine write_ambient_trace( &
++        call_index, current_energy_index, nonzero_nfg, nonzero_pg)
++        integer, intent(in) :: call_index
++        integer, intent(in) :: current_energy_index
++        integer, intent(in) :: nonzero_nfg
++        integer, intent(in) :: nonzero_pg
++        character(len=4) :: solution_word
++        character(len=4) :: selector_word
++        character(len=4) :: formula_word
++
++        solution_word = transfer(title(1), solution_word)
++        selector_word = transfer(title(15), selector_word)
++        formula_word = transfer(ttli(1), formula_word)
++        write(*, '(A,1X,12(I0,1X),2(ES25.16E3,1X),3(A4,1X))') &
++            'CM12TYPED BEGIN', call_index, current_energy_index, ne, na, &
++            ir, ir0, nnbt, it, nnl, iprk, nonzero_nfg, nonzero_pg, &
++            bcoff, pem(25, 6, 2, 6), trace_title_token(solution_word), &
++            trace_title_token(selector_word), trace_title_token(formula_word)
++    end subroutine write_ambient_trace
++
++    subroutine write_hadronic_trace( &
++        call_index, current_energy_index, row_index, trace)
++        integer, intent(in) :: call_index
++        integer, intent(in) :: current_energy_index
++        integer, intent(in) :: row_index
++        type(cm12_hadronic_trace), intent(in) :: trace
+@@ -215,0 +262,34 @@
++        write(*, '(A,1X,9(I0,1X),L1,1X,I0,1X,3(A4,1X),' // &
++            '17(ES25.16E3,1X))') &
++            'CM12TYPED ROW', call_index, current_energy_index, row_index, &
++            trace%dispatch%family, trace%dispatch%branch, &
++            trace%dispatch%orbital_l, trace%dispatch%legacy_l, &
++            trace%dispatch%state_index, trace%dispatch%form_selector, &
++            trace%dispatch%dispatch, trace%dispatch%dispatch_branch, &
++            trace_title_token(trace%formula_title), &
++            trace_title_token(trace%dispatch%dispatch_title), &
++            trace_title_token(trace%dispatch%previous_title), &
++            trace%dispatch%pre_reset_energy_mev, &
++            trace%dispatch%post_reset_energy_mev, &
++            trace%dispatch%input_energy_mev, &
++            trace%dispatch%effective_energy_mev, &
++            trace%dispatch%dither_before_mev, trace%form%z, &
++            trace%form%qb, trace%form%qk, trace%form%zr, trace%form%zb, &
++            trace%form%brn, trace%form%ter, trace%form%tei, &
++            trace%form%der, trace%form%dei, trace%hadronic_real, &
++            trace%hadronic_imag
++    end subroutine write_hadronic_trace
++
++    function trace_title_token(title_value) result(token)
++        character(len=4), intent(in) :: title_value
++        character(len=4) :: token
++        integer :: character_index
++
++        token = title_value
++        do character_index = 1, len(token)
++            if (token(character_index:character_index) == ' ') then
++                token(character_index:character_index) = '_'
++            end if
++        end do
++    end function trace_title_token
++
+--- a/prsd.f
++++ b/prsd.f
+@@ -2586,3 +2586,2 @@
+-      IF(CM12DIAG.EQ.1.AND.IR.EQ.2.AND.MM.EQ.1.AND.JJ.EQ.1
+-     C .AND.LL.EQ.5.AND.NROT.EQ.2.AND.NNF.EQ.5)
++      IF(CM12DIAG.EQ.1.AND.IR.EQ.1)
+      C WRITE(*,9018) Z,QB,QK,ZR,CM12ZB,BRN,TER,TEI,DER,DEI
+--- a/cm12_request_kernel.f90
++++ b/cm12_request_kernel.f90
+@@ -48,6 +48,22 @@
+         integer :: evaluated_multipoles = 0
+     end type cm12_request_result
+ 
++    integer, parameter, public :: cm12_max_accumulation_trace = &
++        family_count * branch_count * partial_wave_count
++
++    type, public :: cm12_accumulation_trace
++        integer :: family = 0
++        integer :: branch = 0
++        integer :: orbital_l = 0
++        integer :: form_selector = 0
++        complex(real32) :: multipole = &
++            cmplx(0.0_real32, 0.0_real32, kind=real32)
++        complex(real32) :: amplitudes_before(amplitude_count) = &
++            cmplx(0.0_real32, 0.0_real32, kind=real32)
++        complex(real32) :: amplitudes_after(amplitude_count) = &
++            cmplx(0.0_real32, 0.0_real32, kind=real32)
++    end type cm12_accumulation_trace
++
+     public :: cm12_prepare_legacy_background
+     public :: cm12_prepare_legacy_angle_background
+     public :: cm12_background_grid_state
+@@ -115,7 +131,8 @@
+     end subroutine cm12_prepare_legacy_angle_background
+ 
+     pure subroutine cm12_evaluate_request( &
+-        solution, dataset, request, background, result, status, message)
++        solution, dataset, request, background, result, status, message, &
++        accumulation_trace, accumulation_trace_count)
+         type(cm12_solution), intent(in) :: solution
+         type(cm12_dataset), intent(in) :: dataset
+         type(cm12_request), intent(in) :: request
+@@ -123,6 +140,9 @@
+         type(cm12_request_result), intent(out) :: result
+         integer, intent(out) :: status
+         character(len=*), intent(out) :: message
++        type(cm12_accumulation_trace), intent(out), optional :: &
++            accumulation_trace(:)
++        integer, intent(out), optional :: accumulation_trace_count
+ 
+         complex(real32) :: accumulated(amplitude_count)
+         complex(real32) :: multipole
+@@ -132,8 +152,14 @@
+         integer :: branch
+         integer :: orbital_l
+         integer :: form_selector
++        integer :: trace_index
+ 
+         result = cm12_request_result()
++        trace_index = 0
++        if (present(accumulation_trace)) then
++            accumulation_trace = cm12_accumulation_trace()
++        end if
++        if (present(accumulation_trace_count)) accumulation_trace_count = 0
+         if (.not. cm12_solution_is_loaded(solution)) then
+             status = cm12_invalid_argument
+             message = 'CM12 request requires a loaded solution'
+@@ -213,17 +239,41 @@
+                             background%non_cm12_multipoles( &
+                                 family, branch, orbital_l + 1)
+                     end if
++                    trace_index = trace_index + 1
++                    if (present(accumulation_trace)) then
++                        if (trace_index > size(accumulation_trace)) then
++                            status = cm12_invalid_argument
++                            message = 'accumulation trace buffer is too small'
++                            return
++                        end if
++                        accumulation_trace(trace_index)%family = family
++                        accumulation_trace(trace_index)%branch = branch
++                        accumulation_trace(trace_index)%orbital_l = orbital_l
++                        accumulation_trace(trace_index)%form_selector = &
++                            form_selector
++                        accumulation_trace(trace_index)%multipole = &
++                            adjusted_multipole
++                        accumulation_trace(trace_index)%amplitudes_before = &
++                            result%amplitudes_mfm
++                    end if
+                     call cm12_accumulate_multipole( &
+                         solution, request%reaction, request%angle_cm_deg, &
+                         family, branch, orbital_l, adjusted_multipole, &
+                         result%amplitudes_mfm, accumulated, status, message)
+                     if (status /= cm12_ok) return
++                    if (present(accumulation_trace)) then
++                        accumulation_trace(trace_index)%amplitudes_after = &
++                            accumulated
++                    end if
+                     result%amplitudes_mfm = accumulated
+                     result%evaluated_multipoles = &
+                         result%evaluated_multipoles + 1
+                 end do
+             end do
+         end do
++        if (present(accumulation_trace_count)) then
++            accumulation_trace_count = trace_index
++        end if
+ 
+         call cm12_evaluate_dsg( &
+             result%kinematics%photon_lab_energy_mev, &
+--- a/cm12_prbas_seam.f90
++++ b/cm12_prbas_seam.f90
+@@ -1,12 +1,14 @@
+ subroutine prbas
+     use, intrinsic :: iso_fortran_env, only: real32
+     use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+-    use cm12_kernel, only: cm12_dataset, cm12_ok
++    use cm12_kernel, only: cm12_dataset, cm12_evaluate_multipole, cm12_ok
+     use cm12_prbas_dispatch, only: cm12_validate_prbas_ambient
+     use cm12_solution_kernel, only: &
+-        cm12_calculate_kinematics, cm12_kinematics, cm12_solution
++        cm12_calculate_kinematics, cm12_kinematics, cm12_solution, &
++        cm12_solution_multipole
+     use cm12_request_kernel, only: &
+-        cm12_background_grid_state, cm12_evaluate_request, &
++        cm12_accumulation_trace, cm12_background_grid_state, &
++        cm12_evaluate_request, cm12_max_accumulation_trace, &
+         cm12_prepare_legacy_angle_background, &
+         cm12_prepare_legacy_background, cm12_prepared_background, &
+         cm12_request, cm12_request_result
+@@ -107,6 +109,8 @@
+     type(cm12_background_grid_state) :: grid_state
+     type(cm12_hadronic_trace) :: &
+         hadronic_trace(cm12_max_hadronic_trace)
++    type(cm12_accumulation_trace) :: &
++        accumulation_trace(cm12_max_accumulation_trace)
+     type(cm12_request_result) :: result
+     type(cm12_kinematics) :: validation_kinematics
+     character(len=512) :: message
+@@ -114,7 +118,10 @@
+     integer :: angle_index
+     integer :: result_index
+     integer :: hadronic_trace_count
++    integer :: accumulation_trace_count
+     integer, save :: diagnostic_call_count = 0
++    integer, save :: forced_diagnostic_call_count = 0
++    integer :: cm12_grid_call
+     integer :: nfg_nonzero
+     integer :: pg_nonzero
+     integer :: status
+@@ -128,6 +135,7 @@
+     character(len=16) :: mode_value
+     external :: prbas_legacy
+     common /cm12diag/ cm12_diagnostic
++    common /cm12gridtrace/ cm12_grid_call
+ 
+     cm12_diagnostic = 0
+     diagnostic_value = ''
+@@ -137,6 +145,8 @@
+     if ( &
+         diagnostic_status == 0 .and. diagnostic_length > 0 .and. &
+         diagnostic_value(1:1) == '1') then
++        forced_diagnostic_call_count = forced_diagnostic_call_count + 1
++        cm12_grid_call = forced_diagnostic_call_count
+         cm12_diagnostic = 1
+         call fallback_to_legacy
+         return
+@@ -186,6 +196,8 @@
+             call write_hadronic_trace( &
+                 diagnostic_call_count, energy_index, k, hadronic_trace(k))
+         end do
++        call write_multipole_grid( &
++            diagnostic_call_count, energy_index, request, background)
+         do angle_index = 1, na
+             ia = angle_index
+             request = cm12_request( &
+@@ -201,10 +213,19 @@
+             end if
+             call cm12_evaluate_request( &
+                 solution, dataset, request, background, result, &
+-                status, message)
++                status, message, accumulation_trace, &
++                accumulation_trace_count)
+             if (status /= cm12_ok) then
+                 call stop_after_typed_failure('request evaluation', message)
+             end if
++            do k = 1, accumulation_trace_count
++                call write_accumulation_trace( &
++                    diagnostic_call_count, energy_index, angle_index, k, &
++                    request, accumulation_trace(k))
++            end do
++            call write_final_trace( &
++                diagnostic_call_count, energy_index, angle_index, &
++                request, result)
+ 
+             ethr = result%kinematics%threshold_lab_energy_mev
+             epi(energy_index) = result%kinematics%final_meson_energy_mev
+@@ -279,7 +300,123 @@
+             trace%form%der, trace%form%dei, trace%hadronic_real, &
+             trace%hadronic_imag
+     end subroutine write_hadronic_trace
++
++    subroutine write_multipole_grid( &
++        call_index, current_energy_index, current_request, current_background)
++        integer, intent(in) :: call_index
++        integer, intent(in) :: current_energy_index
++        type(cm12_request), intent(in) :: current_request
++        type(cm12_prepared_background), intent(in) :: current_background
++
++        type(cm12_kinematics) :: current_kinematics
++        complex(real32) :: multipole
++        complex(real32) :: adjusted_multipole
++        real(real32) :: parameters(25)
++        integer :: family
++        integer :: branch
++        integer :: orbital_l
++        integer :: form_selector
++        integer :: grid_status
++        character(len=512) :: grid_message
+ 
++        call cm12_calculate_kinematics( &
++            current_request%reaction, current_request%photon_lab_energy_mev, &
++            current_kinematics, grid_status, grid_message)
++        if (grid_status /= cm12_ok) then
++            call stop_after_typed_failure('grid kinematics', grid_message)
++        end if
++        do family = 1, 6
++            do branch = 1, 2
++                do orbital_l = 0, 5
++                    call cm12_solution_multipole( &
++                        solution, family, branch, orbital_l, form_selector, &
++                        parameters, grid_status, grid_message)
++                    if (grid_status /= cm12_ok) then
++                        call stop_after_typed_failure( &
++                            'grid solution lookup', grid_message)
++                    end if
++                    adjusted_multipole = cmplx( &
++                        0.0_real32, 0.0_real32, kind=real32)
++                    if (form_selector > 100 .and. form_selector < 200) then
++                        call cm12_evaluate_multipole( &
++                            dataset, form_selector, parameters, family, branch, &
++                            orbital_l, current_kinematics%w_cm_mev, &
++                            current_background%born_multipoles( &
++                                family, branch, orbital_l + 1), &
++                            multipole, grid_status, grid_message)
++                        if (grid_status /= cm12_ok) then
++                            call stop_after_typed_failure( &
++                                'grid multipole evaluation', grid_message)
++                        end if
++                        adjusted_multipole = multipole - cmplx( &
++                            current_background%opec_multipoles( &
++                                family, branch, orbital_l + 1), &
++                            0.0_real32, kind=real32)
++                    else if (form_selector /= 0) then
++                        adjusted_multipole = &
++                            current_background%non_cm12_multipoles( &
++                                family, branch, orbital_l + 1)
++                    end if
++                    write(*, '(A,1X,6(I0,1X),3(ES25.16E3,1X))') &
++                        'CM12TYPED GRID', call_index, current_energy_index, &
++                        family, branch, orbital_l + 1, form_selector, &
++                        current_request%photon_lab_energy_mev, &
++                        real(adjusted_multipole, kind=real32), &
++                        aimag(adjusted_multipole)
++                end do
++            end do
++        end do
++    end subroutine write_multipole_grid
++
++    subroutine write_accumulation_trace( &
++        call_index, current_energy_index, current_angle_index, trace_index, &
++        current_request, trace)
++        integer, intent(in) :: call_index
++        integer, intent(in) :: current_energy_index
++        integer, intent(in) :: current_angle_index
++        integer, intent(in) :: trace_index
++        type(cm12_request), intent(in) :: current_request
++        type(cm12_accumulation_trace), intent(in) :: trace
++        integer :: amplitude_index
++
++        write(*, '(A,1X,9(I0,1X),20(ES25.16E3,1X))') &
++            'CM12TYPED ACCUM', call_index, current_energy_index, &
++            current_angle_index, current_request%reaction, trace_index, &
++            trace%family, trace%branch, trace%orbital_l + 1, &
++            trace%form_selector, &
++            current_request%photon_lab_energy_mev, &
++            current_request%angle_cm_deg, &
++            real(trace%multipole, kind=real32), aimag(trace%multipole), &
++            (real(trace%amplitudes_before(amplitude_index), kind=real32), &
++                aimag(trace%amplitudes_before(amplitude_index)), &
++                amplitude_index=1, 4), &
++            (real(trace%amplitudes_after(amplitude_index), kind=real32), &
++                aimag(trace%amplitudes_after(amplitude_index)), &
++                amplitude_index=1, 4)
++    end subroutine write_accumulation_trace
++
++    subroutine write_final_trace( &
++        call_index, current_energy_index, current_angle_index, &
++        current_request, current_result)
++        integer, intent(in) :: call_index
++        integer, intent(in) :: current_energy_index
++        integer, intent(in) :: current_angle_index
++        type(cm12_request), intent(in) :: current_request
++        type(cm12_request_result), intent(in) :: current_result
++        integer :: amplitude_index
++
++        write(*, '(A,1X,4(I0,1X),11(ES25.16E3,1X))') &
++            'CM12TYPED FINAL', call_index, current_energy_index, &
++            current_angle_index, current_request%reaction, &
++            current_request%photon_lab_energy_mev, &
++            current_request%angle_cm_deg, &
++            (real(current_result%amplitudes_mfm(amplitude_index), &
++                kind=real32), &
++                aimag(current_result%amplitudes_mfm(amplitude_index)), &
++                amplitude_index=1, 4), &
++            current_result%dsg_microbarn_per_sr
++    end subroutine write_final_trace
++
+     function trace_title_token(title_value) result(token)
+         character(len=4), intent(in) :: title_value
+         character(len=4) :: token
+--- a/cm12_prda_probs_seam.f90
++++ b/cm12_prda_probs_seam.f90
+@@ -101,6 +101,8 @@
+     real(real32) :: dei
+     real(real32) :: dpz(99)
+     real(real32) :: obsprd
++    integer :: cm12_diagnostic
++    integer :: cm12_grid_call
+ 
+     common /prsc/ &
+         mtrn, ir, mm, jj, ll, nn, ne, na, ie, ia, ii, nnbt, it, nprm, &
+@@ -109,6 +111,8 @@
+         dum, a, obsx, err, tex, obs, dobs, xex, nbt, cis, ch, hdat, &
+         ir0, thtx, ninc, nincmx, nnl, nmttl, nittl, der, dei, dpz, &
+         obsprd
++    common /cm12diag/ cm12_diagnostic
++    common /cm12gridtrace/ cm12_grid_call
+ 
+     type(cm12_solution), pointer :: solution
+     complex(real32) :: initial_amplitudes(4)
+@@ -117,6 +121,11 @@
+     real(real32) :: angle_cm_deg
+     integer :: status
+     integer :: k
++    integer :: form_selector
++    integer, save :: diagnostic_trace_index = 0
++    integer, save :: diagnostic_last_call = -1
++    integer, save :: diagnostic_last_energy = -1
++    integer, save :: diagnostic_last_angle = -1
+     character(len=256) :: message
+     external :: prda_legacy
+ 
+@@ -132,6 +141,7 @@
+             hr(k, ii), hi(k, ii), kind=real32)
+     end do
+     multipole = cmplx(der, dei, kind=real32)
++    call cm12solutionform(mm, jj, ll, form_selector)
+     angle_cm_deg = a(ia)
+     if (abs(angle_cm_deg) < 0.01_real32) angle_cm_deg = 0.0_real32
+     if (abs(angle_cm_deg - 180.0_real32) < 0.01_real32) then
+@@ -144,6 +154,25 @@
+         write(*, '(a)') 'CM12 PRDA evaluation failed: ' // trim(message)
+         error stop 8
+     end if
++    if (cm12_diagnostic == 1) then
++        if ( &
++            cm12_grid_call /= diagnostic_last_call .or. &
++            ie /= diagnostic_last_energy .or. &
++            ia /= diagnostic_last_angle) then
++            diagnostic_trace_index = 0
++            diagnostic_last_call = cm12_grid_call
++            diagnostic_last_energy = ie
++            diagnostic_last_angle = ia
++        end if
++        diagnostic_trace_index = diagnostic_trace_index + 1
++        write(*, '(A,1X,9(I0,1X),20(ES25.16E3,1X))') &
++            'CM12DIAG ACCUM', cm12_grid_call, ie, ia, ir, &
++            diagnostic_trace_index, mm, jj, ll, form_selector, &
++            e(ie), a(ia), der, dei, &
++            (real(initial_amplitudes(k), kind=real32), &
++                aimag(initial_amplitudes(k)), k=1, 4), &
++            (real(amplitudes(k), kind=real32), aimag(amplitudes(k)), k=1, 4)
++    end if
+     do k = 1, 4
+         hrx(k) = real(amplitudes(k), kind=real32)
+         hix(k) = aimag(amplitudes(k))
+@@ -217,6 +246,8 @@
+     real(real32) :: dei
+     real(real32) :: dpz(99)
+     real(real32) :: obsprd
++    integer :: cm12_diagnostic
++    integer :: cm12_grid_call
+ 
+     common /prsc/ &
+         mtrn, ir, mm, jj, ll, nn, ne, na, ie, ia, ii, nnbt, it, nprm, &
+@@ -225,6 +256,8 @@
+         dum, a, obsx, err, tex, obs, dobs, xex, nbt, cis, ch, hdat, &
+         ir0, thtx, ninc, nincmx, nnl, nmttl, nittl, der, dei, dpz, &
+         obsprd
++    common /cm12diag/ cm12_diagnostic
++    common /cm12gridtrace/ cm12_grid_call
+ 
+     complex(real32) :: amplitudes(4)
+     integer :: status
+@@ -253,4 +286,10 @@
+         write(*, '(a)') 'CM12 DSG evaluation failed: ' // trim(message)
+         error stop 9
+     end if
++    if (cm12_diagnostic == 1) then
++        write(*, '(A,1X,4(I0,1X),11(ES25.16E3,1X))') &
++            'CM12DIAG RESULT', cm12_grid_call, ie, ia, ir, e(ie), a(ia), &
++            (real(amplitudes(k), kind=real32), aimag(amplitudes(k)), &
++                k=1, 4), obsprd
++    end if
+ end subroutine probs
+--- a/prsd.f
++++ b/prsd.f
+@@ -1360,6 +1360,8 @@
+       COMMON/CM12DIAG/CM12DIAG
+       INTEGER CM12ACTIVE,CM12ROW,CM12MM,CM12JJ,CM12LL
+       COMMON/CM12TRACE/CM12ACTIVE,CM12ROW,CM12MM,CM12JJ,CM12LL
++      INTEGER CM12GRIDCALL,IGRID,MGRID,JGRID,LGRID,NFXGRID
++      COMMON/CM12GRIDTRACE/CM12GRIDCALL
+ C     EQUIVALENCE (CCX,GOM1)
+       DATA MMMN,MMMX,TERR/1,6,4HTERR/
+ C     CALCULATE BASES AND AMPLITUDES FOR PLOT
+@@ -1452,6 +1454,21 @@
+       EMI(I,M,J,L)=0.0
+     3 CONTINUE
+     2 CONTINUE
++      IF(CM12DIAG.EQ.1) THEN
++         DO IGRID=1,NE
++            DO MGRID=1,6
++               DO JGRID=1,2
++                  DO LGRID=1,6
++                     CALL CM12SOLUTIONFORM(MGRID,JGRID,LGRID,NFXGRID)
++                     WRITE(*,9020) CM12GRIDCALL,IGRID,MGRID,JGRID,
++     C                  LGRID,NFXGRID,E(IGRID),
++     C                  EMR(IGRID,MGRID,JGRID,LGRID),
++     C                  EMI(IGRID,MGRID,JGRID,LGRID)
++                  END DO
++               END DO
++            END DO
++         END DO
++      ENDIF
+       IF(IR.EQ.0)  GO TO 99
+       II=1
+       DO 4 I=1,NE
+@@ -1509,6 +1526,7 @@
+  9010 FORMAT('CM12DIAG INITIAL',4(1X,ES24.16E3))
+  9011 FORMAT('CM12DIAG APPLY',4(1X,I4),10(1X,ES24.16E3))
+  9012 FORMAT('CM12DIAG FINAL',9(1X,ES24.16E3))
++ 9020 FORMAT('CM12DIAG GRID',6(1X,I4),3(1X,ES24.16E3))
+    99 RETURN
+       END
+ C *****************************************************************
+
+--- a/cmmwp_seam.f90
++++ b/cmmwp_seam.f90
+@@ -70,6 +70,9 @@
+     real(real32) :: dei
+     real(real32) :: dpz(99)
+     real(real32) :: obsprd
++    integer :: cm12_diagnostic
++    integer :: cm12_grid_call
++    integer :: cm12_supply_phase
+ 
+     common /prsc/ &
+         mtrn, ir, mm, jj, ll, nn, ne, na, ie, ia, ii, nnbt, it, nprm, &
+@@ -78,6 +81,9 @@
+         dum, a, obsx, err, tex, obs, dobs, xex, nbt, cis, ch, hdat, &
+         ir0, thtx, ninc, nincmx, nnl, nmttl, nittl, der, dei, dpz, &
+         obsprd
++    common /cm12diag/ cm12_diagnostic
++    common /cm12gridtrace/ cm12_grid_call
++    common /cm12supplytrace/ cm12_supply_phase
+ 
+     type(cm12_dataset), pointer :: dataset
+     type(cm12_solution), pointer :: solution
+@@ -123,12 +129,14 @@
+     end if
+     w_cm_mev = sqrt( &
+         proton_mass**2 + 2.0_real32 * e(ie) * proton_mass)
++    photon_lab_energy_mev = &
++        (w_cm_mev**2 - proton_mass**2) / &
++        (2.0_real32 * proton_mass)
+ 
+     born_multipole = 0.0_real32
++    born = 0.0_real32
++    opec = 0.0_real32
+     if (form_number / 10 == 13) then
+-        photon_lab_energy_mev = &
+-            (w_cm_mev**2 - proton_mass**2) / &
+-            (2.0_real32 * proton_mass)
+         call cm12_solution_background( &
+             solution, background, status, message)
+         if (status /= cm12_ok) then
+@@ -162,6 +170,15 @@
+         write(*, '(a)') 'CM12 multipole evaluation failed: ' // trim(message)
+         error stop 7
+     end if
++    if ( &
++        cm12_diagnostic == 1 .and. cm12_supply_phase == 1 .and. &
++        (form_number == 124 .or. form_number == 134)) then
++        write(*, '(A,1X,7(I0,1X),7(ES25.16E3,1X))') &
++            'CM12DIAG CMMWP SUPPLY', cm12_grid_call, ie, ir, mm, jj, ll, &
++            form_number, e(ie), w_cm_mev, photon_lab_energy_mev, &
++            born_multipole, opec(mm, jj, ll), &
++            real(multipole, kind=real32), aimag(multipole)
++    end if
+ 
+     der = real(multipole, kind=real32)
+     dei = aimag(multipole)
+--- a/prsd.f
++++ b/prsd.f
+@@ -1362,12 +1362,15 @@
+       COMMON/CM12TRACE/CM12ACTIVE,CM12ROW,CM12MM,CM12JJ,CM12LL
+       INTEGER CM12GRIDCALL,IGRID,MGRID,JGRID,LGRID,NFXGRID
+       COMMON/CM12GRIDTRACE/CM12GRIDCALL
++      INTEGER CM12SUPPLYPHASE
++      COMMON/CM12SUPPLYTRACE/CM12SUPPLYPHASE
+ C     EQUIVALENCE (CCX,GOM1)
+       DATA MMMN,MMMX,TERR/1,6,4HTERR/
+ C     CALCULATE BASES AND AMPLITUDES FOR PLOT
+       DATA WP,WN,WPI0,WPIC/938.256,939.65,135.04,139.65/
+       DATA SPW,SOP,SOPW,BORN,BRNX/1.0,1.0,-1.0,4HBORN,4HBRNX/
+       SAVE
++      CM12SUPPLYPHASE=0
+       IF(IR0.EQ.0) GO TO 1
+       SOP=0.0
+       SOPW=0.0
+@@ -1443,7 +1446,13 @@
+       IF(NFX.EQ.0.AND.L.GT.2) NFX=3
+       IF(NFX.EQ.0) GO TO 3
+       EMR(I,M,J,L)=0.0
++      CM12SUPPLYPHASE=1
+       CALL PRDLT
++      CM12SUPPLYPHASE=0
++      IF(CM12DIAG.EQ.1.AND.
++     C (NFX.EQ.124.OR.NFX.EQ.134))
++     C WRITE(*,9021) CM12GRIDCALL,I,IR,M,J,L,NFX,E(I),
++     C SPW,SOPW,EMPI(M,J,L),DER,DEI
+       EMR(I,M,J,L)=DER
+       EMI(I,M,J,L)=DEI
+       IF(IR0.NE.0) GO TO 3
+@@ -1505,6 +1514,11 @@
+       DER=SPW*DER+SOPW*EMPI(M,J,L)
+       DEI=SPW*DEI
+       LL=L
++      IF(CM12DIAG.EQ.1.AND.IA.EQ.1.AND.
++     C (NFX.EQ.124.OR.NFX.EQ.134))
++     C WRITE(*,9022) CM12GRIDCALL,I,IR,M,J,L,NFX,E(I),
++     C SPW,SOPW,EMPI(M,J,L),EMR(I,M,J,L),
++     C EMI(I,M,J,L),DER,DEI
+ C     write(*,223) m,j,l,emr(i,m,j,l),emi(i,m,j,l)
+ C 223 format(3i3,2e12.4)
+       CALL PRDA
+@@ -1527,6 +1541,9 @@
+  9011 FORMAT('CM12DIAG APPLY',4(1X,I4),10(1X,ES24.16E3))
+  9012 FORMAT('CM12DIAG FINAL',9(1X,ES24.16E3))
+  9020 FORMAT('CM12DIAG GRID',6(1X,I4),3(1X,ES24.16E3))
++ 9021 FORMAT('CM12DIAG PRBAS GRID SUPPLY',7(1X,I4),6(1X,ES24.16E3))
++ 9022 FORMAT('CM12DIAG PRBAS RETURN SUPPLY',7(1X,I4),
++     C 8(1X,ES24.16E3))
+    99 RETURN
+       END
+ C *****************************************************************
+--- a/cm12_prbas_seam.f90
++++ b/cm12_prbas_seam.f90
+@@ -312,6 +312,8 @@
+         complex(real32) :: multipole
+         complex(real32) :: adjusted_multipole
+         real(real32) :: parameters(25)
++        real(real32) :: reconstructed_energy
++        real(real32), parameter :: proton_mass = 938.256_real32
+         integer :: family
+         integer :: branch
+         integer :: orbital_l
+@@ -336,6 +338,8 @@
+                             'grid solution lookup', grid_message)
+                     end if
+                     adjusted_multipole = cmplx( &
++                        0.0_real32, 0.0_real32, kind=real32)
++                    multipole = cmplx( &
+                         0.0_real32, 0.0_real32, kind=real32)
+                     if (form_selector > 100 .and. form_selector < 200) then
+                         call cm12_evaluate_multipole( &
+@@ -357,6 +361,27 @@
+                             current_background%non_cm12_multipoles( &
+                                 family, branch, orbital_l + 1)
+                     end if
++                    if (form_selector == 124 .or. form_selector == 134) then
++                        reconstructed_energy = &
++                            (current_kinematics%w_cm_mev**2 - &
++                                proton_mass**2) / &
++                            (2.0_real32 * proton_mass)
++                        write(*, &
++                            '(A,1X,7(I0,1X),9(ES25.16E3,1X))') &
++                            'CM12TYPED PRBAS SUPPLY', call_index, &
++                            current_energy_index, current_request%reaction, &
++                            family, branch, orbital_l + 1, form_selector, &
++                            current_request%photon_lab_energy_mev, &
++                            current_kinematics%w_cm_mev, &
++                            reconstructed_energy, &
++                            current_background%born_multipoles( &
++                                family, branch, orbital_l + 1), &
++                            current_background%opec_multipoles( &
++                                family, branch, orbital_l + 1), &
++                            real(multipole, kind=real32), aimag(multipole), &
++                            real(adjusted_multipole, kind=real32), &
++                            aimag(adjusted_multipole)
++                    end if
+                     write(*, '(A,1X,6(I0,1X),3(ES25.16E3,1X))') &
+                         'CM12TYPED GRID', call_index, current_energy_index, &
+                         family, branch, orbital_l + 1, form_selector, &
