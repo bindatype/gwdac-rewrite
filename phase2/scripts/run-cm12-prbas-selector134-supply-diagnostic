@@ -1,0 +1,347 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
+readonly phase1_root="${PHASE1_ROOT:-/phase1}"
+readonly phase2_root="${PHASE2_ROOT:-/phase2}"
+readonly candidate_root="${GWDAC_CANDIDATE_ROOT:?set GWDAC_CANDIDATE_ROOT to the mounted candidate checkout}"
+readonly state_root="${SELECTOR134_STATE_ROOT:-/workspace/phase2/prbas-selector134-supply}"
+readonly report_root="${SELECTOR134_REPORT_ROOT:-${phase2_root}/reports/cm12-prbas-lifecycle-contract/selector134-supply/capture}"
+readonly fixture="${phase1_root}/fixtures/go3pr2-production-adapter/live.in"
+readonly kcm_root="${source_root}/said/KCM.100330"
+readonly data_root="${source_root}/sdat"
+readonly solution_file="${data_root}/prsol.dat"
+readonly solution_sha256=dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522
+readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-300}"
+readonly candidate_head="$(git -c safe.directory='*' -C "${candidate_root}" rev-parse HEAD)"
+readonly short_source_commit="$(git -C "${source_root}" rev-parse --short=12 HEAD)"
+readonly build_state_root="${state_root}/build"
+readonly build_report_root="${state_root}/build-report"
+readonly executable="${build_state_root}/artifacts/${short_source_commit}/prsdd-headless"
+readonly combined_patch="${state_root}/cm12_prbas_selector134_combined.patch"
+readonly -a diagnostic_patches=(
+    cm12_prbas_invalidation_trace.patch
+    cm12_prbas_prdlt_all_forms_trace.patch
+    cm12_prbas_return_grid_trace.patch
+    cm12_prbas_selector134_supply_trace.patch
+)
+
+if [[ -n "$(git -c safe.directory='*' -C "${candidate_root}" status --porcelain --untracked-files=all)" ]]; then
+    printf 'Candidate checkout is not clean: %s\n' "${candidate_root}" >&2
+    exit 2
+fi
+if [[ -e "${report_root}" ]]; then
+    printf 'Selector-134 report root already exists: %s\n' "${report_root}" >&2
+    exit 2
+fi
+mkdir -p "${report_root}" "${state_root}/runs" "${build_report_root}"
+test -f "${fixture}"
+
+for patch_name in "${diagnostic_patches[@]}"; do
+    cmp \
+        "${candidate_root}/phase2/kernel/${patch_name}" \
+        "${phase2_root}/kernel/${patch_name}"
+done
+cmp \
+    "${candidate_root}/phase2/scripts/run-cm12-prbas-selector134-supply-diagnostic" \
+    "${phase2_root}/scripts/run-cm12-prbas-selector134-supply-diagnostic"
+cmp \
+    "${candidate_root}/phase1/scripts/build-prsdd" \
+    "${phase1_root}/scripts/build-prsdd"
+
+for patch_name in "${diagnostic_patches[@]}"; do
+    cat "${phase2_root}/kernel/${patch_name}"
+done >"${combined_patch}"
+
+CM12_SEAM_ROOT="${phase2_root}/kernel" \
+CM12_PRBAS_DIAGNOSTIC_PATCH="${combined_patch}" \
+PHASE1_STATE_ROOT="${build_state_root}" \
+PHASE1_REPORT_ROOT="${build_report_root}" \
+    bash "${phase1_root}/scripts/build-prsdd"
+test -x "${executable}"
+for marker in \
+    'CM12TYPED PRBAS SUPPLY' \
+    'CM12DIAG CMMWP SUPPLY' \
+    'CM12DIAG PRBAS GRID SUPPLY' \
+    'CM12DIAG PRBAS RETURN SUPPLY'; do
+    grep -aFq "${marker}" "${executable}"
+done
+
+run_case() {
+    local label="$1"
+    local force_legacy="$2"
+    local run_root
+    local status
+    local -a environment
+
+    run_root="$(mktemp -d "${state_root}/runs/${label}.XXXXXX")"
+    cp -a "${source_root}/pr" "${run_root}/pr"
+    rm -f \
+        "${run_root}/pr/SAID.TMP" \
+        "${run_root}/pr/SAID.PCT" \
+        "${run_root}/pr/SAID.LOG" \
+        "${run_root}/pr/SAID.PS" \
+        "${run_root}/pr/fort.3" \
+        "${run_root}/pr/fort.7"
+    ln -sfn "${kcm_root}" "${run_root}/pr/KCM"
+    ln -s "${data_root}" "${run_root}/sdat"
+
+    environment=(
+        "CM12_KCM_ROOT=${kcm_root}"
+        "CM12_SOLUTION_FILE=${solution_file}"
+        "CM12_SOLUTION_SHA256=${solution_sha256}"
+        "CM12_SOLUTION_ID=CM12"
+        "SAID_DATA_ROOT=${data_root}"
+        "TZ=America/New_York"
+    )
+    if [[ "${force_legacy}" == yes ]]; then
+        environment+=("CM12_FORCE_LEGACY_PRBAS=1")
+    fi
+
+    set +e
+    (
+        cd "${run_root}/pr"
+        timeout "${timeout_seconds}" env -u CM12_PRBAS_MODE \
+            "${environment[@]}" "${executable}" <"${fixture}" \
+            >"${report_root}/${label}.stdout" \
+            2>"${report_root}/${label}.stderr"
+    )
+    status=$?
+    set -e
+    printf '%s\n' "${status}" >"${report_root}/${label}.exit"
+}
+
+run_case typed no
+run_case forced-legacy yes
+test "$(cat "${report_root}/typed.exit")" -eq 0
+test "$(cat "${report_root}/forced-legacy.exit")" -eq 0
+
+extract_marker() {
+    local marker="$1"
+    local expected="$2"
+    local first_data_field="$3"
+    local header="$4"
+    local input="$5"
+    local output="$6"
+
+    awk -v marker="${marker}" -v expected="${expected}" \
+        -v first="${first_data_field}" -v header="${header}" '
+        BEGIN { OFS = "\t"; print header }
+        index($0, marker) {
+            count = split(substr($0, index($0, marker)), item)
+            if (count != expected) {
+                print "unexpected " marker " field count: " count > "/dev/stderr"
+                exit 2
+            }
+            for (column = first; column <= count; column++) {
+                printf "%s%s", item[column], (column == count ? ORS : OFS)
+            }
+        }
+    ' "${input}" >"${output}"
+}
+
+readonly key_header='call_id\tenergy_index\treaction\tfamily\tbranch\tlegacy_l\tselector'
+extract_marker 'CM12TYPED PRBAS SUPPLY' 19 4 \
+    "${key_header}\trequest_energy\tw_cm\treconstructed_energy\tborn_argument\topec_original\traw_real\traw_imag\treturn_real\treturn_imag" \
+    "${report_root}/typed.stdout" "${report_root}/typed-supply.tsv"
+extract_marker 'CM12DIAG CMMWP SUPPLY' 17 4 \
+    "${key_header}\trequest_energy\tw_cm\treconstructed_energy\tborn_reconstructed\topec_reconstructed\traw_real\traw_imag" \
+    "${report_root}/forced-legacy.stdout" \
+    "${report_root}/forced-cmmwp-supply.tsv"
+extract_marker 'CM12DIAG PRBAS GRID SUPPLY' 17 5 \
+    "${key_header}\trequest_energy\tspw\tsopw\topec_original\traw_real\traw_imag" \
+    "${report_root}/forced-legacy.stdout" \
+    "${report_root}/forced-grid-supply.tsv"
+extract_marker 'CM12DIAG PRBAS RETURN SUPPLY' 19 5 \
+    "${key_header}\trequest_energy\tspw\tsopw\topec_original\tstorage_real\tstorage_imag\treturn_real\treturn_imag" \
+    "${report_root}/forced-legacy.stdout" \
+    "${report_root}/forced-return-supply.tsv"
+
+awk -F '\t' -v OFS='\t' \
+    -v summary="${report_root}/summary.tsv" '
+    function key() {
+        return $1 SUBSEP $2 SUBSEP $3 SUBSEP $4 SUBSEP $5 SUBSEP $6 SUBSEP $7
+    }
+    function exact(left, right) { return ("x" left == "x" right ? "yes" : "no") }
+    FILENAME == ARGV[1] {
+        if (FNR == 1) next
+        k = key()
+        order[++rows] = k
+        for (column = 1; column <= NF; column++) typed[k, column] = $column
+        seen_typed[k]++
+        next
+    }
+    FILENAME == ARGV[2] {
+        if (FNR == 1) next
+        k = key()
+        for (column = 1; column <= NF; column++) cmmwp[k, column] = $column
+        seen_cmmwp[k]++
+        next
+    }
+    FILENAME == ARGV[3] {
+        if (FNR == 1) next
+        k = key()
+        for (column = 1; column <= NF; column++) grid[k, column] = $column
+        seen_grid[k]++
+        next
+    }
+    FILENAME == ARGV[4] {
+        if (FNR == 1) next
+        k = key()
+        for (column = 1; column <= NF; column++) returned[k, column] = $column
+        seen_return[k]++
+        next
+    }
+    END {
+        print "call_id", "energy_index", "reaction", "family", "branch", \
+            "legacy_l", "selector", "typed_request_energy", "typed_w_cm", \
+            "typed_reconstructed_energy", "typed_born_argument", \
+            "typed_opec_original", "typed_raw_real", "typed_raw_imag", \
+            "typed_return_real", "typed_return_imag", \
+            "forced_request_energy", "forced_w_cm", \
+            "forced_reconstructed_energy", "forced_born_reconstructed", \
+            "forced_opec_reconstructed", "forced_opec_original", \
+            "forced_raw_real", "forced_raw_imag", "forced_return_real", \
+            "forced_return_imag", "request_exact", "w_exact", \
+            "reconstructed_energy_exact", "typed_roundtrip_exact", \
+            "forced_roundtrip_exact", "born_exact", "original_opec_exact", \
+            "raw_real_exact", "raw_imag_exact", "return_real_exact", \
+            "return_imag_exact"
+        for (position = 1; position <= rows; position++) {
+            k = order[position]
+            selector = typed[k, 7]
+            selector_rows[selector]++
+            if (seen_typed[k] != 1 || seen_cmmwp[k] != 1 || \
+                seen_grid[k] != 1 || seen_return[k] != 1) structural++
+            request_exact = exact(typed[k, 8], cmmwp[k, 8])
+            w_exact = exact(typed[k, 9], cmmwp[k, 9])
+            reconstructed_exact = exact(typed[k, 10], cmmwp[k, 10])
+            typed_roundtrip = exact(typed[k, 8], typed[k, 10])
+            forced_roundtrip = exact(cmmwp[k, 8], cmmwp[k, 10])
+            born_exact = exact(typed[k, 11], cmmwp[k, 11])
+            opec_exact = exact(typed[k, 12], grid[k, 11])
+            raw_real_exact = exact(typed[k, 13], cmmwp[k, 13])
+            raw_imag_exact = exact(typed[k, 14], cmmwp[k, 14])
+            return_real_exact = exact(typed[k, 15], returned[k, 14])
+            return_imag_exact = exact(typed[k, 16], returned[k, 15])
+            check["request", selector] += (request_exact == "yes")
+            check["w", selector] += (w_exact == "yes")
+            check["reconstructed", selector] += (reconstructed_exact == "yes")
+            check["typed_roundtrip", selector] += (typed_roundtrip == "yes")
+            check["forced_roundtrip", selector] += (forced_roundtrip == "yes")
+            check["born", selector] += (born_exact == "yes")
+            check["opec", selector] += (opec_exact == "yes")
+            check["raw_real", selector] += (raw_real_exact == "yes")
+            check["raw_imag", selector] += (raw_imag_exact == "yes")
+            check["return_real", selector] += (return_real_exact == "yes")
+            check["return_imag", selector] += (return_imag_exact == "yes")
+            print typed[k,1], typed[k,2], typed[k,3], typed[k,4], typed[k,5], \
+                typed[k,6], selector, typed[k,8], typed[k,9], typed[k,10], \
+                typed[k,11], typed[k,12], typed[k,13], typed[k,14], \
+                typed[k,15], typed[k,16], cmmwp[k,8], cmmwp[k,9], \
+                cmmwp[k,10], cmmwp[k,11], cmmwp[k,12], grid[k,11], \
+                cmmwp[k,13], cmmwp[k,14], returned[k,14], returned[k,15], \
+                request_exact, w_exact, reconstructed_exact, typed_roundtrip, \
+                forced_roundtrip, born_exact, opec_exact, raw_real_exact, \
+                raw_imag_exact, return_real_exact, return_imag_exact
+        }
+        print "metric", "selector", "exact", "total" > summary
+        split("request w reconstructed typed_roundtrip forced_roundtrip born opec raw_real raw_imag return_real return_imag", name, " ")
+        for (selector_index = 1; selector_index <= 2; selector_index++) {
+            selector = (selector_index == 1 ? 124 : 134)
+            for (metric = 1; metric <= 11; metric++) {
+                print name[metric], selector, check[name[metric], selector] + 0, \
+                    selector_rows[selector] + 0 >> summary
+            }
+        }
+        print "structural_key_errors", "all", structural + 0, 0 >> summary
+        close(summary)
+    }
+' "${report_root}/typed-supply.tsv" \
+    "${report_root}/forced-cmmwp-supply.tsv" \
+    "${report_root}/forced-grid-supply.tsv" \
+    "${report_root}/forced-return-supply.tsv" \
+    >"${report_root}/supply-comparison.tsv"
+
+extract_go5() {
+    local input="$1"
+    local output="$2"
+    awk '
+        BEGIN { OFS = "\t"; print "row", "angle", "predicted_obs", "measured_obs", "error", "dchi" }
+        index($0, "WEB") { section++ }
+        section == 1 && NF == 5 && $1 ~ /^[+-]?[0-9]+\.[0-9]+$/ &&
+            $2 ~ /^[+-]?0\.[0-9]+E[+-][0-9]+$/ {
+            print ++row, $1, $2, $3, $4, $5
+        }
+    ' "${input}" >"${output}"
+}
+extract_go5 "${report_root}/typed.stdout" "${report_root}/typed-go5.tsv"
+extract_go5 "${report_root}/forced-legacy.stdout" \
+    "${report_root}/forced-legacy-go5.tsv"
+
+awk -F '\t' -v OFS='\t' '
+    FNR == NR {
+        if (FNR > 1) for (column = 1; column <= 6; column++) value[FNR-1,column] = $column
+        next
+    }
+    FNR == 1 { print "row", "field", "typed", "forced_legacy"; next }
+    {
+        for (column = 1; column <= 6; column++) {
+            if ("x" value[FNR-1,column] != "x" $column) {
+                print FNR-1, column, value[FNR-1,column], $column
+            }
+        }
+    }
+' "${report_root}/typed-go5.tsv" "${report_root}/forced-legacy-go5.tsv" \
+    >"${report_root}/go5-differences.tsv"
+
+readonly typed_rows="$(($(wc -l <"${report_root}/typed-supply.tsv") - 1))"
+readonly cmmwp_rows="$(($(wc -l <"${report_root}/forced-cmmwp-supply.tsv") - 1))"
+readonly grid_rows="$(($(wc -l <"${report_root}/forced-grid-supply.tsv") - 1))"
+readonly return_rows="$(($(wc -l <"${report_root}/forced-return-supply.tsv") - 1))"
+readonly comparison_rows="$(($(wc -l <"${report_root}/supply-comparison.tsv") - 1))"
+readonly structural_errors="$(awk -F '\t' '$1 == "structural_key_errors" { print $3 }' "${report_root}/summary.tsv")"
+readonly typed_go5_rows="$(($(wc -l <"${report_root}/typed-go5.tsv") - 1))"
+readonly forced_go5_rows="$(($(wc -l <"${report_root}/forced-legacy-go5.tsv") - 1))"
+
+structural_status=PASS
+if [[ "${typed_rows}" -ne 2660 || "${cmmwp_rows}" -ne 2660 || \
+    "${grid_rows}" -ne 2660 || "${return_rows}" -ne 2660 || \
+    "${comparison_rows}" -ne 2660 || "${structural_errors}" -ne 0 || \
+    "${typed_go5_rows}" -ne 1533 || "${forced_go5_rows}" -ne 1533 ]]; then
+    structural_status=FAIL
+fi
+readonly structural_status
+
+cp "${combined_patch}" "${report_root}/combined-diagnostic.patch"
+cp "${build_report_root}/build-manifest.txt" "${report_root}/build-manifest.txt"
+{
+    printf 'evidence_label=captured/reference-candidate-diagnostic\n'
+    printf 'candidate_head=%s\n' "${candidate_head}"
+    printf 'archived_source_commit=%s\n' "$(git -C "${source_root}" rev-parse HEAD)"
+    printf 'fixture_sha256=%s\n' "$(sha256sum "${fixture}" | awk '{print $1}')"
+    printf 'executable_sha256=%s\n' "$(sha256sum "${executable}" | awk '{print $1}')"
+    printf 'runner_sha256=%s\n' "$(sha256sum "${phase2_root}/scripts/run-cm12-prbas-selector134-supply-diagnostic" | awk '{print $1}')"
+    for patch_name in "${diagnostic_patches[@]}"; do
+        printf 'patch_sha256[%s]=%s\n' "${patch_name}" \
+            "$(sha256sum "${phase2_root}/kernel/${patch_name}" | awk '{print $1}')"
+    done
+    printf 'timezone=America/New_York\n'
+    printf 'target_selectors=124,134\n'
+    printf 'selector_135_population=separate_not_pooled\n'
+    . /etc/os-release
+    printf 'container_os=%s\n' "${PRETTY_NAME}"
+} >"${report_root}/run-context.txt"
+
+gzip -n -f "${report_root}/typed.stdout" "${report_root}/forced-legacy.stdout"
+(
+    cd "${report_root}"
+    find . -maxdepth 1 -type f ! -name manifest.sha256 -print0 | \
+        sort -z | xargs -0 sha256sum >manifest.sha256
+)
+
+printf 'Structural validation: %s\n' "${structural_status}"
+cat "${report_root}/summary.tsv"
+if [[ "${structural_status}" != PASS ]]; then
+    exit 1
+fi

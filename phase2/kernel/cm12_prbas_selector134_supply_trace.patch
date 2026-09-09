@@ -1,0 +1,158 @@
+--- a/cmmwp_seam.f90
++++ b/cmmwp_seam.f90
+@@ -70,6 +70,9 @@
+     real(real32) :: dei
+     real(real32) :: dpz(99)
+     real(real32) :: obsprd
++    integer :: cm12_diagnostic
++    integer :: cm12_grid_call
++    integer :: cm12_supply_phase
+ 
+     common /prsc/ &
+         mtrn, ir, mm, jj, ll, nn, ne, na, ie, ia, ii, nnbt, it, nprm, &
+@@ -78,6 +81,9 @@
+         dum, a, obsx, err, tex, obs, dobs, xex, nbt, cis, ch, hdat, &
+         ir0, thtx, ninc, nincmx, nnl, nmttl, nittl, der, dei, dpz, &
+         obsprd
++    common /cm12diag/ cm12_diagnostic
++    common /cm12gridtrace/ cm12_grid_call
++    common /cm12supplytrace/ cm12_supply_phase
+ 
+     type(cm12_dataset), pointer :: dataset
+     type(cm12_solution), pointer :: solution
+@@ -123,12 +129,14 @@
+     end if
+     w_cm_mev = sqrt( &
+         proton_mass**2 + 2.0_real32 * e(ie) * proton_mass)
++    photon_lab_energy_mev = &
++        (w_cm_mev**2 - proton_mass**2) / &
++        (2.0_real32 * proton_mass)
+ 
+     born_multipole = 0.0_real32
++    born = 0.0_real32
++    opec = 0.0_real32
+     if (form_number / 10 == 13) then
+-        photon_lab_energy_mev = &
+-            (w_cm_mev**2 - proton_mass**2) / &
+-            (2.0_real32 * proton_mass)
+         call cm12_solution_background( &
+             solution, background, status, message)
+         if (status /= cm12_ok) then
+@@ -162,6 +170,15 @@
+         write(*, '(a)') 'CM12 multipole evaluation failed: ' // trim(message)
+         error stop 7
+     end if
++    if ( &
++        cm12_diagnostic == 1 .and. cm12_supply_phase == 1 .and. &
++        (form_number == 124 .or. form_number == 134)) then
++        write(*, '(A,1X,7(I0,1X),7(ES25.16E3,1X))') &
++            'CM12DIAG CMMWP SUPPLY', cm12_grid_call, ie, ir, mm, jj, ll, &
++            form_number, e(ie), w_cm_mev, photon_lab_energy_mev, &
++            born_multipole, opec(mm, jj, ll), &
++            real(multipole, kind=real32), aimag(multipole)
++    end if
+ 
+     der = real(multipole, kind=real32)
+     dei = aimag(multipole)
+--- a/prsd.f
++++ b/prsd.f
+@@ -1362,12 +1362,15 @@
+       COMMON/CM12TRACE/CM12ACTIVE,CM12ROW,CM12MM,CM12JJ,CM12LL
+       INTEGER CM12GRIDCALL,IGRID,MGRID,JGRID,LGRID,NFXGRID
+       COMMON/CM12GRIDTRACE/CM12GRIDCALL
++      INTEGER CM12SUPPLYPHASE
++      COMMON/CM12SUPPLYTRACE/CM12SUPPLYPHASE
+ C     EQUIVALENCE (CCX,GOM1)
+       DATA MMMN,MMMX,TERR/1,6,4HTERR/
+ C     CALCULATE BASES AND AMPLITUDES FOR PLOT
+       DATA WP,WN,WPI0,WPIC/938.256,939.65,135.04,139.65/
+       DATA SPW,SOP,SOPW,BORN,BRNX/1.0,1.0,-1.0,4HBORN,4HBRNX/
+       SAVE
++      CM12SUPPLYPHASE=0
+       IF(IR0.EQ.0) GO TO 1
+       SOP=0.0
+       SOPW=0.0
+@@ -1443,7 +1446,13 @@
+       IF(NFX.EQ.0.AND.L.GT.2) NFX=3
+       IF(NFX.EQ.0) GO TO 3
+       EMR(I,M,J,L)=0.0
++      CM12SUPPLYPHASE=1
+       CALL PRDLT
++      CM12SUPPLYPHASE=0
++      IF(CM12DIAG.EQ.1.AND.
++     C (NFX.EQ.124.OR.NFX.EQ.134))
++     C WRITE(*,9021) CM12GRIDCALL,I,IR,M,J,L,NFX,E(I),
++     C SPW,SOPW,EMPI(M,J,L),DER,DEI
+       EMR(I,M,J,L)=DER
+       EMI(I,M,J,L)=DEI
+       IF(IR0.NE.0) GO TO 3
+@@ -1505,6 +1514,11 @@
+       DER=SPW*DER+SOPW*EMPI(M,J,L)
+       DEI=SPW*DEI
+       LL=L
++      IF(CM12DIAG.EQ.1.AND.IA.EQ.1.AND.
++     C (NFX.EQ.124.OR.NFX.EQ.134))
++     C WRITE(*,9022) CM12GRIDCALL,I,IR,M,J,L,NFX,E(I),
++     C SPW,SOPW,EMPI(M,J,L),EMR(I,M,J,L),
++     C EMI(I,M,J,L),DER,DEI
+ C     write(*,223) m,j,l,emr(i,m,j,l),emi(i,m,j,l)
+ C 223 format(3i3,2e12.4)
+       CALL PRDA
+@@ -1527,6 +1541,9 @@
+  9011 FORMAT('CM12DIAG APPLY',4(1X,I4),10(1X,ES24.16E3))
+  9012 FORMAT('CM12DIAG FINAL',9(1X,ES24.16E3))
+  9020 FORMAT('CM12DIAG GRID',6(1X,I4),3(1X,ES24.16E3))
++ 9021 FORMAT('CM12DIAG PRBAS GRID SUPPLY',7(1X,I4),6(1X,ES24.16E3))
++ 9022 FORMAT('CM12DIAG PRBAS RETURN SUPPLY',7(1X,I4),
++     C 8(1X,ES24.16E3))
+    99 RETURN
+       END
+ C *****************************************************************
+--- a/cm12_prbas_seam.f90
++++ b/cm12_prbas_seam.f90
+@@ -312,6 +312,8 @@
+         complex(real32) :: multipole
+         complex(real32) :: adjusted_multipole
+         real(real32) :: parameters(25)
++        real(real32) :: reconstructed_energy
++        real(real32), parameter :: proton_mass = 938.256_real32
+         integer :: family
+         integer :: branch
+         integer :: orbital_l
+@@ -336,6 +338,8 @@
+                             'grid solution lookup', grid_message)
+                     end if
+                     adjusted_multipole = cmplx( &
++                        0.0_real32, 0.0_real32, kind=real32)
++                    multipole = cmplx( &
+                         0.0_real32, 0.0_real32, kind=real32)
+                     if (form_selector > 100 .and. form_selector < 200) then
+                         call cm12_evaluate_multipole( &
+@@ -357,6 +361,27 @@
+                             current_background%non_cm12_multipoles( &
+                                 family, branch, orbital_l + 1)
+                     end if
++                    if (form_selector == 124 .or. form_selector == 134) then
++                        reconstructed_energy = &
++                            (current_kinematics%w_cm_mev**2 - &
++                                proton_mass**2) / &
++                            (2.0_real32 * proton_mass)
++                        write(*, &
++                            '(A,1X,7(I0,1X),9(ES25.16E3,1X))') &
++                            'CM12TYPED PRBAS SUPPLY', call_index, &
++                            current_energy_index, current_request%reaction, &
++                            family, branch, orbital_l + 1, form_selector, &
++                            current_request%photon_lab_energy_mev, &
++                            current_kinematics%w_cm_mev, &
++                            reconstructed_energy, &
++                            current_background%born_multipoles( &
++                                family, branch, orbital_l + 1), &
++                            current_background%opec_multipoles( &
++                                family, branch, orbital_l + 1), &
++                            real(multipole, kind=real32), aimag(multipole), &
++                            real(adjusted_multipole, kind=real32), &
++                            aimag(adjusted_multipole)
++                    end if
+                     write(*, '(A,1X,6(I0,1X),3(ES25.16E3,1X))') &
+                         'CM12TYPED GRID', call_index, current_energy_index, &
+                         family, branch, orbital_l + 1, form_selector, &
