@@ -1,0 +1,8 @@
+section	case	status	multipoles	a1_real	a1_imag	dsg
+request	1	0	40	 -1.37084780E+01	  2.01492119E+01	  8.96467209E+00
+request	2	0	40	 -1.02181225E+01	 -4.52479029E+00	  2.03560233E+00
+request	3	0	40	 -7.93513489E+00	  2.66114926E+00	  6.38169622E+00
+request	4	0	40	 -1.62853432E+00	  1.20228326E+00	  1.18553412E+00
+order	A-B-A	0	40	exact    
+rejection	invalid-angle	1	0	center-of-mass angle must be in 0..180 degrees
+rejection	below-threshold	7	0	CM12 request is at or below the reaction threshold

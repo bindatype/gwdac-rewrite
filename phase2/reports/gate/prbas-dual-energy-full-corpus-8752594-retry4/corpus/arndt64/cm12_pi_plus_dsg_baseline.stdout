@@ -1,0 +1,205 @@
+
+ Welcome to SAID64, the 64-bit version of SAID.
+ Several new features have been added. The mail back
+ option, "go9" has been improved, for example.
+
+ Note! 
+ SAID data file assignments can be changed at any time
+ by entering "GO250"
+ RETURN for non-graphics
+ "TDL" to set PLOT time delay
+ or enter TERMINAL type (XW, TK41, or ?) ->
+ You are using the single meson photoproduction code
+ from SAID64. This code contains the new, as of March 2011,
+ Chew-Mandelstam parametrization form. It is
+ unitary at the two-body level, and uses the hadronic
+ amplitudes determined in fits to pi-N elastic and the
+ pi-N -> eta-N reaction. The formalism is described in
+ Phys. Rev. C 82, 035202 (2010).
+
+ Access this solution after loading the default solution
+ by using: go2, v, fa10
+ (As always, case does not matter in SAID.)
+
+ RETURN to continue ->
+ New contour plotter- Enter CONP or "GO60" to view
+ Note new "GO55" Chi2 summary option(alternate to "GO5")
+ "GO56" Summarize fits compared to Single-Energy fits
+ "GO29" to do your own resonance fit
+ "GO28" get decay amplitudes(A1/2,A3/2) from GW solns
+ "GO57" Compare MULTIPOLES for different solutions 6/05
+ "GO58" another "Compare MULTIPOLES"
+ "GO59" Print/Plot amplitudes (H, F, A) vs E, S, A, t..
+ "GO7" then "Go27" to PLOT PiN amplitudes for any solution
+ The experimental data file is
+ PR094  Photo-prod          07/09 Arndt  08/18/14                
+
+ CAUTION! do NOT use any solution outside its range of
+ validity. Extrapolation properties are generally BAD!
+
+ Eg(photon energy) thresholds are:  
+ pion=  145. eta=   707. kaon=   912. MeV
+ Kindly work ABOVE these energies to avoid nonsense.
+ Enter "E" here to set up for eta photoproduction
+ Enter "P" here to set up for etaprime photoproduction
+ Enter "L" here to set up for k-Lambda photoproduction
+ Enter "S" here to set up for k-Sigma photoproduction
+ Enter "B" here to switch to "Benchmark" PR data
+
+ RETURN to continue -> g2, w1, w2, r1, r2= 13.75 22.50  0.00  0.00  0.00   
+  Solution:
+  CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    9/ 9/26  
+  "GO22" -punch params
+ An "alternative" solution can be defined with a "GO51"
+ RETURN to continue ->
+  Enter first four letters of the desired solution
+ "SES " will set up a "single-energy" soln with DIAGONAL ErrM
+ "G2  " will allow change in BORN terms
+ Enter OWN to input a solution -Return to see soln file -> g2, w1, w2, r1, r2= 13.75 22.50  0.00  0.00  0.00   
+  Solution:
+  CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    9/ 9/26  
+  "GO22" -punch params
+ An "alternative" solution can be defined with a "GO51"
+ RETURN to continue -> Reaction no-  1(PI0P) 2(PI+N) 3(PI-P) 4(PI0N)
+ Enter reaction no ->
+ Note: TOTAL cross-section MUST be done at 0 deg
+ Ind Var? A(Acm),C(CosA),E(Elab), or W(Wcm) -> (Min Inc Max) for Acm  ? GO9 to quit ->  Fixed variable? E(Elab), or W(Wcm) -> Value of Elab ? ->  You are set to calculate PI+N production at Elab = 1000.000
+  Acm  goes from    0.000 to  180.000 in increments of   10.000
+  Enter N to change, -GO9 to quit ->
+Thresholds=  144.76  151.65  148.43  144.74
+ Enter Y(or M) for Multipoles at Elab= 1000.00 MeV->
+  Enter observable (or MULT), -Return for choices ->
+ WEB
+
+  CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    9/ 9/26  
+     PI+N  DSG  AT Elab =  1000.00       9/ 9/26  
+     Acm          Obs,Err             (Alab, DSGlab) 
+     0.000  0.1008E+02  0.0000E+00    0.00  0.3224E+02
+    10.000  0.6988E+01  0.0000E+00    5.60  0.2212E+02
+    20.000  0.7432E+01  0.0000E+00   11.26  0.2282E+02
+    30.000  0.8829E+01  0.0000E+00   17.03  0.2575E+02
+    40.000  0.9264E+01  0.0000E+00   22.99  0.2514E+02
+    50.000  0.8448E+01  0.0000E+00   29.19  0.2091E+02
+    60.000  0.6642E+01  0.0000E+00   35.71  0.1468E+02
+    70.000  0.4505E+01  0.0000E+00   42.64  0.8714E+01
+    80.000  0.2805E+01  0.0000E+00   50.09  0.4656E+01
+    90.000  0.2036E+01  0.0000E+00   58.15  0.2845E+01
+   100.000  0.2187E+01  0.0000E+00   66.98  0.2529E+01
+   110.000  0.2820E+01  0.0000E+00   76.71  0.2658E+01
+   120.000  0.3371E+01  0.0000E+00   87.52  0.2562E+01
+   130.000  0.3489E+01  0.0000E+00   99.57  0.2130E+01
+   140.000  0.3186E+01  0.0000E+00  113.02  0.1570E+01
+   150.000  0.2730E+01  0.0000E+00  127.94  0.1105E+01
+   160.000  0.2388E+01  0.0000E+00  144.29  0.8234E+00
+   170.000  0.2242E+01  0.0000E+00  161.81  0.6945E+00
+   180.000  0.2213E+01  0.0000E+00  180.00  0.6602E+00
+  To see exp data enter a range(min max) for Elab -> "Scratch" data is: OUT  "GO13" will toggle IN/OUT
+ Enter "Y" to normalize, "R" to enter references->
+ E=  995.000 ND=   1  HE(88)P  BONN   HEISE, THESIS BONN-IR-88-06    
+     55.84  0.82690E+01  0.39200E+00
+
+ E=  995.000 ND=   1  HE(88)P  BONN   HEISE, THESIS BONN-IR-88-06    
+     93.02  0.20330E+01  0.10100E+00
+
+ E=  995.000 ND=   1  ZE(88)P  BONN   ZENZ, THESIS BONN-IR-88-12     
+     73.18  0.41550E+01  0.19800E+00
+
+ E=  996.000 ND=   1  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)  
+    163.30  0.24710E+01  0.13500E+00
+
+ E=  996.000 ND=   1  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)  
+    154.50  0.24670E+01  0.13700E+00
+
+ E=  996.000 ND=   1  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)  
+    154.50  0.25900E+01  0.15400E+00
+
+ E=  996.000 ND=   1  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)  
+    126.30  0.35650E+01  0.18900E+00
+
+ E=  997.000 ND=   1  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)  
+    178.80  0.22490E+01  0.13600E+00
+
+ E=  997.000 ND=   1  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)  
+    134.10  0.34650E+01  0.19800E+00
+
+ E=  997.600 ND=   1  DU(80)P  BONN   E.J.DURWEN, PRP IR-80-7 80     
+     97.70  0.19780E+01  0.12500E+00
+
+ E=  998.000 ND=   1  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)  
+    179.00  0.22470E+01  0.12000E+00
+
+ E=  999.000 ND=   1  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)  
+    154.50  0.26380E+01  0.14600E+00
+
+ E=  999.100 ND=   1  DU(80)P  BONN   E.J.DURWEN, PRP IR-80-7 80     
+    108.30  0.24470E+01  0.15200E+00
+
+ E=  999.200 ND=   1  DU(80)P  BONN   E.J.DURWEN, PRP IR-80-7 80     
+    117.70  0.32410E+01  0.20100E+00
+
+ E= 1000.000 ND=   1  FU(71)   TOKY   FUJII, PRL26, 1672(71)         
+    180.00  0.24600E+01  0.11000E+00
+
+ E= 1000.000 ND=   1  AL(83)   BONN   ALTHOFF, ZPC18, 199(83)        
+     20.00  0.82000E+01  0.45000E+00
+
+ E= 1000.000 ND=   1  AL(83)   BONN   ALTHOFF, ZPC18, 199(83)        
+     30.00  0.10320E+02  0.59000E+00
+
+ E= 1002.000 ND=  21  EC(67)   CALT   ECKLUND, PR159, 1195(1967)     
+      6.10  0.93700E+01  0.24000E+00
+      8.10  0.79900E+01  0.31000E+00
+     10.30  0.71700E+01  0.22000E+00
+     12.20  0.69800E+01  0.17000E+00
+     14.20  0.73300E+01  0.20000E+00
+     16.20  0.74000E+01  0.20000E+00
+     20.20  0.75600E+01  0.23000E+00
+     25.10  0.86200E+01  0.13000E+00
+     30.10  0.88000E+01  0.20000E+00
+     35.10  0.94700E+01  0.18000E+00
+     40.10  0.94400E+01  0.12000E+00
+     45.10  0.95100E+01  0.20000E+00
+     50.10  0.82500E+01  0.25000E+00
+     55.10  0.80800E+01  0.21000E+00
+     60.10  0.64200E+01  0.22000E+00
+     65.10  0.57500E+01  0.18000E+00
+     70.10  0.46100E+01  0.90000E-01
+     75.10  0.40100E+01  0.15000E+00
+     80.10  0.30400E+01  0.15000E+00
+     85.10  0.24200E+01  0.13000E+00
+     90.10  0.20400E+01  0.70000E-01
+
+ E= 1003.000 ND=   1  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)  
+    134.20  0.34690E+01  0.18300E+00
+
+ E= 1005.000 ND=   1  DA(01)   BONN   DANNHAUSEN, EPJA11, 441(2001)  
+    126.40  0.35790E+01  0.18900E+00
+
+ WEB
+
+ Once a PLOT is displayed you can enter:
+ "PLOT" to replot/rescale the picture
+ "SWAP" to PLOT the "alternate" solution (defined by "GO51")
+ "MEAS" to measure points with the graphics CURSOR(stroke "M")
+ "CHAN" to change a partial-wave and replot
+ "OBS " to plot another observable on the same plot
+  Enter PLOT to generate a picture -> Ymin,ymax=  0.0000E+00  0.1091E+02 -Return, or change ->CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    9
+PR094  Photo-prod          07/09 Arndt  08/18/14                
+ PI+N  DSG    Elab= 1000.00  UNNormalized
+     0.00
+    10.91
+ Plotted data is for Elab= 995.00 to Elab=1005.00
+ HE(88)P 
+ ZE(88)P 
+ DA(01)  
+ DU(80)P 
+ FU(71)  
+ AL(83)  
+ EC(67)  
+ "PLOT", "MEAS", "SWAP", "CHAN", "OBS " or: 
+
+  Enter observable (or MULT), -Return for choices -> Messages can be sent to: 
+ mparis@gwu.edu or rworkman@gwu.edu
+ Thanks for using SAID
+ The SAID files can be retrieved through MAIL
+ by entering "M". Enter "M" or RETURN(to skip)->

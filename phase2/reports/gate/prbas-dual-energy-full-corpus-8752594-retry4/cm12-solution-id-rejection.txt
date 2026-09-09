@@ -1,0 +1,3 @@
+STOP 1
+status=6
+message=requested solution identifier is absent from source file

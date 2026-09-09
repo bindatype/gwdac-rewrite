@@ -1,0 +1,22 @@
+contract	status	message
+non_printable_title	1	frozen hadronic formula returned a non-printable title
+ambient_supported	0	<empty>
+ambient_it_rejected	1	typed PRBAS requires retained IT=1
+ambient_nnl_rejected	1	typed PRBAS requires retained NNL=6
+ambient_iprk_rejected	1	typed PRBAS does not support IPRK scaling
+ambient_bcoff_rejected	1	typed PRBAS requires retained BCOFF=0
+ambient_kill_rejected	1	typed PRBAS requires retained KILL=0
+ambient_nfg_rejected	1	typed PRBAS does not support PNMOD overrides
+ambient_pg_rejected	1	typed PRBAS does not support PGLOB parameters
+process_state_survives_request	0	<empty>
+solution_reload_preserves_process	0	<empty>
+process_state_invalidated	0	<empty>
+solution_reload_preserves_invalidation	0	<empty>
+invalidated_grid_rejected	1	typed PRBAS process state is invalidated
+initialize_grid	0	<empty>
+reaction_mismatch	1	background grid state provenance does not match request
+original_reaction_reuse	0	<empty>
+dispatch_below_clamp	0	input=1.5000 dither=0.0010 effective=2.0000
+dispatch_at_clamp	0	input=2.0000 dither=none effective=2.0000
+dispatch_above_clamp	0	input=2.5000 dither=none effective=2.5000
+dispatch_dither_then_clamp	0	input=1.9995 dither=-0.0010 effective=2.0000

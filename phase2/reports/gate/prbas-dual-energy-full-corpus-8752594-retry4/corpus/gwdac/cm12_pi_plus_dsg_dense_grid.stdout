@@ -1,0 +1,153 @@
+
+ Welcome to SAID64, the 64-bit version of SAID.
+ Several new features have been added. The mail back
+ option, "go9" has been improved, for example.
+
+ Note! 
+ SAID data file assignments can be changed at any time
+ by entering "GO250"
+ RETURN for non-graphics
+ "TDL" to set PLOT time delay
+ or enter TERMINAL type (XW, TK41, or ?) ->
+ You are using the single meson photoproduction code
+ from SAID64. This code contains the new, as of March 2011,
+ Chew-Mandelstam parametrization form. It is
+ unitary at the two-body level, and uses the hadronic
+ amplitudes determined in fits to pi-N elastic and the
+ pi-N -> eta-N reaction. The formalism is described in
+ Phys. Rev. C 82, 035202 (2010).
+
+ Access this solution after loading the default solution
+ by using: go2, v, fa10
+ (As always, case does not matter in SAID.)
+
+ RETURN to continue ->
+ New contour plotter- Enter CONP or "GO60" to view
+ Note new "GO55" Chi2 summary option(alternate to "GO5")
+ "GO56" Summarize fits compared to Single-Energy fits
+ "GO29" to do your own resonance fit
+ "GO28" get decay amplitudes(A1/2,A3/2) from GW solns
+ "GO57" Compare MULTIPOLES for different solutions 6/05
+ "GO58" another "Compare MULTIPOLES"
+ "GO59" Print/Plot amplitudes (H, F, A) vs E, S, A, t..
+ "GO7" then "Go27" to PLOT PiN amplitudes for any solution
+ The experimental data file is
+ PR094  Photo-prod          07/09 Arndt  08/18/14                
+
+ CAUTION! do NOT use any solution outside its range of
+ validity. Extrapolation properties are generally BAD!
+
+ Eg(photon energy) thresholds are:  
+ pion=  145. eta=   707. kaon=   912. MeV
+ Kindly work ABOVE these energies to avoid nonsense.
+ Enter "E" here to set up for eta photoproduction
+ Enter "P" here to set up for etaprime photoproduction
+ Enter "L" here to set up for k-Lambda photoproduction
+ Enter "S" here to set up for k-Sigma photoproduction
+ Enter "B" here to switch to "Benchmark" PR data
+
+ RETURN to continue -> g2, w1, w2, r1, r2= 13.75 22.50  0.00  0.00  0.00   
+  Solution:
+  CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    9/ 9/26  
+  "GO22" -punch params
+ An "alternative" solution can be defined with a "GO51"
+ RETURN to continue ->
+  Enter first four letters of the desired solution
+ "SES " will set up a "single-energy" soln with DIAGONAL ErrM
+ "G2  " will allow change in BORN terms
+ Enter OWN to input a solution -Return to see soln file -> g2, w1, w2, r1, r2= 13.75 22.50  0.00  0.00  0.00   
+  Solution:
+  CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    9/ 9/26  
+  "GO22" -punch params
+ An "alternative" solution can be defined with a "GO51"
+ RETURN to continue -> Reaction no-  1(PI0P) 2(PI+N) 3(PI-P) 4(PI0N)
+ Enter reaction no ->
+ Note: TOTAL cross-section MUST be done at 0 deg
+ Ind Var? A(Acm),C(CosA),E(Elab), or W(Wcm) -> (Min Inc Max) for Acm  ? GO9 to quit ->  Fixed variable? E(Elab), or W(Wcm) -> Value of Elab ? ->  You are set to calculate PI+N production at Elab =     +Inf
+  Acm  goes from    0.000 to  180.000 in increments of    3.000
+  Enter N to change, -GO9 to quit ->
+Thresholds=  144.76  151.65  148.43  144.74
+ Enter Y(or M) for Multipoles at Elab=    +Inf MeV->
+  Enter observable (or MULT), -Return for choices ->
+ WEB
+
+  CM12 2700 MEV P(200) CHI/DP=51634/25553                SM05    9/ 9/26  
+     PI+N  DSG  AT Elab =     +Inf       9/ 9/26  
+     Acm          Obs,Err             (Alab, DSGlab) 
+     0.000         NaN  0.0000E+00     NaN         NaN
+     3.000         NaN  0.0000E+00     NaN         NaN
+     6.000         NaN  0.0000E+00     NaN         NaN
+     9.000         NaN  0.0000E+00     NaN         NaN
+    12.000         NaN  0.0000E+00     NaN         NaN
+    15.000         NaN  0.0000E+00     NaN         NaN
+    18.000         NaN  0.0000E+00     NaN         NaN
+    21.000         NaN  0.0000E+00     NaN         NaN
+    24.000         NaN  0.0000E+00     NaN         NaN
+    27.000         NaN  0.0000E+00     NaN         NaN
+    30.000         NaN  0.0000E+00     NaN         NaN
+    33.000         NaN  0.0000E+00     NaN         NaN
+    36.000         NaN  0.0000E+00     NaN         NaN
+    39.000         NaN  0.0000E+00     NaN         NaN
+    42.000         NaN  0.0000E+00     NaN         NaN
+    45.000         NaN  0.0000E+00     NaN         NaN
+    48.000         NaN  0.0000E+00     NaN         NaN
+    51.000         NaN  0.0000E+00     NaN         NaN
+    54.000         NaN  0.0000E+00     NaN         NaN
+    57.000         NaN  0.0000E+00     NaN         NaN
+    60.000         NaN  0.0000E+00     NaN         NaN
+    63.000         NaN  0.0000E+00     NaN         NaN
+    66.000         NaN  0.0000E+00     NaN         NaN
+    69.000         NaN  0.0000E+00     NaN         NaN
+    72.000         NaN  0.0000E+00     NaN         NaN
+    75.000         NaN  0.0000E+00     NaN         NaN
+    78.000         NaN  0.0000E+00     NaN         NaN
+    81.000         NaN  0.0000E+00     NaN         NaN
+    84.000         NaN  0.0000E+00     NaN         NaN
+    87.000         NaN  0.0000E+00     NaN         NaN
+    90.000         NaN  0.0000E+00     NaN         NaN
+    93.000         NaN  0.0000E+00     NaN         NaN
+    96.000         NaN  0.0000E+00     NaN         NaN
+    99.000         NaN  0.0000E+00     NaN         NaN
+   102.000         NaN  0.0000E+00     NaN         NaN
+   105.000         NaN  0.0000E+00     NaN         NaN
+   108.000         NaN  0.0000E+00     NaN         NaN
+   111.000         NaN  0.0000E+00     NaN         NaN
+   114.000         NaN  0.0000E+00     NaN         NaN
+   117.000         NaN  0.0000E+00     NaN         NaN
+   120.000         NaN  0.0000E+00     NaN         NaN
+   123.000         NaN  0.0000E+00     NaN         NaN
+   126.000         NaN  0.0000E+00     NaN         NaN
+   129.000         NaN  0.0000E+00     NaN         NaN
+   132.000         NaN  0.0000E+00     NaN         NaN
+   135.000         NaN  0.0000E+00     NaN         NaN
+   138.000         NaN  0.0000E+00     NaN         NaN
+   141.000         NaN  0.0000E+00     NaN         NaN
+   144.000         NaN  0.0000E+00     NaN         NaN
+   147.000         NaN  0.0000E+00     NaN         NaN
+   150.000         NaN  0.0000E+00     NaN         NaN
+   153.000         NaN  0.0000E+00     NaN         NaN
+   156.000         NaN  0.0000E+00     NaN         NaN
+   159.000         NaN  0.0000E+00     NaN         NaN
+   162.000         NaN  0.0000E+00     NaN         NaN
+   165.000         NaN  0.0000E+00     NaN         NaN
+   168.000         NaN  0.0000E+00     NaN         NaN
+   171.000         NaN  0.0000E+00     NaN         NaN
+   174.000         NaN  0.0000E+00     NaN         NaN
+   177.000         NaN  0.0000E+00     NaN         NaN
+   180.000         NaN  0.0000E+00     NaN         NaN
+  To see exp data enter a range(min max) for Elab -> "PLOT", "MEAS", "SWAP", "CHAN", "OBS " or: 
+
+  Enter observable (or MULT), -Return for choices ->
+
+  Choices are
+  (DSG )  (P   )  (S   )  (T   )  (SGT )  (G   )  (H   )
+  (EMRI)  (E   )  (F   )  (OX  )  (OZ  )  (CX  )  (CZ  )
+  (TX  )  (TZ  )  (LX  )  (LZ  )  (ST3 )  (ST1 )  (ST13)
+  (DX1 )  (DX3 )  (DX13)  (OX* )  (OZ* )  (CX* )  (CZ* )
+  (TX* )  (TZ* )  (LX* )  (LZ* )  (
+
+  Enter observable (or MULT), -Return for choices -> Messages can be sent to: 
+ mparis@gwu.edu or rworkman@gwu.edu
+ Thanks for using SAID
+ The SAID files can be retrieved through MAIL
+ by entering "M". Enter "M" or RETURN(to skip)->
