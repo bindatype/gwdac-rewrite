@@ -31,7 +31,7 @@ if [[ -n "$(git -c safe.directory='*' -C "${candidate_root}" status --porcelain 
     exit 2
 fi
 if [[ -e "${report_root}" ]]; then
-    printf 'Selector-134 report root already exists: %s\n' "${report_root}" >&2
+    printf 'Selector-13x report root already exists: %s\n' "${report_root}" >&2
     exit 2
 fi
 mkdir -p "${report_root}" "${state_root}/runs" "${build_report_root}"
@@ -254,8 +254,9 @@ awk -F '\t' -v OFS='\t' \
         }
         print "metric", "selector", "exact", "total" > summary
         split("request w reconstructed typed_roundtrip forced_roundtrip born opec raw_real raw_imag return_real return_imag", name, " ")
-        for (selector_index = 1; selector_index <= 2; selector_index++) {
-            selector = (selector_index == 1 ? 124 : 134)
+        for (selector_index = 1; selector_index <= 3; selector_index++) {
+            selector = (selector_index == 1 ? 124 : \
+                (selector_index == 2 ? 134 : 135))
             for (metric = 1; metric <= 11; metric++) {
                 denominator = selector_rows[selector]
                 if (name[metric] == "born" && selector == 124) denominator = 0
@@ -316,9 +317,9 @@ readonly typed_go5_rows="$(($(wc -l <"${report_root}/typed-go5.tsv") - 1))"
 readonly forced_go5_rows="$(($(wc -l <"${report_root}/forced-legacy-go5.tsv") - 1))"
 
 structural_status=PASS
-if [[ "${typed_rows}" -ne 4123 || "${cmmwp_rows}" -ne 4123 || \
-    "${grid_rows}" -ne 4123 || "${return_rows}" -ne 2660 || \
-    "${comparison_rows}" -ne 4123 || "${structural_errors}" -ne 0 || \
+if [[ "${typed_rows}" -ne 4788 || "${cmmwp_rows}" -ne 4788 || \
+    "${grid_rows}" -ne 4788 || "${return_rows}" -ne 2926 || \
+    "${comparison_rows}" -ne 4788 || "${structural_errors}" -ne 0 || \
     "${typed_go5_rows}" -ne 1533 || "${forced_go5_rows}" -ne 1533 ]]; then
     structural_status=FAIL
 fi
@@ -338,8 +339,7 @@ cp "${build_report_root}/build-manifest.txt" "${report_root}/build-manifest.txt"
             "$(sha256sum "${phase2_root}/kernel/${patch_name}" | awk '{print $1}')"
     done
     printf 'timezone=America/New_York\n'
-    printf 'target_selectors=124,134\n'
-    printf 'selector_135_population=separate_not_pooled\n'
+    printf 'target_selectors=124,134,135\n'
     . /etc/os-release
     printf 'container_os=%s\n' "${PRETTY_NAME}"
 } >"${report_root}/run-context.txt"

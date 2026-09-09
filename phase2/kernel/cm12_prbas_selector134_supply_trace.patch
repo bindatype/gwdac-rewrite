@@ -38,13 +38,14 @@
          call cm12_solution_background( &
              solution, background, status, message)
          if (status /= cm12_ok) then
-@@ -162,6 +170,15 @@
+@@ -162,6 +170,16 @@
          write(*, '(a)') 'CM12 multipole evaluation failed: ' // trim(message)
          error stop 7
      end if
 +    if ( &
 +        cm12_diagnostic == 1 .and. cm12_supply_phase == 1 .and. &
-+        (form_number == 124 .or. form_number == 134)) then
++        (form_number == 124 .or. form_number == 134 .or. &
++            form_number == 135)) then
 +        write(*, '(A,1X,7(I0,1X),7(ES25.16E3,1X))') &
 +            'CM12DIAG CMMWP SUPPLY', cm12_grid_call, ie, ir, mm, jj, ll, &
 +            form_number, e(ie), w_cm_mev, photon_lab_energy_mev, &
@@ -72,7 +73,7 @@
        IF(IR0.EQ.0) GO TO 1
        SOP=0.0
        SOPW=0.0
-@@ -1443,7 +1446,13 @@
+@@ -1443,7 +1446,14 @@
        IF(NFX.EQ.0.AND.L.GT.2) NFX=3
        IF(NFX.EQ.0) GO TO 3
        EMR(I,M,J,L)=0.0
@@ -80,25 +81,27 @@
        CALL PRDLT
 +      CM12SUPPLYPHASE=0
 +      IF(CM12DIAG.EQ.1.AND.
-+     C (NFX.EQ.124.OR.NFX.EQ.134))
++     C (NFX.EQ.124.OR.NFX.EQ.134.OR.
++     C NFX.EQ.135))
 +     C WRITE(*,9021) CM12GRIDCALL,I,IR,M,J,L,NFX,E(I),
 +     C SPW,SOPW,EMPI(M,J,L),DER,DEI
        EMR(I,M,J,L)=DER
        EMI(I,M,J,L)=DEI
        IF(IR0.NE.0) GO TO 3
-@@ -1505,6 +1514,11 @@
+@@ -1505,6 +1515,12 @@
        DER=SPW*DER+SOPW*EMPI(M,J,L)
        DEI=SPW*DEI
        LL=L
 +      IF(CM12DIAG.EQ.1.AND.IA.EQ.1.AND.
-+     C (NFX.EQ.124.OR.NFX.EQ.134))
++     C (NFX.EQ.124.OR.NFX.EQ.134.OR.
++     C NFX.EQ.135))
 +     C WRITE(*,9022) CM12GRIDCALL,I,IR,M,J,L,NFX,E(I),
 +     C SPW,SOPW,EMPI(M,J,L),EMR(I,M,J,L),
 +     C EMI(I,M,J,L),DER,DEI
  C     write(*,223) m,j,l,emr(i,m,j,l),emi(i,m,j,l)
  C 223 format(3i3,2e12.4)
        CALL PRDA
-@@ -1527,6 +1541,9 @@
+@@ -1527,6 +1543,9 @@
   9011 FORMAT('CM12DIAG APPLY',4(1X,I4),10(1X,ES24.16E3))
   9012 FORMAT('CM12DIAG FINAL',9(1X,ES24.16E3))
   9020 FORMAT('CM12DIAG GRID',6(1X,I4),3(1X,ES24.16E3))
@@ -128,11 +131,14 @@
                          0.0_real32, 0.0_real32, kind=real32)
                      if (form_selector > 100 .and. form_selector < 200) then
                          call cm12_evaluate_multipole( &
-@@ -357,6 +361,27 @@
+@@ -357,6 +361,30 @@
                              current_background%non_cm12_multipoles( &
                                  family, branch, orbital_l + 1)
                      end if
-+                    if (form_selector == 124 .or. form_selector == 134) then
++                    if ( &
++                        form_selector == 124 .or. &
++                        form_selector == 134 .or. &
++                        form_selector == 135) then
 +                        reconstructed_energy = &
 +                            (current_kinematics%w_cm_mev**2 - &
 +                                proton_mass**2) / &
