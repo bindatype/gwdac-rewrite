@@ -29,6 +29,7 @@ make reviewer-verify
 make reviewer-verify-gate-identity
 make reviewer-verify-runtime-refresh-contract
 make reviewer-verify-evidence-sort-policy
+make reviewer-verify-cm12-harness-contract
 make reviewer-reproduce
 ```
 
@@ -56,6 +57,14 @@ Bash script under `phase1/scripts`; its fixture proves that an unpinned pipeline
 can reorder unchanged path/hash pairs under a hostile locale and is rejected.
 The policy is intentionally local to the evidence-producing command. It does
 not impose a process-wide locale on compiler or runtime output.
+
+The CM12 harness contract check keeps immutable diagnostic-reference input
+separate from redirected run output, requires formal reproduction to enforce
+typed-candidate equality, and confirms that all three retained Phase 2 corpus
+packages are registered for integrity verification. Its fixture suite proves
+that recoupling reference input to the output root, relaxing candidate
+enforcement, discarding candidate failures, or dropping a package registration
+is rejected.
 
 The full reproducer runs the 24-fixture, 288-record CM12 gate, the exact `pnsd`
 oracle contract, and the five-engine runtime-refresh smoke sweep. Run one group
@@ -115,18 +124,22 @@ failure.
 | `64` | command-line usage error |
 
 The verifier covers the security, adapter, GO5, GO5 reconciliation,
-unpatched-priming, `pnsd`, and runtime-refresh manifest packages. It also
-independently compares all committed DSG and amplitude fixture tables across
-the modern build and both checked-in historical executables. The experimental
-PRBAS candidate is still run during
-reproduction, but its known mismatches are diagnostic evidence and do not enter
-the accepted three-executable oracle gate. Reviewer reproduction permits only
-the candidate request probe's documented exit 6; every other nonzero build or
-generator exit remains a reproduction failure.
+unpatched-priming, `pnsd`, runtime-refresh, and three retained Phase 2 corpus
+manifest packages. `PACKAGE PASS` establishes that committed bytes match their
+manifest; it does not accept a candidate or endorse a package's scientific
+conclusion. The verifier also independently compares all committed DSG and
+amplitude fixture tables across the modern build and both checked-in historical
+executables.
+
+Formal CM12 reproduction requires the typed PRBAS candidate to match all 24
+fixtures and 288 displayed records, in addition to the retained three-executable
+oracle agreement. Candidate mismatches are compatibility failures. The request
+probe mismatch allowance is disabled; every nonzero build or generator exit
+remains a reproduction failure unless it accompanies a classified compatibility
+failure.
 
 Coverage differs from integrity verification. The GO5/`PRRDX` diagnostic and
 the unpatched-priming measurement are checked against their committed manifests,
 but `reproduce-evidence` does not re-run either diagnostic. It reproduces only
-the CM12 gate, including the diagnostic PRBAS candidate, the `pnsd` two-build
-and exact-artifact contract, and the five runtime-refresh engine outcomes
-described above.
+the strict CM12 gate, the `pnsd` two-build and exact-artifact contract, and the
+five runtime-refresh engine outcomes described above.

@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly outputs_root="$(cd "${script_root}/.." && pwd)"
+source "${script_root}/lib/exit-codes.sh"
+
+readonly build_script="${CM12_HARNESS_BUILD_SCRIPT:-${outputs_root}/phase2/scripts/build-cm12-seam}"
+readonly reproducer="${CM12_HARNESS_REPRODUCER:-${script_root}/reproduce-evidence}"
+readonly registry="${CM12_HARNESS_MANIFEST_REGISTRY:-${script_root}/config/evidence-manifests.tsv}"
+
+for tool in awk grep; do
+    if ! command -v "${tool}" >/dev/null 2>&1; then
+        printf 'INFRASTRUCTURE FAIL missing tool: %s\n' "${tool}" >&2
+        exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+    fi
+done
+
+failures=0
+contract_failure() {
+    printf 'CONTRACT FAIL cm12-harness %s\n' "$*" >&2
+    failures=$((failures + 1))
+}
+
+for path in "${build_script}" "${reproducer}" "${registry}"; do
+    if [[ ! -f "${path}" ]]; then
+        contract_failure "missing path=${path}"
+    fi
+done
+if [[ "${failures}" -ne 0 ]]; then
+    exit "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}"
+fi
+
+if [[ "$(grep -Fc \
+    'readonly reference_report_root="${PHASE2_REFERENCE_REPORT_ROOT:-${phase2_root}/reports}"' \
+    "${build_script}")" -ne 1 ]]; then
+    contract_failure 'reference report root declaration is missing or ambiguous'
+fi
+
+reference_inputs=(
+    hadronic-pipeline-diagnostic/legacy-pipeline-trace.tsv
+    cm12-form-diagnostic/legacy-form-trace.tsv
+    cm12-form-diagnostic/legacy-target-summary.tsv
+)
+for relative in "${reference_inputs[@]}"; do
+    if [[ "$(grep -Fc "\${reference_report_root}/${relative}" \
+        "${build_script}")" -ne 1 ]]; then
+        contract_failure "reference input is not read exactly once: ${relative}"
+    fi
+    if grep -Fq "\${report_root}/${relative}" "${build_script}"; then
+        contract_failure "reference input still depends on output root: ${relative}"
+    fi
+done
+if grep -E '(>|>>|mkdir|install|cp|mv|rm)[^#]*\$\{reference_report_root\}' \
+    "${build_script}" >/dev/null; then
+    contract_failure 'reference report root appears in a write operation'
+fi
+
+if [[ "$(grep -Fc 'GWDAC_GATE_REQUIRE_CANDIDATE=1 \' "${reproducer}")" -ne 1 ]]; then
+    contract_failure 'formal reproducer does not require the candidate'
+fi
+if [[ "$(grep -Fc 'GWDAC_GATE_ALLOW_REQUEST_PROBE_MISMATCH=0 \' \
+    "${reproducer}")" -ne 1 ]]; then
+    contract_failure 'formal reproducer permits request-probe mismatch'
+fi
+if grep -Fq 'non_gating_prbas_candidate_fixture_mismatches' "${reproducer}"; then
+    contract_failure 'formal reproducer still labels candidate mismatches non-gating'
+fi
+if [[ "$(grep -Fc '"${candidate_failures}" -ne 0' "${reproducer}")" -lt 1 ]]; then
+    contract_failure 'candidate failures are not classified'
+fi
+if [[ "$(grep -Fc '"${candidate_failures}" -eq 0' "${reproducer}")" -lt 2 ]]; then
+    contract_failure 'candidate failures do not guard unexplained-exit and pass paths'
+fi
+if [[ "$(grep -Fc '"${candidate_required}" != 1' "${reproducer}")" -ne 1 || \
+    "$(grep -Fc '"${request_probe_mismatch_allowed}" != 0' \
+        "${reproducer}")" -ne 1 ]]; then
+    contract_failure 'generated summary strict settings are not verified'
+fi
+
+packages=(
+    $'cm12-prbas-failed\tphase2/reports/gate/prbas-sp00-full-corpus-20260903T140148Z\tphase2/reports/gate/prbas-sp00-full-corpus-20260903T140148Z/manifest.sha256'
+    $'cm12-prbas-intermediate\tphase2/reports/gate/prbas-grid-full-corpus-20260904T102459Z\tphase2/reports/gate/prbas-grid-full-corpus-20260904T102459Z/manifest.sha256'
+    $'cm12-prbas-signed-candidate\tphase2/reports/gate/prbas-dual-energy-full-corpus-8752594-retry4\tphase2/reports/gate/prbas-dual-energy-full-corpus-8752594-retry4/manifest.sha256'
+)
+for package in "${packages[@]}"; do
+    if [[ "$(grep -Fxc "${package}" "${registry}")" -ne 1 ]]; then
+        contract_failure "manifest registry row missing or ambiguous: ${package%%$'\t'*}"
+    fi
+done
+
+if [[ "${failures}" -ne 0 ]]; then
+    exit "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}"
+fi
+
+printf 'CONTRACT PASS cm12-harness reference_inputs=3 strict_candidate=1 registered_packages=3\n'

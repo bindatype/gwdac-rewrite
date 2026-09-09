@@ -101,6 +101,8 @@ for gate_contract_file in \
 	reviewer/verify-committed-evidence \
 	reviewer/verify-evidence-sort-policy \
 		reviewer/verify-evidence-sort-policy-fixtures \
+		reviewer/verify-cm12-harness-contract \
+		reviewer/verify-cm12-harness-contract-fixtures \
 		reviewer/verify-runtime-refresh-contract-fixtures \
 		reviewer/verify-checkpoint3a-contract \
 		reviewer/verify-checkpoint3a-contract-fixtures \
@@ -496,6 +498,10 @@ fi
 
 if ! "${script_root}/verify-evidence-sort-policy"; then
 	integrity_failure 'evidence-sort-policy rejected the committed scripts'
+fi
+
+if ! "${script_root}/verify-cm12-harness-contract"; then
+	integrity_failure 'CM12 harness contract rejected the committed scripts'
 fi
 
 if ! "${script_root}/verify-checkpoint3a-contract"; then

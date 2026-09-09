@@ -9,4 +9,7 @@ prsdd-go5-width-correction	phase1/reports/prsdd-go5-width-correction-20260814	ph
 unpatched-priming	phase1/reports/unpatched-priming-measurement	phase1/reports/unpatched-priming-measurement/manifest.sha256
 unpatched-priming-determinism	phase1/reports/unpatched-priming-evidence-determinism-20260820	phase1/reports/unpatched-priming-evidence-determinism-20260820/manifest.sha256
 checkpoint3a-pdsd	phase1/reports/checkpoint3a1-pdsd-measurement	phase1/reports/checkpoint3a1-pdsd-measurement/manifest.sha256
+cm12-prbas-failed	phase2/reports/gate/prbas-sp00-full-corpus-20260903T140148Z	phase2/reports/gate/prbas-sp00-full-corpus-20260903T140148Z/manifest.sha256
+cm12-prbas-intermediate	phase2/reports/gate/prbas-grid-full-corpus-20260904T102459Z	phase2/reports/gate/prbas-grid-full-corpus-20260904T102459Z/manifest.sha256
+cm12-prbas-signed-candidate	phase2/reports/gate/prbas-dual-energy-full-corpus-8752594-retry4	phase2/reports/gate/prbas-dual-energy-full-corpus-8752594-retry4/manifest.sha256
 runtime-refresh-aggregate	.	phase1/reports/runtime-refresh/aggregate-manifest.sha256

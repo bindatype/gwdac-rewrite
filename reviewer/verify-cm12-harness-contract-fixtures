@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+readonly script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly outputs_root="$(cd "${script_root}/.." && pwd)"
+source "${script_root}/lib/exit-codes.sh"
+
+for tool in awk cp grep mktemp; do
+    if ! command -v "${tool}" >/dev/null 2>&1; then
+        printf 'INFRASTRUCTURE FAIL missing tool: %s\n' "${tool}" >&2
+        exit "${REVIEWER_EXIT_INFRASTRUCTURE}"
+    fi
+done
+
+readonly workspace="$(mktemp -d "${TMPDIR:-/tmp}/cm12-harness-contract.XXXXXX")"
+readonly build_script="${workspace}/build-cm12-seam"
+readonly reproducer="${workspace}/reproduce-evidence"
+readonly registry="${workspace}/evidence-manifests.tsv"
+
+cleanup() {
+    rm -rf "${workspace}"
+}
+trap cleanup EXIT
+
+cp "${outputs_root}/phase2/scripts/build-cm12-seam" "${build_script}"
+cp "${script_root}/reproduce-evidence" "${reproducer}"
+cp "${script_root}/config/evidence-manifests.tsv" "${registry}"
+
+run_contract() {
+    local build="$1"
+    local reproduce="$2"
+    local manifests="$3"
+    local output="$4"
+
+    CM12_HARNESS_BUILD_SCRIPT="${build}" \
+    CM12_HARNESS_REPRODUCER="${reproduce}" \
+    CM12_HARNESS_MANIFEST_REGISTRY="${manifests}" \
+        "${script_root}/verify-cm12-harness-contract" >"${output}" 2>&1
+}
+
+expect_rejected() {
+    local label="$1"
+    local build="$2"
+    local reproduce="$3"
+    local manifests="$4"
+    local output="${workspace}/${label}.log"
+    local status
+
+    run_contract "${build}" "${reproduce}" "${manifests}" "${output}"
+    status=$?
+    if [[ "${status}" -ne "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}" ]]; then
+        printf 'FIXTURE FAIL cm12-harness label=%s exit=%s expected=%s\n' \
+            "${label}" "${status}" "${REVIEWER_EXIT_EVIDENCE_INTEGRITY}" >&2
+        exit "${REVIEWER_EXIT_REPRODUCTION}"
+    fi
+    if ! grep -Fq 'CONTRACT FAIL cm12-harness' "${output}"; then
+        printf 'FIXTURE FAIL cm12-harness label=%s missing attribution\n' \
+            "${label}" >&2
+        exit "${REVIEWER_EXIT_REPRODUCTION}"
+    fi
+}
+
+positive_output="${workspace}/positive.log"
+if ! run_contract \
+    "${build_script}" "${reproducer}" "${registry}" "${positive_output}"; then
+    printf 'FIXTURE FAIL cm12-harness positive contract rejected\n' >&2
+    exit "${REVIEWER_EXIT_REPRODUCTION}"
+fi
+
+coupled_build="${workspace}/build-cm12-seam-coupled"
+awk '
+    !changed && /reference_report_root.*hadronic-pipeline-diagnostic/ {
+        sub(/\$\{reference_report_root\}/, "${report_root}")
+        changed=1
+    }
+    { print }
+' "${build_script}" >"${coupled_build}"
+expect_rejected report-root-coupled "${coupled_build}" "${reproducer}" "${registry}"
+
+relaxed_reproducer="${workspace}/reproduce-evidence-relaxed"
+awk '
+    { sub(/GWDAC_GATE_REQUIRE_CANDIDATE=1/, "GWDAC_GATE_REQUIRE_CANDIDATE=0") }
+    { print }
+' "${reproducer}" >"${relaxed_reproducer}"
+expect_rejected candidate-relaxed "${build_script}" "${relaxed_reproducer}" "${registry}"
+
+discarding_reproducer="${workspace}/reproduce-evidence-discarding"
+awk '
+    !changed && /candidate_failures.*-ne 0/ {
+        sub(/-ne 0/, "-eq 0")
+        changed=1
+    }
+    { print }
+' "${reproducer}" >"${discarding_reproducer}"
+expect_rejected candidate-discarded \
+    "${build_script}" "${discarding_reproducer}" "${registry}"
+
+incomplete_registry="${workspace}/evidence-manifests-incomplete.tsv"
+awk '$1 != "cm12-prbas-signed-candidate" { print }' \
+    "${registry}" >"${incomplete_registry}"
+expect_rejected package-unregistered \
+    "${build_script}" "${reproducer}" "${incomplete_registry}"
+
+printf 'PASS cm12-harness-contract positive=1 negative=4\n'

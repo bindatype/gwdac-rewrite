@@ -5,6 +5,7 @@ readonly source_root="${ARNDT64_SOURCE:-/workspace/arndt64}"
 readonly phase1_root="${PHASE1_ROOT:-/phase1}"
 readonly phase2_root="${PHASE2_ROOT:-/phase2}"
 readonly report_root="${PHASE2_REPORT_ROOT:-${phase2_root}/reports}"
+readonly reference_report_root="${PHASE2_REFERENCE_REPORT_ROOT:-${phase2_root}/reports}"
 readonly state_root="${PHASE2_STATE_ROOT:-/workspace/phase2/reproducible}"
 readonly kernel_root="${phase2_root}/kernel"
 readonly build_report_root="${report_root}/cm12-seam-build"
@@ -621,7 +622,7 @@ gfortran \
 
 "${artifact_root}/cm12-prbas-dispatch-probe" \
     "${solution_file}" "${solution_sha256}" \
-    "${report_root}/hadronic-pipeline-diagnostic/legacy-pipeline-trace.tsv" \
+    "${reference_report_root}/hadronic-pipeline-diagnostic/legacy-pipeline-trace.tsv" \
     >"${prbas_report_root}/hadronic-dispatch.tsv"
 awk -F '\t' '
     NR > 1 && $11 != "T" { exit 1 }
@@ -711,8 +712,8 @@ awk -F '\t' '
 
 "${artifact_root}/cm12-form-diagnostic-probe" \
     "${solution_file}" "${solution_sha256}" "${kcm_root}" \
-    "${report_root}/cm12-form-diagnostic/legacy-form-trace.tsv" \
-    "${report_root}/cm12-form-diagnostic/legacy-target-summary.tsv" \
+    "${reference_report_root}/cm12-form-diagnostic/legacy-form-trace.tsv" \
+    "${reference_report_root}/cm12-form-diagnostic/legacy-target-summary.tsv" \
     '0.2036E+01' >"${prbas_report_root}/form-contributions.tsv"
 grep -Fq 'exact_candidate_deltas=40' \
     "${prbas_report_root}/form-contributions.tsv"

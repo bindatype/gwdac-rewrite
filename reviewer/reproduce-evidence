@@ -95,12 +95,15 @@ reproduce_cm12() {
     local fixture_failures
     local oracle_failures
     local candidate_failures
+    local candidate_required
+    local request_probe_mismatch_allowed
+    local strict_contract=yes
 
     printf 'RUN cm12-corpus-gate\n'
     GWDAC_GATE_RUN_ID="${run_id}" \
     GWDAC_GATE_PROJECT="gwdac-reviewer-cm12-${short_commit}-$$" \
-    GWDAC_GATE_REQUIRE_CANDIDATE=0 \
-    GWDAC_GATE_ALLOW_REQUEST_PROBE_MISMATCH=1 \
+    GWDAC_GATE_REQUIRE_CANDIDATE=1 \
+    GWDAC_GATE_ALLOW_REQUEST_PROBE_MISMATCH=0 \
         "${disposable}/phase2/scripts/run-cm12-gate"
     gate_status=$?
 
@@ -113,29 +116,44 @@ reproduce_cm12() {
     fixture_failures="$(awk -F= '$1 == "fixture_failures" {print $2}' "${summary}")"
     oracle_failures="$(awk -F= '$1 == "oracle_failures" {print $2}' "${summary}")"
     candidate_failures="$(awk -F= '$1 == "candidate_failures" {print $2}' "${summary}")"
+    candidate_required="$(awk -F= '$1 == "candidate_required" {print $2}' "${summary}")"
+    request_probe_mismatch_allowed="$(awk -F= \
+        '$1 == "request_probe_mismatch_allowed" {print $2}' "${summary}")"
     if [[ -z "${command_failures}" || -z "${fixture_failures}" || \
-        -z "${oracle_failures}" || -z "${candidate_failures}" ]]; then
+        -z "${oracle_failures}" || -z "${candidate_failures}" || \
+        -z "${candidate_required}" || \
+        -z "${request_probe_mismatch_allowed}" ]]; then
         printf 'REPRODUCTION FAIL cm12 summary incomplete\n' >&2
         reproduction_failures=$((reproduction_failures + 1))
         return
+    fi
+    if [[ "${candidate_required}" != 1 || \
+        "${request_probe_mismatch_allowed}" != 0 ]]; then
+        printf 'REPRODUCTION FAIL cm12 strict contract candidate_required=%s request_probe_mismatch_allowed=%s\n' \
+            "${candidate_required}" "${request_probe_mismatch_allowed}" >&2
+        reproduction_failures=$((reproduction_failures + 1))
+        strict_contract=no
     fi
     if [[ "${command_failures}" -ne 0 ]]; then
         printf 'REPRODUCTION FAIL cm12 command_failures=%s\n' "${command_failures}" >&2
         reproduction_failures=$((reproduction_failures + 1))
     fi
-    if [[ "${oracle_failures}" -ne 0 || "${fixture_failures}" -ne 0 ]]; then
-        printf 'COMPATIBILITY FAIL cm12 oracle_failures=%s fixture_failures=%s\n' \
-            "${oracle_failures}" "${fixture_failures}" >&2
+    if [[ "${oracle_failures}" -ne 0 || "${fixture_failures}" -ne 0 || \
+        "${candidate_failures}" -ne 0 ]]; then
+        printf 'COMPATIBILITY FAIL cm12 oracle_failures=%s fixture_failures=%s candidate_failures=%s\n' \
+            "${oracle_failures}" "${fixture_failures}" \
+            "${candidate_failures}" >&2
         compatibility_failures=$((compatibility_failures + 1))
     fi
     if [[ "${gate_status}" -ne 0 && "${command_failures}" -eq 0 && \
-        "${fixture_failures}" -eq 0 ]]; then
+        "${fixture_failures}" -eq 0 && "${candidate_failures}" -eq 0 ]]; then
         printf 'REPRODUCTION FAIL cm12 unexplained exit=%s\n' "${gate_status}" >&2
         reproduction_failures=$((reproduction_failures + 1))
     fi
-    if [[ "${gate_status}" -eq 0 ]]; then
-        printf 'PASS cm12 fixtures=24 records=288 non_gating_prbas_candidate_fixture_mismatches=%s\n' \
-            "${candidate_failures}"
+    if [[ "${gate_status}" -eq 0 && "${command_failures}" -eq 0 && \
+        "${fixture_failures}" -eq 0 && "${oracle_failures}" -eq 0 && \
+        "${candidate_failures}" -eq 0 && "${strict_contract}" == yes ]]; then
+        printf 'PASS cm12 fixtures=24 records=288 candidate_exact=24/24 candidate_required=1 request_probe_mismatch_allowed=0\n'
     fi
 }
 
