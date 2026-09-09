@@ -151,7 +151,7 @@
 +                            current_request%photon_lab_energy_mev, &
 +                            current_kinematics%w_cm_mev, &
 +                            reconstructed_energy, &
-+                            current_background%born_multipoles( &
++                            current_background%production_born_multipoles( &
 +                                family, branch, orbital_l + 1), &
 +                            current_background%opec_multipoles( &
 +                                family, branch, orbital_l + 1), &

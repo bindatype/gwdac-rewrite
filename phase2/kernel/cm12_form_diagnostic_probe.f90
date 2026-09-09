@@ -252,7 +252,7 @@ program cm12_form_diagnostic_probe
                             dataset, form_selector, parameters, &
                             family, branch, orbital_l, &
                             current_result%kinematics%w_cm_mev, &
-                            background%born_multipoles( &
+                            background%production_born_multipoles( &
                                 family, branch, orbital_l + 1), &
                             scalar_multipole, status, message)
                         if (status /= cm12_ok) stop 14

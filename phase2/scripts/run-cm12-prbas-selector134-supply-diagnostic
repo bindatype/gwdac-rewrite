@@ -13,6 +13,7 @@ readonly data_root="${source_root}/sdat"
 readonly solution_file="${data_root}/prsol.dat"
 readonly solution_sha256=dbcaae30bbf44aca6e5482fc2b10b81cb6e1033cf41061bc089d5f6a85576522
 readonly timeout_seconds="${RUN_TIMEOUT_SECONDS:-300}"
+readonly require_exact="${SELECTOR13X_REQUIRE_EXACT:-0}"
 readonly candidate_head="$(git -c safe.directory='*' -C "${candidate_root}" rev-parse HEAD)"
 readonly short_source_commit="$(git -C "${source_root}" rev-parse --short=12 HEAD)"
 readonly build_state_root="${state_root}/build"
@@ -25,6 +26,11 @@ readonly -a diagnostic_patches=(
     cm12_prbas_return_grid_trace.patch
     cm12_prbas_selector134_supply_trace.patch
 )
+
+if [[ "${require_exact}" != 0 && "${require_exact}" != 1 ]]; then
+    printf 'SELECTOR13X_REQUIRE_EXACT must be 0 or 1\n' >&2
+    exit 2
+fi
 
 if [[ -n "$(git -c safe.directory='*' -C "${candidate_root}" status --porcelain --untracked-files=all)" ]]; then
     printf 'Candidate checkout is not clean: %s\n' "${candidate_root}" >&2
@@ -315,6 +321,7 @@ readonly comparison_rows="$(($(wc -l <"${report_root}/supply-comparison.tsv") - 
 readonly structural_errors="$(awk -F '\t' '$1 == "structural_key_errors" { print $3 }' "${report_root}/summary.tsv")"
 readonly typed_go5_rows="$(($(wc -l <"${report_root}/typed-go5.tsv") - 1))"
 readonly forced_go5_rows="$(($(wc -l <"${report_root}/forced-legacy-go5.tsv") - 1))"
+readonly go5_differences="$(($(wc -l <"${report_root}/go5-differences.tsv") - 1))"
 
 structural_status=PASS
 if [[ "${typed_rows}" -ne 4522 || "${cmmwp_rows}" -ne 4522 || \
@@ -324,6 +331,38 @@ if [[ "${typed_rows}" -ne 4522 || "${cmmwp_rows}" -ne 4522 || \
     structural_status=FAIL
 fi
 readonly structural_status
+
+metric_exact() {
+    local metric="$1"
+    local selector="$2"
+
+    awk -F '\t' -v metric="${metric}" -v selector="${selector}" '
+        $1 == metric && $2 == selector { found = 1; exact = ($3 == $4) }
+        END { exit !(found && exact) }
+    ' "${report_root}/summary.tsv"
+}
+
+exact_status=NOT_REQUESTED
+if [[ "${require_exact}" == 1 ]]; then
+    exact_status=PASS
+    for selector in 124 134 135; do
+        for metric in request w reconstructed opec raw_real raw_imag \
+            return_real return_imag; do
+            if ! metric_exact "${metric}" "${selector}"; then
+                exact_status=FAIL
+            fi
+        done
+    done
+    for selector in 134 135; do
+        if ! metric_exact born "${selector}"; then
+            exact_status=FAIL
+        fi
+    done
+    if [[ "${go5_differences}" -ne 0 ]]; then
+        exact_status=FAIL
+    fi
+fi
+readonly exact_status
 
 cp "${combined_patch}" "${report_root}/combined-diagnostic.patch"
 cp "${build_report_root}/build-manifest.txt" "${report_root}/build-manifest.txt"
@@ -340,6 +379,7 @@ cp "${build_report_root}/build-manifest.txt" "${report_root}/build-manifest.txt"
     done
     printf 'timezone=America/New_York\n'
     printf 'target_selectors=124,134,135\n'
+    printf 'require_exact=%s\n' "${require_exact}"
     . /etc/os-release
     printf 'container_os=%s\n' "${PRETTY_NAME}"
 } >"${report_root}/run-context.txt"
@@ -352,7 +392,12 @@ gzip -n -f "${report_root}/typed.stdout" "${report_root}/forced-legacy.stdout"
 )
 
 printf 'Structural validation: %s\n' "${structural_status}"
+printf 'Exact validation: %s\n' "${exact_status}"
+printf 'GO5 displayed-field differences: %s\n' "${go5_differences}"
 cat "${report_root}/summary.tsv"
 if [[ "${structural_status}" != PASS ]]; then
+    exit 1
+fi
+if [[ "${require_exact}" == 1 && "${exact_status}" != PASS ]]; then
     exit 1
 fi

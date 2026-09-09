@@ -10,7 +10,8 @@ module cm12_request_kernel
         cm12_solution_background, cm12_solution_is_loaded, &
         cm12_solution_multipole, cm12_accumulate_multipole
     use cm12_background_seam, only: &
-        cm12_evaluate_background, cm12_evaluate_initial_amplitudes
+        cm12_evaluate_background, cm12_evaluate_initial_amplitudes, &
+        cm12_evaluate_production_born_multipoles
     use cm12_non_cm12_seam, only: &
         cm12_background_grid_state, cm12_hadronic_trace, &
         cm12_prepare_non_cm12_multipoles
@@ -30,6 +31,8 @@ module cm12_request_kernel
 
     type, public :: cm12_prepared_background
         real(real32) :: born_multipoles( &
+            family_count, branch_count, partial_wave_count) = 0.0_real32
+        real(real32) :: production_born_multipoles( &
             family_count, branch_count, partial_wave_count) = 0.0_real32
         real(real32) :: opec_multipoles( &
             family_count, branch_count, partial_wave_count) = 0.0_real32
@@ -69,6 +72,8 @@ contains
 
         type(cm12_background_constants) :: constants
         type(cm12_kinematics) :: kinematics
+        real(real32) :: production_born_energy_mev
+        real(real32), parameter :: proton_mass_mev = 938.256_real32
 
         background = cm12_prepared_background()
         call cm12_solution_background( &
@@ -87,6 +92,13 @@ contains
         call cm12_calculate_kinematics( &
             request%reaction, request%photon_lab_energy_mev, &
             kinematics, status, message)
+        if (status /= cm12_ok) return
+        production_born_energy_mev = &
+            (kinematics%w_cm_mev**2 - proton_mass_mev**2) / &
+            (2.0_real32 * proton_mass_mev)
+        call cm12_evaluate_production_born_multipoles( &
+            constants, production_born_energy_mev, &
+            background%production_born_multipoles, status, message)
         if (status /= cm12_ok) return
         call cm12_prepare_non_cm12_multipoles( &
             solution, request%reaction, kinematics, &
@@ -165,6 +177,8 @@ contains
         end if
         if ( &
             any(.not. ieee_is_finite(background%born_multipoles)) .or. &
+            any(.not. ieee_is_finite( &
+                background%production_born_multipoles)) .or. &
             any(.not. ieee_is_finite(background%opec_multipoles)) .or. &
             any(.not. ieee_is_finite( &
                 real(background%initial_amplitudes, kind=real32))) .or. &
@@ -200,7 +214,7 @@ contains
                             dataset, form_selector, parameters, &
                             family, branch, orbital_l, &
                             result%kinematics%w_cm_mev, &
-                            background%born_multipoles( &
+                            background%production_born_multipoles( &
                                 family, branch, orbital_l + 1), &
                             multipole, status, message)
                         if (status /= cm12_ok) return

@@ -22,6 +22,7 @@ module cm12_background_seam
     public :: cm12_evaluate_born_multipoles
     public :: cm12_evaluate_background
     public :: cm12_evaluate_initial_amplitudes
+    public :: cm12_evaluate_production_born_multipoles
 
     interface
         subroutine prborn(energy, multipoles, form)
@@ -79,6 +80,34 @@ contains
         status = cm12_ok
         message = ''
     end subroutine cm12_evaluate_born_multipoles
+
+    subroutine cm12_evaluate_production_born_multipoles( &
+        constants, photon_lab_energy_mev, born_multipoles, status, message)
+        type(cm12_background_constants), intent(in) :: constants
+        real(real32), intent(in) :: photon_lab_energy_mev
+        real(real32), intent(out) :: born_multipoles(6, 2, 6)
+        integer, intent(out) :: status
+        character(len=*), intent(out) :: message
+
+        born_multipoles = 0.0_real32
+        if ( &
+            .not. ieee_is_finite(photon_lab_energy_mev) .or. &
+            photon_lab_energy_mev <= 0.0_real32) then
+            status = cm12_invalid_argument
+            message = 'Production Born energy must be finite and positive'
+            return
+        end if
+        if (.not. valid_constants(constants)) then
+            status = cm12_invalid_argument
+            message = 'Born/background constants must be finite'
+            return
+        end if
+
+        call set_legacy_constants(constants)
+        call prborn(photon_lab_energy_mev, born_multipoles, 5)
+        status = cm12_ok
+        message = ''
+    end subroutine cm12_evaluate_production_born_multipoles
 
     subroutine cm12_evaluate_background( &
         constants, photon_lab_energy_mev, angle_cm_deg, reaction, &
