@@ -232,7 +232,7 @@
 +                        call cm12_evaluate_multipole( &
 +                            dataset, form_selector, parameters, family, branch, &
 +                            orbital_l, current_kinematics%w_cm_mev, &
-+                            current_background%born_multipoles( &
++                            current_background%production_born_multipoles( &
 +                                family, branch, orbital_l + 1), &
 +                            multipole, grid_status, grid_message)
 +                        if (grid_status /= cm12_ok) then
@@ -447,4 +447,3 @@
     99 RETURN
        END
  C *****************************************************************
-
