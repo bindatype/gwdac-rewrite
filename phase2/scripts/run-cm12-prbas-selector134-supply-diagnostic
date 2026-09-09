@@ -202,7 +202,7 @@ awk -F '\t' -v OFS='\t' \
             "forced_reconstructed_energy", "forced_born_reconstructed", \
             "forced_opec_reconstructed", "forced_opec_original", \
             "forced_raw_real", "forced_raw_imag", "forced_return_real", \
-            "forced_return_imag", "request_exact", "w_exact", \
+            "forced_return_imag", "return_evaluated", "request_exact", "w_exact", \
             "reconstructed_energy_exact", "typed_roundtrip_exact", \
             "forced_roundtrip_exact", "born_exact", "original_opec_exact", \
             "raw_real_exact", "raw_imag_exact", "return_real_exact", \
@@ -211,19 +211,26 @@ awk -F '\t' -v OFS='\t' \
             k = order[position]
             selector = typed[k, 7]
             selector_rows[selector]++
+            should_return = (typed[k,3] < 3 ? typed[k,4] <= 4 : \
+                typed[k,4] != 3 && typed[k,4] != 4)
+            has_return = (seen_return[k] == 1)
             if (seen_typed[k] != 1 || seen_cmmwp[k] != 1 || \
-                seen_grid[k] != 1 || seen_return[k] != 1) structural++
+                seen_grid[k] != 1 || has_return != should_return) structural++
+            if (has_return) return_rows[selector]++
             request_exact = exact(typed[k, 8], cmmwp[k, 8])
             w_exact = exact(typed[k, 9], cmmwp[k, 9])
             reconstructed_exact = exact(typed[k, 10], cmmwp[k, 10])
             typed_roundtrip = exact(typed[k, 8], typed[k, 10])
             forced_roundtrip = exact(cmmwp[k, 8], cmmwp[k, 10])
-            born_exact = exact(typed[k, 11], cmmwp[k, 11])
+            born_exact = (selector == 124 ? "not-used" : \
+                exact(typed[k, 11], cmmwp[k, 11]))
             opec_exact = exact(typed[k, 12], grid[k, 11])
             raw_real_exact = exact(typed[k, 13], cmmwp[k, 13])
             raw_imag_exact = exact(typed[k, 14], cmmwp[k, 14])
-            return_real_exact = exact(typed[k, 15], returned[k, 14])
-            return_imag_exact = exact(typed[k, 16], returned[k, 15])
+            return_real_exact = (has_return ? \
+                exact(typed[k, 15], returned[k, 14]) : "not-evaluated")
+            return_imag_exact = (has_return ? \
+                exact(typed[k, 16], returned[k, 15]) : "not-evaluated")
             check["request", selector] += (request_exact == "yes")
             check["w", selector] += (w_exact == "yes")
             check["reconstructed", selector] += (reconstructed_exact == "yes")
@@ -241,7 +248,7 @@ awk -F '\t' -v OFS='\t' \
                 typed[k,15], typed[k,16], cmmwp[k,8], cmmwp[k,9], \
                 cmmwp[k,10], cmmwp[k,11], cmmwp[k,12], grid[k,11], \
                 cmmwp[k,13], cmmwp[k,14], returned[k,14], returned[k,15], \
-                request_exact, w_exact, reconstructed_exact, typed_roundtrip, \
+                (has_return ? "yes" : "no"), request_exact, w_exact, reconstructed_exact, typed_roundtrip, \
                 forced_roundtrip, born_exact, opec_exact, raw_real_exact, \
                 raw_imag_exact, return_real_exact, return_imag_exact
         }
@@ -250,8 +257,12 @@ awk -F '\t' -v OFS='\t' \
         for (selector_index = 1; selector_index <= 2; selector_index++) {
             selector = (selector_index == 1 ? 124 : 134)
             for (metric = 1; metric <= 11; metric++) {
+                denominator = selector_rows[selector]
+                if (name[metric] == "born" && selector == 124) denominator = 0
+                if (name[metric] == "return_real" || \
+                    name[metric] == "return_imag") denominator = return_rows[selector]
                 print name[metric], selector, check[name[metric], selector] + 0, \
-                    selector_rows[selector] + 0 >> summary
+                    denominator + 0 >> summary
             }
         }
         print "structural_key_errors", "all", structural + 0, 0 >> summary
@@ -305,9 +316,9 @@ readonly typed_go5_rows="$(($(wc -l <"${report_root}/typed-go5.tsv") - 1))"
 readonly forced_go5_rows="$(($(wc -l <"${report_root}/forced-legacy-go5.tsv") - 1))"
 
 structural_status=PASS
-if [[ "${typed_rows}" -ne 2660 || "${cmmwp_rows}" -ne 2660 || \
-    "${grid_rows}" -ne 2660 || "${return_rows}" -ne 2660 || \
-    "${comparison_rows}" -ne 2660 || "${structural_errors}" -ne 0 || \
+if [[ "${typed_rows}" -ne 4123 || "${cmmwp_rows}" -ne 4123 || \
+    "${grid_rows}" -ne 4123 || "${return_rows}" -ne 2660 || \
+    "${comparison_rows}" -ne 4123 || "${structural_errors}" -ne 0 || \
     "${typed_go5_rows}" -ne 1533 || "${forced_go5_rows}" -ne 1533 ]]; then
     structural_status=FAIL
 fi
